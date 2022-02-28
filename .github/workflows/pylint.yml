@@ -3,8 +3,8 @@ name: Pylint
 on:
   push:
      paths:
-      - 'be/**.py'
-      
+      - 'be/**/*.py'
+
 jobs:
   build:
     runs-on: self-hosted
