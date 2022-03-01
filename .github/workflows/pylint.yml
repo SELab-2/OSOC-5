@@ -1,26 +1,27 @@
-name: Pylint
+name: Pylint CI
 
 on:
   push:
      paths:
-      - 'be/**/*.py'
+      - 'be/osoc/**/*.py'
 
 jobs:
-  build:
+  lint:
     runs-on: self-hosted
     strategy:
-      matrix:
-        python-version: "3.9"
+      max-parallel: 4
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.9"
     - name: Install dependencies
+      working-directory: ./be
       run: |
         python -m pip install --upgrade pip
         pip install pylint
+        pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pylint --max-line-length=255 $(git ls-files 'be/osoc/**/*.py')
