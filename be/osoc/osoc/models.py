@@ -1,8 +1,7 @@
-from asyncio.windows_events import NULL
 import uuid
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
 
@@ -42,7 +41,7 @@ class Suggestion(models.Model):
         _('suggestion'),
         max_length=1,
         choices=Suggestion.choices,
-        default=NULL,
+        default=None,
     )
     reason = models.TextField(
         _('reason')
@@ -112,11 +111,11 @@ class Student(models.Model):
     )
     skills = models.ManyToManyField(
         Skill,
-        related_name="name",
+
     )
     suggestions = models.ForeignKey(
         Suggestion,
-        related_name='suggestion',
+
         on_delete=models.CASCADE,
         blank=True,
         null=True,
@@ -173,11 +172,10 @@ class Project(models.Model):
     )
     skills = models.ManyToManyField(
         Skill,
-        related_name="name"
     )
     students = models.ForeignKey(
         Student,
-        related_name=Student.get_full_name(),
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
@@ -214,11 +212,9 @@ class Coach(models.Model):
     )
     has_projects = models.ManyToManyField(
         Project,
-        related_name="name"
     )
     suggestions = models.ForeignKey(
         Suggestion,
-        related_name="suggestion",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
