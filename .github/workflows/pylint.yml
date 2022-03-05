@@ -1,10 +1,11 @@
 name: Pylint CI
 
 on:
-  push:
-     paths:
+  pull_request:
+    # branches:
+    #   - main
+    paths:
       - 'be/osoc/**/*.py'
-
 jobs:
   lint:
     runs-on: self-hosted
