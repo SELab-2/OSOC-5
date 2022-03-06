@@ -2,13 +2,19 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
 
-from osoc.osoc.models import Student
-from .serializers import UserSerializer, GroupSerializer, StudentSerializer
+from osoc.osoc.models import Student, Coach
+from .serializers import UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer
 
 
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class CoachViewSet(viewsets.ModelViewSet):
+    queryset = Coach.objects.all()
+    serializer_class = CoachSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
