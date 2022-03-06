@@ -7,12 +7,17 @@ from .serializers import UserSerializer, GroupSerializer, StudentSerializer, Coa
 
 
 class StudentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows students to be viewed or edited.
+    """
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
 class CoachViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows coaches to be viewed or edited.
+    """
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
     permission_classes = [permissions.IsAuthenticated]

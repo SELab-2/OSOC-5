@@ -1,14 +1,14 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from osoc.osoc.models import Coach, Student
+from osoc.osoc.models import Student, Coach, Student
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Student
-        fields = ['first_name', 'last_name']
-
+        fields = ['url', 'id', 'first_name', 'surname', 'email', 'phone_number', 'language',
+                  'extra_info', 'cv', 'portfolio', 'last_email_sent' ]
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
