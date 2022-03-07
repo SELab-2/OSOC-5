@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import { onMounted } from '@vue/runtime-core'
-import {useAuthUserStore} from "../stores/useAuthUserStore"
+import {useCoachStore} from "../stores/useCoachStore"
 
-const authUserStore = useAuthUserStore()
+const coachStore = useCoachStore()
 
 onMounted(() => {
-  authUserStore.loadUser(0);
+  coachStore.loadUsers();
 })
 </script>
 
 <template>
   <p>
-    FF {{ authUserStore.fullName }}
+    FF {{ coachStore.users }}
   </p>
 
   <p>
