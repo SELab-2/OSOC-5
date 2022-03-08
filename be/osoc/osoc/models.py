@@ -1,5 +1,6 @@
-import uuid
-
+"""
+Describes the database (PostgreSQL) models.
+"""
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
@@ -10,8 +11,12 @@ phone_regex = RegexValidator(
     message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
 )
 
-
 class Skill(models.Model):
+    """
+    Skill; A talent or ability of a Student.
+
+    Students can more than one skill (many-to-many relationship).
+    """
     name = models.CharField(
         _('name'),
         max_length=255,
@@ -22,8 +27,10 @@ class Skill(models.Model):
         max_length=255
     )
 
-
 class Student(models.Model):
+    """
+    Student; Person who would like to participate in an OSOC project.
+    """
     class Language(models.TextChoices):
         DUTCH = '0', _('Dutch')
         ENGLISH = '1', _('English')
@@ -35,8 +42,8 @@ class Student(models.Model):
         _('name'),
         max_length=255,
     )
-    surname = models.CharField(
-        _('surname'),
+    last_name = models.CharField(
+        _('last name'),
         max_length=255,
     )
     call_name = models.CharField(
@@ -91,16 +98,9 @@ class Student(models.Model):
         _("studies"),
         max_length=255
     )
-    """
-    other fields necessary?
-    from tally form: total degree years, current degree year, 
-    best skill, previously participated in osoc, willing to be student coach
-    """
-
-
     skills = models.ManyToManyField(
         Skill,
-        on_delete=models.CASCADE
+        # on_delete=models.CASCADE
     )
 
     def get_full_name(self):
@@ -108,7 +108,7 @@ class Student(models.Model):
         Returns the first_name plus the last_name, with a space in between.
         (method is required to implement by Django)
         """
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = f'{self.first_name} {self.last_name}'
         return full_name.strip()
 
     def clean(self):
@@ -136,13 +136,16 @@ class Student(models.Model):
 
 
 class Coach(models.Model):
-
+    """
+    Coach; Person who, together with other coaches, oversees
+           one or more projects.
+    """
     first_name = models.CharField(
         _('name'),
         max_length=255,
     )
-    surname = models.CharField(
-        _('surname'),
+    last_name = models.CharField(
+        _('last name'),
         max_length=255,
     )
     email = models.EmailField(
@@ -160,7 +163,7 @@ class Coach(models.Model):
     suggestions = models.ManyToManyField(
         Student,
         through='Suggestion',
-        on_delete=models.CASCADE,
+        # on_delete=models.CASCADE,
     )
 
     def get_full_name(self):
@@ -168,7 +171,7 @@ class Coach(models.Model):
         Returns the first_name plus the last_name, with a space in between.
         (method is required to implement by Django)
         """
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = f'{self.first_name} {self.last_name}'
         return full_name.strip()
 
     def clean(self):
@@ -194,9 +197,11 @@ class Coach(models.Model):
     def __str__(self):
         return self.get_full_name()
 
-
 class Project(models.Model):
-
+    """
+    Project; A project of a partner that needs skills (read: students)
+             and has a number of coaches.
+    """
     name = models.CharField(
         _('name'),
         max_length=255,
@@ -210,24 +215,21 @@ class Project(models.Model):
     )
     skills = models.ManyToManyField(
         Skill,
-        through='Project_needs_skills',
-        on_delete=models.CASCADE,
+        through='ProjectNeedsSkills',
+        # on_delete=models.CASCADE,
     )
     coaches = models.ManyToManyField(
         Coach,
-        on_delete=models.CASCADE,
+        # on_delete=models.CASCADE,
     )
 
     def __str__(self):
         return self.name
 
-
-class Project_needs_skills(models.Model):
+class ProjectNeedsSkills(models.Model):
     """
-    intermediary model
-    this is needed because an amount of this skill needed must be specified
+    Intermediary model; A project can need skill N times.
     """
-
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE
@@ -236,14 +238,16 @@ class Project_needs_skills(models.Model):
         Skill,
         on_delete=models.CASCADE
     )
-
     amount = models.PositiveSmallIntegerField(
         _('amount'),
         default=1,
     )
 
-
 class Suggestion(models.Model):
+    """
+    Suggestion; A coach can suggest whether he/she thinks a student
+                can be used.
+    """
     class Suggestion(models.TextChoices):
         YES = '0', _('Yes')
         NO = '1', _('No')
@@ -253,12 +257,10 @@ class Suggestion(models.Model):
         Student,
         on_delete=models.CASCADE
     )
-
     coach = models.ForeignKey(
         Coach,
         on_delete=models.CASCADE
     )
-
     suggestion = models.CharField(
         _('suggestion'),
         max_length=1,
@@ -274,20 +276,15 @@ class Suggestion(models.Model):
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
 
-
-class Project_suggestion(models.Model):
+class ProjectSuggestion(models.Model):
     """
-    intermediary model
-    a coach can suggest a student for a project
-    -> three way relation
+    Intermediary model; A coach can suggest a student for a project.
     """
-
     reason = models.TextField(
         _('reason'),
         blank=True,
         null=True
     )
-
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE
@@ -304,6 +301,6 @@ class Project_suggestion(models.Model):
         Skill,
         on_delete=models.CASCADE
     )
-    
+
     class Meta:
         unique_together = (("project", "student", "coach"),)
