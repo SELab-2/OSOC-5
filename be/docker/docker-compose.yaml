@@ -10,10 +10,11 @@ services:
       - postgres:/data/db
   be:
     container_name: osoc-be
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    build: 
+      context: ../
+      dockerfile: ./docker/Dockerfile
     volumes:
-      - .:/code
+      - ../:/src
     ports:
       - "8000:8000"
     depends_on:
