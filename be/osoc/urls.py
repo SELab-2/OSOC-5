@@ -28,6 +28,8 @@ router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'coaches', views.CoachViewSet)
 router.register(r'students', views.StudentViewSet)
+router.register(r'projects', views.ProjectViewSet)
+router.register(r'skills', views.SkillViewSet)
 
 schema_view = get_schema_view(
     openapi.Info(

@@ -49,7 +49,8 @@ class Student(models.Model):
     call_name = models.CharField(
         _('call name'),
         max_length=255,
-        default="",
+        null=True,
+        blank=True
     )
     email = models.EmailField(
         _('email address'),
@@ -84,7 +85,8 @@ class Student(models.Model):
     )
     last_email_sent = models.DateTimeField(
         _('last email sent'),
-        null=True
+        null=True,
+        blank=True
     )
     school_name = models.CharField(
         _("school name"),
@@ -153,7 +155,7 @@ class Coach(models.Model):
         max_length=255,
         unique=True,
     )
-    isAdmin = models.BooleanField(
+    is_admin = models.BooleanField(
         _('is admin'),
         default=False
     )
