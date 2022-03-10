@@ -1,11 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '/src/components/Home.vue'
+import SignupPage from "../components/SignupPage.vue";
+import LoginPage from "../components/LoginPage.vue";
+import NotFoundPage from "../components/NotFoundPage.vue";
 
 const routes = [
     {
+        path: '/signup',
+        name: 'Signup',
+        component: SignupPage,
+    },
+    {
         path: '/',
-        name: 'Home',
-        component: Home,
+        alias: '/login',
+        name: 'Login',
+        component: LoginPage,
+    },
+    {
+        path: "/:catchAll(.*)",
+        component: NotFoundPage,
     },
 ]
 

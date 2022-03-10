@@ -5,15 +5,16 @@
       class="q-px-md q-mb-lg"
       style="text-align: center; max-width: 500px; margin: 0 auto;"
   >
-    <h3 class="text-bold">Login</h3>
+    <h3 class="text-bold">Log In</h3>
+
     <q-input
         filled
         v-model="email"
         label="E-mail"
         lazy-rules
         :rules="[
-                            (val) => (val && val.length > 0) || 'Please enter your email address.',
-                        ]"
+           (val) => (val && val.length > 0) || 'Please enter your email address.',
+        ]"
     />
 
     <q-input
@@ -24,8 +25,8 @@
         label="Password"
         lazy-rules
         :rules="[
-                            (val) => (val && val.length > 0) || 'Please enter a password.',
-                        ]"
+           (val) => (val && val.length > 0) || 'Please enter a password.',
+        ]"
     >
       <template v-slot:append>
         <q-icon
@@ -36,11 +37,10 @@
       </template>
     </q-input>
     <label class="fpwd cursor-pointer underlined">Forgot your password?</label>
-    <br />
+    <br/>
 
     <div>
       <q-btn
-          rounded
           label="Log in"
           type="submit"
           size="md"
@@ -49,16 +49,16 @@
           class="q-mx-md"
       />
       <label class="text-bold">or</label>
-      <q-icon name="mdi-github" size="2.5em" class="q-mx-md cursor-pointer" />
-      <q-separator inset class="middle-sep q-my-md" />
-      <label class="underlined cursor-pointer q-my-md">Signup</label>
+      <q-icon name="mdi-github" size="2.5em" class="q-mx-md cursor-pointer"/>
+      <q-separator inset class="middle-sep q-my-md"/>
+      <router-link  class="underlined router-link" to="/signup">Sign Up</router-link>
     </div>
   </q-form>
 </template>
 
 <script>
-import { useQuasar } from 'quasar'
-import { ref } from 'vue'
+import {useQuasar} from 'quasar'
+import {ref} from 'vue'
 
 export default {
   setup() {
@@ -74,10 +74,9 @@ export default {
 
       onSubmit() {
         $q.notify({
-          color: 'green-4',
-          textColor: 'white',
-          icon: 'cloud_done',
-          message: 'Submitted',
+          icon: 'done',
+          color: 'positive',
+          message: 'Submitted'
         })
       },
 
@@ -93,6 +92,10 @@ export default {
 <style>
 .underlined {
   text-decoration: underline;
+}
+
+.router-link {
+  color: inherit;
 }
 
 .fpwd {
