@@ -20,8 +20,8 @@ class Migration(migrations.Migration):
                 ('first_name', models.CharField(max_length=255, verbose_name='name')),
                 ('last_name', models.CharField(max_length=255, verbose_name='last name')),
                 ('email', models.EmailField(max_length=255, unique=True, verbose_name='email address')),
-                ('isAdmin', models.BooleanField(default=False, verbose_name='is admin')),
-                ('last_email_sent', models.DateTimeField(verbose_name='last email sent')),
+                ('is_admin', models.BooleanField(default=False, verbose_name='is admin')),
+                ('last_email_sent', models.DateTimeField(null=True, verbose_name='last email sent')),
             ],
         ),
         migrations.CreateModel(
