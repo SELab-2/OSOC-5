@@ -1,9 +1,12 @@
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets, mixins, permissions
-
+from django.contrib.auth import login, logout
+from rest_framework import viewsets, mixins, permissions, views, status, generics
 from osoc.osoc.models import Skill, Student, Coach, Project
 from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer
+from rest_framework.response import Response
+from django.conf import settings
 
+from . import serializers
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
@@ -57,3 +60,29 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class LoginView(views.APIView):
+    # This view should be accessible also for unauthenticated users.
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = serializers.LoginSerializer(data=self.request.data,
+            context={ 'request': self.request })
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return Response(None, status=status.HTTP_202_ACCEPTED)
+
+class LogoutView(views.APIView):
+    def post(self, request):
+        logout(request)
+        return Response()
+
+class RegisterView(generics.CreateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (permissions.AllowAny,)
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        user.backend = settings.AUTHENTICATION_BACKENDS[0]
+        login(self.request, user)
