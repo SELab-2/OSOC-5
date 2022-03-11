@@ -90,13 +90,6 @@ export default {
 </script>
 
 <style>
-.underlined {
-  text-decoration: underline;
-}
-
-.router-link {
-  color: inherit;
-}
 
 .fpwd {
   float: right;
