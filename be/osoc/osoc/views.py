@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins, permissions, views, status, generics
 from osoc.osoc.models import Skill, Student, Coach, Project
-from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer
+from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, RegisterSerializer
 from rest_framework.response import Response
 from django.conf import settings
 
@@ -65,6 +65,10 @@ class LoginView(views.APIView):
     # This view should be accessible also for unauthenticated users.
     permission_classes = (permissions.AllowAny,)
 
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+
     def post(self, request, format=None):
         serializer = serializers.LoginSerializer(data=self.request.data,
             context={ 'request': self.request })
@@ -74,15 +78,28 @@ class LoginView(views.APIView):
         return Response(None, status=status.HTTP_202_ACCEPTED)
 
 class LogoutView(views.APIView):
-    def post(self, request):
+    permission_classes = (permissions.AllowAny,)
+
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+
+    def get(self, request):
         logout(request)
         return Response()
 
-class RegisterView(generics.CreateAPIView):
-    serializer_class = UserSerializer
-    permission_classes = (permissions.AllowAny,)
+class RegisterView(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
+    permission_classes = (permissions.IsAdminUser,)
 
-    def perform_create(self, serializer):
+    @classmethod
+    def get_extra_actions(cls):
+        return []
+        
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        user.backend = settings.AUTHENTICATION_BACKENDS[0]
-        login(self.request, user)
+        return Response({
+        "user": UserSerializer(user, context=self.get_serializer_context()).data
+        })

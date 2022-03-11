@@ -30,7 +30,6 @@ router.register(r'coaches', views.CoachViewSet)
 router.register(r'students', views.StudentViewSet)
 router.register(r'projects', views.ProjectViewSet)
 router.register(r'skills', views.SkillViewSet)
-
 schema_view = get_schema_view(
     openapi.Info(
         title="OSOC API",
@@ -50,6 +49,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('login/', views.LoginView.as_view()),
+    path('logout/', views.LogoutView.as_view()),
+    path('register/', views.RegisterView.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
