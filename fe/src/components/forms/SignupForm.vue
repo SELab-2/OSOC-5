@@ -2,8 +2,8 @@
   <q-form
       @submit="onSubmit"
       @reset="onReset"
-      class="q-px-md q-mb-lg"
-      style="text-align: center; max-width: 500px; margin: 0 auto;"
+      class="q-px-xl q-mb-lg"
+      style="text-align: center; max-width: 500px; margin: 0 auto; margin-top: 7em;"
   >
     <h2 style="font-weight: 800">Sign Up</h2>
 
@@ -91,14 +91,16 @@
           label="Sign up"
           type="submit"
           size="md"
-          color="white"
-          text-color="black"
+          color="primary"
           class="q-mx-md cornered"
       />
       <label class="text-bold">or</label>
-      <q-btn round color="black" class="q-mx-md cursor-pointer cornered">
-        <q-avatar size="35px" icon="mdi-github">
-        </q-avatar>
+      <q-btn
+       color="black" 
+       icon="mdi-github" 
+       label="Sign in via GitHub" 
+       class="q-mx-md cursor-pointer cornered"
+       >
       </q-btn>
       <q-separator inset class="middle-sep q-my-md sep"/>
       <router-link class="underlined router-link" to="/login">Log In</router-link>
@@ -171,8 +173,8 @@ export default {
 
 <style scoped>
 .sep {
-  margin-left: 13em;
-  margin-right: 13em;
+  margin-left: 10em;
+  margin-right: 10em;
 }
 
 

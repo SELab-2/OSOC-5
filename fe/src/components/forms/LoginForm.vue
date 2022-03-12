@@ -2,13 +2,12 @@
   <q-form
       @submit="onSubmit"
       @reset="onReset"
-      class="q-px-md q-mb-lg"
-      style="text-align: center; max-width: 500px; margin: 0 auto;"
+      class="q-px-xl q-mb-xs"
+      style="text-align: center; max-width:500px; margin: 0 auto;"
   >
     <h2  style="font-weight: 800">Sign In</h2>
 
     <q-input
-        bg-color="brandteal"
         outlined
         v-model="email"
         label="E-mail"
@@ -20,7 +19,6 @@
     />
 
     <q-input
-        bg-color="brandteal"
         class="shadowtest"
         outlined
         :type="isPwd ? 'password' : 'text'"
@@ -42,25 +40,29 @@
     <label class="fpwd cursor-pointer underlined">Forgot your password?</label>
     <br/>
 
-    <div>
+<!--     <div> -->
       <q-btn
-          color="test"
-          
+          color="primary"
           label="Sign in"
           type="submit"
           size="md"
-          text-color="black"
           class="q-mx-md cornered"
+          
       />
+<!--     <br/> -->
       <label class="text-bold">or</label>
-      <q-btn round color="black" class="q-mx-md cursor-pointer cornered">
-        <q-avatar size="35px" icon="mdi-github">
-        </q-avatar>
+<!--       <br/> -->
+      <q-btn
+       color="black" 
+       icon="mdi-github" 
+       label="Sign in via GitHub" 
+       class="q-mx-md cursor-pointer cornered"
+       >
       </q-btn>
       
       <q-separator class="sep middle-sep q-my-md"/>
       <router-link  class="underlined router-link" to="/signup">Sign Up</router-link>
-    </div>
+<!--     </div> -->
   </q-form>
 </template>
 
@@ -106,28 +108,16 @@ export default {
 
 <style scoped>
 .sep {
-  margin-left: 13em;
-  margin-right: 13em;
+  margin-left: 10em;
+  margin-right: 10em;
 }
 </style>
 
 <style>
 
-body {
-  background: #e8fff6;
-}
-
 .q-field__control {
   border-radius: 14px !important;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-}
-
-.bg-brandteal {
-  background: #f6fffb !important;
-}
-
-.bg-test {
-  background: #f0faf6 !important;
 }
 
 .cornered {
@@ -138,7 +128,7 @@ body {
   float: right;
   position: absolute;
   top: 250px;
-  right: 15px;
+  right: 50px;
   font-size: 80%;
 }
 </style>
