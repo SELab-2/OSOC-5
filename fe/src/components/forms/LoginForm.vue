@@ -45,15 +45,15 @@
     <div>
       <q-btn
           color="test"
-          rounded
+          
           label="Sign in"
           type="submit"
           size="md"
           text-color="black"
-          class="q-mx-md"
+          class="q-mx-md cornered"
       />
       <label class="text-bold">or</label>
-      <q-btn round color="black" class="q-mx-md cursor-pointer">
+      <q-btn round color="black" class="q-mx-md cursor-pointer cornered">
         <q-avatar size="35px" icon="mdi-github">
         </q-avatar>
       </q-btn>
@@ -87,7 +87,8 @@ export default {
       password,
       isPwd: ref(true),
 
-      onSubmit() {        $q.notify({
+      onSubmit() {
+        $q.notify({
           icon: 'done',
           color: 'positive',
           message: 'Submitted'
@@ -121,16 +122,9 @@ body {
   background: #e8fff6;
 }
 
-.q-field--outlined {
-  border-radius: 14px !important;
-}
-
 .q-field__control {
-  
   border-radius: 14px !important;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-/* box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px; */
-/*   box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px; */
 }
 
 .bg-brandteal {
@@ -141,10 +135,14 @@ body {
   background: #f0faf6 !important;
 }
 
+.cornered {
+  border-radius: 10px !important;
+}
+
 .fpwd {
   float: right;
   position: absolute;
-  top: 235px;
+  top: 250px;
   right: 15px;
   font-size: 80%;
 }
