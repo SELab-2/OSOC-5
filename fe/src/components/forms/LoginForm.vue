@@ -51,7 +51,7 @@
       <label class="text-bold">or</label>
       <q-icon name="mdi-github" size="2.5em" class="q-mx-md cursor-pointer"/>
       <q-separator inset class="middle-sep q-my-md"/>
-      <router-link  class="underlined router-link" to="/signup">Sign Up</router-link>
+      <router-link :to="{ name: 'Signup' }" :class="$q.dark.isActive ? 'text-white' : 'text-black'" >Sign Up</router-link>
     </div>
   </q-form>
 </template>

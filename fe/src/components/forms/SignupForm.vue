@@ -83,7 +83,7 @@
       </template>
     </q-input>
 
-    <q-toggle v-model="accept" label="I accept the license and terms" />
+    <q-checkbox right-label size="xs" v-model="accept" label="I accept the license and terms" />
 
     <br/>
 
@@ -99,7 +99,7 @@
       <label class="text-bold">or</label>
       <q-icon name="mdi-github" size="2.5em" class="q-mx-md cursor-pointer"/>
       <q-separator inset class="middle-sep q-my-md"/>
-      <router-link class="underlined router-link" to="/login">Log In</router-link>
+      <router-link :to="{ name: 'Login' }" :class="$q.dark.isActive ? 'text-white' : 'text-black'" >Log In</router-link>
     </div>
   </q-form>
 </template>
@@ -117,7 +117,7 @@ export default {
     const lastName = ref(null)
     const password = ref(null)
     const confirmPassword = ref(null)
-    const accept = ref(false)
+    const accept = ref(true)
 
     return {
       email,
