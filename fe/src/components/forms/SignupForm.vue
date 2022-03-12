@@ -106,6 +106,11 @@
 <script>
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
+import { useMeta } from 'quasar'
+
+const metaData = {
+  title: 'Sign Up',
+}
 
 export default {
   setup() {
@@ -117,6 +122,9 @@ export default {
     const password = ref(null)
     const confirmPassword = ref(null)
     const accept = ref(false)
+    
+    useMeta(metaData)
+    
 
     return {
       email,

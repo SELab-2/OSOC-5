@@ -67,6 +67,11 @@
 <script>
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
+import { useMeta } from 'quasar'
+
+const metaData = {
+  title: 'Sign In',
+}
 
 export default {
   setup() {
@@ -74,14 +79,15 @@ export default {
 
     const email = ref(null)
     const password = ref(null)
+    
+    useMeta(metaData)
 
     return {
       email,
       password,
       isPwd: ref(true),
 
-      onSubmit() {
-        $q.notify({
+      onSubmit() {        $q.notify({
           icon: 'done',
           color: 'positive',
           message: 'Submitted'
