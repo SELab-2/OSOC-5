@@ -1,3 +1,4 @@
+
 <template>
   <div class="row items-center absolute-full">
     <LightDarkButton />
@@ -17,9 +18,8 @@ import OsocLogo from "./tools/OsocLogo.vue";
 import { useMeta } from 'quasar';
 
 const metaData = {
-  title: 'Index Page',
   meta: {
-    themecolor: { name: 'theme-color', content: '#e8fff6'}
+    // themecolor: { name: 'theme-color', content: '#e8fff6'}
   }
 }
 

@@ -128,7 +128,7 @@ body {
 }
 
 .bg-brandteal {
-  background: #defff1 !important;
+  background: #f6fffb !important;
 }
 
 .bg-test {
