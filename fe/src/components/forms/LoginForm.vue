@@ -109,11 +109,6 @@ export default {
   margin-left: 13em;
   margin-right: 13em;
 }
-
-
-
-
-
 </style>
 
 <style>

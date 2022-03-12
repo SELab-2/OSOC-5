@@ -5,12 +5,12 @@
       class="q-px-md q-mb-lg"
       style="text-align: center; max-width: 500px; margin: 0 auto;"
   >
-    <h3 class="text-bold">Sign Up</h3>
+    <h2 style="font-weight: 800">Sign Up</h2>
 
     <div class="row" >
       <div class="q-pr-xs col-6">
         <q-input
-            filled
+            outlined
             v-model="firstName"
             label="First Name"
             lazy-rules
@@ -22,7 +22,7 @@
 
       <div class="q-pl-xs col-6">
         <q-input
-            filled
+            outlined
             v-model="lastName"
             label="Last Name"
             lazy-rules
@@ -34,7 +34,7 @@
     </div>
 
     <q-input
-        filled
+        outlined
         v-model="email"
         label="E-mail"
         type="email"
@@ -46,7 +46,7 @@
 
     <q-input
         class="move-up"
-        filled
+        outlined
         :type="isPwd ? 'password' : 'text'"
         v-model="password"
         label="Password"
@@ -65,7 +65,7 @@
     </q-input>
     <q-input
         class="move-up"
-        filled
+        outlined
         :type="isConfPwd ? 'password' : 'text'"
         v-model="confirmPassword"
         label="Confirm Password"
@@ -93,11 +93,14 @@
           size="md"
           color="white"
           text-color="black"
-          class="q-mx-md"
+          class="q-mx-md cornered"
       />
       <label class="text-bold">or</label>
-      <q-icon name="mdi-github" size="2.5em" class="q-mx-md cursor-pointer"/>
-      <q-separator inset class="middle-sep q-my-md"/>
+      <q-btn round color="black" class="q-mx-md cursor-pointer cornered">
+        <q-avatar size="35px" icon="mdi-github">
+        </q-avatar>
+      </q-btn>
+      <q-separator inset class="middle-sep q-my-md sep"/>
       <router-link class="underlined router-link" to="/login">Log In</router-link>
     </div>
   </q-form>
@@ -166,11 +169,23 @@ export default {
 }
 </script>
 
+<style scoped>
+.sep {
+  margin-left: 13em;
+  margin-right: 13em;
+}
+
+
+</style>
+
 <style>
 .underlined {
   text-decoration: underline;
 }
 
+.q-checkbox__bg {
+  border-radius: 6px !important;
+}
 .router-link {
   color: inherit;
 }
