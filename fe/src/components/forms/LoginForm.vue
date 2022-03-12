@@ -5,21 +5,24 @@
       class="q-px-md q-mb-lg"
       style="text-align: center; max-width: 500px; margin: 0 auto;"
   >
-    <h3 class="text-bold">Log In</h3>
+    <h2  style="font-weight: 800">Sign In</h2>
 
     <q-input
-        filled
+        bg-color="brandteal"
+        outlined
         v-model="email"
         label="E-mail"
         lazy-rules
+        class="inputfield"
         :rules="[
            (val) => (val && val.length > 0) || 'Please enter your email address.',
         ]"
     />
 
     <q-input
-        class="move-up"
-        filled
+        bg-color="brandteal"
+        class="shadowtest"
+        outlined
         :type="isPwd ? 'password' : 'text'"
         v-model="password"
         label="Password"
@@ -41,16 +44,21 @@
 
     <div>
       <q-btn
-          label="Log in"
+          color="test"
+          rounded
+          label="Sign in"
           type="submit"
           size="md"
-          color="white"
           text-color="black"
           class="q-mx-md"
       />
       <label class="text-bold">or</label>
-      <q-icon name="mdi-github" size="2.5em" class="q-mx-md cursor-pointer"/>
-      <q-separator inset class="middle-sep q-my-md"/>
+      <q-btn round color="black" class="q-mx-md cursor-pointer">
+        <q-avatar size="35px" icon="mdi-github">
+        </q-avatar>
+      </q-btn>
+      
+      <q-separator class="sep middle-sep q-my-md"/>
       <router-link  class="underlined router-link" to="/signup">Sign Up</router-link>
     </div>
   </q-form>
@@ -89,7 +97,43 @@ export default {
 }
 </script>
 
+<style scoped>
+.sep {
+  margin-left: 13em;
+  margin-right: 13em;
+}
+
+
+
+
+
+</style>
+
 <style>
+
+body {
+  background: #e8fff6;
+}
+
+.q-field--outlined {
+  border-radius: 14px !important;
+}
+
+.q-field__control {
+  
+  border-radius: 14px !important;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+/* box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px; */
+/*   box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px; */
+}
+
+.bg-brandteal {
+  background: #defff1 !important;
+}
+
+.bg-test {
+  background: #f0faf6 !important;
+}
 
 .fpwd {
   float: right;

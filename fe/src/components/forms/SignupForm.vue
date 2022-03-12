@@ -83,8 +83,7 @@
       </template>
     </q-input>
 
-    <q-toggle v-model="accept" label="I accept the license and terms" />
-
+    <q-checkbox v-model="accept" label="I accept the terms and conditions." />
     <br/>
 
     <div>
