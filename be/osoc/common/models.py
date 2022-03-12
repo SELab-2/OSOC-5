@@ -2,6 +2,8 @@
 Describes the database (PostgreSQL) models.
 """
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
@@ -10,6 +12,7 @@ phone_regex = RegexValidator(
     regex=r'^\+?1?\d{9,15}$',
     message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
 )
+
 
 class Skill(models.Model):
     """
@@ -26,11 +29,46 @@ class Skill(models.Model):
         max_length=255
     )
 
-class Coach(models.Model):
+
+class CoachManager(BaseUserManager):
+    """
+    Custom user model manager where email is the unique identifiers
+    for authentication instead of usernames.
+    """
+
+    def create_user(self, email, password, **extra_fields):
+        """
+        Create and save a User with the given email and password.
+        """
+        if not email:
+            raise ValueError(_('The Email must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        """
+        Create and save a SuperUser with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+        return self.create_user(email, password, **extra_fields)
+
+
+class Coach(AbstractUser):  # models.Model):
     """
     Coach; Person who, together with other coaches, oversees
            one or more projects.
     """
+    username = None
     first_name = models.CharField(
         _('name'),
         max_length=255,
@@ -53,6 +91,11 @@ class Coach(models.Model):
         blank=True,
         null=True
     )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CoachManager()
 
     def get_full_name(self):
         """
@@ -84,6 +127,7 @@ class Coach(models.Model):
 
     def __str__(self):
         return self.get_full_name()
+
 
 class Student(models.Model):
     """
@@ -198,6 +242,7 @@ class Student(models.Model):
     def __str__(self):
         return self.get_full_name()
 
+
 class Project(models.Model):
     """
     Project; A project of a partner that needs skills (read: students)
@@ -231,10 +276,11 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+
 class RequiredSkills(models.Model):
     """
-    Intermediary model; A project can need a skill N times.
-    """
+        Intermediary model; A project can need a skill N times.
+        """
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE
@@ -247,6 +293,7 @@ class RequiredSkills(models.Model):
         _('amount'),
         default=1,
     )
+
 
 class Suggestion(models.Model):
     """
@@ -282,6 +329,7 @@ class Suggestion(models.Model):
 
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
+
 
 class ProjectSuggestion(models.Model):
     """
