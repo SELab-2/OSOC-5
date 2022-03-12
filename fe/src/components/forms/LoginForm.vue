@@ -51,12 +51,10 @@
       />
 <!--     <br/> -->
       <label class="text-bold">or</label>
-<!--       <br/> -->
       
       <GitHubSignInButton/>
       <q-separator class="sep middle-sep q-my-md"/>
-      <router-link  class="underlined router-link" to="/signup">Sign Up</router-link>
-<!--     </div> -->
+      <router-link :to="{ name: 'Signup' }" :class="$q.dark.isActive ? 'text-white' : 'text-black'" >Sign Up</router-link>
   </q-form>
 </template>
 

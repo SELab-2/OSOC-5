@@ -98,7 +98,7 @@
       <GitHubSignInButton/>
       
       <q-separator inset class="middle-sep q-my-md sep"/>
-      <router-link class="underlined router-link" to="/login">Log In</router-link>
+      <router-link :to="{ name: 'Login' }" :class="$q.dark.isActive ? 'text-white' : 'text-black'" >Log In</router-link>
     </div>
   </q-form>
 </template>
