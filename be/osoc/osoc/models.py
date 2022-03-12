@@ -270,7 +270,6 @@ class Suggestion(models.Model):
         _('suggestion'),
         max_length=1,
         choices=Suggestion.choices,
-        default=None,
     )
     reason = models.TextField(
         _('reason'),

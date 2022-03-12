@@ -1,16 +1,14 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from osoc.osoc.models import Project, ProjectNeedsSkills, Student, Coach, Skill
+from osoc.osoc.models import Project, ProjectNeedsSkills, Student, Coach, Skill, Suggestion
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Student
         fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 'phone_number', 'language',
-                  'extra_info', 'cv', 'portfolio', 'school_name', 'degree', 'studies', 'skills']
-
-    
+                  'extra_info', 'cv', 'portfolio', 'school_name', 'degree', 'studies', 'skills', 'suggestions']
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -38,10 +36,20 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         coaches = validated_data.pop('coaches')
         project = Project.objects.create(**validated_data)
         project.coaches.set(coaches)
-        for skill_data in skills:
-            skill = skill_data.pop('skill')
-            ProjectNeedsSkills.objects.create(project=project, skill=skill)
+        for skill in skills:
+            print(skill['skill'].name)
+            print('type: ', type(skill['skill']))
+            ProjectNeedsSkills.objects.create(project=project, skill=skill['skill'].name, amount=1)
         return project
+
+class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Suggestion
+        fields = ['suggestion', 'reason', 'coach']
+    
+    def create(self, validated_data, student):
+        suggestion = Suggestion.objects.create(student=student, **validated_data)
+        return suggestion
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
