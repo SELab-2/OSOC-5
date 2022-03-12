@@ -2,6 +2,8 @@
 Describes the database (PostgreSQL) models.
 """
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
@@ -10,6 +12,7 @@ phone_regex = RegexValidator(
     regex=r'^\+?1?\d{9,15}$',
     message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
 )
+
 
 class Skill(models.Model):
     """
@@ -26,6 +29,106 @@ class Skill(models.Model):
         _('description'),
         max_length=255
     )
+
+
+class CoachManager(BaseUserManager):
+    """
+    Custom user model manager where email is the unique identifiers
+    for authentication instead of usernames.
+    """
+
+    def create_user(self, email, password, **extra_fields):
+        """
+        Create and save a User with the given email and password.
+        """
+        if not email:
+            raise ValueError(_('The Email must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        """
+        Create and save a SuperUser with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+        return self.create_user(email, password, **extra_fields)
+
+
+class Coach(AbstractUser):  # models.Model):
+    """
+    Coach; Person who, together with other coaches, oversees
+           one or more projects.
+    """
+    username = None
+    first_name = models.CharField(
+        _('name'),
+        max_length=255,
+    )
+    last_name = models.CharField(
+        _('last name'),
+        max_length=255,
+    )
+    email = models.EmailField(
+        _('email address'),
+        max_length=255,
+        unique=True,
+    )
+    is_admin = models.BooleanField(
+        _('is admin'),
+        default=False
+    )
+    last_email_sent = models.DateTimeField(
+        _('last email sent'),
+        blank=True,
+        null=True
+    )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CoachManager()
+
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        (method is required to implement by Django)
+        """
+        full_name = f'{self.first_name} {self.last_name}'
+        return full_name.strip()
+
+    def clean(self):
+        """
+        Will be called before saving.
+        """
+        # strip first name and last name
+        self.first_name = self.first_name.strip()
+        self.last_name = self.last_name.strip()
+
+        # strip email and transform it to lowercase
+        self.email = strip_and_lower_email(self.email)
+
+    def save(self, *args, **kwargs):
+        """
+        Custom save method that calls the full_clean method.
+        See https://docs.djangoproject.com/en/dev/ref/models/instances/
+        #django.db.models.Model.clean_fields
+        """
+        self.full_clean()
+        super(Coach, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.get_full_name()
+
 
 class Student(models.Model):
     """
@@ -137,67 +240,68 @@ class Student(models.Model):
         return self.get_full_name()
 
 
-class Coach(models.Model):
-    """
-    Coach; Person who, together with other coaches, oversees
-           one or more projects.
-    """
-    first_name = models.CharField(
-        _('name'),
-        max_length=255,
-    )
-    last_name = models.CharField(
-        _('last name'),
-        max_length=255,
-    )
-    email = models.EmailField(
-        _('email address'),
-        max_length=255,
-        unique=True,
-    )
-    is_admin = models.BooleanField(
-        _('is admin'),
-        default=False
-    )
-    last_email_sent = models.DateTimeField(
-        _('last email sent')
-    )
-    suggestions = models.ManyToManyField(
-        Student,
-        through='Suggestion',
-        # on_delete=models.CASCADE,
-    )
+# class Coach(models.Model):
+#     """
+#     Coach; Person who, together with other coaches, oversees
+#            one or more projects.
+#     """
+#     first_name = models.CharField(
+#         _('name'),
+#         max_length=255,
+#     )
+#     last_name = models.CharField(
+#         _('last name'),
+#         max_length=255,
+#     )
+#     email = models.EmailField(
+#         _('email address'),
+#         max_length=255,
+#         unique=True,
+#     )
+#     is_admin = models.BooleanField(
+#         _('is admin'),
+#         default=False
+#     )
+#     last_email_sent = models.DateTimeField(
+#         _('last email sent')
+#     )
+#     suggestions = models.ManyToManyField(
+#         Student,
+#         through='Suggestion',
+#         # on_delete=models.CASCADE,
+#     )
 
-    def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        (method is required to implement by Django)
-        """
-        full_name = f'{self.first_name} {self.last_name}'
-        return full_name.strip()
+#     def get_full_name(self):
+#         """
+#         Returns the first_name plus the last_name, with a space in between.
+#         (method is required to implement by Django)
+#         """
+#         full_name = f'{self.first_name} {self.last_name}'
+#         return full_name.strip()
 
-    def clean(self):
-        """
-        Will be called before saving.
-        """
-        # strip first name and last name
-        self.first_name = self.first_name.strip()
-        self.last_name = self.last_name.strip()
+#     def clean(self):
+#         """
+#         Will be called before saving.
+#         """
+#         # strip first name and last name
+#         self.first_name = self.first_name.strip()
+#         self.last_name = self.last_name.strip()
 
-        # strip email and transform it to lowercase
-        self.email = strip_and_lower_email(self.email)
+#         # strip email and transform it to lowercase
+#         self.email = strip_and_lower_email(self.email)
 
-    def save(self, *args, **kwargs):
-        """
-        Custom save method that calls the full_clean method.
-        See https://docs.djangoproject.com/en/dev/ref/models/instances/
-        #django.db.models.Model.clean_fields
-        """
-        self.full_clean()
-        super(Student, self).save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         """
+#         Custom save method that calls the full_clean method.
+#         See https://docs.djangoproject.com/en/dev/ref/models/instances/
+#         #django.db.models.Model.clean_fields
+#         """
+#         self.full_clean()
+#         super(Student, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return self.get_full_name()
+#     def __str__(self):
+#         return self.get_full_name()
+
 
 class Project(models.Model):
     """
@@ -228,6 +332,7 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+
 class ProjectNeedsSkills(models.Model):
     """
     Intermediary model; A project can need skill N times.
@@ -244,6 +349,7 @@ class ProjectNeedsSkills(models.Model):
         _('amount'),
         default=1,
     )
+
 
 class Suggestion(models.Model):
     """
@@ -277,6 +383,7 @@ class Suggestion(models.Model):
 
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
+
 
 class ProjectSuggestion(models.Model):
     """

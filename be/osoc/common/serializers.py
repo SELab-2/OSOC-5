@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
-from osoc.osoc.models import Project, Student, Coach, Skill
+from osoc.common.models import Project, Student, Coach, Skill
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -11,15 +11,19 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 'phone_number', 'language',
                   'extra_info', 'cv', 'portfolio', 'school_name', 'degree', 'studies', 'skills']
 
+
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin']
 
+
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Project
-        fields = ['url', 'id', 'name', 'partner_name', 'extra_info', 'skills', 'coaches']
+        fields = ['url', 'id', 'name', 'partner_name',
+                  'extra_info', 'skills', 'coaches']
+
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -29,13 +33,15 @@ class SkillSerializer(serializers.HyperlinkedModelSerializer):
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
+        model = Coach
         fields = ['url', 'username', 'email', 'groups']
+
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
         fields = ['url', 'name']
+
 
 class LoginSerializer(serializers.Serializer):
     """
@@ -77,13 +83,15 @@ class LoginSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Coach
         fields = ('id', 'username', 'email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
+        user = Coach.objects.create_user(
+            validated_data['username'], validated_data['email'], validated_data['password'])
 
         return user
