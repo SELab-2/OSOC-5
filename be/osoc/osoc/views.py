@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
 
-from osoc.osoc.models import Skill, Student, Coach, Project
+from osoc.osoc.models import Skill, Student, Coach, Project, Suggestion
 from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, SuggestionSerializer
 
 
@@ -16,18 +16,19 @@ class StudentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
-    def add_suggestion(self, request, pk=None):
-        student = self.get_object()
+    def make_suggestion(self, request, pk=None):
+        """
+        lets a coach make a suggestion for the current student
+        if the coach has already made a suggestion for this student, it is updated
+        """
         serializer = SuggestionSerializer(data=request.data, context={'request': request})
-        print(request.data)
         if serializer.is_valid():
-            print(serializer.data)
-
-            coach = serializer.data.pop('coach')
-            print('coach', coach) # this is a url, should be a Coach object
-            serializer.create(serializer.data, student=student)
-            # student.suggestions.add(serializer) TODO
-            return Response(serializer.data)
+            data = serializer.data
+            coach_url = data.pop('coach')
+            coach = Coach.objects.filter(id=coach_url.split('/')[-2])[0] # TODO coach must be current user
+            student = self.get_object()
+            _, created = Suggestion.objects.update_or_create(student=student, coach=coach, defaults=data)
+            return Response({"suggestion": serializer.data, "status": "created" if created else "updated"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CoachViewSet(viewsets.ModelViewSet):

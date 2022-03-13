@@ -15,12 +15,11 @@ class Skill(models.Model):
     """
     Skill; A talent or ability of a Student.
 
-    Students can more than one skill (many-to-many relationship).
+    Students can have more than one skill (many-to-many relationship).
     """
     name = models.CharField(
         _('name'),
-        max_length=255,
-        primary_key=True
+        max_length=255
     )
     description = models.CharField(
         _('description'),
@@ -161,12 +160,11 @@ class Student(models.Model):
     )
     skills = models.ManyToManyField(
         Skill,
-        # on_delete=models.CASCADE
     )
     suggestions = models.ManyToManyField(
         Coach,
         through='Suggestion',
-        # on_delete=models.CASCADE,
+        blank=True
     )
 
     def get_full_name(self):
@@ -216,24 +214,21 @@ class Project(models.Model):
     extra_info = models.TextField(
         _('extra info'),
     )
-    skills = models.ManyToManyField(
+    required_skills = models.ManyToManyField(
         Skill,
-        through='ProjectNeedsSkills',
-        # on_delete=models.CASCADE,
+        through='RequiredSkills',
     )
     coaches = models.ManyToManyField(
         Coach,
-        blank=True,
-        null=True
-        # on_delete=models.CASCADE,
+        blank=True
     )
 
     def __str__(self):
         return self.name
 
-class ProjectNeedsSkills(models.Model):
+class RequiredSkills(models.Model):
     """
-    Intermediary model; A project can need skill N times.
+    Intermediary model; A project can need a skill N times.
     """
     project = models.ForeignKey(
         Project,
@@ -277,6 +272,9 @@ class Suggestion(models.Model):
         null=True
     )
 
+    class Meta:
+        unique_together = (("student", "coach"),)
+
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
 
@@ -307,4 +305,4 @@ class ProjectSuggestion(models.Model):
     )
 
     class Meta:
-        unique_together = (("project", "student", "coach"),)
+        unique_together = (("project", "student", "coach"))

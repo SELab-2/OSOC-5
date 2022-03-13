@@ -1,10 +1,16 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from osoc.osoc.models import Project, ProjectNeedsSkills, Student, Coach, Skill, Suggestion
+from osoc.osoc.models import Project, RequiredSkills, Student, Coach, Skill, Suggestion
 
+
+class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Suggestion
+        fields = ['suggestion', 'reason', 'coach']
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    suggestions = SuggestionSerializer(many=True, source='suggestion_set', required=False)
     class Meta:
         model = Student
         fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 'phone_number', 'language',
@@ -20,36 +26,25 @@ class SkillSerializer(serializers.HyperlinkedModelSerializer):
         model = Skill
         fields = ['url', 'name', 'description']
 
-class ProjectNeedsSkillsSerializer(serializers.HyperlinkedModelSerializer):
+class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = ProjectNeedsSkills
+        model = RequiredSkills
         fields = ['amount', 'skill']
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
-    skills = ProjectNeedsSkillsSerializer(many=True)
+    required_skills = RequiredSkillsSerializer(many=True, source='requiredskills_set')
     class Meta:
         model = Project
-        fields = ['url', 'id', 'name', 'partner_name', 'extra_info', 'skills', 'coaches']
+        fields = ['url', 'id', 'name', 'partner_name', 'extra_info', 'required_skills', 'coaches']
     
     def create(self, validated_data):
-        skills = validated_data.pop('skills')
+        skills_data = validated_data.pop('requiredskills_set')
         coaches = validated_data.pop('coaches')
         project = Project.objects.create(**validated_data)
         project.coaches.set(coaches)
-        for skill in skills:
-            print(skill['skill'].name)
-            print('type: ', type(skill['skill']))
-            ProjectNeedsSkills.objects.create(project=project, skill=skill['skill'].name, amount=1)
+        for skill_data in skills_data:
+            RequiredSkills.objects.create(project=project, **skill_data)
         return project
-
-class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Suggestion
-        fields = ['suggestion', 'reason', 'coach']
-    
-    def create(self, validated_data, student):
-        suggestion = Suggestion.objects.create(student=student, **validated_data)
-        return suggestion
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
