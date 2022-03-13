@@ -1,31 +1,36 @@
 <template>
     <div class="">
-        <q-toolbar class="bg-white text-secondary shadow-2">
+        <q-toolbar class="bg-secondary text-white shadow-2">
             <q-btn flat round>
                 <q-avatar size="42px">
                     <img src="../assets/logo.svg">
                  </q-avatar>
             </q-btn>
-              <q-space />
+            <div class="text-subtitle1 q-mx-md"><b>Selection Tool</b></div>
+            
+
               
-              <q-tabs v-model="tab" shrink>
-                <q-tab name="students" label="Select Students" />
+              <q-tabs class="absolute-center" v-model="tab" shrink>
+                <q-tab name="students" label="Students" />
                 <q-tab name="projects" label="Projects" />
-                <q-tab name="users" label="Manage Users" />
+                <q-tab name="users" label="Users" />
               </q-tabs>
             <q-space />
             <q-btn-dropdown flat rounded icon="mdi-account">
-                <q-list>
-                    <q-item v-for="(item, index) in items" :key="`${index}`" clickable v-close-popup tabindex="0">
-                        <q-item-section>
-                          <q-icon size="md" :name="`${item.icon}`" color="primary"/>
+              <div class="row items-center q-my-sm">
+              <q-avatar class="q-ml-sm" size="40px">
+                <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              </q-avatar>
+                <div class="text-subtitle1 q-mx-md">{{user.name}}</div>
+              </div>
+                <q-separator />
+                <q-list separator>
+                    <q-item v-for="(item, index) in dropdownitems" :key="`${index}`" clickable v-close-popup tabindex="0">
+                        <q-item-section avatar>
+                          <q-icon size="xs" :name="`${item.icon}`" color="primary"/>
                         </q-item-section>
                         <q-item-section>
-                          <q-item-label>{{item.name}}</q-item-label> 
-                          <q-item-label caption>February 22, 2016</q-item-label>
-                        </q-item-section>
-                        <q-item-section side>
-                          <q-icon name="info" />
+                          <q-item-label :lines="1" >{{item.name}}</q-item-label> 
                         </q-item-section>
                       </q-item>
                 </q-list>
@@ -42,7 +47,10 @@ import { ref } from 'vue'
 export default {
     data() {
         return {
-            items: [
+            user: {
+              name: 'Miet Claeys'
+            },
+            dropdownitems: [
               {
                   name: 'Email Templates',
                   icon: 'email'
