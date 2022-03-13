@@ -1,7 +1,20 @@
 <template>
     <div class="q-pa-md q-gutter-md">
         <div id="q-app" style="min-height: 100vh">
+            
             <div class="q-ma-sm">
+                <div class="row q-mb-md vertical-middle">
+                <h class="text-bold text-h4">Users</h>
+                <q-space/>
+                    <q-btn
+                        flat
+                      color="secondary"
+                      icon-right="archive"
+                      label="Export to csv"
+                      no-caps
+                      @click="exportTable"
+                    />
+                </div>
                 <q-table
                     class="usertable"
                     :rows="users"
@@ -11,6 +24,7 @@
                     hide-pagination
                     separator=""
                 >
+                
                     <template v-slot:body="props">
                         <q-tr
                             :class="props.rowIndex % 2 == 0 ? 'bg-accent' : ''"
@@ -71,6 +85,27 @@
 
 <script>
 import { ref, computed } from 'vue'
+import { exportFile } from 'quasar'
+
+function wrapCsvValue (val, formatFn) {
+  let formatted = formatFn !== void 0
+    ? formatFn(val)
+    : val
+
+  formatted = formatted === void 0 || formatted === null
+    ? ''
+    : String(formatted)
+
+  formatted = formatted.split('"').join('""')
+  /**
+   * Excel accepts \n and \r in strings, but some other CSV parsers do not
+   * Uncomment the next two lines to escape new lines
+   */
+  // .split('\n').join('\\n')
+  // .split('\r').join('\\r')
+
+  return `"${formatted}"`
+}
 
 const columns = [
     {
@@ -104,11 +139,7 @@ const columns = [
         field: 'email',
         sortable: true,
     },
-    {
-        name: 'delete',
-        align: 'center',
-        sortable: false,
-    },
+    
 ]
 
 const roles = ['admin', 'coach', 'disabled']
@@ -197,12 +228,40 @@ export default {
             ],
         }
     },
+    methods: {
+       exportTable () {
+           // naive encoding to csv format
+           const content = [columns.map(col => wrapCsvValue(col.label))].concat(
+             this.users.map(row => columns.map(col => wrapCsvValue(
+               typeof col.field === 'function'
+                 ? col.field(row)
+                 : row[ col.field === void 0 ? col.name : col.field ],
+               col.format
+             )).join(','))
+           ).join('\r\n')
+       
+           const status = exportFile(
+             'table-export.csv',
+             content,
+             'text/csv'
+           )
+       
+           if (status !== true) {
+             $q.notify({
+               message: 'Browser denied file download...',
+               color: 'negative',
+               icon: 'warning'
+             })
+           }
+         } 
+    },
     setup() {
         return {
             active: ref(true),
             columns,
             roles,
             pagination,
+            
         }
     },
     created: function () {
