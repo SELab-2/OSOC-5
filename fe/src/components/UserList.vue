@@ -3,20 +3,26 @@
         <div id="q-app" style="min-height: 100vh">
             <div class="q-ma-sm">
                 <q-table
+                    class="usertable"
                     :rows="users"
                     :columns="columns"
                     row-key="id"
                     v-model:pagination="pagination"
                     hide-pagination
+                    separator=""
                 >
                     <template v-slot:body="props">
                         <q-tr
-                            :class="props.rowIndex%2 == 0 ? 'bg-accent' : ''"
+                            :class="props.rowIndex % 2 == 0 ? 'bg-accent' : ''"
                             :props="props"
                         >
-                            <q-td key="name" @click="console.log(props)" :props="props">{{
-                                props.row.name
-                            }}</q-td>
+                            <q-td
+                                key="name"
+                                @click="console.log(props)"
+                                :props="props"
+                            >
+                                {{ props.row.name }}
+                            </q-td>
                             <q-td key="role" :props="props">
                                 <q-select
                                     borderless
@@ -30,6 +36,9 @@
                                     behavior="menu"
                                 />
                             </q-td>
+                            <q-td key="assignedto" :props="props">{{
+                                props.row.assignedto
+                            }}</q-td>
                             <q-td key="email" :props="props">{{
                                 props.row.email
                             }}</q-td>
@@ -50,7 +59,9 @@
                         v-model="pagination.page"
                         color="grey-8"
                         :max="pagesNumber"
-                        size="sm"
+                        size="md"
+                        active-color="secondary"
+                        style="border-radius: 20px"
                     />
                 </div>
             </div>
@@ -79,6 +90,14 @@ const columns = [
         sortable: true,
     },
     {
+        name: 'assignedto',
+        required: false,
+        label: 'Assigned To',
+        align: 'left',
+        field: 'assignedto',
+        sortable: true,
+    },
+    {
         name: 'email',
         align: 'right',
         label: 'Email',
@@ -97,7 +116,7 @@ let pagination = ref({
     sortBy: 'desc',
     descending: false,
     page: 1,
-    rowsPerPage: 5,
+    rowsPerPage: 6,
     // rowsNumber: xx if getting data from a server
 })
 export default {
@@ -134,24 +153,28 @@ export default {
                     name: 'Lander Saerens',
                     email: 'lander.saerens@ugent.be',
                     role: ref('coach'),
+                    assignedto: 'Project #1',
                 },
                 {
                     id: 1237,
                     name: 'Friedrich Vandenberghe',
                     email: 'friedrich.vandenberghe@ugent.be',
                     role: ref('coach'),
+                    assignedto: 'Project #2',
                 },
                 {
                     id: 1238,
                     name: 'Miet Claeys',
                     email: 'miet@osoc.be',
                     role: ref('coach'),
+                    assignedto: 'Project #3',
                 },
                 {
                     id: 1239,
                     name: 'Wouter Hennen',
                     email: 'wouter.hennen@ugent.be',
                     role: ref('coach'),
+                    assignedto: 'Project #1',
                 },
                 {
                     id: 1230,
@@ -182,7 +205,24 @@ export default {
             pagination,
         }
     },
+    created: function () {
+        document.body.style.backgroundColor = '#FAFAFA'
+    },
+    destroyed: function () {
+        document.body.style.backgroundColor = null
+    },
 }
 </script>
 
-<style></style>
+<style>
+.q-btn--rectangle {
+    border-radius: 10px !important;
+}
+</style>
+
+<style scoped>
+.usertable {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    border-radius: 20px;
+}
+</style>
