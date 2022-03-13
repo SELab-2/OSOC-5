@@ -1,15 +1,17 @@
 <template>
     <div class="">
-        <q-toolbar class="bg-secondary text-white shadow-2">
+      <q-layout view="hHh lpR fFf">
+      <q-header elevated class="bg-primary text-white" height-hint="98">
+          <q-toolbar class="bg-secondary text-white shadow-2">
             <q-btn flat round>
                 <q-avatar size="42px">
                     <img src="../assets/logo.svg">
                  </q-avatar>
             </q-btn>
-            <div class="text-subtitle1 q-mx-md"><b>Selection Tool</b></div>
+            <q-toolbar-title><b>Selection Tool</b></q-toolbar-title>
             
 
-              
+            <q-space />
               <q-tabs class="absolute-center" v-model="tab" shrink>
                 <q-tab name="students" label="Students" />
                 <q-tab name="projects" label="Projects" />
@@ -36,6 +38,8 @@
                 </q-list>
             </q-btn-dropdown>
         </q-toolbar>
+      </q-header>
+      </q-layout>
     </div>
 </template>
 
@@ -74,5 +78,5 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 </style>

@@ -3,7 +3,7 @@ import App from './App.vue'
 // @ts-ignore
 import router from './router'
 import { createPinia } from 'pinia'
-import { Quasar, Notify } from 'quasar'
+import { Quasar, Notify, Meta } from 'quasar'
 import '@quasar/extras/roboto-font-latin-ext/roboto-font-latin-ext.css'
 import '@quasar/extras/material-icons/material-icons.css'
 import '@quasar/extras/material-icons-outlined/material-icons-outlined.css'
@@ -16,5 +16,12 @@ import 'quasar/src/css/index.sass'
 createApp(App)
     .use(createPinia())
     .use(router)
-    .use(Quasar, { plugins: { Notify }, config: { notify: {} } })
+    .use(Quasar, 
+        { 
+            plugins: { Notify, Meta }, 
+            config: { 
+                notify: {}
+            }
+        }
+    )
     .mount('#app')
