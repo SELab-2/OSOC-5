@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from osoc.osoc.models import Project, RequiredSkills, Student, Coach, Skill, Suggestion
+from osoc.osoc.models import Project, RequiredSkills, Student, Coach, Skill, Suggestion, ProjectSuggestion
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,13 +31,20 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
         model = RequiredSkills
         fields = ['amount', 'skill']
 
+class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['student', 'coach', 'role', 'reason']
+
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     required_skills = RequiredSkillsSerializer(many=True, source='requiredskills_set')
+    suggested_students = ProjectSuggestionSerializer(many=True, source='projectsuggestion_set', required=False)
     class Meta:
         model = Project
-        fields = ['url', 'id', 'name', 'partner_name', 'extra_info', 'required_skills', 'coaches']
+        fields = ['url', 'id', 'name', 'partner_name', 'extra_info', 'required_skills', 'coaches', 'suggested_students']
     
     def create(self, validated_data):
+        validated_data.pop('projectsuggestion_set') # ignore this field
         skills_data = validated_data.pop('requiredskills_set')
         coaches = validated_data.pop('coaches')
         project = Project.objects.create(**validated_data)

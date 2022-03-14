@@ -222,6 +222,11 @@ class Project(models.Model):
         Coach,
         blank=True
     )
+    suggested_students = models.ManyToManyField(
+        Student,
+        through='ProjectSuggestion',
+        blank=True
+    )
 
     def __str__(self):
         return self.name

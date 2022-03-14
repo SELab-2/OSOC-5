@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
 
-from osoc.osoc.models import Skill, Student, Coach, Project, Suggestion
-from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, SuggestionSerializer
+from osoc.osoc.models import Skill, Student, Coach, Project, Suggestion, ProjectSuggestion
+from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, SuggestionSerializer, ProjectSuggestionSerializer
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -28,7 +28,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             coach = Coach.objects.filter(id=coach_url.split('/')[-2])[0] # TODO coach must be current user
             student = self.get_object()
             _, created = Suggestion.objects.update_or_create(student=student, coach=coach, defaults=data)
-            return Response({"suggestion": serializer.data, "status": "created" if created else "updated"})
+            return Response({"data": serializer.data, "status": "created" if created else "updated"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CoachViewSet(viewsets.ModelViewSet):
@@ -46,6 +46,34 @@ class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
+    def suggest_student(self, request, pk=None):
+        serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            data = serializer.data
+            coach_url = data.pop('coach')
+            coach = Coach.objects.filter(id=coach_url.split('/')[-2])[0] # TODO coach must be current user
+            student_url = data.pop('student')
+            student = Student.objects.filter(id=student_url.split('/')[-2])[0] # probably not the right way to do this
+            skill_url = data.pop('role')
+            skill = Skill.objects.filter(id=skill_url.split('/')[-2])[0] # probably not the right way to do this
+            data['role'] = skill
+            _, created = ProjectSuggestion.objects.update_or_create(project=self.get_object(), student=student, coach=coach, defaults=data)
+            return Response({"data": serializer.data, "status": "created" if created else "updated"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
+    def remove_student(self, request, pk=None):
+        serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            coach_url = serializer.data.pop('coach')
+            coach = Coach.objects.filter(id=coach_url.split('/')[-2])[0] # probably not the right way to do this
+            student_url = serializer.data.pop('student')
+            student = Student.objects.filter(id=student_url.split('/')[-2])[0] # probably not the right way to do this
+            deleted, _ = ProjectSuggestion.objects.filter(project=self.get_object(), coach=coach, student=student).delete()
+            return Response({"data": serializer.data, "status": "deleted" if deleted else "not found"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SkillViewSet(viewsets.GenericViewSet, 
                    mixins.ListModelMixin,
