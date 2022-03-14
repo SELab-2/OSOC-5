@@ -12,8 +12,8 @@
             <q-space />
               <q-tabs class="absolute-center" v-model="tab" shrink>
                 <q-route-tab name="students" label="Students" to="/example" exact/>
-                <q-route-tab name="projects" label="Projects" to="/signup" exact/>
-                <q-route-tab name="users" label="Users" to="/login" exact/>
+                <q-route-tab name="projects" label="Projects" to="/example2" exact/>
+                <q-route-tab name="users" label="Users" to="/example3" exact/>
               </q-tabs>
             <q-space />
             <q-btn-dropdown flat rounded icon="mdi-account">
