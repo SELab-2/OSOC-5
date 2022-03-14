@@ -1,84 +1,100 @@
 <template>
     <div class="q-pa-md q-gutter-md">
-        <div id="q-app" style="min-height: 100vh">
-            
-            <div class="q-ma-sm">
-                <div class="row q-mb-md vertical-middle">
-                <h class="text-bold text-h4">Users</h>
-                <q-space/>
-                    <q-btn
-                        flat
-                      color="secondary"
-                      icon-right="archive"
-                      label="Export to csv"
-                      no-caps
-                      @click="exportTable"
-                    />
-                </div>
-                <q-table
-                    class="usertable"
-                    :rows="users"
-                    :columns="columns"
-                    row-key="id"
-                    v-model:pagination="pagination"
-                    hide-pagination
-                    separator=""
+        <div class="row q-mb-md vertical-middle">
+            <h class="text-bold text-h4">Users</h>
+            <q-space />
+            <q-btn
+                flat
+                color="secondary"
+                icon-right="archive"
+                label="Export to csv"
+                no-caps
+                @click="exportTable"
+            />
+        </div>
+
+        <q-table
+            class="usertable"
+            :rows="users"
+            :columns="columns"
+            row-key="id"
+            v-model:pagination="pagination"
+            hide-pagination
+            separator=""
+        >
+            <template v-slot:body="props">
+                <q-tr
+                    :class="props.rowIndex % 2 == 0 ? 'bg-accent' : ''"
+                    :props="props"
                 >
-                
-                    <template v-slot:body="props">
-                        <q-tr
-                            :class="props.rowIndex % 2 == 0 ? 'bg-accent' : ''"
-                            :props="props"
+                    <q-td key="name" @click="console.log(props)" :props="props">
+                        {{ props.row.name }}
+                    </q-td>
+                    <q-td key="role" :props="props">
+                        <q-select
+                            v-ripple
+                            borderless
+                            dense
+                            style="
+                                max-width: 100px;
+                                border-radius: 5px;
+                                position: relative;
+                            "
+                            v-model="props.row.role"
+                            :options="roles"
+                            transition-show="jump-down"
+                            transition-hide="jump-up"
+                            transition-duration="300"
+                            behavior="menu"
+                            map-options
+                            emit-value
                         >
-                            <q-td
-                                key="name"
-                                @click="console.log(props)"
-                                :props="props"
-                            >
-                                {{ props.row.name }}
-                            </q-td>
-                            <q-td key="role" :props="props">
-                                <q-select
-                                    borderless
-                                    dense
-                                    style="max-width: 100px"
-                                    v-model="props.row.role"
-                                    :options="roles"
-                                    transition-show="jump-down"
-                                    transition-hide="jump-up"
-                                    transition-duration="300"
-                                    behavior="menu"
-                                />
-                            </q-td>
-                            <q-td key="assignedto" :props="props">{{
-                                props.row.assignedto
-                            }}</q-td>
-                            <q-td key="email" :props="props">{{
-                                props.row.email
-                            }}</q-td>
-                            <q-td style="width: 10px" key="remove">
-                                <q-btn
-                                    flat
-                                    round
-                                    dense
-                                    text-color="red"
-                                    icon="mdi-delete-outline"
-                                />
-                            </q-td>
-                        </q-tr>
-                    </template>
-                </q-table>
-                <div class="row justify-center q-mt-md">
-                    <q-pagination
-                        v-model="pagination.page"
-                        color="grey-8"
-                        :max="pagesNumber"
-                        size="md"
-                        active-color="secondary"
-                        style="border-radius: 20px"
-                    />
-                </div>
-            </div>
+                            <template v-slot:option="scope">
+                                <q-item
+                                    class="items-center"
+                                    v-bind="scope.itemProps"
+                                >
+                                    <q-icon
+                                        class="q-mr-md icon"
+                                        size="xs"
+                                        :name="scope.opt.icon"
+                                    />
+                                    <q-item-section>
+                                        <q-item-label>{{
+                                            scope.opt.label
+                                        }}</q-item-label>
+                                    </q-item-section>
+                                </q-item>
+                            </template>
+                        </q-select>
+                    </q-td>
+                    <q-td key="assignedto" :props="props">{{
+                        props.row.assignedto
+                    }}</q-td>
+                    <q-td key="email" :props="props">{{
+                        props.row.email
+                    }}</q-td>
+                    <q-td style="width: 10px" key="remove">
+                        <q-btn
+                            flat
+                            round
+                            dense
+                            text-color="red"
+                            icon="mdi-delete-outline"
+                        />
+                    </q-td>
+                </q-tr>
+            </template>
+        </q-table>
+        <div class="row justify-center q-mt-md">
+            <q-pagination
+                v-model="pagination.page"
+                color="grey-8"
+                :max="pagesNumber"
+                size="md"
+                active-color="secondary"
+                style="border-radius: 20px"
+            />
         </div>
     </div>
 </template>
@@ -139,10 +155,29 @@ const columns = [
         field: 'email',
         sortable: true,
     },
-    
 ]
 
-const roles = ['admin', 'coach', 'disabled']
+const roles = [
+    {
+        label: 'Admin',
+        value: 'admin',
+        icon: 'mdi-account-outline',
+        color: 'blue',
+    },
+    {
+        label: 'Coach',
+        value: 'coach',
+        icon: 'mdi-whistle-outline',
+        color: 'green',
+    },
+    {
+        label: 'Disabled',
+        value: 'disabled',
+        icon: 'mdi-close',
+        color: 'red',
+    },
+]
+
 let pagination = ref({
     sortBy: 'desc',
     descending: false,
@@ -275,6 +310,10 @@ export default {
 
 <style>
 .q-btn--rectangle {
+    border-radius: 10px !important;
+}
+
+.q-menu {
     border-radius: 10px !important;
 }
 </style>
