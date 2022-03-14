@@ -1,6 +1,4 @@
 <template>
-    <div class="">
-      <q-layout view="hHh lpR fFf">
       <q-header elevated class="bg-primary text-white" height-hint="98">
           <q-toolbar class="bg-secondary text-white shadow-2">
             <q-btn flat round>
@@ -13,9 +11,9 @@
 
             <q-space />
               <q-tabs class="absolute-center" v-model="tab" shrink>
-                <q-tab name="students" label="Students" />
-                <q-tab name="projects" label="Projects" />
-                <q-tab name="users" label="Users" />
+                <q-route-tab name="students" label="Students" to="/example" exact/>
+                <q-route-tab name="projects" label="Projects" to="/signup" exact/>
+                <q-route-tab name="users" label="Users" to="/login" exact/>
               </q-tabs>
             <q-space />
             <q-btn-dropdown flat rounded icon="mdi-account">
@@ -39,14 +37,18 @@
             </q-btn-dropdown>
         </q-toolbar>
       </q-header>
-      </q-layout>
-    </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 
+import { useQuasar, useMeta } from 'quasar'
 
+const metaData = {
+  meta: {
+    themecolor: {name: 'theme-color', content: '#24a3cb'}
+  }
+}
 
 export default {
     data() {
@@ -72,6 +74,7 @@ export default {
       },
   setup () {
     return {
+      color: useMeta(metaData),
       tab: ref('students')
     }
   }
