@@ -36,9 +36,10 @@
                             borderless
                             dense
                             style="
-                                max-width: 100px;
+                                
                                 border-radius: 5px;
                                 position: relative;
+                                width: 80px;
                             "
                             v-model="props.row.role"
                             :options="roles"
