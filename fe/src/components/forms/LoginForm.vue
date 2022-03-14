@@ -46,21 +46,14 @@
           label="Sign in"
           type="submit"
           size="md"
-          class="q-mx-md cornered"
-          style="box-shadow: 0px 5px 20px -4px #57bf98"
+          class="q-mx-md cornered primarybuttonshadow"
+          
       />
 <!--     <br/> -->
       <label class="text-bold">or</label>
 <!--       <br/> -->
-      <q-btn unelevated
-       color="black" 
-       icon="mdi-github" 
-       label="Sign in via GitHub" 
-       class="q-mx-md cursor-pointer cornered"
-       style="box-shadow: 0px 8px 20px -4px grey"
-       >
-      </q-btn>
       
+      <GitHubSignInButton/>
       <q-separator class="sep middle-sep q-my-md"/>
       <router-link  class="underlined router-link" to="/signup">Sign Up</router-link>
 <!--     </div> -->
@@ -71,12 +64,14 @@
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
 import { useMeta } from 'quasar'
+import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
 
 const metaData = {
   title: 'Sign In',
 }
 
 export default {
+  components: {GitHubSignInButton},
   setup() {
     const $q = useQuasar()
 
@@ -115,6 +110,10 @@ export default {
 </style>
 
 <style>
+
+.primarybuttonshadow {
+  box-shadow: 0px 5px 20px -4px #57bf98
+}
 
 .q-field__control {
   border-radius: 14px !important;

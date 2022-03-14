@@ -87,21 +87,16 @@
     <br/>
 
     <div>
-      <q-btn
+      <q-btn unelevated
           label="Sign up"
           type="submit"
           size="md"
           color="primary"
-          class="q-mx-md cornered"
+          class="q-mx-md cornered primarybuttonshadow"
       />
       <label class="text-bold">or</label>
-      <q-btn
-       color="black" 
-       icon="mdi-github" 
-       label="Sign in via GitHub" 
-       class="q-mx-md cursor-pointer cornered"
-       >
-      </q-btn>
+      <GitHubSignInButton/>
+      
       <q-separator inset class="middle-sep q-my-md sep"/>
       <router-link class="underlined router-link" to="/login">Log In</router-link>
     </div>
@@ -112,12 +107,15 @@
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
 import { useMeta } from 'quasar'
+import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
+
 
 const metaData = {
   title: 'Sign Up',
 }
 
 export default {
+  components: { GitHubSignInButton },
   setup() {
     const $q = useQuasar()
 
@@ -140,6 +138,8 @@ export default {
       accept,
       isPwd: ref(true),
       isConfPwd: ref(true),
+      
+      
 
       onSubmit () {
         if (password.value !== confirmPassword.value) {
