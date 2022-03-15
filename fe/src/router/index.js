@@ -17,12 +17,14 @@ const routes = [
         children: [
             {
                 path: 'signup',
-                component: SignupForm
+                component: SignupForm,
+                name: 'Signup'
             },
             {
                 path: 'login',
                 alias: '',
-                component: LoginForm
+                component: LoginForm,
+                name: "Login"
             },
 
         ],
