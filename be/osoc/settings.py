@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_nose',
     'rest_framework',
+    'drf_yasg',
     'osoc',
+    'osoc.common',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +86,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 NOSE_ARGS = [
     '--with-coverage',
-    '--cover-package=osoc',
+    '--cover-package=osoc.common',
 ]
 
 # Database
