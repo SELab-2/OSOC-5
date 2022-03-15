@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import SignupPage from "../components/formPages/SignupPage.vue";
-import LoginPage from "../components/formPages/LoginPage.vue";
+import SignupForm from "../components/forms/SignupForm.vue";
+import LoginForm from "../components/forms/LoginForm.vue";
 import NotFoundPage from "../components/NotFoundPage.vue";
 import Example from "../components/appPages/Example.vue"
 import Example2 from "../components/appPages/Example2.vue"
@@ -16,12 +16,12 @@ const routes = [
         children: [
             {
                 path: 'signup',
-                component: SignupPage
+                component: SignupForm
             },
             {
                 path: 'login',
                 alias: '',
-                component: LoginPage
+                component: LoginForm
             },
 
         ],
