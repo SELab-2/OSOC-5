@@ -1,3 +1,5 @@
 psycopg2-binary
 Django
 djangorestframework
+django-nose
+coverage
