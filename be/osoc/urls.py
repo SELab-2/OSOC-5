@@ -48,9 +48,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
-    path('login/', views.LoginView.as_view()),
-    path('logout/', views.LogoutView.as_view()),
-    path('register/', views.RegisterView.as_view()),
+    path('api-auth/register/', views.RegisterView.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),

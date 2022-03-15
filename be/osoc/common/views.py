@@ -68,35 +68,6 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-class LoginView(views.APIView):
-    # This view should be accessible also for unauthenticated users.
-    permission_classes = (AllowAny,)
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def post(self, request, format=None):
-        serializer = serializers.LoginSerializer(data=self.request.data,
-                                                 context={'request': self.request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        login(request, user)
-        return Response(None, status=status.HTTP_202_ACCEPTED)
-
-
-class LogoutView(views.APIView):
-    permission_classes = (AllowAny,)
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def get(self, request):
-        logout(request)
-        return Response()
-
-
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (IsAuthenticated,IsAdmin,)
@@ -110,5 +81,5 @@ class RegisterView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data
+            "user": CoachSerializer(user, context=self.get_serializer_context()).data
         })

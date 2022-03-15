@@ -3,14 +3,16 @@ from django.contrib import admin
 from .models import Coach, Project, Skill, Student, Suggestion
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import Coach
 
 
 @admin.register(Coach)
 class UserAdmin(DjangoUserAdmin):
     """Define admin model for custom User model with no email field."""
-
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = Coach
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (('Personal info'), {'fields': ('first_name', 'last_name')}),

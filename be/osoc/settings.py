@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', 'localhost:8000', '0.0.0.0', '127.0.0.1']
 
+LOGIN_REDIRECT_URL = '/'
+
 AUTH_USER_MODEL = 'common.Coach'
 
 # Application definition
