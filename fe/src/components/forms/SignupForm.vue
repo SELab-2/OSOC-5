@@ -2,6 +2,7 @@
   <q-form
       @submit="onSubmit"
       @reset="onReset"
+
       class="q-px-xl q-mb-lg"
       style="text-align: center; max-width: 500px; margin: 0 auto; margin-top: 7em;"
   >
@@ -10,6 +11,7 @@
     <div class="row" >
       <div class="q-pr-xs col-6">
         <q-input
+
             outlined
             v-model="firstName"
             label="First Name"
@@ -22,6 +24,7 @@
 
       <div class="q-pl-xs col-6">
         <q-input
+
             outlined
             v-model="lastName"
             label="Last Name"
@@ -83,6 +86,7 @@
       </template>
     </q-input>
 
+
     <q-checkbox v-model="accept" label="I accept the terms and conditions." />
     <br/>
 
@@ -106,6 +110,7 @@
 <script>
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
+
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
 
@@ -138,8 +143,6 @@ export default {
       accept,
       isPwd: ref(true),
       isConfPwd: ref(true),
-      
-      
 
       onSubmit () {
         if (password.value !== confirmPassword.value) {
@@ -171,6 +174,7 @@ export default {
 }
 </script>
 
+
 <style scoped>
 .sep {
   margin-left: 10em;
@@ -185,9 +189,11 @@ export default {
   text-decoration: underline;
 }
 
+
 .q-checkbox__bg {
   border-radius: 6px !important;
 }
+
 .router-link {
   color: inherit;
 }

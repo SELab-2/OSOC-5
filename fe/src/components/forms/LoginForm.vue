@@ -40,7 +40,7 @@
     <label class="fpwd cursor-pointer underlined">Forgot your password?</label>
     <br/>
 
-<!--     <div> -->
+
       <q-btn unelevated
           color="primary"
           label="Sign in"
@@ -61,6 +61,7 @@
 <script>
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
+
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
 
@@ -75,7 +76,7 @@ export default {
 
     const email = ref(null)
     const password = ref(null)
-    
+
     useMeta(metaData)
 
     return {
@@ -108,6 +109,15 @@ export default {
 </style>
 
 <style>
+
+.underlined {
+  text-decoration: underline;
+}
+
+.router-link {
+  color: inherit;
+  }
+
 
 .primarybuttonshadow {
   box-shadow: 0px 5px 20px -4px #57bf98

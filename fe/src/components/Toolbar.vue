@@ -1,0 +1,85 @@
+<template>
+      <q-header elevated class="bg-primary text-white" height-hint="98">
+          <q-toolbar class="bg-secondary text-white shadow-2">
+            <q-btn flat round>
+                <q-avatar size="42px">
+                    <img src="../assets/logo.svg">
+                 </q-avatar>
+            </q-btn>
+            <q-toolbar-title><b>Selection Tool</b></q-toolbar-title>
+            
+
+            <q-space />
+              <q-tabs class="absolute-center" v-model="tab" shrink>
+                <q-route-tab name="students" label="Students" to="/example" exact/>
+                <q-route-tab name="projects" label="Projects" to="/example2" exact/>
+                <q-route-tab name="users" label="Users" to="/example3" exact/>
+              </q-tabs>
+            <q-space />
+            <q-btn-dropdown flat rounded icon="mdi-account">
+              <div class="row items-center q-my-sm">
+              <q-avatar class="q-ml-sm" size="40px">
+                <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              </q-avatar>
+                <div class="text-subtitle1 q-mx-md">{{user.name}}</div>
+              </div>
+                <q-separator />
+                <q-list separator>
+                    <q-item v-for="(item, index) in dropdownitems" :key="`${index}`" clickable v-close-popup tabindex="0">
+                        <q-item-section avatar>
+                          <q-icon size="xs" :name="`${item.icon}`" color="primary"/>
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label :lines="1" >{{item.name}}</q-item-label> 
+                        </q-item-section>
+                      </q-item>
+                </q-list>
+            </q-btn-dropdown>
+        </q-toolbar>
+      </q-header>
+</template>
+
+<script>
+import { ref } from 'vue'
+
+import { useQuasar, useMeta } from 'quasar'
+
+const metaData = {
+  meta: {
+    themecolor: {name: 'theme-color', content: '#24a3cb'}
+  }
+}
+
+export default {
+    data() {
+        return {
+            user: {
+              name: 'Miet Claeys'
+            },
+            dropdownitems: [
+              {
+                  name: 'Email Templates',
+                  icon: 'email'
+              },
+              {
+                  name: 'Change Password',
+                  icon: 'key'
+              },
+              {
+                  name: 'Sign Out',
+                  icon: 'logout'
+              }
+          ]
+      }
+      },
+  setup () {
+    return {
+      color: useMeta(metaData),
+      tab: ref('students')
+    }
+  }
+}
+</script>
+
+<style scoped>
+</style>

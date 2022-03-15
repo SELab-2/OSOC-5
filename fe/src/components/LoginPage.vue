@@ -1,4 +1,3 @@
-
 <template>
   <div class="row items-center absolute-full">
     <LightDarkButton />
@@ -15,18 +14,8 @@
 import LoginForm from "./forms/LoginForm.vue";
 import LightDarkButton from "./tools/LightDarkButton.vue";
 import OsocLogo from "./tools/OsocLogo.vue";
-import { useMeta } from 'quasar';
-
-const metaData = {
-  meta: {
-    // themecolor: { name: 'theme-color', content: '#e8fff6'}
-  }
-}
 
 export default {
   components: {OsocLogo, LightDarkButton, LoginForm},
-  setup() {
-    useMeta(metaData)
-  }
 }
 </script>
