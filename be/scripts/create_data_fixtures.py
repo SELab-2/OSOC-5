@@ -10,10 +10,5 @@ if __name__ == "__main__":
     import django
     django.setup()
 
-    from django.contrib.auth.models import User
-    from django.core.exceptions import ObjectDoesNotExist
-
-    try:
-        User.objects.get(username='admin')
-    except ObjectDoesNotExist:
-        User.objects.create_superuser('admin', 'admin@example.com', 'dev')
+    # order is important here!
+    # call_command('loaddata', 'periods.json')
