@@ -1,10 +1,12 @@
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import login, logout
-from rest_framework import viewsets, mixins, permissions, views, status, generics
+from rest_framework import viewsets, mixins, views, status, generics
 from osoc.common.models import Skill, Student, Coach, Project
 from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, RegisterSerializer
 from rest_framework.response import Response
 from django.conf import settings
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import IsAdmin
 
 from . import serializers
 
@@ -15,7 +17,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     """
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class CoachViewSet(viewsets.ModelViewSet):
@@ -24,7 +26,7 @@ class CoachViewSet(viewsets.ModelViewSet):
     """
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -33,7 +35,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class SkillViewSet(viewsets.GenericViewSet,
@@ -45,7 +47,7 @@ class SkillViewSet(viewsets.GenericViewSet,
     """
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -54,7 +56,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = Coach.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -63,12 +65,12 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class LoginView(views.APIView):
     # This view should be accessible also for unauthenticated users.
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (AllowAny,)
 
     @classmethod
     def get_extra_actions(cls):
@@ -84,7 +86,7 @@ class LoginView(views.APIView):
 
 
 class LogoutView(views.APIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (AllowAny,)
 
     @classmethod
     def get_extra_actions(cls):
@@ -97,7 +99,7 @@ class LogoutView(views.APIView):
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (IsAuthenticated,IsAdmin,)
 
     @classmethod
     def get_extra_actions(cls):

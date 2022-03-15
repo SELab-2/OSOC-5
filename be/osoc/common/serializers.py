@@ -64,13 +64,13 @@ class LoginSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         # Take username and password from request
-        username = attrs.get('username')
+        email = attrs.get('email')
         password = attrs.get('password')
 
-        if username and password:
+        if email and password:
             # Try to authenticate the user using Django auth framework.
             user = authenticate(request=self.context.get('request'),
-                                username=username, password=password)
+                                email=email, password=password)
             if not user:
                 # If we don't have a regular user, raise a ValidationError
                 msg = 'Access denied: wrong username or password.'
