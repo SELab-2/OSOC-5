@@ -40,7 +40,6 @@
     <label class="fpwd cursor-pointer underlined">Forgot your password?</label>
     <br/>
 
-
       <q-btn unelevated
           color="primary"
           label="Sign in"
@@ -101,6 +100,7 @@ export default {
 }
 </script>
 
+
 <style scoped>
 .sep {
   margin-left: 10em;
@@ -116,6 +116,7 @@ export default {
 
 .router-link {
   color: inherit;
+
   }
 
 
@@ -135,6 +136,7 @@ export default {
 .fpwd {
   float: right;
   position: absolute;
+
   top: 250px;
   right: 50px;
   font-size: 80%;

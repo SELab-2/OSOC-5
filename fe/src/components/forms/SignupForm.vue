@@ -12,6 +12,7 @@
       <div class="q-pr-xs col-6">
         <q-input
 
+
             outlined
             v-model="firstName"
             label="First Name"
@@ -24,7 +25,6 @@
 
       <div class="q-pl-xs col-6">
         <q-input
-
             outlined
             v-model="lastName"
             label="Last Name"
@@ -111,6 +111,7 @@
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
 
+
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
 
@@ -130,6 +131,7 @@ export default {
     const password = ref(null)
     const confirmPassword = ref(null)
     const accept = ref(false)
+
     
     useMeta(metaData)
     
@@ -188,7 +190,6 @@ export default {
 .underlined {
   text-decoration: underline;
 }
-
 
 .q-checkbox__bg {
   border-radius: 6px !important;
