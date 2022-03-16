@@ -22,7 +22,7 @@
       },
       color: {
         type: String,
-        default: "yellow-1"
+        default: "yellow-4"
       }
     },
     emits: ['update:modelValue'],

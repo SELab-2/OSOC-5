@@ -1,36 +1,40 @@
 <template>
   <div class="q-pa-md q-gutter-md">
     <div class="row">
-      <div class="col-9">
-        <h class="text-bold text-h4"> Users</h>
-      </div>
-      <div class="col-3">
-        <q-btn
-          stack
-          flat
-          color="secondary"
-          icon="download"
-          label="csv"
-          @click="exportTable"
-        />
-      </div>
+      <h class="text-bold text-h4"> Users</h>
+      <q-space />
+      <q-btn
+        stack
+        flat
+        color="yellow"
+        icon="download"
+        label="csv"
+        @click="exportTable"
+      />
     </div>
     <div class="row q-mb-md vertical-middle">
-      <SegmentedControl v-model="roleFilter" 
+      <SegmentedControl
+        v-model="roleFilter"
         :options="[
-          { name: 'all', label: 'All' }, 
-          { name:'admin', label: 'Admins' },
+          { name: 'all', label: 'All' },
+          { name: 'admin', label: 'Admins' },
           { name: 'coach', label: 'Coaches' },
-          { name: 'disabled', label: 'Disabled' }
+          { name: 'disabled', label: 'Disabled' },
         ]"
-        />
-        
-        <q-space />
-        <q-input outlined dense debounce="300" v-model="filter" placeholder="Search">
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
+      />
+
+      <q-space />
+      <q-input
+        outlined
+        dense
+        debounce="300"
+        v-model="filter"
+        placeholder="Search"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
     </div>
     <q-table
       class="my-table user-table shadow-4"
@@ -38,6 +42,7 @@
       :columns="columns"
       row-key="id"
       :pagination="pagination"
+      :filter="roleFilter == 'all' ? '' : roleFilter"
       separator="horizontal"
     >
       <template v-slot:body="props">
@@ -100,14 +105,11 @@ import { ref, computed } from 'vue'
 import { exportFile } from 'quasar'
 import SegmentedControl from './SegmentedControl.vue'
 
-function wrapCsvValue (val, formatFn) {
-  let formatted = formatFn !== void 0
-    ? formatFn(val)
-    : val
+function wrapCsvValue(val, formatFn) {
+  let formatted = formatFn !== void 0 ? formatFn(val) : val
 
-  formatted = formatted === void 0 || formatted === null
-    ? ''
-    : String(formatted)
+  formatted =
+    formatted === void 0 || formatted === null ? '' : String(formatted)
 
   formatted = formatted.split('"').join('""')
   /**
@@ -182,6 +184,7 @@ const roles = [
   },
 ]
 export default {
+  components: {SegmentedControl},
   data() {
     return {
       users: [
@@ -303,6 +306,7 @@ export default {
   setup() {
     return {
       active: ref(true),
+      roleFilter: ref('all'),
       columns,
       roles,
     }
@@ -311,12 +315,16 @@ export default {
 </script>
 
 <style scoped>
+:deep(.q-field__control) {
+  border-radius: 10px !important;
+}
+  
 :deep(.q-btn--rectangle) {
-    border-radius: 12px !important;
+  border-radius: 12px !important;
 }
 
 :deep(.q-menu) {
-    border-radius: 10px !important;
+  border-radius: 10px !important;
 }
 
 .user-table {
@@ -324,9 +332,9 @@ export default {
 }
 </style>
 
-<style scoped lang="sass">
+<style lang="sass">
 .my-table
     thead
         /* bg color is important for th; just specify one */
-        background-color: rgba(#FCB70F, .7)
+        background-color: $yellow-7
 </style>
