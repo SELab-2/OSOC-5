@@ -4,11 +4,12 @@
             <div class="text-bold text-h4">Users</div>
             <q-space />
             <q-btn
+                stack
+                
                 flat
                 color="secondary"
-                icon-right="archive"
-                label="Export to csv"
-                no-caps
+                icon="download"
+                label="csv"
                 @click="exportTable"
             />
         </div>
