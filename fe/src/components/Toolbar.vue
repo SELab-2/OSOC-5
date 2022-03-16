@@ -1,12 +1,12 @@
 <template>
-      <q-header elevated class="bg-primary text-white" height-hint="98">
-          <q-toolbar class="bg-secondary text-white shadow-2">
+      <q-header elevated class="bg-white text-white" height-hint="98">
+          <q-toolbar class="text-secondary bg-white shadow-2">
             <q-btn flat round>
                 <q-avatar size="42px">
                     <img src="../assets/logo.svg">
                  </q-avatar>
             </q-btn>
-            <q-toolbar-title><b>Selection Tool</b></q-toolbar-title>
+            <q-toolbar-title class="text-black"><b>Selection Tool</b></q-toolbar-title>
             
 
             <q-space />
