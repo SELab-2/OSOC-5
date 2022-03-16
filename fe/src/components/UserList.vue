@@ -62,22 +62,16 @@
                       :name="scope.opt.icon"
                   />
                   <q-item-section>
-                    <q-item-label>{{
-                        scope.opt.label
-                      }}
+                    <q-item-label>{{scope.opt.label}}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
               </template>
             </q-select>
           </q-td>
-          <q-td key="assignedto" :props="props">{{
-              props.row.assignedto
-            }}
+          <q-td key="assignedto" :props="props">{{props.row.assignedto}}
           </q-td>
-          <q-td key="email" :props="props">{{
-              props.row.email
-            }}
+          <q-td key="email" :props="props">{{props.row.email }}
           </q-td>
           <q-td style="width: 10px" key="remove">
             <q-btn
