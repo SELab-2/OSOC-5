@@ -128,7 +128,6 @@ const columns = [
     label: 'Role',
     align: 'left',
     field: 'role',
-    sortable: true,
   },
   {
     name: 'assignedto',
