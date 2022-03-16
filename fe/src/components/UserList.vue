@@ -6,9 +6,9 @@
     </div>
     <div class="col-3" >
       <q-btn
-         outline
+          outline
           style="float: right"
-          color="blue"
+          color="black"
           icon-right="mdi-download"
           label="Export to csv"
           @click="exportTable"
