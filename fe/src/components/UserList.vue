@@ -1,7 +1,7 @@
 <template>
     <div class="q-pa-md q-gutter-md">
         <div class="row q-mb-md vertical-middle">
-            <h class="text-bold text-h4">Users</h>
+            <div class="text-bold text-h4">Users</div>
             <q-space />
             <q-btn
                 flat
@@ -12,15 +12,33 @@
                 @click="exportTable"
             />
         </div>
-
+        <div class="row q-mb-md vertical-middle">
+          <SegmentedControl v-model="roleFilter" 
+            :options="[
+              { name: 'all', label: 'All' }, 
+              { name:'admin', label: 'Admins' },
+              { name: 'coach', label: 'Coaches' },
+              { name: 'disabled', label: 'Disabled' }
+            ]"
+            />
+            
+            <q-space />
+            <q-input outlined dense debounce="300" v-model="filter" placeholder="Search">
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+        </div>
+        
         <q-table
             class="usertable shadow-4"
             :rows="users"
             :columns="columns"
+            :filter="roleFilter == 'all' ? '' : roleFilter"
             row-key="id"
             v-model:pagination="pagination"
             hide-pagination
-            separator=""
+            separator="transparent"
         >
             <template v-slot:body="props">
                 <q-tr
@@ -103,6 +121,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { exportFile } from 'quasar'
+import SegmentedControl from './SegmentedControl.vue'
 
 function wrapCsvValue (val, formatFn) {
   let formatted = formatFn !== void 0
@@ -187,6 +206,8 @@ let pagination = ref({
     // rowsNumber: xx if getting data from a server
 })
 export default {
+  components: {SegmentedControl},
+  
     computed: {
         // a computed getter
         pagesNumber() {
@@ -196,6 +217,7 @@ export default {
     },
     data() {
         return {
+          roleFilter: ref('all'),
             users: [
                 {
                     id: 123,
@@ -309,17 +331,15 @@ export default {
 }
 </script>
 
-<style>
-.q-btn--rectangle {
-    border-radius: 10px !important;
-}
-
-.q-menu {
-    border-radius: 10px !important;
-}
-</style>
-
 <style scoped>
+:deep(.q-btn--rectangle) {
+    border-radius: 12px !important;
+}
+
+:deep(.q-menu) {
+    border-radius: 10px !important;
+}
+
 .usertable {
     border-radius: 20px;
 }
