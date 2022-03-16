@@ -6,15 +6,12 @@
           <img src="../assets/logo.svg" />
         </q-avatar>
       </q-btn>
-      <q-toolbar-title class="text-black"
-        ><b>Selection Tool</b></q-toolbar-title
-      >
 
       <q-space />
       <q-tabs class="absolute-center" v-model="tab" shrink>
-        <q-route-tab name="students" label="Students" to="/example" exact />
+        <q-route-tab name="students" label="Select Students" to="/example" exact />
         <q-route-tab name="projects" label="Projects" to="/example2" exact />
-        <q-route-tab name="users" label="Users" to="/users" exact />
+        <q-route-tab name="users" label="Manage Users" to="/users" exact />
       </q-tabs>
       <q-space />
       <q-btn-dropdown flat rounded icon="mdi-account">
