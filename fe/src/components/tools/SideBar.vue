@@ -1,57 +1,66 @@
 <template>
-  <q-drawer side="left" bordered show-if-above>
-    <div class="q-pa-md">
-      <label class="q-pa-md">Students</label>
-      <q-input icon="mdi-search" class="q-ma-md" clearable filled v-model="search" label="Search..." />
-      <q-btn-toggle
-          size="md"
-          v-model="userKind"
-          spread
-          no-caps
-          toggle-color="green"
-          color="white"
-          text-color="black"
-          class="q-ma-md"
-          :options="userKinds"
-      />
-      <q-btn-toggle
-          size="md"
-          v-model="suggestion"
-          spread
-          no-caps
-          toggle-color="green"
-          color="white"
-          text-color="black"
-          class="q-ma-md"
-          :options="suggestionKinds"
-      />
-      <q-select class="q-ma-md" filled v-model="model" :options="options" label="Filled" />
-    </div>
+  <div>
+    <q-drawer
+        v-model="drawer"
+        show-if-above
 
-  </q-drawer>
+        :mini="!drawer || miniState"
+        @click.capture="drawerClick"
+
+        :mini-width="30"
+        :width="300"
+        :breakpoint="100"
+        bordered
+        class="bg-grey-3"
+    >
+      <q-scroll-area class="fit">
+      </q-scroll-area>
+
+      <!--
+        in this case, we use a button (can be anything)
+        so that user can switch back
+        to mini-mode
+      -->
+      <div class=" absolute" style="top: 15px; right: -17px">
+        <q-btn
+            dense
+            round
+            unelevated
+            color="yellow"
+            :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
+            @click="miniState = true"
+        />
+      </div>
+    </q-drawer>
+  </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ref } from 'vue'
+
 export default {
   setup () {
-    const userKinds = [
-      {label: 'All', value: 'All'},
-      {label: 'Alumni', value: 'Alumni'},
-      {label: 'Student Coaches', value: 'Student Coaches'}
-    ]
-    const suggestionKinds = [
-      {label: 'Yes', value: 'Yes'},
-      {label: 'Maybe', value: 'Maybe'},
-      {label: 'No', value: 'No'},
-      {label: 'None', value: 'None'}
-    ]
+    const miniState = ref(false)
+    const drawer = ref(false)
+
     return {
-      search: ref(""),
-      userKind: ref('All'),
-      suggestion: ref('None'),
-      userKinds,
-      suggestionKinds
+      drawer,
+      miniState,
+
+      drawerClick (e) {
+        console.log(miniState.value);
+        console.log(drawer.value);
+        // if in "mini" state and user
+        // click on drawer, we switch it to "normal" mode
+        if (miniState.value) {
+          miniState.value = false
+
+          // notice we have registered an event with capture flag;
+          // we need to stop further propagation as this click is
+          // intended for switching drawer to "normal" mode only
+          e.stopPropagation()
+        }
+      }
     }
   }
 }
