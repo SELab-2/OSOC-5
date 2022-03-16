@@ -1,6 +1,6 @@
 <template>
       <q-header elevated class="bg-white text-white" height-hint="98">
-          <q-toolbar class="text-secondary bg-white shadow-2">
+          <q-toolbar class="text-blue bg-white">
             <q-btn flat round>
                 <q-avatar size="42px">
                     <img src="../assets/logo.svg">
@@ -13,7 +13,7 @@
               <q-tabs class="absolute-center" v-model="tab" shrink>
                 <q-route-tab name="students" label="Students" to="/example" exact/>
                 <q-route-tab name="projects" label="Projects" to="/example2" exact/>
-                <q-route-tab name="users" label="Users" to="/example3" exact/>
+                <q-route-tab name="users" label="Users" to="/users" exact/>
               </q-tabs>
             <q-space />
             <q-btn-dropdown flat rounded icon="mdi-account">
@@ -80,6 +80,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>

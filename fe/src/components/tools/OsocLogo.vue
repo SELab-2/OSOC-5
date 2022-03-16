@@ -1,5 +1,4 @@
 <template>
-
   <img v-if="$q.dark.isActive" src="../../assets/logo_dark.svg"/>
   <img v-else src="../../assets/logo.svg"/>
 </template>
