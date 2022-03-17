@@ -92,15 +92,15 @@
 
     <div>
       <q-btn unelevated
-          label="Sign up"
-          type="submit"
-          size="md"
-          color="primary"
-          class="q-mx-md cornered primarybuttonshadow"
+             label="Sign up"
+             type="submit"
+             size="md"
+             color="primary"
+             class="q-mx-md cornered primarybuttonshadow"
       />
       <label class="text-bold">or</label>
       <GitHubSignInButton/>
-      
+
       <q-separator inset class="middle-sep q-my-md sep"/>
       <router-link :to="{ name: 'Login' }" :class="$q.dark.isActive ? 'text-white' : 'text-black'" >Log In</router-link>
     </div>
@@ -110,21 +110,15 @@
 <script>
 import {useQuasar} from 'quasar'
 import {ref} from 'vue'
-
-
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
-
-
 const metaData = {
   title: 'Sign Up',
 }
-
 export default {
   components: { GitHubSignInButton },
   setup() {
     const $q = useQuasar()
-
     const email = ref(null)
     const firstName = ref(null)
     const lastName = ref(null)
@@ -132,9 +126,7 @@ export default {
     const confirmPassword = ref(null)
     const accept = ref(false)
 
-    
     useMeta(metaData)
-    
 
     return {
       email,
@@ -145,7 +137,6 @@ export default {
       accept,
       isPwd: ref(true),
       isConfPwd: ref(true),
-
       onSubmit () {
         if (password.value !== confirmPassword.value) {
           $q.notify({
@@ -166,7 +157,6 @@ export default {
           })
         }
       },
-
       onReset() {
         email.value = null
         password.value = null
@@ -182,19 +172,19 @@ export default {
   margin-left: 10em;
   margin-right: 10em;
 }
-
-
+:deep(.q-field__control) {
+  border-radius: 14px !important;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
 </style>
 
 <style>
 .underlined {
   text-decoration: underline;
 }
-
 .q-checkbox__bg {
   border-radius: 6px !important;
 }
-
 .router-link {
   color: inherit;
 }

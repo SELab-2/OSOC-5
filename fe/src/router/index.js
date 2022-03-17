@@ -4,9 +4,9 @@ import LoginForm from "../components/forms/LoginForm.vue";
 import NotFoundPage from "../components/NotFoundPage.vue";
 import Example from "../components/appPages/Example.vue"
 import Example2 from "../components/appPages/Example2.vue"
-import Example3 from "../components/appPages/Example3.vue"
 import FormPage from "../components/FormPage.vue";
 import AppPage from "../components/AppPage.vue";
+import UserList from "../components/UserList.vue";
 
 
 
@@ -44,9 +44,9 @@ const routes = [
                 component: Example2
             },
             {
-                path: '/example3',
-                name: 'Example3',
-                component: Example3
+                path: '/users',
+                name: 'Users',
+                component: UserList
             },
 
         ],

@@ -16,10 +16,10 @@ import 'quasar/src/css/index.sass'
 createApp(App)
     .use(createPinia())
     .use(router)
-    .use(Quasar, 
-        { 
-            plugins: { Notify, Meta }, 
-            config: { 
+    .use(Quasar,
+        {
+            plugins: { Notify, Meta },
+            config: {
                 notify: {}
             }
         }
