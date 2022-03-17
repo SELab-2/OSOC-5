@@ -1,26 +1,54 @@
 <template>
   <div class="q-pa-md q-gutter-md">
     <div class="row">
-      <div class="col-9">
-        <h class="text-bold text-h4"> Users</h>
-      </div>
-      <div class="col-3">
-        <q-btn
-          outline
-          style="float: right"
-          color="black"
-          icon-right="mdi-download"
-          label="Export to csv"
-          @click="exportTable"
-        />
-      </div>
+      <h class="text-bold text-h4"> Users</h>
+      <q-space />
+      <q-btn
+        stack
+        flat
+        color="yellow"
+        icon="download"
+        label="csv"
+        @click="exportTable"
+      />
     </div>
+    <div class="row q-mb-md vertical-middle">
+      <SegmentedControl
+        v-model="roleFilter"
+        :options="[
+          { name: 'all', label: 'All' },
+          { name: 'admin', label: 'Admins' },
+          { name: 'coach', label: 'Coaches' },
+          { name: 'inactive', label: 'Inactive' },
+        ]"
+      />
+
+      <q-space />
+      <q-input
+        outlined
+        dense
+        debounce="300"
+        color="yellow-4"
+        v-model="filter"
+        placeholder="Search"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+    </div>
+    
+    
+    <!-- filter cannot be empty, since this won't trigger the table filter function call.
+         This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
     <q-table
       class="my-table user-table shadow-4"
       :rows="users"
       :columns="columns"
       row-key="id"
       :pagination="pagination"
+      :filter="roleFilter"
+      :filter-method="useTableFilter"
       separator="horizontal"
     >
       <template v-slot:body="props">
@@ -34,6 +62,7 @@
           <q-td key="role" :props="props">
             <q-select
               v-ripple
+              color="yellow"
               borderless
               dense
               style="border-radius: 5px; position: relative; width: 80px"
@@ -79,8 +108,9 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { exportFile } from 'quasar'
+import SegmentedControl from './SegmentedControl.vue'
 
 function wrapCsvValue(val, formatFn) {
   let formatted = formatFn !== void 0 ? formatFn(val) : val
@@ -145,22 +175,20 @@ const roles = [
     label: 'Admin',
     value: 'admin',
     icon: 'mdi-account-outline',
-    color: 'blue',
   },
   {
     label: 'Coach',
     value: 'coach',
     icon: 'mdi-whistle-outline',
-    color: 'green',
   },
   {
-    label: 'Disabled',
-    value: 'disabled',
+    label: 'Inactive',
+    value: 'inactive',
     icon: 'mdi-close',
-    color: 'red',
   },
 ]
 export default {
+  components: { SegmentedControl },
   data() {
     return {
       users: [
@@ -214,24 +242,40 @@ export default {
           id: 1230,
           name: 'Lisa De Jonghe',
           email: 'lisa.dejonghe@ugent.be',
-          role: ref('disabled'),
+          role: ref('inactive'),
         },
         {
           id: 1231,
           name: 'Lander Saerens',
           email: 'lander.saerens@ugent.be',
-          role: ref('disabled'),
+          role: ref('inactive'),
         },
         {
           id: 1232,
           name: 'Friedrich Vandenberghe',
           email: 'friedrich.vandenberghe@ugent.be',
-          role: ref('disabled'),
+          role: ref('inactive'),
         },
       ],
     }
   },
   methods: {
+    // Method for searching the table.
+    // Terms is equal to roleFilter.
+    // The method filter to the elements which pass both filters.
+    useTableFilter(rows, terms, cols, cellValue) {
+      const lowerTerms = this.filter ? this.filter.toLowerCase() : ''
+      
+      return rows.filter((row) =>
+        (terms == 'all' || cellValue(cols[1], row) == terms) &&
+        cols.some((col) => {
+          const val = cellValue(col, row) + ''
+          const haystack =
+            val === 'undefined' || val === 'null' ? '' : val.toLowerCase()
+          return haystack.indexOf(lowerTerms) !== -1
+        })
+      )
+    },
     exportTable() {
       // naive encoding to csv format
       const current = new Date()
@@ -282,6 +326,8 @@ export default {
   setup() {
     return {
       active: ref(true),
+      filter: ref(''),
+      roleFilter: ref('all'),
       columns,
       roles,
     }
@@ -290,6 +336,18 @@ export default {
 </script>
 
 <style scoped>
+:deep(.q-field__control) {
+  border-radius: 10px !important;
+}
+
+:deep(.q-btn--rectangle) {
+  border-radius: 12px !important;
+}
+
+:deep(.q-menu) {
+  border-radius: 10px !important;
+}
+
 .user-table {
   border-radius: 10px;
 }
@@ -299,5 +357,5 @@ export default {
 .my-table
     thead
         /* bg color is important for th; just specify one */
-        background-color: rgba(#FCB70F, .7)
+        background-color: $yellow-7
 </style>
