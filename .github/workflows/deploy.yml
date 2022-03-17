@@ -13,7 +13,7 @@ jobs:
     steps:
     - name: Set up SSH
       run: |
-        [[ -r /home/gg/.ssh/deploy ]] || exit 1
+        [[ -r /home/$SSH_USER/.ssh/deploy ]] || exit 1
       env:
         SSH_USER: ${{ secrets.SSH_DEPLOY_USER }}
     - name: "Deploy Application"

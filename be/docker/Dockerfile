@@ -30,8 +30,7 @@ CMD \
     python manage.py migrate && \
     python scripts/create_superuser.py \
     && \
-    python manage.py test
-    # python manage.py runserver 0.0.0.0:8000
+    python manage.py runserver 0.0.0.0:8000
 # gunicorn osoc.wsgi -b 0.0.0.0:80 --access-logfile '-' --error-logfile '-'
 
 

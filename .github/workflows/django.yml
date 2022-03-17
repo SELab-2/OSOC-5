@@ -1,6 +1,11 @@
 name: Django CI
 
-on: [ push ]
+on:
+  pull_request:
+    # branches:
+    #   - main
+    paths:
+      - 'be/osoc/**/*.py'
 
 jobs:
   build:
