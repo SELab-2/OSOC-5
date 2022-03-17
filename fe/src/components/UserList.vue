@@ -19,7 +19,7 @@
           { name: 'all', label: 'All' },
           { name: 'admin', label: 'Admins' },
           { name: 'coach', label: 'Coaches' },
-          { name: 'disabled', label: 'Disabled' },
+          { name: 'inactive', label: 'Inactive' },
         ]"
       />
 
@@ -62,6 +62,7 @@
           <q-td key="role" :props="props">
             <q-select
               v-ripple
+              color="yellow"
               borderless
               dense
               style="border-radius: 5px; position: relative; width: 80px"
@@ -174,19 +175,16 @@ const roles = [
     label: 'Admin',
     value: 'admin',
     icon: 'mdi-account-outline',
-    color: 'blue',
   },
   {
     label: 'Coach',
     value: 'coach',
     icon: 'mdi-whistle-outline',
-    color: 'green',
   },
   {
-    label: 'Disabled',
-    value: 'disabled',
+    label: 'Inactive',
+    value: 'inactive',
     icon: 'mdi-close',
-    color: 'red',
   },
 ]
 export default {
@@ -244,19 +242,19 @@ export default {
           id: 1230,
           name: 'Lisa De Jonghe',
           email: 'lisa.dejonghe@ugent.be',
-          role: ref('disabled'),
+          role: ref('inactive'),
         },
         {
           id: 1231,
           name: 'Lander Saerens',
           email: 'lander.saerens@ugent.be',
-          role: ref('disabled'),
+          role: ref('inactive'),
         },
         {
           id: 1232,
           name: 'Friedrich Vandenberghe',
           email: 'friedrich.vandenberghe@ugent.be',
-          role: ref('disabled'),
+          role: ref('inactive'),
         },
       ],
     }
