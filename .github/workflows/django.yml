@@ -5,6 +5,8 @@ on: [ push ]
 jobs:
   build:
     runs-on: self-hosted
+    strategy:
+      max-parallel: 4
     services:
       db:
         image: postgres

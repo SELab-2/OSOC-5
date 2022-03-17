@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    strategy:
+      max-parallel: 4
     steps:
     - uses: actions/checkout@v2
     - name: Set up node

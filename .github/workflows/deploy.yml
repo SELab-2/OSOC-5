@@ -8,6 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    strategy:
+      max-parallel: 1
     steps:
     - name: Set up SSH
       run: |
