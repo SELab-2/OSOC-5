@@ -1,0 +1,27 @@
+name: Eslint CI
+
+on:
+  push:
+    paths:
+      - 'fe/src/**/*.js'
+      - 'fe/src/**/*.ts'
+      - 'fe/src/**/*.vue'
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install dependencies
+        working-directory: ./fe
+        run: |
+          npm ci
+      - name: Analysing the code with eslint
+        working-directory: ./fe
+        run: |
+          npm run lint
+          npm run build
