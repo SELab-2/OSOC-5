@@ -25,4 +25,4 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint --max-line-length=255 $(git ls-files 'be/osoc/**/*.py')
+        pylint --max-line-length=255 $(git ls-files 'be/osoc/**/*.py' ':!:be/osoc/**/migrations/*.py')
