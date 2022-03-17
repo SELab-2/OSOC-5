@@ -28,6 +28,7 @@
         outlined
         dense
         debounce="300"
+        color="yellow-4"
         v-model="filter"
         placeholder="Search"
       >
@@ -36,13 +37,18 @@
         </template>
       </q-input>
     </div>
+    
+    
+    <!-- filter cannot be empty, since this won't trigger the table filter function call.
+         This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
     <q-table
       class="my-table user-table shadow-4"
       :rows="users"
       :columns="columns"
       row-key="id"
       :pagination="pagination"
-      :filter="roleFilter == 'all' ? '' : roleFilter"
+      :filter="roleFilter"
+      :filter-method="useTableFilter"
       separator="horizontal"
     >
       <template v-slot:body="props">
@@ -101,7 +107,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { exportFile } from 'quasar'
 import SegmentedControl from './SegmentedControl.vue'
 
@@ -184,7 +190,7 @@ const roles = [
   },
 ]
 export default {
-  components: {SegmentedControl},
+  components: { SegmentedControl },
   data() {
     return {
       users: [
@@ -256,6 +262,22 @@ export default {
     }
   },
   methods: {
+    // Method for searching the table.
+    // Terms is equal to roleFilter.
+    // The method filter to the elements which pass both filters.
+    useTableFilter(rows, terms, cols, cellValue) {
+      const lowerTerms = this.filter ? this.filter.toLowerCase() : ''
+      
+      return rows.filter((row) =>
+        (terms == 'all' || cellValue(cols[1], row) == terms) &&
+        cols.some((col) => {
+          const val = cellValue(col, row) + ''
+          const haystack =
+            val === 'undefined' || val === 'null' ? '' : val.toLowerCase()
+          return haystack.indexOf(lowerTerms) !== -1
+        })
+      )
+    },
     exportTable() {
       // naive encoding to csv format
       const current = new Date()
@@ -306,6 +328,7 @@ export default {
   setup() {
     return {
       active: ref(true),
+      filter: ref(''),
       roleFilter: ref('all'),
       columns,
       roles,
@@ -318,7 +341,7 @@ export default {
 :deep(.q-field__control) {
   border-radius: 10px !important;
 }
-  
+
 :deep(.q-btn--rectangle) {
   border-radius: 12px !important;
 }
