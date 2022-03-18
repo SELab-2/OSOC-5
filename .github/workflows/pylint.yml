@@ -9,8 +9,6 @@ on:
 jobs:
   lint:
     runs-on: self-hosted
-    strategy:
-      max-parallel: 4
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
