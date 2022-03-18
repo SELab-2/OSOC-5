@@ -1,29 +1,42 @@
 <template>
     <h2 style='font-weight: 800'>Projects</h2>
-    <div class='q-pa-md row items-start q-gutter-md'>
 
+    <div class='q-pa-md row items-start q-gutter-md'>
 
         <q-card v-for='(item, index) in [ {}, {}, {}, {}, {}, {}, {} ]' :key='index' class='my-card' flat bordered>
 
             <q-card-section>
-
-                <div class='text-h5 q-mt-sm q-mb-xs'>Project 1</div>
-
-                <div class='text-overline '>Client 1</div>
-
+                <div class='text-h5 q-mt-sm q-mb-xs'>Project {{ index }}</div>
+                <div class='text-overline '>Client {{ index }}</div>
                 <div class='text-caption text-grey'>Coaches:</div>
                 <q-chip outline icon='person'>Astrid</q-chip>
                 <q-chip outline icon='person'>Miet</q-chip>
 
                 <div class='text-caption text-grey'>Roles:</div>
-                <q-chip outline icon='info'>1x Full Stack Developer</q-chip>
-                <q-chip outline icon='info'>1x Comms</q-chip>
-                <q-chip outline icon='info'>1x Front-end Developer</q-chip>
-                <q-chip outline icon='info'>1x Media</q-chip>
-                <q-chip outline icon='info'>1x Back-end Developer</q-chip>
+                <q-chip outline icon='info'>
+                    <q-tooltip anchor='top middle' self='center middle'>
+                        Must know everything
+                    </q-tooltip>
+                    1x Full Stack Developer
+                </q-chip>
+                <q-chip outline>
+                    1x Comms
+                </q-chip>
+                <q-chip outline icon='info'>
+                    <q-tooltip anchor='top middle' self='center middle'>
+                        Must know React.js
+                    </q-tooltip>
+                    1x Front-end Developer
+                </q-chip>
+                <q-chip outline>
+                    1x Media
+                </q-chip>
+                <q-chip outline>
+                    1x Back-end Developer
+                </q-chip>
 
             </q-card-section>
-            <q-list bordered class='rounded-borders' style='max-width: 600px'>
+            <q-list bordered separator>
 
                 <!--    LIJST VAN STUDENTEN            -->
 
@@ -49,17 +62,16 @@
                             </div>
                         </q-item-section>
                     </q-item>
-                    <q-separator spaced />
                 </div>
                 <!--                <q-separator spaced />-->
             </q-list>
 
-            <q-card-actions>
+<!--            <q-card-actions>
                 <q-btn flat color='primary' label='Mail' />
                 <q-space />
                 <q-btn flat color='dark' label='Edit' />
 
-            </q-card-actions>
+            </q-card-actions>-->
 
         </q-card>
 
@@ -84,6 +96,7 @@ export default {
 
 <style lang='sass' scoped>
 .my-card
+    border-radius: 10px !important
     width: 100%
     max-width: 400px
 </style>
