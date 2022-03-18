@@ -3,10 +3,11 @@ import SignupForm from "../components/forms/SignupForm.vue";
 import LoginForm from "../components/forms/LoginForm.vue";
 import NotFoundPage from "../components/NotFoundPage.vue";
 import Example from "../components/appPages/Example.vue"
-import Example2 from "../components/appPages/Example2.vue"
+import Projects from "../components/appPages/Projects.vue"
 import FormPage from "../components/FormPage.vue";
 import AppPage from "../components/AppPage.vue";
 import UserList from "../components/UserList.vue";
+import CreateProjects from '../components/appPages/CreateProjects.vue'
 
 
 
@@ -39,9 +40,14 @@ const routes = [
                 component: Example
             },
             {
-                path: '/example2',
-                name: 'Example2',
-                component: Example2
+                path: '/projects',
+                name: 'Projects',
+                component: Projects
+            },
+            {
+                path: '/projects/create',
+                name: 'Create Project',
+                component: CreateProjects
             },
             {
                 path: '/users',

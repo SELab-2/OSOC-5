@@ -10,7 +10,7 @@
       <q-space />
       <q-tabs class="absolute-center" v-model="tab" shrink>
         <q-route-tab name="students" label="Select Students" to="/example" exact />
-        <q-route-tab name="projects" label="Projects" to="/example2" exact />
+        <q-route-tab name="projects" label="Projects" to="/projects" exact />
         <q-route-tab name="users" label="Manage Users" to="/users" exact />
       </q-tabs>
       <q-space />
