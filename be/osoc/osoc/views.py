@@ -2,6 +2,8 @@ from django.contrib.auth.models import User, Group
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
+from django.urls import resolve
+from urllib.parse import urlparse
 
 from osoc.osoc.models import Skill, Student, Coach, Project, Suggestion, ProjectSuggestion
 from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, SuggestionSerializer, ProjectSuggestionSerializer
@@ -24,10 +26,14 @@ class StudentViewSet(viewsets.ModelViewSet):
         serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             data = serializer.data
+
+            # get coach object from url
+            # TODO coach must be current user -> request.user.id, needs session-auth branch
             coach_url = data.pop('coach')
-            coach = Coach.objects.filter(id=coach_url.split('/')[-2])[0] # TODO coach must be current user
-            student = self.get_object()
-            _, created = Suggestion.objects.update_or_create(student=student, coach=coach, defaults=data)
+            coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
+
+            # create Suggestion if it doesnt exist yet, else update it
+            _, created = Suggestion.objects.update_or_create(student=self.get_object(), coach=coach, defaults=data)
             return Response({"data": serializer.data, "status": "created" if created else "updated"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -52,13 +58,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             data = serializer.data
+
+            # get coach object from url
+            # TODO coach must be current user -> request.user.id, needs session-auth branch
             coach_url = data.pop('coach')
-            coach = Coach.objects.filter(id=coach_url.split('/')[-2])[0] # TODO coach must be current user
+            coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
+
+            # get student object from url
             student_url = data.pop('student')
-            student = Student.objects.filter(id=student_url.split('/')[-2])[0] # probably not the right way to do this
+            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
+
+            # replace skill url with skill object
             skill_url = data.pop('role')
-            skill = Skill.objects.filter(id=skill_url.split('/')[-2])[0] # probably not the right way to do this
-            data['role'] = skill
+            data['role'] = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
+
+            # create ProjectSuggestion if it doesnt exist yet, else update it
             _, created = ProjectSuggestion.objects.update_or_create(project=self.get_object(), student=student, coach=coach, defaults=data)
             return Response({"data": serializer.data, "status": "created" if created else "updated"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -67,10 +81,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def remove_student(self, request, pk=None):
         serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
+            # get coach object from url
             coach_url = serializer.data.pop('coach')
-            coach = Coach.objects.filter(id=coach_url.split('/')[-2])[0] # probably not the right way to do this
+            coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
+
+            # get student object from url
             student_url = serializer.data.pop('student')
-            student = Student.objects.filter(id=student_url.split('/')[-2])[0] # probably not the right way to do this
+            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
+
+            # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(project=self.get_object(), coach=coach, student=student).delete()
             return Response({"data": serializer.data, "status": "deleted" if deleted else "not found"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
