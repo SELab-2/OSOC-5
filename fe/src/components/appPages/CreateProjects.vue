@@ -42,14 +42,19 @@
       ]"
                 />
             </div>
+
             <div class='col'>
                 <h4 style='font-weight: 300'>Project Roles</h4>
                 * Insert list of roles *
+                <!--TODO-->
             </div>
+
             <div class='col'>
                 <h4 style='font-weight: 300'>Project Coaches</h4>
                 * Insert list of coaches *
+                <!--TODO-->
             </div>
+
         </div>
 
         <br />

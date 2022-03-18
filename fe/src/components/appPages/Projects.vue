@@ -6,8 +6,16 @@
         <q-card v-for='(item, index) in [ {}, {}, {}, {}, {}, {}, {} ]' :key='index' class='my-card' flat bordered>
 
             <q-card-section>
-                <div class='text-h5 q-mt-sm q-mb-xs'>Project {{ index }}</div>
-                <div class='text-overline '>Client {{ index }}</div>
+                <div class="row">
+                    <div class="col">
+                        <div class='text-h5 q-mt-sm q-mb-xs'>Project {{ index }}</div>
+                        <div class='text-overline '>Client {{ index }}</div>
+                    </div>
+                    <div class="col-md-auto">
+                        <q-btn round outline color="black" icon="mail" />
+                        <q-btn round outline color="black" icon="edit" />
+                    </div>
+                </div>
                 <div class='text-caption text-grey'>Coaches:</div>
                 <q-chip outline icon='person'>Astrid</q-chip>
                 <q-chip outline icon='person'>Miet</q-chip>
@@ -66,13 +74,6 @@
                 <!--                <q-separator spaced />-->
             </q-list>
 
-<!--            <q-card-actions>
-                <q-btn flat color='primary' label='Mail' />
-                <q-space />
-                <q-btn flat color='dark' label='Edit' />
-
-            </q-card-actions>-->
-
         </q-card>
 
 
@@ -98,5 +99,8 @@ export default {
 .my-card
     border-radius: 10px !important
     width: 100%
-    max-width: 400px
+    max-width: 375px
+
+.q-btn
+    margin: 5px
 </style>
