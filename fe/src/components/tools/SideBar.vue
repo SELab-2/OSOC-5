@@ -13,7 +13,7 @@
       bordered
       class="bg-grey-3"
     >
-      <q-scroll-area :style="drawer && !miniState? '' : 'visibility: hidden'" class="fit">
+      <div :style="drawer && !miniState? '' : 'visibility: hidden'" class="fit">
         <div class="q-ma-md column">
           <h class="text-bold text-h4">Filters</h>
           <br/>
@@ -23,6 +23,7 @@
             rounded
             debounce="300"
             color="green"
+            bg-color="white"
             v-model="search"
             placeholder="Search"
           >
@@ -58,6 +59,7 @@
             v-model="roles"
             multiple
             color="green"
+            bg-color="white"
             :options="[
               { name: 'fullStack', label: 'Full-stack developer'},
               { name: 'data', label: 'Data person'},
@@ -79,24 +81,22 @@
           />
 
           <h class="text-bold text-h4">Students</h>
-          <q-card class="my-card">
-            <q-card-section rounded>
-              <div class="row">
-                <label class="text-bold">Charlie Delta</label>
-              </div>
-              <q-linear-progress :value="0.2" :buffer="0.5" reverse rounded>
-              </q-linear-progress>
-              <q-progress class="mt-2" :max="max" show-value>
-                <q-progress-bar :value="value * (6 / 10)" variant="success"></q-progress-bar>
-                <q-progress-bar :value="value * (2.5 / 10)" variant="warning"></q-progress-bar>
-                <q-progress-bar :value="value * (1.5 / 10)" variant="danger"></q-progress-bar>
-              </q-progress>
-            </q-card-section>
-          </q-card>
+
+          <q-list>
+            <q-item v-for="(student, index) in students" :key="index">
+              <StudentCard
+                :name="student.name"
+                :yes="student.yes"
+                :maybe="student.maybe"
+                :no="student.no"
+                :official="student.official"
+              />
+            </q-item>
+          </q-list>
         </div>
 
 
-      </q-scroll-area>
+      </div>
 
       <!--
         in this case, we use a button (can be anything)
@@ -120,6 +120,7 @@
 <script lang="ts">
 import {ref} from 'vue'
 import SegmentedControl from "../SegmentedControl.vue";
+import StudentCard from "./StudentCard.vue";
 
 export default {
   setup() {
@@ -130,6 +131,12 @@ export default {
     const onProject = ref(false)
     const roleFilter = ref('all')
     const suggestion = ref('yes')
+    const students = [
+      {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
+      {name: 'Charlie Puth', yes: 8, maybe: 3, no: 1, official: 'maybe'},
+      {name: 'Charlie Choplin', yes: 0, maybe: 3, no: 1, official: 'no'},
+      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'}
+    ]
 
     return {
       drawer,
@@ -139,9 +146,8 @@ export default {
       search,
       byMe,
       onProject,
+      students,
       drawerClick(e) {
-        console.log(miniState.value);
-        console.log(drawer.value);
         // if in "mini" state and user
         // click on drawer, we switch it to "normal" mode
         if (miniState.value) {
@@ -156,6 +162,7 @@ export default {
     }
   },
   components: {
+    StudentCard,
     SegmentedControl,
   }
 }
