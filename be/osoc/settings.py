@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from os import getenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
     'rest_framework',
     'drf_yasg',
     'osoc',
@@ -78,6 +80,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'osoc.wsgi.application'
 
+# Tests
+# https://django-testing-docs.readthedocs.io/en/latest/coverage.html
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=osoc.common',
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -88,7 +99,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'dev',
-        'HOST': 'db',
+        'HOST': getenv('POSTGRES_HOST', 'db'),
         'PORT': 5432,
     }
 }

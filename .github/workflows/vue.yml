@@ -1,0 +1,30 @@
+name: Vue CI
+
+on:
+  pull_request:
+    # branches:
+    #   - main
+    paths:
+      - 'fe/src/**/*.js'
+      - 'fe/src/**/*.ts'
+      - 'fe/src/**/*.vue'
+
+jobs:
+  build:
+    runs-on: self-hosted
+    strategy:
+      max-parallel: 4
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up node
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+    - name: Install dependencies
+      working-directory: ./fe
+      run: |
+        npm ci
+    - name: Build Vue
+      working-directory: ./fe
+      run: |
+        npm run build
