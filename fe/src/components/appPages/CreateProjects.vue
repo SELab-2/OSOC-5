@@ -38,7 +38,7 @@
                     class='inputfield'
                     type='URL'
                     :rules="[
-        (val) => (val && val.length > 0) || 'Please enter the name of the partner.',
+        (val) => (val && val.length > 0) || 'Please enter the URL of the project.',
       ]"
                 />
             </div>
