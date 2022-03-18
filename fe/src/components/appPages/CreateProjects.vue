@@ -77,18 +77,13 @@
 <script>
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
-import { useMeta } from 'quasar'
 
-const metaData = {
-    title: 'Create Project',
-}
 export default {
     setup() {
         const $q = useQuasar()
         const project_name = ref(null)
         const project_partner_name = ref(null)
         const project_link = ref(null)
-        useMeta(metaData)
         return {
 
             project_name,
