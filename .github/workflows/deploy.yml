@@ -11,8 +11,7 @@ jobs:
     steps:
     - name: Verify production server
       run: |
-        [[ ! -r ~/deploy.sh ]] && echo "[-] Run action from production server!" && exit 1
-      env:
+        [[ -r ~/deploy.sh ]] || exit 1
     - name: "Deploy Application"
       run: |
         bash ~/deploy.sh
