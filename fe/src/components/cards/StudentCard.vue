@@ -27,7 +27,6 @@ export default {
     const widthYes = 100 * this.no / totalSuggestions
     const widthMaybe = 100 * this.maybe / totalSuggestions
     const widthNo = 100 * this.yes / totalSuggestions
-    console.log(widthYes)
     return {
       total: totalSuggestions,
       yesStyle: {

@@ -130,7 +130,7 @@
 <script lang="ts">
 import {ref} from 'vue'
 import SegmentedControl from "../SegmentedControl.vue";
-import StudentCard from "./StudentCard.vue";
+import StudentCard from "../cards/StudentCard.vue";
 
 export default {
   setup() {
