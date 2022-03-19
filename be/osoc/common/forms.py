@@ -1,6 +1,7 @@
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from allauth.account.forms import SignupForm
 from django import forms
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+
 from .models import *
 
 # Create your forms here.

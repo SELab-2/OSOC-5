@@ -129,6 +129,21 @@ class Coach(AbstractUser):  # models.Model):
     def __str__(self):
         return self.get_full_name()
 
+class GithubUser(models.Model):
+    """
+    Skill; A talent or ability of a Student.
+
+    Students can more than one skill (many-to-many relationship).
+    """
+    login = models.CharField(
+        _('login'),
+        max_length=255,
+        unique=True
+    )
+    coach = models.ForeignKey(
+        Coach,
+        on_delete=models.CASCADE
+    )
 
 class Student(models.Model):
     """
