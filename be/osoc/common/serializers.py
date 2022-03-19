@@ -72,13 +72,6 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
 
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Coach
-        fields = ['url', 'username', 'email', 'groups']
-
-
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group

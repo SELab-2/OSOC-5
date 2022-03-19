@@ -1,13 +1,14 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins, permissions, views, status, generics
-from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, RegisterSerializer, SuggestionSerializer, ProjectSuggestionSerializer
+from .serializers import SkillSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, RegisterSerializer, SuggestionSerializer, ProjectSuggestionSerializer, LoginSerializer
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
 from django.urls import resolve
 from urllib.parse import urlparse
 from .models import Skill, Student, Coach, Project, Suggestion, ProjectSuggestion
+from .permissions import IsAdmin
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -29,16 +30,13 @@ class StudentViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             data = serializer.data
 
-            # get coach object from url
-            # TODO coach must be current user -> request.user.id, needs session-auth branch
-            coach_url = data.pop('coach')
-            coach = Coach.objects.get(
-                **resolve(urlparse(coach_url).path).kwargs)
+            # get current user
+            coach = Coach.objects.get(request.user.id)
 
             # create Suggestion if it doesnt exist yet, else update it
             _, created = Suggestion.objects.update_or_create(
                 student=self.get_object(), coach=coach, defaults=data)
-            return Response({"data": serializer.data, "status": "created" if created else "updated"})
+            return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -48,7 +46,7 @@ class CoachViewSet(viewsets.ModelViewSet):
     """
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -57,7 +55,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
     def suggest_student(self, request, pk=None):
@@ -66,11 +64,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             data = serializer.data
 
-            # get coach object from url
-            # TODO coach must be current user -> request.user.id, needs session-auth branch
-            coach_url = data.pop('coach')
-            coach = Coach.objects.get(
-                **resolve(urlparse(coach_url).path).kwargs)
+            # get current user
+            coach = Coach.objects.get(request.user.id)
 
             # get student object from url
             student_url = data.pop('student')
@@ -85,7 +80,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             # create ProjectSuggestion if it doesnt exist yet, else update it
             _, created = ProjectSuggestion.objects.update_or_create(
                 project=self.get_object(), student=student, coach=coach, defaults=data)
-            return Response({"data": serializer.data, "status": "created" if created else "updated"})
+            return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
@@ -93,10 +88,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectSuggestionSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
-            # get coach object from url
-            coach_url = serializer.data.pop('coach')
-            coach = Coach.objects.get(
-                **resolve(urlparse(coach_url).path).kwargs)
+
+            # get current user
+            coach = Coach.objects.get(request.user.id)
 
             # get student object from url
             student_url = serializer.data.pop('student')
@@ -106,7 +100,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
                 project=self.get_object(), coach=coach, student=student).delete()
-            return Response({"data": serializer.data, "status": "deleted" if deleted else "not found"})
+            if deleted:
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -119,15 +115,6 @@ class SkillViewSet(viewsets.GenericViewSet,
     """
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = Coach.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
@@ -149,7 +136,7 @@ class LoginView(views.APIView):
         return []
 
     def post(self, request, format=None):
-        serializer = serializers.LoginSerializer(data=self.request.data,
+        serializer = LoginSerializer(data=self.request.data,
                                                  context={'request': self.request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
@@ -182,5 +169,5 @@ class RegisterView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data
+            "user": CoachSerializer(user, context=self.get_serializer_context()).data
         })
