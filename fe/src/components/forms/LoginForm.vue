@@ -64,7 +64,6 @@ import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
-
 const metaData = {
   title: 'Sign In',
 }
@@ -100,7 +99,6 @@ export default {
   margin-left: 10em;
   margin-right: 10em;
 }
-
 :deep(.q-field__control) {
   border-radius: 14px !important;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -111,7 +109,6 @@ export default {
 .underlined {
   text-decoration: underline;
 }
-
 .router-link {
   color: inherit;
 }
@@ -123,7 +120,6 @@ export default {
 .cornered {
   border-radius: 10px !important;
 }
-
 .fpwd {
   float: right;
   position: absolute;

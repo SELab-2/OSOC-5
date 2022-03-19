@@ -40,7 +40,6 @@
 </script>
 
 <style scoped>
-  
   :deep(.q-tab) {
     z-index: 1 !important;
     min-height: 0px !important;
