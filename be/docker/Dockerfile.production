@@ -1,0 +1,38 @@
+FROM python:3.9-slim
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+EXPOSE 80
+
+# COPY requirements.txt requirements.txt
+# RUN pip3 install -r requirements.txt
+
+# RUN mkdir /src;
+# WORKDIR /src
+
+ENV DJANGO_SETTINGS_MODULE osoc.production_settings
+ARG SECRET_KEY
+ENV SECRET_KEY $SECRET_KEY
+ARG POSTGRES_USER
+ENV POSTGRES_USER $POSTGRES_USER
+ARG POSTGRES_PASSWORD
+ENV POSTGRES_PASSWORD $POSTGRES_PASSWORD
+
+COPY requirements.txt src/requirements.txt
+WORKDIR /src
+
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    pip install gunicorn
+
+# COPY . .
+
+CMD \
+    chmod 755 ./docker/wait-for-it.sh && \
+    ./docker/wait-for-it.sh -t 0 db:5432 --strict -- && \
+    python manage.py migrate && \
+    python manage.py collectstatic --noinput && \
+    python scripts/create_superuser.py \
+    && \
+    gunicorn osoc.wsgi -b 0.0.0.0:8000 --access-logfile 'accesslogs' --error-logfile 'errorlogs'
