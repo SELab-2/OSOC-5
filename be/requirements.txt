@@ -3,3 +3,5 @@ Django >= 2.0
 djangorestframework
 drf-yasg
 django-oauth-toolkit
+django
+django-allauth
