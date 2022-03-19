@@ -8,15 +8,19 @@
         <q-icon size="md" name="mdi-linkedin"/>
         <q-icon size="md" name="mdi-github"/>
       </div>
-      <q-select
-        rounded
-        outlined
-        dense
-        style="width: 150px"
-        v-model="officialSuggestion"
-        :options="['Not decided', 'Yes', 'Maybe', 'No']"
-        label="Suggestion"
-      />
+      <div class="row q-gutter-sm">
+        <q-btn size='12px' round outline color='black' icon='mail' />
+        <q-select
+          rounded
+          outlined
+          dense
+          style="width: 150px"
+          v-model="officialSuggestion"
+          :options="['Not decided', 'Yes', 'Maybe', 'No']"
+          label="Suggestion"
+        />
+      </div>
+
     </div>
     <div class="row q-px-lg">
       <div class="col-4">
