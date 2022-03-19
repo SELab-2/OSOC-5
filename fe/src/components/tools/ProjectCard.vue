@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card shadow-4 q-ma-sm" flat bordered>
+  <q-card class="my-card shadow-4 q-ma-sm" flat bordered >
     <q-card-section>
       <div class="row">
         <div class="col">
@@ -23,6 +23,10 @@
       <project-role-chip
         v-model="this.selectedRoles[role.type]"
         v-for="(role, index) in project.roles"
+        @dragenter="onDragEnter"
+        @dragleave="onDragLeave"
+        @dragover="onDragOver"
+        @drop="onDrop($event, role)"
         :key="index"
         :role="role"
       />
@@ -105,13 +109,53 @@ export default {
       })
       return result
     },
+    onDragEnter(e) {
+      // don't drop on other draggables
+      console.log(e.target.draggable)
+      if (e.target.draggable !== true) {
+        e.target.classList.add('drag-enter')
+      }
+    },
+    onDragLeave(e) {
+      e.target.classList.remove('drag-enter')
+    },
+    onDragOver(e) {
+      e.preventDefault()
+    },
+    onDrop(e, role) {
+      e.preventDefault()
+      console.log(e)
+    
+      // don't drop on other draggables
+      if (e.target.draggable === true) {
+        return
+      }
+      const data = JSON.parse(e.dataTransfer.getData('text'))
+      console.log(data)
+      const draggedId = data.targetId
+      const draggedEl = document.getElementById(draggedId)
+      const name = data.name
+      console.log(name)
+      console.log(draggedEl)
+    
+      // check if original parent node
+      if (draggedEl.parentNode === e.target) {
+        e.target.classList.remove('drag-enter')
+        return
+      }
+    
+      // make the exchange
+      // draggedEl.parentNode.removeChild(draggedEl)
+      // e.target.appendChild(draggedEl)
+      // e.target.classList.remove('drag-enter')
+      console.log(role)
+      this.project.students.push({id: 10, name: name, role: role.type})
+      this.selectedRoles[role.type] = true
+    }
   },
   computed: {
     groupedStudents() {
-      console.log(this.project)
       let students = this.groupBy(this.project.students, 'role')
-      console.log('Hello')
-      console.log(students)
       return students
     },
   },

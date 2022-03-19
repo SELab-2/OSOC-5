@@ -1,10 +1,8 @@
 <template>
-    <!--TODO: maybe global margin instead of on each page-->
     <div style='margin: 5px'>
         <SideBar />
             <div class="q-ma-sm">
         <h class="text-bold text-h3 q-mx-sm" >Projects</h>
-        
         
         <div>
             <masonry-wall :items="projects" :ssr-columns="1" :column-width="320" :gap="0">

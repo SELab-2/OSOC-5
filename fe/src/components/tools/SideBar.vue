@@ -88,14 +88,25 @@
             <h class="text-bold text-h5">Students</h>
 
             <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
-              <q-list class="scroll">
-                <q-item v-for="(student, index) in students" :key="index">
+              <q-list 
+                class="scroll"
+                @dragenter="onDragEnter"
+                @dragleave="onDragLeave"
+                @dragover="onDragOver"
+                @drop="onDrop"
+                >
+                <q-item v-for="(student, index) in students" 
+                    :key="index" 
+                    draggable="true"
+                    @dragstart="onDragStart($event, student.name)"
+                    :id="student.name">
                   <StudentCard
                     :name="student.name"
                     :yes="student.yes"
                     :maybe="student.maybe"
                     :no="student.no"
                     :official="student.official"
+                    
                   />
                 </q-item>
               </q-list>
@@ -134,6 +145,56 @@ import SegmentedControl from "../SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 
 export default {
+  methods: {
+    onDragStart(e, item) {
+      const data = {
+        targetId: e.target.id,
+        name: item
+      }
+      e.dataTransfer.setData('text', JSON.stringify(data))
+      console.log(e.dataTransfer.getData('text'))
+      e.dataTransfer.dropEffect = 'move'
+    },
+    onDragEnter(e) {
+      // don't drop on other draggables
+      console.log(e.target.draggable)
+      if (e.target.draggable !== true) {
+        e.target.classList.add('drag-enter')
+      }
+    },
+    onDragLeave(e) {
+      e.target.classList.remove('drag-enter')
+    },
+    onDragOver(e) {
+      e.preventDefault()
+    },
+    onDrop(e) {
+      e.preventDefault()
+      console.log(e)
+    
+      // don't drop on other draggables
+      if (e.target.draggable === true) {
+        return
+      }
+      const data = JSON.parse(e.dataTransfer.getData('text'))
+      const draggedId = data.targetId
+      const draggedEl = document.getElementById(draggedId)
+      const name = data.name
+      console.log(name)
+      console.log(draggedEl)
+    
+      // check if original parent node
+      if (draggedEl.parentNode === e.target) {
+        e.target.classList.remove('drag-enter')
+        return
+      }
+    
+      // make the exchange
+      draggedEl.parentNode.removeChild(draggedEl)
+      e.target.appendChild(draggedEl)
+      e.target.classList.remove('drag-enter')
+    }
+  },
   setup() {
     const miniState = ref(false)
     const drawer = ref(false)
