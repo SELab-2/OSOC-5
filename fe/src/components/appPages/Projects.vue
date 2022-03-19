@@ -6,14 +6,15 @@
         <q-card v-for='(item, index) in [ {}, {}, {}, {}, {}, {}, {} ]' :key='index' class='my-card' flat bordered>
 
             <q-card-section>
-                <div class="row">
-                    <div class="col">
+                <div class='row'>
+                    <div class='col'>
                         <div class='text-h5 q-mt-sm q-mb-xs'>Project {{ index }}</div>
                         <div class='text-overline '>Client {{ index }}</div>
                     </div>
-                    <div class="col-md-auto">
-                        <q-btn round outline color="black" icon="mail" />
-                        <q-btn round outline color="black" icon="edit" />
+                    <div class='col-md-auto'>
+                        <q-btn size='12px' round outline color='black' icon='mail' />
+                        <q-btn size='12px' round outline color='black' icon='info' />
+                        <q-btn size='12px' round outline color='black' icon='edit' />
                     </div>
                 </div>
                 <div class='text-caption text-grey'>Coaches:</div>
@@ -76,6 +77,10 @@
 
         </q-card>
 
+
+        <q-page-sticky position='top-right' :offset='[18, 18]'>
+            <q-btn fab icon='warning' color='red' label='resolve conflicts' to='/projects/conflicts' />
+        </q-page-sticky>
 
         <q-page-sticky position='bottom-right' :offset='[18, 18]'>
             <q-btn fab icon='add' color='accent' to='/projects/create' />
