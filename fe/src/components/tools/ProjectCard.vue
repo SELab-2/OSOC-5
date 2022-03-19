@@ -34,7 +34,6 @@
           </q-card-section>
           <q-card-section>
             <q-item
-              inset-level="0.3"
               dense
               v-for="student in groupedStudents[role.type]"
               :key="student.id"
@@ -56,12 +55,6 @@
               </div>
             </q-item>
           </q-card-section>
-        </div>
-      </q-slide-transition>
-
-      <q-slide-transition>
-        <div v-show="test">
-          <q-card-section class="text-subitle2"> test </q-card-section>
         </div>
       </q-slide-transition>
     </q-card-section>
