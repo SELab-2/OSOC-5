@@ -1,9 +1,8 @@
 <template>
-  <div>
+  <div >
     <q-drawer
       v-model="drawer"
       show-if-above
-
       :mini="!drawer || miniState"
       @click.capture="drawerClick"
 
@@ -11,88 +10,99 @@
       :width="350"
       :breakpoint="100"
       bordered
-      class="bg-grey-3"
+      class="bg-grey-3 full-height"
     >
-      <div :style="drawer && !miniState? '' : 'visibility: hidden'" class="fit">
-        <div class="q-ma-md column">
-          <h class="text-bold text-h4">Filters</h>
-          <br/>
-          <q-input
-            outlined
-            dense
-            rounded
-            debounce="300"
-            color="green"
-            bg-color="white"
-            v-model="search"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search"/>
-            </template>
-          </q-input>
-          <br/>
-          <SegmentedControl
-            color="green"
-            v-model="roleFilter"
-            :options="[
-              { name: 'all', label: 'All' },
-              { name: 'alumni', label: 'Alumni' },
-              { name: 'studentCoaches', label: 'Student Coaches' },
-            ]"
-          />
-          <br/>
-          <SegmentedControl
-            color="green"
-            v-model="suggestion"
-            :options="[
-              { name: 'yes', label: 'Yes' },
-              { name: 'maybe', label: 'Maybe' },
-              { name: 'no', label: 'No' },
-              { name: 'none', label: 'None' },
-            ]"
-          />
-          <br/>
-          <q-select
-            rounded
-            outlined
-            v-model="roles"
-            multiple
-            color="green"
-            bg-color="white"
-            :options="[
-              { name: 'fullStack', label: 'Full-stack developer'},
-              { name: 'data', label: 'Data person'},
-              { name: 'frontend', label: 'Front-end developer'}
-            ]"
-            label="Roles"
-          />
-          <q-toggle
-            color="green"
-            v-model="byMe"
-            label="Suggested by you"
-            right-label
-          />
-          <q-toggle
-            color="green"
-            v-model="onProject"
-            label="On project"
-            right-label
-          />
+      <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
+        <div class="">
+          <div class="absolute-full q-ma-sm column q-gutter-y-sm">
+            <h class="text-bold text-h4">Filters</h>
 
-          <h class="text-bold text-h4">Students</h>
+            <q-input
+              outlined
+              dense
+              rounded
+              debounce="300"
+              color="green"
+              bg-color="white"
+              v-model="search"
+              placeholder="Search"
+            >
+              <template v-slot:append>
+                <q-icon name="search"/>
+              </template>
+            </q-input>
 
-          <q-list>
-            <q-item v-for="(student, index) in students" :key="index">
-              <StudentCard
-                :name="student.name"
-                :yes="student.yes"
-                :maybe="student.maybe"
-                :no="student.no"
-                :official="student.official"
+            <SegmentedControl
+              color="green"
+              v-model="roleFilter"
+              :options="[
+                { name: 'all', label: 'All' },
+                { name: 'alumni', label: 'Alumni' },
+                { name: 'studentCoaches', label: 'Student Coaches' },
+              ]"
+            />
+
+            <SegmentedControl
+              color="green"
+              v-model="suggestion"
+              :options="[
+                { name: 'yes', label: 'Yes' },
+                { name: 'maybe', label: 'Maybe' },
+                { name: 'no', label: 'No' },
+                { name: 'none', label: 'None' },
+              ]"
+            />
+
+            <q-select
+              rounded
+              outlined
+              dense
+              v-model="roles"
+              multiple
+              color="green"
+              bg-color="white"
+              :options="[
+                { name: 'fullStack', label: 'Full-stack developer'},
+                { name: 'data', label: 'Data person'},
+                { name: 'frontend', label: 'Front-end developer'}
+              ]"
+              label="Roles"
+            />
+
+            <div class="row q-gutter-x-md">
+              <q-toggle
+                color="green"
+                v-model="byMe"
+                label="Suggested by you"
+                right-label
               />
-            </q-item>
-          </q-list>
+              <q-toggle
+                color="green"
+                v-model="onProject"
+                label="On project"
+                right-label
+              />
+            </div>
+
+            <h class="text-bold text-h4">Students</h>
+
+            <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
+              <q-list class="scroll">
+                <q-item v-for="(student, index) in students" :key="index">
+                  <StudentCard
+                    :name="student.name"
+                    :yes="student.yes"
+                    :maybe="student.maybe"
+                    :no="student.no"
+                    :official="student.official"
+                  />
+                </q-item>
+              </q-list>
+            </q-scroll-area>
+
+          </div>
+
+
         </div>
 
 
@@ -135,6 +145,8 @@ export default {
       {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
       {name: 'Charlie Puth', yes: 8, maybe: 3, no: 1, official: 'maybe'},
       {name: 'Charlie Choplin', yes: 0, maybe: 3, no: 1, official: 'no'},
+      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
+      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
       {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'}
     ]
 
@@ -147,6 +159,12 @@ export default {
       byMe,
       onProject,
       students,
+      thumbStyle: {
+        right: '1px',
+        borderRadius: '3px',
+        width: '4px',
+        opacity: '0.75'
+      },
       drawerClick(e) {
         // if in "mini" state and user
         // click on drawer, we switch it to "normal" mode

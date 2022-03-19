@@ -2,12 +2,11 @@ import {createRouter, createWebHistory} from 'vue-router'
 import SignupForm from "../components/forms/SignupForm.vue";
 import LoginForm from "../components/forms/LoginForm.vue";
 import NotFoundPage from "../components/NotFoundPage.vue";
-import Example from "../components/tools/SideBar.vue"
 import Example2 from "../components/appPages/Example2.vue"
 import FormPage from "../components/FormPage.vue";
 import AppPage from "../components/AppPage.vue";
 import UserList from "../components/UserList.vue";
-
+import SelectStudentsPage from "../components/appPages/SelectStudentsPage.vue";
 
 
 const routes = [
@@ -34,9 +33,9 @@ const routes = [
         component: AppPage,
         children: [
             {
-                path: '/example',
-                name: 'Example',
-                component: Example
+                path: '/students',
+                name: 'Students',
+                component: SelectStudentsPage
             },
             {
                 path: '/example2',

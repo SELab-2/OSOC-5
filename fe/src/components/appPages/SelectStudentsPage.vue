@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { ref } from "vue"
-import SideBar from "./tools/SideBar.vue"
+import SideBar from "../tools/SideBar.vue"
 
 export default {
   components: {
