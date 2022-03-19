@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Coach, Project, Skill, Student, Suggestion
+from .models import Coach, GithubUser, Project, Skill, Student, Suggestion
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -35,6 +35,9 @@ class UserAdmin(DjangoUserAdmin):
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name',)
 
+@admin.register(GithubUser)
+class GithubUserAdmin(admin.ModelAdmin):
+    list_display = ('coach', 'login')
 
 admin.site.register(Skill)
 admin.site.register(Project)

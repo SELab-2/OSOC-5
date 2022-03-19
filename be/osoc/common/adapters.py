@@ -9,6 +9,7 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
             Coach.objects.get(email=sociallogin.user.email)
         except Coach.DoesNotExist:
             raise ImmediateHttpResponse(HttpResponse('No existing email found in the database. Please be sure you already have an account with the same email'))
-        user = Coach.objects.get(email=sociallogin.user.email)
+        coach = Coach.objects.get(email=sociallogin.user.email)
+        GithubUser.objects.get_or_create(login=sociallogin.account.extra_data['login'], coach=coach)
         if not sociallogin.is_existing:
-            sociallogin.connect(request, user) 
+            sociallogin.connect(request, coach) 
