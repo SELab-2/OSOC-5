@@ -173,12 +173,15 @@ export default {
   margin-right: 10em;
 }
 :deep(.q-field__control) {
-  border-radius: 14px !important;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 </style>
 
 <style>
+.q-field__control {
+  border-radius: 10px !important;
+}
+
 .underlined {
   text-decoration: underline;
 }

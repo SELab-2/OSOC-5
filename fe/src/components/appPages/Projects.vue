@@ -2,24 +2,25 @@
     <!--TODO: maybe global margin instead of on each page-->
     <div style='margin: 5px'>
         <SideBar />
-
-        <h2 style='font-weight: 800; margin-top: 18px; margin-left: 15px'>Projects</h2>
-
+            <div class="q-ma-sm">
+        <h class="text-bold text-h3 q-mx-sm" >Projects</h>
+        
+        
         <div class='row justify-start content-start'>
-
-            <q-card v-for='(item, index) in [ {}, {}, {}, {}, {}, {}, {} ]' :key='index'
-                    class='my-card bg-grey-3 col-sm-12 col-md-6 col-lg-4 col-xl-3' flat bordered>
+            <div v-for='(item, index) in [ {}, {}, {}, {}, {}, {}, {} ]' :key='index' class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            <q-card 
+                    class='my-card shadow-4 q-ma-sm' flat bordered>
 
                 <q-card-section>
                     <div class='row'>
                         <div class='col'>
-                            <div class='text-h5 q-mt-sm q-mb-xs'>Project {{ index }}</div>
-                            <div class='text-overline '>Client {{ index }}</div>
+                            <div class='text-h5 text-bold q-mt-sm q-mb-xs'>Project {{ index }}</div>
+                            <div class='text-overline'>Client {{ index }}</div>
                         </div>
-                        <div class='col-md-auto'>
-                            <q-btn size='12px' round color='green' icon='mail' />
-                            <q-btn size='12px' round color='green' icon='info' />
-                            <q-btn size='12px' round color='green' icon='edit' />
+                        <div>
+                            <q-btn flat round size="12px" color='primary' icon='mail' />
+                            <q-btn flat round size="12px" color='primary' icon='info' />
+                            <q-btn flat round size="12px" color='primary' icon='edit' />
                         </div>
                     </div>
                     <div class='text-caption text-grey'>Coaches:</div>
@@ -62,7 +63,7 @@
                                 <q-item-label lines='1'>
                                     <span class='text-weight-medium'>Dayana Stark</span>
                                 </q-item-label>
-                                <span class='text-grey-8'>Frond End Developer</span>
+                                <span class='text-grey-8 text-caption'>Frond End Developer</span>
                                 <q-item-label caption lines='1'>
                                     Suggested by <span class='text-weight-medium'>Jeroen Dewelde</span>
                                 </q-item-label>
@@ -81,17 +82,18 @@
                 </q-list>
 
             </q-card>
+            </div>
 
-
-            <q-page-sticky position='top-right' :offset='[18, 18]'>
-                <q-btn padding='7px' fab icon='warning' color='red' label='resolve conflicts'
+            <q-page-sticky position='top-right' :offset='[15, 10]'>
+                <q-btn padding='7px' icon='warning' color='red' label='Conflicts'
                        to='/projects/conflicts' />
             </q-page-sticky>
 
             <q-page-sticky position='bottom-right' :offset='[18, 18]'>
-                <q-btn fab icon='add' color='yellow' to='/projects/create' />
+                <q-btn fab padding="10px" icon='add' color='yellow' to='/projects/create' />
             </q-page-sticky>
         </div>
+            </div>
     </div>
 </template>
 
@@ -115,6 +117,9 @@ export default {
 <style lang='sass' scoped>
 .my-card
     border-radius: 10px !important
+    
+:deep(.q-btn--rectangle)
+    border-radius: 12px !important
 
 .q-btn
     margin: 5px

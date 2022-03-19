@@ -15,7 +15,7 @@
       <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
         <div class="">
           <div class="absolute-full q-ma-sm column q-gutter-y-sm">
-            <h class="text-bold text-h4">Filters</h>
+            <h class="text-bold text-h5">Filters</h>
 
             <q-input
               outlined
@@ -33,7 +33,8 @@
             </q-input>
 
             <SegmentedControl
-              color="green"
+              color="primary"
+              text-color="white"
               v-model="roleFilter"
               :options="[
                 { name: 'all', label: 'All' },
@@ -43,7 +44,7 @@
             />
 
             <SegmentedControl
-              color="green"
+              color="primary"
               v-model="suggestion"
               :options="[
                 { name: 'yes', label: 'Yes' },
@@ -59,7 +60,7 @@
               dense
               v-model="roles"
               multiple
-              color="green"
+              color="primary"
               bg-color="white"
               :options="[
                 { name: 'fullStack', label: 'Full-stack developer'},
@@ -70,21 +71,21 @@
             />
 
             <div class="row q-gutter-x-md">
-              <q-toggle
-                color="green"
+              <q-checkbox
+                color="primary"
                 v-model="byMe"
                 label="Suggested by you"
                 right-label
               />
-              <q-toggle
-                color="green"
+              <q-checkbox
+                color="primary"
                 v-model="onProject"
                 label="On project"
                 right-label
               />
             </div>
 
-            <h class="text-bold text-h4">Students</h>
+            <h class="text-bold text-h5">Students</h>
 
             <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
               <q-list class="scroll">
@@ -113,10 +114,10 @@
         so that user can switch back
         to mini-mode
       -->
-      <div class=" absolute" style="top: 15px; right: -17px">
+      <div class="absolute" style="top: 15px; right: -17px">
         <q-btn
           dense
-          round
+          
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
@@ -185,3 +186,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+:deep(.q-card) {
+    border-radius: 10px !important;
+  }
+  
+  :deep(.q-item) {
+    padding: 8px 8px !important;
+  }
+</style>
