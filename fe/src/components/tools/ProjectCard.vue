@@ -18,8 +18,11 @@
       <q-chip v-for="coach in project.coaches" :key="coach.id" icon="person">{{
         coach.name
       }}</q-chip>
-
+      
+      <div class="row" style="display: flex; align-items: center" @click="this.expanded = !this.expanded; toggleExpanded(this.expanded)"> 
       <div class="text-caption text-grey">Roles:</div>
+      <q-btn flat round size="sm" icon="mdi-eye"/>
+      </div>
       <project-role-chip
         v-model="this.selectedRoles[role.type]"
         v-for="(role, index) in project.roles"
@@ -86,8 +89,17 @@ export default {
       ),
     }
   },
+  data() {
+      return {
+          expanded: ref(false)
+      }
+  },
   components: { ProjectRoleChip },
   methods: {
+     toggleExpanded(state) {
+         Object.keys(this.selectedRoles)
+         .forEach(role => this.selectedRoles[role] = state)
+     },
     groupBy(array, key) {
       const result = {}
       array.forEach((item) => {
@@ -100,7 +112,9 @@ export default {
     },
     onDragLeave(e, role) {
         e.target.classList.remove('drag-enter')
-        this.selectedRoles[role.type] = false
+        if (!this.expanded) {
+            this.selectedRoles[role.type] = false
+        }
     },
     amountLeft(role) {
         const occupied = this.groupedStudents[role.type]
@@ -125,8 +139,9 @@ export default {
       e.target.classList.remove('drag-enter')
       this.project.students.push({ id: 10, name: data.name, role: role.type })
       draggedEl.parentNode.removeChild(draggedEl)
-      
-      setTimeout(() => this.selectedRoles[role.type] = false, 1000)
+      if (!this.expanded) {
+        setTimeout(() => this.selectedRoles[role.type] = false, 1000)
+      }
     },
   },
   computed: {
@@ -134,6 +149,7 @@ export default {
       let students = this.groupBy(this.project.students, 'role')
       return students
     },
+    
     
   },
 }
