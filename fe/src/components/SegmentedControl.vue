@@ -11,13 +11,18 @@
 
 
 <script lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, defineComponent, PropType } from 'vue'
+  
+  interface Option {
+    name: string
+    label: string
+  }
 
-  export default {
+  export default defineComponent({
     props: {
       modelValue: String, 
       options: {
-        type: [], // [{ name: String, label: String}]
+        type: [Object as PropType<Option>], // [{ name: String, label: String}]
         required: true
       },
       color: {
@@ -36,7 +41,7 @@
         }
       }
     }
-  }
+  })
 </script>
 
 <style scoped>

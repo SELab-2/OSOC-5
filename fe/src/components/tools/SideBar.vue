@@ -13,7 +13,7 @@
       <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
         <div class="">
           <div class="absolute-full q-ma-sm column q-gutter-y-sm">
-            <h class="text-bold text-h5">Filters</h>
+            <div class="text-bold text-h5">Filters</div>
 
             <q-input
               outlined
@@ -56,7 +56,6 @@
               rounded
               outlined
               dense
-              v-model="roles"
               multiple
               color="primary"
               bg-color="white"
@@ -83,7 +82,7 @@
               />
             </div>
 
-            <h class="text-bold text-h5">Students</h>
+            <div class="text-bold text-h5">Students</div>
             <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
               <q-list
 
