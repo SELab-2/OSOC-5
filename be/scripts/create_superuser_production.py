@@ -10,10 +10,10 @@ if __name__ == "__main__":
     import django
     django.setup()
 
-    from django.contrib.auth.models import User
+    from osoc.common.models import Coach
     from django.core.exceptions import ObjectDoesNotExist
 
     try:
-        User.objects.get(username='admin')
+        Coach.objects.get(username='admin')
     except ObjectDoesNotExist:
-        User.objects.create_superuser('admin', environ['DJANGO_SUPERUSER_EMAIL'], environ['DJANGO_SUPERUSER_PASSWORD'])
+        Coach.objects.create_superuser('admin', environ['DJANGO_SUPERUSER_EMAIL'], environ['DJANGO_SUPERUSER_PASSWORD'])
