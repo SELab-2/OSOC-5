@@ -139,13 +139,14 @@ import StudentCard from "./StudentCard.vue";
 
 export default {
   methods: {
+    // Saves the component id and user name in the dataTransfer.
+    // TODO: send id of user instead of name.
     onDragStart(e, item) {
       const data = {
         targetId: e.target.id,
         name: item
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
-      console.log(e.dataTransfer.getData('text'))
       e.dataTransfer.dropEffect = 'copy'
     }
   },
