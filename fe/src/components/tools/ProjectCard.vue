@@ -23,7 +23,6 @@
       <project-role-chip
         v-model="this.selectedRoles[role.type]"
         v-for="(role, index) in project.roles"
-        @dragenter="onDragEnter($event, role)"
         @dragleave="onDragLeave($event, role)"
         @dragover="this.amountLeft(role) > 0 ? onDragOver($event, role) : ''"
         @drop="onDrop($event, role)"
@@ -32,7 +31,7 @@
         :placesLeft="amountLeft(role)"
       />
 
-      <q-slide-transition v-for="(role, index) in project.roles" :key="index" style="margin-top: 15px; margin-bottom: -15px;">
+      <q-slide-transition v-for="(role, index) in project.roles" :key="index" style="margin-top: 10px; margin-bottom: -10px;">
         <div v-show="this.selectedRoles[role.type]" >
           <q-item-label
             class="text-subtitle1 text-bold"
@@ -99,31 +98,13 @@ export default {
       })
       return result
     },
-    onDragEnter(e, role) {
-        
-      // don't drop on other draggables
-      if (e.target.draggable !== true) {
-        e.target.classList.add('drag-enter')
-        e.stopPropagation();
-        console.log("Entered!")
-        
-      }
-      this.test += 1
-      console.log(test)
-      
-    },
     onDragLeave(e, role) {
-        e.stopPropagation();
-        console.log("Left!")
-        this.test -= 1
-          console.log(test)
-      e.target.classList.remove('drag-enter')
-      this.selectedRoles[role.type] = false
+        e.target.classList.remove('drag-enter')
+        this.selectedRoles[role.type] = false
     },
     amountLeft(role) {
         const occupied = this.groupedStudents[role.type]
-        console.log(occupied)
-        return this.project.roles.find(role => role.type === role.type).amount - (occupied ? occupied.length : 0)
+        return role.amount - (occupied ? occupied.length : 0)
     },
     onDragOver(e, role) {
         console.log("Over")
@@ -133,36 +114,19 @@ export default {
     },
     async onDrop(e, role) {
       e.preventDefault()
-      console.log(e)
 
       // don't drop on other draggables
       if (e.target.draggable === true) {
         return
       }
       const data = JSON.parse(e.dataTransfer.getData('text'))
-      console.log(data)
-      const draggedId = data.targetId
-      const draggedEl = document.getElementById(draggedId)
-      const name = data.name
-      console.log(name)
-      console.log(draggedEl)
+      const draggedEl = document.getElementById(data.targetId)
 
-      // check if original parent node
-      if (draggedEl.parentNode === e.target) {
-        e.target.classList.remove('drag-enter')
-        return
-      }
-
-      // make the exchange
-      
-      // e.target.appendChild(draggedEl)
       e.target.classList.remove('drag-enter')
-      console.log(role)
-      this.project.students.push({ id: 10, name: name, role: role.type })
+      this.project.students.push({ id: 10, name: data.name, role: role.type })
       draggedEl.parentNode.removeChild(draggedEl)
-      await nextTick()
-      setTimeout(() => this.selectedRoles[role.type] = false, 1000)
       
+      setTimeout(() => this.selectedRoles[role.type] = false, 1000)
     },
   },
   computed: {

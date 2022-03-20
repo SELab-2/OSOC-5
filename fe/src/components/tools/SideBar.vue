@@ -86,11 +86,7 @@
             <h class="text-bold text-h5">Students</h>
             <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
               <q-list
-                
-                @dragenter="onDragEnter"
-                @dragleave="onDragLeave"
-                @dragover="onDragOver"
-                @drop="onDrop"
+
                 >
                 <q-item v-for="student in students" 
                     :key="student.name" 
@@ -151,45 +147,6 @@ export default {
       e.dataTransfer.setData('text', JSON.stringify(data))
       console.log(e.dataTransfer.getData('text'))
       e.dataTransfer.dropEffect = 'copy'
-    },
-    onDragEnter(e) {
-      // don't drop on other draggables
-      console.log(e.target.draggable)
-      if (e.target.draggable !== true) {
-        e.target.classList.add('drag-enter')
-      }
-    },
-    onDragLeave(e) {
-      e.target.classList.remove('drag-enter')
-    },
-    onDragOver(e) {
-      e.preventDefault()
-    },
-    onDrop(e) {
-      e.preventDefault()
-      console.log(e)
-    
-      // don't drop on other draggables
-      if (e.target.draggable === true) {
-        return
-      }
-      const data = JSON.parse(e.dataTransfer.getData('text'))
-      const draggedId = data.targetId
-      const draggedEl = document.getElementById(draggedId)
-      const name = data.name
-      console.log(name)
-      console.log(draggedEl)
-    
-      // check if original parent node
-      if (draggedEl.parentNode === e.target) {
-        e.target.classList.remove('drag-enter')
-        return
-      }
-    
-      // make the exchange
-      draggedEl.parentNode.removeChild(draggedEl)
-      e.target.appendChild(draggedEl)
-      e.target.classList.remove('drag-enter')
     }
   },
   data() {
