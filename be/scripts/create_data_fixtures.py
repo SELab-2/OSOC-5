@@ -11,4 +11,4 @@ if __name__ == "__main__":
     django.setup()
 
     # order is important here!
-    # call_command('loaddata', 'periods.json')
+    call_command('loaddata', 'fixtures.json')
