@@ -22,26 +22,12 @@
 <script lang="ts">
 export default {
   props: ['name', 'yes', 'maybe', 'no', 'official'],
-  data() {
-    const totalSuggestions = this.yes + this.maybe + this.no
-    const widthYes = 100 * this.no / totalSuggestions
-    const widthMaybe = 100 * this.maybe / totalSuggestions
-    const widthNo = 100 * this.yes / totalSuggestions
-    console.log(widthYes)
-    return {
-      total: totalSuggestions,
-      yesStyle: {
-        width: widthYes + "%"
-      },
-      maybeStyle: {
-        width: widthMaybe + "%"
-      },
-      noStyle: {
-        width: widthNo + "%"
-      }
-    }
+  computed: {
+    total() { return this.yes + this.maybe + this.no },
+    yesStyle() { return { width: ((100 * this.yes / this.total) + '%')} },
+    maybeStyle() { return { width: ((100 * this.maybe / this.total) + '%')} },
+    noStyle() { return { width: ((100 * this.no / this.total) + '%')} },
   }
-
 }
 </script>
 
