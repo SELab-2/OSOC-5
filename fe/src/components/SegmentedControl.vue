@@ -11,9 +11,9 @@
 
 
 <script lang="ts">
-  import { ref, computed } from 'vue'
+  import { defineComponent } from 'vue'
 
-  export default {
+  export default defineComponent({
     props: {
       modelValue: String, 
       options: {
@@ -36,7 +36,7 @@
         }
       }
     }
-  }
+  })
 </script>
 
 <style scoped>

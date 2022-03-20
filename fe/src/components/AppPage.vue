@@ -3,12 +3,13 @@
   <router-view/>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "@vue/runtime-core"
 import Toolbar from "./Toolbar.vue"
 
-export default {
+export default defineComponent({
   components: {Toolbar},
-}
+})
 </script>
 
 <style scoped>

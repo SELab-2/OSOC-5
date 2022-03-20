@@ -107,15 +107,15 @@
   </q-form>
 </template>
 
-<script>
+<script lang="ts">
 import {useQuasar} from 'quasar'
-import {ref} from 'vue'
+import {defineComponent, ref} from 'vue'
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
 const metaData = {
   title: 'Sign Up',
 }
-export default {
+export default defineComponent({
   components: { GitHubSignInButton },
   setup() {
     const $q = useQuasar()
@@ -163,7 +163,7 @@ export default {
       }
     }
   },
-}
+})
 </script>
 
 
