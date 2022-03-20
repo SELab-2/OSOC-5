@@ -71,6 +71,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
+      
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/fe"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "Zelzahn"
+      - "lisadejonghe"
+      - "Wouter01"
+      - "lasaeren"
+  - package-ecosystem: "pip"
+    directory: "/be"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "leveys"
+      - "henricattoire"
+      - "sheemeryck"
