@@ -1,0 +1,123 @@
+[
+    {
+        "model": "common.skill",
+        "pk": 1,
+        "fields":
+        {
+            "name": "Front-end developer",
+            "description": "Develops the front-end"
+        }
+    },
+    {
+        "model": "common.skill",
+        "pk": 2,
+        "fields":
+        {
+            "name": "Back-end developer",
+            "description": "Back-ends the developer"
+        }
+    },
+    {
+        "model": "common.coach",
+        "pk": 1,
+        "fields":
+        {
+            "password": "pbkdf2_sha256$320000$5rgqbJ6R9kNXbeQbRgsQ9w$rcwylWX8M8F2dBSQJ3mId5uxXRARO0hIVJGSGaS62T0=",
+            "last_login": "2022-03-19T13:31:16.762Z",
+            "is_superuser": true,
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2022-03-19T13:30:53.896Z",
+            "first_name": "admin",
+            "last_name": "admin",
+            "email": "admin@example.com",
+            "is_admin": false,
+            "last_email_sent": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "common.coach",
+        "pk": 2,
+        "fields":
+        {
+            "password": "abcdef",
+            "last_login": null,
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-03-19T13:31:49Z",
+            "first_name": "Friedrich",
+            "last_name": "Vandenberghe",
+            "email": "friedrich.vandenberghe@ugent.be",
+            "is_admin": false,
+            "last_email_sent": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "common.student",
+        "pk": 1,
+        "fields":
+        {
+            "first_name": "Jan",
+            "last_name": "Pieter",
+            "call_name": null,
+            "email": "jan.pieter@example.com",
+            "phone_number": null,
+            "language": "0",
+            "extra_info": "",
+            "cv": "http://example.com",
+            "portfolio": "http://example.com",
+            "last_email_sent": null,
+            "school_name": "UGent",
+            "degree": "MaNaMa",
+            "studies": "Computer Science",
+            "skills":
+            [
+                2
+            ]
+        }
+    },
+    {
+        "model": "common.project",
+        "pk": 1,
+        "fields":
+        {
+            "name": "Project A",
+            "partner_name": "Belfius",
+            "extra_info": "Project A",
+            "coaches":
+            [
+                2
+            ]
+        }
+    },
+    {
+        "model": "common.project",
+        "pk": 2,
+        "fields":
+        {
+            "name": "Project B",
+            "partner_name": "Nelfius",
+            "extra_info": "Project B",
+            "coaches":
+            [
+                2
+            ]
+        }
+    },
+    {
+        "model": "common.suggestion",
+        "pk": 1,
+        "fields":
+        {
+            "student": 1,
+            "coach": 2,
+            "suggestion": "0",
+            "reason": ""
+        }
+    }
+]
