@@ -55,7 +55,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
     """
-    queryset = Project.objects.all()
+    queryset = Project.objects.all().order_by('id')
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -113,11 +113,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class SkillViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin):
+                   mixins.DestroyModelMixin,
+                   mixins.RetrieveModelMixin):
     """
     API endpoint that allows skills to be listed, created and deleted.
     """
-    queryset = Skill.objects.all()
+    queryset = Skill.objects.all().order_by('id')
     serializer_class = SkillSerializer
     permission_classes = [permissions.IsAuthenticated]
 
