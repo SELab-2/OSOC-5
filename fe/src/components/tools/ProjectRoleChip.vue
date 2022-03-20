@@ -5,10 +5,9 @@
     clickable
     @click="enabled = !enabled"
     outline
-    :color="role.color + (enabled ? '-8' : '-4')"
-    :class="'bg-' + role.color + (enabled ? '-4' : '-1')"
-    style="border-width: 1.5px; padding-right: 8px"
-    :style="'padding-left: ' + (role.info ? '2px' : '8px')"
+    :color="`${role.color}-${enabled ? 8 : 4}`"
+    :class="`bg-${role.color}-${enabled ? 4 : 1}`"
+    :style="`border-width: 1.5px; padding-right: 8px; padding-left: ${role.info ? 2 : 8}px`"
   >
     <template v-slot:default>
       <div class="row" style="display: flex; align-items: center">
@@ -16,27 +15,24 @@
           v-if="role.info"
           name="info"
           size="sm"
-          :color="role.color + (enabled ? '-2' : '-6')"
+          :color="`${role.color}-${enabled ? 2 : 6}`"
         />
         <div
           class="text-weight-medium"
-          :style="
-            'color: ' + (enabled ? 'white' : 'black') +
-            '; padding-left: ' + (role.info ? '3px' : '0px')
-          "
+          :style="`color: ${enabled ? 'white' : 'black'}; padding-left: ${role.info ? 3 : 0}px`"
         >
           {{ role.label }}
         </div>
         <div
           class="text-bold"
           style="padding-left: 3px"
-          :class="enabled ? 'text-white' : 'text-' + role.color + '-8'"
+          :class="`text-${enabled ? 'white' : `${role.color}-8`}`"
         >
           {{ placesLeft }}
         </div>
         <q-tooltip
           v-if="role.info"
-          :class="'bg-' + role.color + '-2'"
+          :class="`bg-${role.color}-2`"
           class="text-black shadow-2"
           anchor="bottom middle"
           self="center middle"
