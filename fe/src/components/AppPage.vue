@@ -1,14 +1,14 @@
 <template>
-  <Toolbar/>
+  <TopToolbar/>
   <router-view/>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
-import Toolbar from "./Toolbar.vue"
+import TopToolbar from "./TopToolbar.vue"
 
 export default defineComponent({
-  components: {Toolbar},
+  components: {TopToolbar},
 })
 </script>
 
