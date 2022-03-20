@@ -18,10 +18,14 @@
       <q-chip v-for="coach in project.coaches" :key="coach.id" icon="person">{{
         coach.name
       }}</q-chip>
-      
-      <div class="row" style="display: flex; align-items: center" @click="this.expanded = !this.expanded; toggleExpanded(this.expanded)"> 
-      <div class="text-caption text-grey">Roles:</div>
-      <q-btn flat round size="sm" icon="mdi-eye"/>
+
+      <div
+        class="row"
+        style="display: flex; align-items: center"
+        @click="this.expanded = !this.expanded; toggleExpanded(this.expanded)"
+      >
+        <div class="text-caption text-grey">Roles:</div>
+        <q-btn flat round size="sm" icon="mdi-eye" />
       </div>
       <project-role-chip
         v-model="this.selectedRoles[role.type]"
@@ -34,36 +38,33 @@
         :placesLeft="amountLeft(role)"
       />
 
-      <q-slide-transition v-for="(role, index) in project.roles" :key="index" style="margin-top: 10px; margin-bottom: -10px;">
-        <div v-show="this.selectedRoles[role.type]" >
+      <q-slide-transition
+        v-for="(role, index) in project.roles"
+        :key="index"
+        style="margin-top: 10px; margin-bottom: -10px"
+      >
+        <div v-show="this.selectedRoles[role.type]">
           <q-item-label
             class="text-subtitle1 text-bold"
             :class="'text-' + role.color + '-8'"
           >
             {{ role.label }}
           </q-item-label>
-            <q-item
-              dense
-              v-for="student in groupedStudents[role.type]"
-              :key="student.id"
-            >
-              <q-item-section lines="1" class="text-weight-medium">{{
-                student.name
-              }}</q-item-section>
-              
-              <div class="text-grey-8">
-                <q-btn
-                  class="gt-xs"
-                  size="sm"
-                  flat
-                  dense
-                  round
-                  icon="comment"
-                />
-                <q-btn class="gt-xs" size="sm" flat dense round icon="info" />
-                <q-btn class="gt-xs" size="sm" flat dense round icon="delete" />
-              </div>
-            </q-item>
+          <q-item
+            dense
+            v-for="student in groupedStudents[role.type]"
+            :key="student.id"
+          >
+            <q-item-section lines="1" class="text-weight-medium">{{
+              student.name
+            }}</q-item-section>
+
+            <div class="text-grey-8">
+              <q-btn class="gt-xs" size="sm" flat dense round icon="comment" />
+              <q-btn class="gt-xs" size="sm" flat dense round icon="info" />
+              <q-btn class="gt-xs" size="sm" flat dense round icon="delete" />
+            </div>
+          </q-item>
         </div>
       </q-slide-transition>
     </q-card-section>
@@ -76,12 +77,11 @@ import { reactive, ref, nextTick } from 'vue'
 
 var test = 0
 export default {
-  props: {
-    project: {},
-  },
+  props: { project: {} },
+  components: { ProjectRoleChip },
   setup(props) {
     return {
-        
+      // Marks all role lists as hidden.
       selectedRoles: reactive(
         Object.assign(
           ...props.project.roles.map((role) => ({ [role.type]: false }))
@@ -89,17 +89,21 @@ export default {
       ),
     }
   },
+
   data() {
-      return {
-          expanded: ref(false)
-      }
+    return {
+      expanded: ref(false),
+    }
   },
-  components: { ProjectRoleChip },
+
   methods: {
-     toggleExpanded(state) {
-         Object.keys(this.selectedRoles)
-         .forEach(role => this.selectedRoles[role] = state)
-     },
+    // Expand/Hide the whole student list.
+    toggleExpanded(state) {
+      Object.keys(this.selectedRoles).forEach(
+        (role) => (this.selectedRoles[role] = state)
+      )
+    },
+
     groupBy(array, key) {
       const result = {}
       array.forEach((item) => {
@@ -110,22 +114,29 @@ export default {
       })
       return result
     },
-    onDragLeave(e, role) {
-        e.target.classList.remove('drag-enter')
-        if (!this.expanded) {
-            this.selectedRoles[role.type] = false
-        }
-    },
+
+    // Calculates how many places of a role are occupied.
     amountLeft(role) {
-        const occupied = this.groupedStudents[role.type]
-        return role.amount - (occupied ? occupied.length : 0)
+      const occupied = this.groupedStudents[role.type]
+      return role.amount - (occupied ? occupied.length : 0)
     },
+
+    // Show the students assigned to a role when dragging over the chip of that role.
     onDragOver(e, role) {
-        console.log("Over")
       e.preventDefault()
-      e.stopPropagation();
+      e.stopPropagation()
       this.selectedRoles[role.type] = true
     },
+
+    // Hide the students assigned to a role when dragging away from the chip of that role.
+    onDragLeave(e, role) {
+      e.target.classList.remove('drag-enter')
+      if (!this.expanded) {
+        this.selectedRoles[role.type] = false
+      }
+    },
+
+    // Assign a student to a role.
     async onDrop(e, role) {
       e.preventDefault()
 
@@ -136,23 +147,23 @@ export default {
       const data = JSON.parse(e.dataTransfer.getData('text'))
       const draggedEl = document.getElementById(data.targetId)
 
+      // Add a student to the project and remove the student card from the sidebar.
       e.target.classList.remove('drag-enter')
       this.project.students.push({ id: 10, name: data.name, role: role.type })
       draggedEl.parentNode.removeChild(draggedEl)
+
+      // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
       if (!this.expanded) {
-        setTimeout(() => this.selectedRoles[role.type] = false, 1000)
+        setTimeout(() => (this.selectedRoles[role.type] = false), 1000)
       }
     },
   },
   computed: {
+    // Groups the students by role.
+    // Example: { 'backend' : [{student1}, {student2}] }
     groupedStudents() {
-      let students = this.groupBy(this.project.students, 'role')
-      return students
+      return this.groupBy(this.project.students, 'role')
     },
-    
-    
   },
 }
 </script>
-
-<style></style>
