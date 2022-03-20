@@ -1,13 +1,13 @@
 from django.contrib.auth.models import Group
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins, permissions, views, status, generics
-from .serializers import SkillSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, RegisterSerializer, SuggestionSerializer, ProjectSuggestionSerializer, LoginSerializer
+from .serializers import *
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
 from django.urls import resolve
 from urllib.parse import urlparse
-from .models import Skill, Student, Coach, Project, Suggestion, ProjectSuggestion
+from .models import *
 from .permissions import IsAdmin
 
 
@@ -22,27 +22,33 @@ class StudentViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
         """
-        lets a coach make a suggestion for the current student
+        let a coach make a suggestion for the current student
         if the coach has already made a suggestion for this student, it is updated
+        returns HTTP response:
+            400 BAD REQUEST: there was required data missing or the data could not be serialized
+            201 CREATED:     a new suggestion was created
+            200 OK:          an existing suggestion was found for this student from the current user, the found suggestion was updated
         """
         serializer = SuggestionSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
-            data = serializer.data
 
-            # get current user
-            coach = Coach.objects.get(request.user.id)
-
-            # create Suggestion if it doesnt exist yet, else update it
+            # create Suggestion object if it doesnt exist yet, else update it
             _, created = Suggestion.objects.update_or_create(
-                student=self.get_object(), coach=coach, defaults=data)
+                student=self.get_object(), coach=request.user, defaults=serializer.data)
+            
             return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CoachViewSet(viewsets.ModelViewSet):
+class CoachViewSet(viewsets.GenericViewSet, 
+                   mixins.ListModelMixin, 
+                   mixins.RetrieveModelMixin,
+                   mixins.DestroyModelMixin):
     """
-    API endpoint that allows coaches to be viewed or edited.
+    API endpoint that allows coaches to be viewed or removed.
+    a coach cannot be created or updated by this API endpoint
+    only admin users have permission for this endpoint
     """
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
@@ -52,6 +58,7 @@ class CoachViewSet(viewsets.ModelViewSet):
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
+    only admin users have permission for this endpoint, except for suggesting students or removing suggestions 
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -59,13 +66,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
     def suggest_student(self, request, pk=None):
+        """
+        let a coach suggest a student for this project
+        if the coach has already suggested this student for this project, the suggestion is updated
+        returns HTTP response:
+            400 BAD REQUEST: there was required data missing or the data could not be serialized
+            201 CREATED:     a new projectsuggestion was created
+            200 OK:          an existing projectsuggestion was found for this student and project from the current user, 
+                             the found projectsuggestion was updated
+        """
         serializer = ProjectSuggestionSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
             data = serializer.data
-
-            # get current user
-            coach = Coach.objects.get(request.user.id)
 
             # get student object from url
             student_url = data.pop('student')
@@ -79,18 +92,24 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # create ProjectSuggestion if it doesnt exist yet, else update it
             _, created = ProjectSuggestion.objects.update_or_create(
-                project=self.get_object(), student=student, coach=coach, defaults=data)
+                project=self.get_object(), student=student, coach=request.user, defaults=data)
+
             return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
     def remove_student(self, request, pk=None):
+        """
+        let a coach remove a projectsuggestion for this project
+        a coach can only remove a projectsuggestion from themselves
+        returns HTTP response:
+            400 BAD REQUEST: there was required data missing or the data could not be serialized
+            404 NOT FOUND:   there was no projectsuggestion found
+            200 OK:          the projectsuggestion was found and removed
+        """
         serializer = ProjectSuggestionSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
-
-            # get current user
-            coach = Coach.objects.get(request.user.id)
 
             # get student object from url
             student_url = serializer.data.pop('student')
@@ -99,10 +118,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
-                project=self.get_object(), coach=coach, student=student).delete()
-            if deleted:
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_404_NOT_FOUND)
+                project=self.get_object(), coach=request.user, student=student).delete()
+
+            return Response(serializer.data, status=(status.HTTP_200_OK if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

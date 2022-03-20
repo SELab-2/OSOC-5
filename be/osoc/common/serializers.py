@@ -1,18 +1,19 @@
 from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import Project, RequiredSkills, Student, Coach, Skill, ProjectSuggestion, Suggestion
+from .models import *
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Suggestion
         fields = ['suggestion', 'reason', 'coach']
+        read_only_fields = ['coach']
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     suggestions = SuggestionSerializer(
-        many=True, source='suggestion_set', required=False)
+        many=True, source='suggestion_set', read_only=True)
 
     class Meta:
         model = Student
@@ -49,21 +50,22 @@ class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'role', 'reason']
+        read_only_fields = ['coach']
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     required_skills = RequiredSkillsSerializer(
         many=True, source='requiredskills_set')
     suggested_students = ProjectSuggestionSerializer(
-        many=True, source='projectsuggestion_set', required=False)
+        many=True, source='projectsuggestion_set', read_only=True)
 
     class Meta:
         model = Project
         fields = ['url', 'id', 'name', 'partner_name', 'extra_info',
                   'required_skills', 'coaches', 'suggested_students']
 
+    # overwrite create method to be able to create RequiredSkills objects
     def create(self, validated_data):
-        validated_data.pop('projectsuggestion_set')  # ignore this field
         skills_data = validated_data.pop('requiredskills_set')
         coaches = validated_data.pop('coaches')
         project = Project.objects.create(**validated_data)
