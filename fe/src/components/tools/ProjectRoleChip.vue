@@ -1,26 +1,29 @@
 <template>
     <!-- v-model:selected is not used here since this displays an icon, which we don't want. As an alternative, @click is used. -->
 	<q-chip
+    
     clickable
     @click="enabled = !enabled"
     outline
     :color="role.color + (enabled ? '-8' : '-4')"
     :class="'bg-' + role.color + (enabled ? '-4' : '-1')"
     style="border-width: 1.5px;"
-    :style="'padding-left: ' + (role.info ? '2px' : '8px') + '; padding-right: 8px;'">
+    :style="'padding-left: ' + (role.info ? '2px' : '8px') + '; padding-right: 8px;'"
+    >
     <template v-slot:default>
         <div class="row" style="display: flex; align-items: center">
             <q-icon v-if="role.info" 
                 name="info" 
                 size="sm" 
-                :color="role.color + '-6'"/>
+                :color="role.color + (enabled ? '-2' : '-6')"/>
             <div  
+                class="text-weight-medium"
                 :style="'color: ' + (enabled ? 'white' : 'black') + '; padding-left: ' + (role.info ? '3px' : '0px')"
                 >{{ role.label }}</div>
             <div class="text-bold" 
                 style="padding-left: 3px;" 
                 :class="(enabled ? 'text-white' : ('text-' + role.color + '-8'))" 
-                >{{ role.amount }}</div>
+                >{{ placesLeft }}</div>
             <q-tooltip 
                 v-if="role.info" 
                 :class="'bg-' + role.color + '-2'" 
@@ -37,7 +40,7 @@
 import { ref } from 'vue'
 
 export default {
-    props: ['role', 'modelValue'],
+    props: ['role', 'placesLeft', 'modelValue'],
     emits: ['update:modelValue'],
     computed: {
         enabled: {

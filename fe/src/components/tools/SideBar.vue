@@ -4,8 +4,6 @@
       v-model="drawer"
       show-if-above
       :mini="!drawer || miniState"
-      @click.capture="drawerClick"
-
       :mini-width="30"
       :width="350"
       :breakpoint="100"
@@ -86,17 +84,16 @@
             </div>
 
             <h class="text-bold text-h5">Students</h>
-
             <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
-              <q-list 
-                class="scroll"
+              <q-list
+                
                 @dragenter="onDragEnter"
                 @dragleave="onDragLeave"
                 @dragover="onDragOver"
                 @drop="onDrop"
                 >
-                <q-item v-for="(student, index) in students" 
-                    :key="index" 
+                <q-item v-for="student in students" 
+                    :key="student.name" 
                     draggable="true"
                     @dragstart="onDragStart($event, student.name)"
                     :id="student.name">
@@ -128,11 +125,11 @@
       <div class="absolute" style="top: 15px; right: -17px">
         <q-btn
           dense
-          
+          round
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = true"
+          @click="this.miniState = !this.miniState"
         />
       </div>
     </q-drawer>
@@ -153,7 +150,7 @@ export default {
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
       console.log(e.dataTransfer.getData('text'))
-      e.dataTransfer.dropEffect = 'move'
+      e.dataTransfer.dropEffect = 'copy'
     },
     onDragEnter(e) {
       // don't drop on other draggables
@@ -195,49 +192,29 @@ export default {
       e.target.classList.remove('drag-enter')
     }
   },
-  setup() {
-    const miniState = ref(false)
-    const drawer = ref(false)
-    const search = ref("")
-    const byMe = ref(false)
-    const onProject = ref(false)
-    const roleFilter = ref('all')
-    const suggestion = ref('yes')
-    const students = [
-      {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
-      {name: 'Charlie Puth', yes: 8, maybe: 3, no: 1, official: 'maybe'},
-      {name: 'Charlie Choplin', yes: 0, maybe: 3, no: 1, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'}
-    ]
+  data() {
 
     return {
-      drawer,
-      miniState,
-      roleFilter,
-      suggestion,
-      search,
-      byMe,
-      onProject,
-      students,
+      drawer: ref(false),
+      miniState: ref(false),
+      roleFilter: ref('all'),
+      suggestion: ref('yes'),
+      search: ref(""),
+      byMe: ref(false),
+      onProject: ref(false),
+      students: [
+        {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
+        {name: 'Charlie Puth', yes: 8, maybe: 3, no: 1, official: 'maybe'},
+        {name: 'Charlie Choplin', yes: 0, maybe: 3, no: 1, official: 'no'},
+        {name: 'Charliee', yes: 3, maybe: 3, no: 5, official: 'no'},
+        {name: 'Charlieee', yes: 3, maybe: 3, no: 5, official: 'no'},
+        {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'}
+      ],
       thumbStyle: {
         right: '1px',
         borderRadius: '3px',
         width: '4px',
         opacity: '0.75'
-      },
-      drawerClick(e) {
-        // if in "mini" state and user
-        // click on drawer, we switch it to "normal" mode
-        if (miniState.value) {
-          miniState.value = false
-
-          // notice we have registered an event with capture flag;
-          // we need to stop further propagation as this click is
-          // intended for switching drawer to "normal" mode only
-          e.stopPropagation()
-        }
       }
     }
   },
@@ -256,4 +233,5 @@ export default {
   :deep(.q-item) {
     padding: 8px 8px !important;
   }
+
 </style>
