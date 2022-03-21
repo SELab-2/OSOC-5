@@ -10,7 +10,7 @@
 </template>
 
 
-<script lang="ts">
+<script>
   import { ref, computed } from 'vue'
 
   export default {
