@@ -57,7 +57,8 @@
     visibility: hidden;
   }
   
-  :deep(.q-tab__label, .q-tab__content) {
+  :deep(.q-tab__label), :deep(.q-tabs__content) {
+    overflow: visible !important;
     z-index: 2 !important;
   }
   

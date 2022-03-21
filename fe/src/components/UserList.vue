@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md q-gutter-md">
+  <div class="q-pa-md">
     <div class="row">
       <h class="text-bold text-h4"> Users</h>
       <q-space />
@@ -11,31 +11,6 @@
         label="csv"
         @click="exportTable"
       />
-    </div>
-    <div class="row q-mb-md vertical-middle">
-      <SegmentedControl
-        v-model="roleFilter"
-        :options="[
-          { name: 'all', label: 'All' },
-          { name: 'admin', label: 'Admins' },
-          { name: 'coach', label: 'Coaches' },
-          { name: 'inactive', label: 'Inactive' },
-        ]"
-      />
-
-      <q-space />
-      <q-input
-        outlined
-        dense
-        debounce="300"
-        color="yellow-4"
-        v-model="filter"
-        placeholder="Search"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
     </div>
     
     
@@ -51,6 +26,33 @@
       :filter-method="useTableFilter"
       separator="horizontal"
     >
+      <template #top-left>
+        <SegmentedControl
+          color="white"
+          class="bg-transparent shadow-0 segmentedControlShadow"
+          v-model="roleFilter"
+          :options="[
+            { name: 'all', label: 'All' },
+            { name: 'admin', label: 'Admins' },
+            { name: 'coach', label: 'Coaches' },
+            { name: 'inactive', label: 'Inactive' },
+          ]"
+        />
+      </template>
+      <template #top-right>
+        <q-input
+          outlined
+          dense
+          debounce="300"
+          color="yellow-4"
+          v-model="filter"
+          placeholder="Search"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
       <template v-slot:body="props">
         <q-tr
           :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
@@ -335,7 +337,13 @@ export default {
 }
 </script>
 
+
 <style scoped>
+:deep(.q-table__top) {
+  padding: 10px;
+  padding-bottom: 0px;
+}
+
 :deep(.q-field__control) {
   border-radius: 10px !important;
 }
@@ -348,14 +356,20 @@ export default {
   border-radius: 10px !important;
 }
 
-.user-table {
-  border-radius: 10px;
-}
+
 </style>
 
 <style lang="sass">
+.user-table
+  border-radius: 10px !important
+    
+  .segmentedControlShadow
+    /* margin-left: -5px */
+    .q-tab__indicator
+      box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 10px
+      
 .my-table
-    thead
-        /* bg color is important for th; just specify one */
-        background-color: $yellow-7
+  .q-table__top,
+  thead
+    background-color: $yellow-7
 </style>
