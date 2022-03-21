@@ -14,6 +14,7 @@ if __name__ == "__main__":
     from django.core.exceptions import ObjectDoesNotExist
 
     try:
-        Coach.objects.get(username='admin')
+        Coach.objects.get(email=environ['DJANGO_SUPERUSER_EMAIL'])
     except ObjectDoesNotExist:
-        Coach.objects.create_superuser('admin', environ['DJANGO_SUPERUSER_EMAIL'], environ['DJANGO_SUPERUSER_PASSWORD'])
+        Coach.objects.create_superuser(first_name='admin', last_name='admin',
+                password=environ['DJANGO_SUPERUSER_PASSWORD'], email=environ['DJANGO_SUPERUSER_EMAIL'])
