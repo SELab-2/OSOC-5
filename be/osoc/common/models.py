@@ -17,7 +17,6 @@ phone_regex = RegexValidator(
 class Skill(models.Model):
     """
     Skill; A talent or ability of a Student.
-
     Students can have more than one skill (many-to-many relationship).
     """
     name = models.CharField(
@@ -68,7 +67,9 @@ class Coach(AbstractUser):  # models.Model):
     Coach; Person who, together with other coaches, oversees
            one or more projects.
     """
+
     username = None
+
     first_name = models.CharField(
         _('name'),
         max_length=255,
@@ -325,7 +326,7 @@ class Suggestion(models.Model):
     )
 
     class Meta:
-        unique_together = (("student", "coach"),)
+        unique_together = (("student", "coach"))
 
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
@@ -358,4 +359,6 @@ class ProjectSuggestion(models.Model):
     )
 
     class Meta:
+
         unique_together = (("project", "student", "coach"))
+
