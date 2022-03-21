@@ -59,18 +59,19 @@
   </q-form>
 </template>
 
-<script>
+<script lang="ts">
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
 import { useQuasar } from 'quasar'
-import { ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
-
 const metaData = {
   title: 'Sign In',
 }
-export default {
+export default defineComponent({
   components: { GitHubSignInButton },
   setup() {
+    const authenticationStore = useAuthenticationStore()
     const $q = useQuasar()
     const email = ref(null)
     const password = ref(null)
@@ -85,6 +86,8 @@ export default {
           color: 'positive',
           message: 'Submitted',
         })
+
+        authenticationStore.login({email: email.value, password: password.value})
       },
       onReset() {
         email.value = null
@@ -92,7 +95,7 @@ export default {
       },
     }
   },
-}
+})
 </script>
 
 <style scoped>
@@ -100,7 +103,6 @@ export default {
   margin-left: 10em;
   margin-right: 10em;
 }
-
 :deep(.q-field__control) {
   border-radius: 14px !important;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -111,7 +113,6 @@ export default {
 .underlined {
   text-decoration: underline;
 }
-
 .router-link {
   color: inherit;
 }
@@ -123,7 +124,6 @@ export default {
 .cornered {
   border-radius: 10px !important;
 }
-
 .fpwd {
   float: right;
   position: absolute;

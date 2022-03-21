@@ -10,10 +10,10 @@
 </template>
 
 
-<script>
-  import { ref, computed } from 'vue'
+<script lang="ts">
+  import { defineComponent } from 'vue'
 
-  export default {
+  export default defineComponent({
     props: {
       modelValue: String, 
       options: {
@@ -36,11 +36,10 @@
         }
       }
     }
-  }
+  })
 </script>
 
 <style scoped>
-  
   :deep(.q-tab) {
     z-index: 1 !important;
     min-height: 0px !important;
