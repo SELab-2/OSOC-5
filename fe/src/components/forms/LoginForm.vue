@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
+// import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
 import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
 import { useMeta } from 'quasar'
