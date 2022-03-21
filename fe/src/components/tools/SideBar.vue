@@ -11,6 +11,7 @@
       :breakpoint="100"
       bordered
       class="bg-grey-3 full-height"
+      style="padding-top: 100px"
     >
       <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
         <div class="">

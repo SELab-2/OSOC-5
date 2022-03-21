@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div >
     <SideBar/>
-    <div class="justify-between row q-pa-lg">
+    <div class="justify-between row q-pa-lg full-height">
       <div class="row q-gutter-sm items-center">
         <h class="text-bold text-h4">{{ name }}</h>
         <q-icon size="md" class="content-center" name="mdi-twitter"/>
@@ -45,6 +45,23 @@
         />
       </div>
     </div>
+    <div class="row q-px-lg">
+      <div class="col-12">
+        <PracticalCard title="Practical" />
+      </div>
+    </div>
+    <div class="row q-px-lg">
+      <div class="col-6">
+        <TitleTextCard title="Why do you want to participate in osoc?" content="
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        />
+      </div>
+      <div class="col-6">
+        <TitleTextCard title="Why do you think you're a good fit?" content="
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,9 +73,11 @@ import StudentCard from "../cards/StudentCard.vue";
 import TitleTextCard from "../cards/TitleTextCard.vue";
 import SuggestionsCard from "../cards/SuggestionsCard.vue";
 import DocumentsCard from "../cards/DocumentsCard.vue";
+import PracticalCard from "../cards/PracticalCard.vue";
 
 export default {
   components: {
+    PracticalCard,
     DocumentsCard,
     SuggestionsCard,
     TitleTextCard,
