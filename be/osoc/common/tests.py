@@ -30,14 +30,14 @@ class ProjectTestsCoach(APITestCase):
         self.assertEqual(response.data["count"], Project.objects.count())
     
     def test_get_project_instance(self):
-        id = Project.objects.first().id
-        url = reverse("project-detail", args=(id,))
+        project = Project.objects.first()
+        url = reverse("project-detail", args=(project.id,))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], "Test")
-        self.assertEqual(response.data["partner_name"], "Partner")
-        self.assertEqual(response.data["extra_info"], "Extra info")
+        self.assertEqual(response.data["name"], project.name)
+        self.assertEqual(response.data["partner_name"], project.partner_name)
+        self.assertEqual(response.data["extra_info"], project.extra_info)
     
     def test_get_project_instance_not_found(self):
         url = reverse("project-detail", args=(50,))
@@ -96,7 +96,7 @@ class ProjectTestsAdmin(APITestCase):
         after_count = Project.objects.count()
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["name"], "Test_2")
+        self.assertEqual(response.data["name"], data["name"])
         self.assertEqual(before_count, after_count-1)
     
     def test_create_project_bad_request(self):
@@ -122,41 +122,46 @@ class ProjectTestsAdmin(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+class SkillTests(APITestCase):
+    def setUp(self):
+        Skill.objects.create(
+            name="skill",
+            description="a skill"
+        )
+        Skill.objects.create(
+            name="skill_2",
+            description="another skill"
+        )
 
+        user = Coach.objects.create_user(
+            first_name="username", password="Pas$w0rd", last_name="last_name", email="email@example.com")
+        self.client.force_authenticate(user)
 
-# class SkillTests(APITestCase):
-#     def setUp(self):
-#         Skill.objects.create(
-#             name="Skill",
-#             description="A skill"
-#         )
+    def test_get_skill_list(self):
+        url = reverse("skill-list")
+        response = self.client.get(url)
 
-#         user = Coach.objects.create_user(
-#             first_name="username", password="Pas$w0rd", last_name="last_name", email="email@example.com")
-#         self.client.force_authenticate(user)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], Skill.objects.count())
 
-#     def test_get_all_skills(self):
-#         response = self.client.get("/skills/")
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         data = response.data["results"][0]
-#         self.assertEqual(data["name"], "Skill")
-#         self.assertEqual(data["description"], "A skill")
+    def test_get_skill_instance(self):
+        skill = Skill.objects.first()
+        url = reverse("skill-detail", args=(skill.id,))
+        response = self.client.get(url)
 
-#     def test_get_single_skill(self):
-#         response = self.client.get("/skills/2/")
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], skill.name)
+        self.assertEqual(response.data["description"], skill.description)
 
-#         data = response.data
-#         self.assertEqual(data["name"], "Skill")
-#         self.assertEqual(data["description"], "A skill")
+    def test_delete_skill(self):
+        id = Skill.objects.first().id
+        url = reverse("skill-detail", args=(id,))
+        before_count = Skill.objects.count()
+        response = self.client.delete(url)
+        after_count = Skill.objects.count()
 
-#     def test_remove_skill(self):
-#         response = self.client.delete("/skills/3/")
-#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-#         response = self.client.get("/skills/")
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data["count"], 0)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(before_count, after_count+1)
 
 
 # class StudentTests(APITestCase):
