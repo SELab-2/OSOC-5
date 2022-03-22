@@ -2,10 +2,10 @@ name: Django CI
 
 on:
   pull_request:
-    branches:
-      - main
-    # paths:
-    #   - 'be/osoc/**/*.py'
+    # branches:
+    #   - main
+    paths:
+      - 'be/osoc/**/*.py'
 
 jobs:
   build:
