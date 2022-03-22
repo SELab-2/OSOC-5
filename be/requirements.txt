@@ -1,4 +1,6 @@
-psycopg2-binary
+psycopg2
 Django >= 2.0
 djangorestframework
 drf-yasg
+django-nose
+coverage

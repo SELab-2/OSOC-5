@@ -9,7 +9,7 @@ class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:
+        if request.method in permissions.SAFE_METHODS or view.action in ['suggest_student', 'remove_student']:
             return True
 
         # Write permissions are only allowed to the admin

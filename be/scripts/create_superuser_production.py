@@ -10,5 +10,11 @@ if __name__ == "__main__":
     import django
     django.setup()
 
-    # order is important here!
-    call_command('loaddata', 'fixtures.json')
+    from osoc.common.models import Coach
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        Coach.objects.get(email=environ['DJANGO_SUPERUSER_EMAIL'])
+    except ObjectDoesNotExist:
+        Coach.objects.create_superuser(first_name='admin', last_name='admin',
+                password=environ['DJANGO_SUPERUSER_PASSWORD'], email=environ['DJANGO_SUPERUSER_EMAIL'])
