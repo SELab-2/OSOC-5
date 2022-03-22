@@ -153,6 +153,12 @@ class SkillTests(APITestCase):
         self.assertEqual(response.data["name"], skill.name)
         self.assertEqual(response.data["description"], skill.description)
 
+    def test_get_skill_instance_not_found(self):
+        url = reverse("skill-detail", args=(50,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_skill(self):
         id = Skill.objects.first().id
         url = reverse("skill-detail", args=(id,))
@@ -162,40 +168,124 @@ class SkillTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
+    
+    def test_delete_skill_not_found(self):
+        url = reverse("skill-detail", args=(50,))
+        response = self.client.delete(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_skill(self):
+        data = {
+            "name": "skill_3",
+            "description": "yet another skill"
+        }
+        url = reverse("skill-list")
+        before_count = Skill.objects.count()
+        response = self.client.post(url, data, format="json")
+        after_count = Skill.objects.count()
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(before_count, after_count-1)
+    
+    def test_create_skill_bad_request(self):
+        url = reverse("skill-list")
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-# class StudentTests(APITestCase):
-#     def setUp(self) -> None:
-#         Student.objects.create(
-#             first_name="First name",
-#             last_name="Last name",
-#             email="example@example.com",
-#             cv="https://example.com",
-#             portfolio="https://example.com",
-#             school_name="Example",
-#             degree="Example",
-#             studies="Example"
-#         )
+class StudentTests(APITestCase):
+    def setUp(self) -> None:
+        Student.objects.create(
+            first_name="First name",
+            last_name="Last name",
+            email="example@example.com",
+            cv="https://example.com",
+            portfolio="https://example.com",
+            school_name="Example",
+            degree="Example",
+            studies="Example"
+        )
 
-#         user = Coach.objects.create_user(
-#             first_name="username", password="Pas$w0rd", last_name="last_name", email="email@example.com")
-#         self.client.force_authenticate(user)
+        user = Coach.objects.create_user(
+            first_name="username", password="Pas$w0rd", last_name="last_name", email="email@example.com")
+        self.client.force_authenticate(user)
 
-#     def test_get_single_student(self):
-#         response = self.client.get("/students/1/")
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         data = response.data
-#         self.assertEqual(data["email"], "example@example.com")
+    def test_get_student_list(self):
+        url = reverse("student-list")
+        response = self.client.get(url)
 
-#     def test_make_erroneous_suggestion(self):
-#         response = self.client.post(
-#             "/students/1/make_suggestion/")
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], Student.objects.count())
 
-#     # def test_make_suggestion(self):
-#     #     TODO: {"detail": ErrorDetail(string="Not found.", code="not_found")}
-#     #     response = self.client.post(
-#     #         "/students/1/make_suggestion/",
-#     #         {"suggestion": 0, "coach": "/coaches/7/"})
-#     #     print(response)
-#     #     print(response.data)
+    def test_get_student_instance(self):
+        student = Student.objects.first()
+        url = reverse("student-detail", args=(student.id,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["email"], student.email)
+
+    def test_get_student_instance_not_found(self):
+        url = reverse("student-detail", args=(50,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_student(self):
+        id = Student.objects.first().id
+        url = reverse("student-detail", args=(id,))
+        before_count = Student.objects.count()
+        response = self.client.delete(url)
+        after_count = Student.objects.count()
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(before_count, after_count+1)
+    
+    def test_delete_student_not_found(self):
+        url = reverse("student-detail", args=(50,))
+        response = self.client.delete(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_student(self):
+        skill = Skill.objects.create(
+            name="skill",
+            description="a skill"
+        )
+        skill_url = reverse("skill-detail", args=(skill.id,))
+        data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@example.com",
+            "cv": "https://example.com",
+            "portfolio": "https://example.com",
+            "school_name": "Example",
+            "degree": "Example",
+            "studies": "Example",
+            "skills": [skill_url]
+        }
+        url = reverse("student-list")
+        before_count = Student.objects.count()
+        response = self.client.post(url, data, format="json")
+        after_count = Student.objects.count()
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["email"], data["email"])
+        self.assertEqual(before_count, after_count-1)
+    
+    def test_create_student_bad_request(self):
+        url = reverse("student-list")
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # def test_make_suggestion(self):
+    #     TODO: {"detail": ErrorDetail(string="Not found.", code="not_found")}
+    #     response = self.client.post(
+    #         "/students/1/make_suggestion/",
+    #         {"suggestion": 0, "coach": "/coaches/7/"})
+    #     print(response)
+    #     print(response.data)
