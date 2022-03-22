@@ -1,15 +1,24 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from .models import *
 
-from osoc.common.models import Project, Student, Coach, Skill
+
+class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Suggestion
+        fields = ['suggestion', 'reason', 'coach']
+        read_only_fields = ['coach']
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    suggestions = SuggestionSerializer(
+        many=True, source='suggestion_set', read_only=True)
+
     class Meta:
         model = Student
         fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 'phone_number', 'language',
-                  'extra_info', 'cv', 'portfolio', 'school_name', 'degree', 'studies', 'skills']
+                  'extra_info', 'cv', 'portfolio', 'school_name', 'degree', 'studies', 'skills', 'suggestions']
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,11 +40,40 @@ class SkillSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name', 'description']
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'groups']
+        model = RequiredSkills
+        fields = ['amount', 'skill']
 
+
+class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['student', 'coach', 'role', 'reason']
+        read_only_fields = ['coach']
+
+
+class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+    required_skills = RequiredSkillsSerializer(
+        many=True, source='requiredskills_set')
+    suggested_students = ProjectSuggestionSerializer(
+        many=True, source='projectsuggestion_set', read_only=True)
+
+    class Meta:
+        model = Project
+        fields = ['url', 'id', 'name', 'partner_name', 'extra_info',
+                  'required_skills', 'coaches', 'suggested_students']
+
+    # overwrite create method to be able to create RequiredSkills objects
+    def create(self, validated_data):
+        skills_data = validated_data.pop('requiredskills_set')
+        coaches = validated_data.pop('coaches')
+        project = Project.objects.create(**validated_data)
+        project.coaches.set(coaches)
+        for skill_data in skills_data:
+            RequiredSkills.objects.create(project=project, **skill_data)
+        return project
+      
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -86,12 +124,12 @@ class LoginSerializer(serializers.Serializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Coach
         fields = ('id', 'username', 'email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(
+        user = Coach.objects.create_user(
             validated_data['username'], validated_data['email'], validated_data['password'])
 
         return user

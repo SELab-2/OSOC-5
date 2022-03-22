@@ -5,14 +5,16 @@ services:
     container_name: osoc-db
     image: postgres
     environment:
-      POSTGRES_PASSWORD: dev
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev}
     volumes:
       - postgres:/data/db
   be:
     container_name: osoc-be
-    build: 
+    build:
       context: ../
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./docker/${DOCKERFILE:-Dockerfile}
+    user: ${DOCKER_AS_USER}
     volumes:
       - ../:/src
     ports:
