@@ -4,8 +4,6 @@
       v-model="drawer"
       show-if-above
       :mini="!drawer || miniState"
-      @click.capture="drawerClick"
-
       :mini-width="30"
       :width="350"
       :breakpoint="100"
@@ -15,7 +13,7 @@
       <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
         <div class="">
           <div class="absolute-full q-ma-sm column q-gutter-y-sm">
-            <h class="text-bold text-h4">Filters</h>
+            <div class="text-bold text-h5">Filters</div>
 
             <q-input
               outlined
@@ -33,7 +31,8 @@
             </q-input>
 
             <SegmentedControl
-              color="green"
+              color="primary"
+              text-color="white"
               v-model="roleFilter"
               :options="[
                 { name: 'all', label: 'All' },
@@ -43,7 +42,7 @@
             />
 
             <SegmentedControl
-              color="green"
+              color="primary"
               v-model="suggestion"
               :options="[
                 { name: 'yes', label: 'Yes' },
@@ -57,9 +56,8 @@
               rounded
               outlined
               dense
-              v-model="roles"
               multiple
-              color="green"
+              color="primary"
               bg-color="white"
               :options="[
                 { name: 'fullStack', label: 'Full-stack developer'},
@@ -70,31 +68,37 @@
             />
 
             <div class="row q-gutter-x-md">
-              <q-toggle
-                color="green"
+              <q-checkbox
+                color="primary"
                 v-model="byMe"
                 label="Suggested by you"
                 right-label
               />
-              <q-toggle
-                color="green"
+              <q-checkbox
+                color="primary"
                 v-model="onProject"
                 label="On project"
                 right-label
               />
             </div>
 
-            <h class="text-bold text-h4">Students</h>
-
+            <div class="text-bold text-h5">Students</div>
             <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
-              <q-list class="scroll">
-                <q-item v-for="(student, index) in students" :key="index">
+              <q-list
+
+                >
+                <q-item v-for="student in students" 
+                    :key="student.name" 
+                    draggable="true"
+                    @dragstart="onDragStart($event, student.name)"
+                    :id="student.name">
                   <StudentCard
                     :name="student.name"
                     :yes="student.yes"
                     :maybe="student.maybe"
                     :no="student.no"
                     :official="student.official"
+                    
                   />
                 </q-item>
               </q-list>
@@ -113,14 +117,14 @@
         so that user can switch back
         to mini-mode
       -->
-      <div class=" absolute" style="top: 15px; right: -17px">
+      <div class="absolute" style="top: 15px; right: -17px">
         <q-btn
           dense
           round
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = true"
+          @click="this.miniState = !this.miniState"
         />
       </div>
     </q-drawer>
@@ -133,49 +137,41 @@ import SegmentedControl from "../SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 
 export default {
-  setup() {
-    const miniState = ref(false)
-    const drawer = ref(false)
-    const search = ref("")
-    const byMe = ref(false)
-    const onProject = ref(false)
-    const roleFilter = ref('all')
-    const suggestion = ref('yes')
-    const students = [
-      {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
-      {name: 'Charlie Puth', yes: 8, maybe: 3, no: 1, official: 'maybe'},
-      {name: 'Charlie Choplin', yes: 0, maybe: 3, no: 1, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'}
-    ]
+  methods: {
+    // Saves the component id and user name in the dataTransfer.
+    // TODO: send id of user instead of name.
+    onDragStart(e, item) {
+      const data = {
+        targetId: e.target.id,
+        name: item
+      }
+      e.dataTransfer.setData('text', JSON.stringify(data))
+      e.dataTransfer.dropEffect = 'copy'
+    }
+  },
+  data() {
 
     return {
-      drawer,
-      miniState,
-      roleFilter,
-      suggestion,
-      search,
-      byMe,
-      onProject,
-      students,
+      drawer: ref(false),
+      miniState: ref(false),
+      roleFilter: ref('all'),
+      suggestion: ref('yes'),
+      search: ref(""),
+      byMe: ref(false),
+      onProject: ref(false),
+      students: [
+        {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
+        {name: 'Charlie Puth', yes: 8, maybe: 3, no: 1, official: 'maybe'},
+        {name: 'Charlie Choplin', yes: 0, maybe: 3, no: 1, official: 'no'},
+        {name: 'Charliee', yes: 3, maybe: 3, no: 5, official: 'no'},
+        {name: 'Charlieee', yes: 3, maybe: 3, no: 5, official: 'no'},
+        {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'}
+      ],
       thumbStyle: {
         right: '1px',
         borderRadius: '3px',
         width: '4px',
         opacity: '0.75'
-      },
-      drawerClick(e) {
-        // if in "mini" state and user
-        // click on drawer, we switch it to "normal" mode
-        if (miniState.value) {
-          miniState.value = false
-
-          // notice we have registered an event with capture flag;
-          // we need to stop further propagation as this click is
-          // intended for switching drawer to "normal" mode only
-          e.stopPropagation()
-        }
       }
     }
   },
@@ -185,3 +181,14 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+:deep(.q-card) {
+    border-radius: 10px !important;
+  }
+  
+  :deep(.q-item) {
+    padding: 8px 8px !important;
+  }
+
+</style>

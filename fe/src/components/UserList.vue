@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md q-gutter-md">
     <div class="row">
-      <h class="text-bold text-h4"> Users</h>
+      <div class="text-bold text-h4"> Users</div>
       <q-space />
       <q-btn
         stack

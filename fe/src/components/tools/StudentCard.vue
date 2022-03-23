@@ -1,6 +1,6 @@
 <template>
-  <q-card class="my-card full-width">
-    <q-card-section rounded>
+  <q-card class="full-width">
+    <q-card-section style="padding: 10px !important">
       <div class="row justify-between">
         <div >
           <label class="text-bold q-pr-xs">{{ name }}</label>
@@ -44,6 +44,3 @@ export default {
 
 }
 </script>
-
-<style scoped>
-</style>
