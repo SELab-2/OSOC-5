@@ -6,6 +6,8 @@ interface State {
   loggedInUser: { email: string; password: string } | undefined
 }
 
+const host = 'http://localhost:3000'
+
 export const useAuthenticationStore = defineStore('user/authentication', {
   state: (): State => ({
     loggedInUser: undefined,
@@ -18,7 +20,9 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         username: email,
         email,
         password,
-      },{withCredentials: true})
+      },{withCredentials: true}).then(function() {
+        window.location.href = host + '/students'
+      })
 
       setCsrfToken()
 

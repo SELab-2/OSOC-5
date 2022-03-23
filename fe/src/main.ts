@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import {createApp, markRaw} from 'vue'
 import App from './App.vue'
 // @ts-ignore
 import router from './router'
@@ -14,8 +14,13 @@ import '@quasar/extras/mdi-v6/mdi-v6.css'
 import 'quasar/src/css/index.sass'
 import MasonryWall from '@yeger/vue-masonry-wall'
 
+const pinia = createPinia()
+pinia.use(({ store }) => {
+    store.router = markRaw(router)
+})
+
 createApp(App)
-    .use(createPinia())
+    .use(pinia)
     .use(router)
     .use(MasonryWall)
     .use(Quasar,
