@@ -20,7 +20,7 @@
 
   export default defineComponent({
     props: {
-      modelValue: String, 
+      modelValue: string, 
       options: {
         type: [Object as PropType<Option>], // [{ name: String, label: String}]
         required: true
@@ -32,7 +32,7 @@
     },
     emits: ['update:modelValue'],
     computed: {
-      value: String {
+      value: string {
         get() {
           return this.modelValue
         },
