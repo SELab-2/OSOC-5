@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { defineStore } from 'pinia'
+import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 interface State {
@@ -16,8 +16,8 @@ export const useCoachStore = defineStore('user/coach', {
     async loadUsers() {
       this.isLoadingUsers = true
 
-      axios
-        .get('https://sel2-5.ugent.be/api/coaches')
+      instance
+        .get('coaches/')
         .then(({ data }) => {
           this.isLoadingUsers = false
           this.users = data.map((u: Object) => convertObjectKeysToCamelCase(u))

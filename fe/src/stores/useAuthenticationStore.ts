@@ -1,28 +1,28 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
+import { setCsrfToken } from '../utils/axios'
 
 interface State {
-  loggedInUser: User | undefined
-  token: String
+  loggedInUser: { email: string; password: string } | undefined
 }
 
 export const useAuthenticationStore = defineStore('user/authentication', {
   state: (): State => ({
     loggedInUser: undefined,
-    token: '',
   }),
   actions: {
     // https://sel2-5.ugent.be
-    async login(credentials: { email: String; password: String }) {
-      axios
-        .post('http://localhost:8000/api/login', credentials)
-        .then(({ data }) => {
-          console.log(data)
-          //   this.isLoadingUsers = false
-          //   this.users = data.map((u: Object) => convertObjectKeysToCamelCase(u))
-        })
-      // .catch(() => (this.isLoadingUsers = false))
+    // admin@example.com
+    async login({ email, password }: { email: string; password: string }) {
+      await axios.post('http://localhost:8000/api/login/', {
+        username: email,
+        email,
+        password,
+      })
+
+      setCsrfToken()
+
+      this.loggedInUser = { email, password }
     },
     logout() {
       this.$reset()
