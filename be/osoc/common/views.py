@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from django.urls import resolve
 from urllib.parse import urlparse
 from .models import *
-from .permissions import IsAdmin
+from .permissions import IsAdmin, IsOwnerOrAdmin
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -44,15 +44,36 @@ class StudentViewSet(viewsets.ModelViewSet):
 class CoachViewSet(viewsets.GenericViewSet, 
                    mixins.ListModelMixin, 
                    mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):
     """
     API endpoint that allows coaches to be viewed or removed.
-    a coach cannot be created or updated by this API endpoint
-    only admin users have permission for this endpoint
+    a coach cannot be created by this API endpoint
+    a coach can only update and view its own data, except for admins
     """
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
+
+    @action(detail=True, methods=['put'])
+    def make_admin(self, request, pk=None):
+        """
+        let an admin give admin rights to another user
+        """
+        coach = self.get_object()
+        coach.is_admin = True
+        coach.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=True, methods=['put'])
+    def remove_admin(self, request, pk=None):
+        """
+        let an admin remove admin rights from another user
+        """
+        coach = self.get_object()
+        coach.is_admin = False
+        coach.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -124,10 +145,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SkillViewSet(viewsets.GenericViewSet,
-                   mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin):
+class SkillViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows skills to be listed, created and deleted.
     """
