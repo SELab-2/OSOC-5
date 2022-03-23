@@ -179,18 +179,22 @@
     <q-dialog v-model='new_role_prompt' persistent>
         <q-card style='min-width: 350px'>
             <q-card-section>
-                <div class='text-h6'>Enter new role name:</div>
+                <div class='text-h6'>Create a new role</div>
             </q-card-section>
 
             <q-card-section class='q-pt-none'>
-                <q-input dense v-model='new_role' autofocus
-                         @keyup.enter='new_role_prompt = false' />
+                <q-input outlined
+                         v-model='new_role'
+                         class='inputfield'
+                         label='Role name'
+                         lazy-rules
+                         :rules="[ (val) => (val && val.length > 0) || 'Enter the name of the new role.', ]"
+                />
             </q-card-section>
 
             <q-card-actions align='right' class='text-primary'>
                 <q-btn flat label='Cancel' v-close-popup />
-                <q-btn flat label='Add role' v-close-popup />
-                <!--                TODO: this doesn't add it to the list yet-->
+                <q-btn flat label='Add role' @click='new_role_confirm' />
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -206,7 +210,7 @@ const columns_roles = [
     { name: 'comment', align: 'left', label: 'Comment', field: 'comment' },
 ]
 
-const rows_rols = [
+const original_rows_rols = [
     {
         name: 'Frond-End',
         amount: 0,
@@ -273,6 +277,8 @@ export default {
         const new_role_prompt = ref(false)
         const new_role = ref('')
 
+        const rows_rols = ref([...original_rows_rols])
+
 
         return {
             pagination_roles: {
@@ -312,9 +318,9 @@ export default {
                 /* TODO expand if actually used ... */
             },
 
-
-            rows_rols: ref(rows_rols),
             columns_roles,
+            rows_rols,
+
             columns_coaches,
             rows_coaches,
 
@@ -331,10 +337,16 @@ export default {
                 errorMessageRoleAmount.value = ''
                 return true
             },
+
             new_role_prompt,
             new_role,
-            addNewRole() {
-                /* TODO: implement and use */
+            new_role_confirm() {
+                if (new_role.value && new_role.value.length > 0) {
+                    rows_rols.value = [...rows_rols.value, { name: new_role.value, amount: 0, comment: '' }]
+
+                    new_role_prompt.value = false
+                    new_role.value = ''
+                }
             },
         }
     },
@@ -348,14 +360,11 @@ export default {
     border-radius: 14px !important
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px
 
-
 .primarybuttonshadow
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px
 
-
 .cornered
     border-radius: 10px !important
-
 
 .projectcol
     padding-left: 15px
@@ -364,7 +373,6 @@ export default {
 .projectsubtitle
     font-weight: 300
     text-align: center
-
 
 .table
     border-radius: 10px
