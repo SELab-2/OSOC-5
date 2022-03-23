@@ -2,9 +2,8 @@
     <q-form
         @submit='onSubmit'
         @reset='onReset'
-        style='max-width: 90%; margin: 25px auto'
     >
-        <h2 style='font-weight: 800'>Create project</h2>
+        <h2 class='appPageTitle'>Create project</h2>
         <div class='row'>
             <div class='projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4'>
                 <h4 class='projectsubtitle'>Basic Info</h4>
@@ -161,7 +160,7 @@
                 label='Cancel'
                 type='cancel'
                 size='md'
-                class='q-mx-md cornered primarybuttonshadow'
+                class='q-mx-md cornered'
                 to='/projects'
             />
             <q-btn
@@ -170,7 +169,7 @@
                 label='Submit'
                 type='submit'
                 size='md'
-                class='q-mx-md cornered primarybuttonshadow'
+                class='q-mx-md cornered'
             />
             <q-space />
         </div>
@@ -184,6 +183,7 @@
 
             <q-card-section class='q-pt-none'>
                 <q-input outlined
+                         autofocus
                          v-model='new_role'
                          class='inputfield'
                          label='Role name'
@@ -282,10 +282,10 @@ export default {
 
         return {
             pagination_roles: {
-                rowsPerPage: 10, // current rows per page being displayed
+                rowsPerPage: 5, // current rows per page being displayed
             },
             pagination_coaches: {
-                rowsPerPage: 10, // current rows per page being displayed
+                rowsPerPage: 5, // current rows per page being displayed
             },
 
             project_name,
@@ -360,9 +360,6 @@ export default {
     border-radius: 14px !important
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px
 
-.primarybuttonshadow
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px
-
 .cornered
     border-radius: 10px !important
 
@@ -373,6 +370,8 @@ export default {
 .projectsubtitle
     font-weight: 300
     text-align: center
+    margin-top: 0
+    margin-bottom: 15px
 
 .table
     border-radius: 10px
@@ -381,4 +380,12 @@ export default {
         /* bg color is important for th; just specify one */
         background-color: $yellow-7
 
+.q-form
+    max-width: 90%
+    margin-left: 25px
+    margin-right: 25px
+
+.appPageTitle
+    font-weight: 800
+    font-size: xxx-large
 </style>
