@@ -4,6 +4,10 @@ from rest_framework.reverse import reverse
 
 from osoc.common.models import Coach, Project, ProjectSuggestion, Skill, Student, Suggestion
 
+"""
+run tests with the following command:
+`docker exec -it osoc-be python manage.py test osoc.common.tests.py`
+"""
 
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:
@@ -362,31 +366,63 @@ class CoachTestsCoach(APITestCase):
             password="p4ssWorD",
             email="email2@example.com"
         )
-        Coach.objects.create(
-            first_name="first name",
-            last_name="last name",
-            password="Paa$w0oRdd",
-            email="email3@example.com"
-        )
 
-        user = Coach.objects.create_user(
-            first_name="username", password="Pas$w0rd", last_name="last_name", email="email@example.com")
-        self.client.force_authenticate(user)
+        self.user = Coach.objects.create_user(
+            first_name="username", 
+            password="Pas$w0rd", 
+            last_name="last_name", 
+            email="email@example.com")
+        self.client.force_authenticate(self.user)
 
-    def test_get_coach_list(self):
+    def test_get_coach_list_forbidden(self):
         url = reverse("coach-list")
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], Coach.objects.count())
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    
+    def test_get_coach_instance_forbidden(self):
+        coach = Coach.objects.exclude(id=self.user.id).first()
+        url = reverse("coach-detail", args=(coach.id,))
+        response = self.client.get(url)
 
-    def test_get_coach_instance(self):
-        coach = Coach.objects.first()
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_coach_instance_owner(self):
+        coach = self.user
         url = reverse("coach-detail", args=(coach.id,))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["email"], coach.email)
+    
+    def test_update_coach_forbidden(self):
+        coach = Coach.objects.exclude(id=self.user.id).first()
+        old_name = coach.first_name
+        url = reverse("coach-detail", args=(coach.id,))
+        data = {
+            "first_name": "new first name",
+            "last_name": "last name",
+            "email": "email2@example.com"
+        }
+        response = self.client.put(url, data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(coach.first_name, old_name)
+    
+    def test_update_coach_owner(self):
+        coach = self.user
+        url = reverse("coach-detail", args=(coach.id,))
+        data = {
+            "first_name": "new first name",
+            "last_name": "last name",
+            "email": "email2@example.com"
+        }
+        response = self.client.put(url, data=data, format="json")
+        print(response.content)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["first_name"], data["first_name"])
+        self.assertEqual(coach.first_name, data["first_name"])
 
     def test_get_coach_instance_not_found(self):
         url = reverse("coach-detail", args=(50,))
@@ -410,16 +446,28 @@ class CoachTestsAdmin(APITestCase):
             password="p4ssWorD",
             email="email2@example.com"
         )
-        Coach.objects.create(
-            first_name="first name",
-            last_name="last name",
-            password="Paa$w0oRdd",
-            email="email3@example.com"
-        )
 
-        admin = Coach.objects.create_user(
-            first_name="admin", password="Pas$w0rd", last_name="last_name", email="admin@example.com", is_admin=True)
-        self.client.force_authenticate(admin)
+        self.admin = Coach.objects.create_user(
+            first_name="admin", 
+            password="Pas$w0rd", 
+            last_name="last_name", 
+            email="admin@example.com", 
+            is_admin=True)
+        self.client.force_authenticate(self.admin)
+    
+    def test_coach_list(self):
+        url = reverse("coach-list")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], Coach.objects.count())
+    
+    def test_coach_instance(self):
+        coach = Coach.objects.exclude(id=self.admin.id).first()
+        url = reverse("coach-detail", args=(coach.id,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_delete_coach(self):
         id = Coach.objects.first().id
@@ -436,3 +484,23 @@ class CoachTestsAdmin(APITestCase):
         response = self.client.delete(url)
         
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_coach_make_admin(self):
+        coach = Coach.objects.exclude(id=self.admin.id).first()
+        coach.is_admin = False
+        coach.save()
+        url = reverse("coach-make-admin", args=(coach.id,))
+        response = self.client.put(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(coach.is_admin, True)
+    
+    def test_coach_remove_admin(self):
+        coach = Coach.objects.exclude(id=self.admin.id).first()
+        coach.is_admin = True
+        coach.save()
+        url = reverse("coach-remove-admin", args=(coach.id,))
+        response = self.client.put(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(coach.is_admin, False)
