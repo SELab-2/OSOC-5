@@ -1,9 +1,7 @@
-FROM python:3.9-slim
+FROM python:3.9
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-
-EXPOSE 80
 
 # COPY requirements.txt requirements.txt
 # RUN pip3 install -r requirements.txt
@@ -27,7 +25,9 @@ RUN pip install --upgrade pip && \
 CMD \
     chmod 755 ./docker/wait-for-it.sh && \
     ./docker/wait-for-it.sh -t 0 db:5432 --strict -- && \
+    # python manage.py makemigrations && \
     python manage.py migrate && \
+    python scripts/create_data_fixtures.py \
     python scripts/create_superuser.py \
     && \
     python manage.py runserver 0.0.0.0:8000

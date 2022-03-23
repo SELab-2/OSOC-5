@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md q-gutter-md">
     <div class="row">
-      <h class="text-bold text-h4"> Users</h>
+      <div class="text-bold text-h4"> Users</div>
       <q-space />
       <q-btn
         stack
@@ -43,7 +43,7 @@
          This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
     <q-table
       class="my-table user-table shadow-4"
-      :rows="users"
+      :rows="coachStore.users"
       :columns="columns"
       row-key="id"
       :filter="roleFilter"
@@ -56,7 +56,7 @@
           :props="props"
         >
           <q-td key="name" @click="console.log(props)" :props="props">
-            {{ props.row.name }}
+            {{ props.row.firstName }} {{ props.row.lastName }}
           </q-td>
           <q-td key="role" :props="props">
             <q-select
@@ -97,6 +97,7 @@
               flat
               round
               style="color: #f14a3b"
+              @click="coachStore.removeUser(props.row.id)"
               icon="mdi-trash-can-outline"
             />
           </q-td>
@@ -190,76 +191,6 @@ const roles = [
 ]
 export default defineComponent({
   components: { SegmentedControl },
-  data() {
-    return {
-      users: [
-        {
-          id: 123,
-          name: 'Miet Claeys',
-          email: 'miet@osoc.be',
-          role: ref('admin'),
-        },
-        {
-          id: 1234,
-          name: 'Wouter Hennen',
-          email: 'wouter.hennen@ugent.be',
-          role: ref('admin'),
-        },
-        {
-          id: 1235,
-          name: 'Lisa De Jonghe',
-          email: 'lisa.dejonghe@ugent.be',
-          role: ref('admin'),
-        },
-        {
-          id: 1236,
-          name: 'Lander Saerens',
-          email: 'lander.saerens@ugent.be',
-          role: ref('coach'),
-          assignedto: 'Project #1',
-        },
-        {
-          id: 1237,
-          name: 'Friedrich Vandenberghe',
-          email: 'friedrich.vandenberghe@ugent.be',
-          role: ref('coach'),
-          assignedto: 'Project #2',
-        },
-        {
-          id: 1238,
-          name: 'Miet Claeys',
-          email: 'miet@osoc.be',
-          role: ref('coach'),
-          assignedto: 'Project #3',
-        },
-        {
-          id: 1239,
-          name: 'Wouter Hennen',
-          email: 'wouter.hennen@ugent.be',
-          role: ref('coach'),
-          assignedto: 'Project #1',
-        },
-        {
-          id: 1230,
-          name: 'Lisa De Jonghe',
-          email: 'lisa.dejonghe@ugent.be',
-          role: ref('inactive'),
-        },
-        {
-          id: 1231,
-          name: 'Lander Saerens',
-          email: 'lander.saerens@ugent.be',
-          role: ref('inactive'),
-        },
-        {
-          id: 1232,
-          name: 'Friedrich Vandenberghe',
-          email: 'friedrich.vandenberghe@ugent.be',
-          role: ref('inactive'),
-        },
-      ],
-    }
-  },
   methods: {
     // Method for searching the table.
     // Terms is equal to roleFilter.
@@ -330,7 +261,20 @@ export default defineComponent({
     
     onMounted(() => {
       coachStore.loadUsers();
+      coachStore.$subscribe((users, state) => {
+        console.log(users, state)
+        switch (users.events.key) {
+            case 'role':
+              coachStore.updateRole(users.events.target, users.events.newValue, () => $q.notify({
+                icon: 'done',
+                color: 'warning',
+                message: `Will update role to ${users.events.newValue} for ${users.events.target.firstName} ${users.events.target.lastName}`,
+                textColor: 'black'
+              }))
+        }
+      })
     })
+    
 
     return {
       active: ref(true),

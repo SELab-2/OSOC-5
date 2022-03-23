@@ -2,6 +2,8 @@
 Describes the database (PostgreSQL) models.
 """
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
@@ -15,13 +17,11 @@ phone_regex = RegexValidator(
 class Skill(models.Model):
     """
     Skill; A talent or ability of a Student.
-
-    Students can more than one skill (many-to-many relationship).
+    Students can have more than one skill (many-to-many relationship).
     """
     name = models.CharField(
         _('name'),
-        max_length=255,
-        primary_key=True
+        max_length=255
     )
     description = models.CharField(
         _('description'),
@@ -29,11 +29,47 @@ class Skill(models.Model):
     )
 
 
-class Coach(models.Model):
+class CoachManager(BaseUserManager):
+    """
+    Custom user model manager where email is the unique identifiers
+    for authentication instead of usernames.
+    """
+
+    def create_user(self, email, password, **extra_fields):
+        """
+        Create and save a User with the given email and password.
+        """
+        if not email:
+            raise ValueError(_('The Email must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        """
+        Create and save a SuperUser with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+        return self.create_user(email, password, **extra_fields)
+
+
+class Coach(AbstractUser):  # models.Model):
     """
     Coach; Person who, together with other coaches, oversees
            one or more projects.
     """
+
+    username = None
+
     first_name = models.CharField(
         _('name'),
         max_length=255,
@@ -56,6 +92,11 @@ class Coach(models.Model):
         blank=True,
         null=True
     )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CoachManager()
 
     def get_full_name(self):
         """
@@ -164,12 +205,11 @@ class Student(models.Model):
     )
     skills = models.ManyToManyField(
         Skill,
-        # on_delete=models.CASCADE
     )
     suggestions = models.ManyToManyField(
         Coach,
         through='Suggestion',
-        # on_delete=models.CASCADE,
+        blank=True
     )
 
     def get_full_name(self):
@@ -220,25 +260,28 @@ class Project(models.Model):
     extra_info = models.TextField(
         _('extra info'),
     )
-    skills = models.ManyToManyField(
+    required_skills = models.ManyToManyField(
         Skill,
-        through='ProjectNeedsSkills',
-        # on_delete=models.CASCADE,
+        through='RequiredSkills',
     )
     coaches = models.ManyToManyField(
         Coach,
-        blank=True,
-        # on_delete=models.CASCADE,
+        blank=True
+    )
+    suggested_students = models.ManyToManyField(
+        Student,
+        through='ProjectSuggestion',
+        blank=True
     )
 
     def __str__(self):
         return self.name
 
 
-class ProjectNeedsSkills(models.Model):
+class RequiredSkills(models.Model):
     """
-    Intermediary model; A project can need skill N times.
-    """
+        Intermediary model; A project can need a skill N times.
+        """
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE
@@ -275,13 +318,15 @@ class Suggestion(models.Model):
         _('suggestion'),
         max_length=1,
         choices=Suggestion.choices,
-        default=None,
     )
     reason = models.TextField(
         _('reason'),
         blank=True,
         null=True
     )
+
+    class Meta:
+        unique_together = (("student", "coach"))
 
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
@@ -314,4 +359,6 @@ class ProjectSuggestion(models.Model):
     )
 
     class Meta:
-        unique_together = (("project", "student", "coach"),)
+
+        unique_together = (("project", "student", "coach"))
+

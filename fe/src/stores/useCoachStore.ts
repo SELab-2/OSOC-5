@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { defineStore } from 'pinia'
+import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 interface State {
@@ -15,14 +15,27 @@ export const useCoachStore = defineStore('user/coach', {
   actions: {
     async loadUsers() {
       this.isLoadingUsers = true
-
-      axios
-        .get('https://sel2-5.ugent.be/api/coaches')
+      instance
+        .get('coaches/')
         .then(({ data }) => {
           this.isLoadingUsers = false
-          this.users = data.map((u: Object) => convertObjectKeysToCamelCase(u))
+          this.users = convertObjectKeysToCamelCase(data).results
+          this.users.forEach(user => {user.role = user.isAdmin ? 'admin' : 'coach'})
         })
         .catch(() => (this.isLoadingUsers = false))
+    },
+    async updateRole(user, newRole, callback) {
+      console.log(`Will update role to ${newRole} for ${user.firstName} ${user.lastName}`)
+      callback();
+    },
+    async removeUser(userId) {
+      await instance
+      .delete(`coaches/${userId}/`)
+      .then(() => {
+        const index = this.users.findIndex(user => user.id === userId)
+        this.users.splice(index,1)
+      })
+      .catch(() => console.log("Failed to delete"))
     },
     clearUsers() {
       this.$reset()
