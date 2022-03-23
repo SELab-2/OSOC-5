@@ -46,7 +46,6 @@
       :rows="users"
       :columns="columns"
       row-key="id"
-      :pagination="pagination"
       :filter="roleFilter"
       :filter-method="useTableFilter"
       separator="horizontal"
@@ -107,12 +106,14 @@
   </div>
 </template>
 
-<script>
-import { ref, computed, watch } from 'vue'
-import { exportFile } from 'quasar'
+<script lang="ts">
+import { defineComponent, onMounted } from '@vue/runtime-core'
+import {useCoachStore} from "../stores/useCoachStore"
+import { ref } from 'vue'
+import { exportFile, useQuasar } from 'quasar'
 import SegmentedControl from './SegmentedControl.vue'
 
-function wrapCsvValue(val, formatFn) {
+const wrapCsvValue = (val: String, formatFn: ((arg0: any) => any) | undefined) => {
   let formatted = formatFn !== void 0 ? formatFn(val) : val
 
   formatted =
@@ -187,7 +188,7 @@ const roles = [
     icon: 'mdi-close',
   },
 ]
-export default {
+export default defineComponent({
   components: { SegmentedControl },
   data() {
     return {
@@ -263,12 +264,12 @@ export default {
     // Method for searching the table.
     // Terms is equal to roleFilter.
     // The method filter to the elements which pass both filters.
-    useTableFilter(rows, terms, cols, cellValue) {
-      const lowerTerms = this.filter ? this.filter.toLowerCase() : ''
+    useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: any, arg1: any) => string) {
+      const lowerTerms = this.filter?.toLowerCase() ?? ''
       
-      return rows.filter((row) =>
+      return rows.filter((row: any) =>
         (terms == 'all' || cellValue(cols[1], row) == terms) &&
-        cols.some((col) => {
+        cols.some((col: any) => {
           const val = cellValue(col, row) + ''
           const haystack =
             val === 'undefined' || val === 'null' ? '' : val.toLowerCase()
@@ -292,7 +293,7 @@ export default {
         columns.slice(0, -1).map((col) => wrapCsvValue(col.label)),
       ]
         .concat(
-          this.users.map((row) =>
+          this.users.map((row: { [x: string]: any }) =>
             columns
               .slice(0, -1)
               .map((col) =>
@@ -315,7 +316,7 @@ export default {
       )
 
       if (status !== true) {
-        $q.notify({
+        this.$q.notify({
           message: 'Browser denied file download...',
           color: 'negative',
           icon: 'warning',
@@ -324,15 +325,24 @@ export default {
     },
   },
   setup() {
+    const coachStore = useCoachStore()
+    const $q = useQuasar()
+    
+    onMounted(() => {
+      coachStore.loadUsers();
+    })
+
     return {
       active: ref(true),
       filter: ref(''),
       roleFilter: ref('all'),
       columns,
       roles,
+      coachStore,
+      $q
     }
   },
-}
+})
 </script>
 
 <style scoped>

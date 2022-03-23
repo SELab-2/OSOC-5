@@ -43,10 +43,10 @@
   </q-header>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
 
-import { useQuasar, useMeta } from 'quasar'
+import { useMeta } from 'quasar'
 
 const metaData = {
   meta: {
@@ -54,7 +54,7 @@ const metaData = {
   },
 }
 
-export default {
+export default defineComponent({
   data() {
     return {
       user: {
@@ -82,5 +82,5 @@ export default {
       tab: ref('students'),
     }
   },
-}
+})
 </script>
