@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card full-width">
+  <q-card class="my-card full-width full-height">
     <q-card-section rounded>
       <div class="row justify-between">
         <div >
