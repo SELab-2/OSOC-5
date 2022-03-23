@@ -78,7 +78,6 @@ import SegmentedControl from "../SegmentedControl.vue";
 import StudentCard from "../cards/StudentCard.vue";
 import TitleTextCard from "../cards/TitleTextCard.vue";
 import SuggestionsCard from "../cards/SuggestionsCard.vue";
-import DocumentsCard from "../cards/DocumentsCard.vue";
 import PracticalCard from "../cards/PracticalCard.vue";
 import DetailsCard from "../cards/DetailsCard.vue";
 
