@@ -1,11 +1,11 @@
 <template>
   <q-tabs
-    v-model="value"
+    v-model="this.value"
     class="bg-white text-black shadow-2"
-    :indicator-color="color"
+    :indicator-color="this.color"
     style="border-radius: 10px;"
   >
-    <q-tab v-for="(option, index) in options" :key="index" no-caps :ripple="false" :name="option.name" :label="option.label"/>
+    <q-tab v-for="(option, index) in this.options" :key="index" no-caps :ripple="false" :name="option.name" :label="option.label"/>
   </q-tabs>
 </template>
 
@@ -33,7 +33,7 @@
     emits: ['update:modelValue'],
     computed: {
       value: {
-        get() {
+        get(): String {
           return this.modelValue
         },
         set(value: String) {
