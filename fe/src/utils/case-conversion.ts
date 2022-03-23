@@ -27,6 +27,8 @@ const keysToCamel = function (o: Object): Object {
         })
 
         return n
+    } else if (isArray(o)) {
+        return o.map(obj => keysToCamel(obj))
     }
 
     return o
