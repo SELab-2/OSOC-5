@@ -18,7 +18,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         username: email,
         email,
         password,
-      })
+      },{withCredentials: true})
 
       setCsrfToken()
 
