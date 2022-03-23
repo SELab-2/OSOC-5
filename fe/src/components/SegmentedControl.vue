@@ -32,7 +32,7 @@
     },
     emits: ['update:modelValue'],
     computed: {
-      value: {
+      value: String {
         get() {
           return this.modelValue
         },
