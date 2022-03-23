@@ -143,11 +143,11 @@ export default {
     const suggestion = ref('yes')
     const students = [
       {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
-      {name: 'Charlie Puth', yes: 8, maybe: 3, no: 1, official: 'maybe'},
-      {name: 'Charlie Choplin', yes: 0, maybe: 3, no: 1, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'},
-      {name: 'Charlie', yes: 3, maybe: 3, no: 5, official: 'no'}
+      {name: 'Echo Sierra', yes: 8, maybe: 3, no: 1, official: 'maybe'},
+      {name: 'November Quebec', yes: 0, maybe: 3, no: 1, official: 'no'},
+      {name: 'Charles Callender', yes: 3, maybe: 3, no: 5, official: 'maybe'},
+      {name: 'Ressie Rosser', yes: 0, maybe: 1, no: 5, official: 'yes'},
+      {name: 'Jane Johnson', yes: 3, maybe: 3, no: 5, official: 'no'}
     ]
 
     return {
