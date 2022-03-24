@@ -1,8 +1,8 @@
 <template>
     <div style='margin: 5px'>
         <SideBar />
-        <div class="q-ma-sm">
-        <div class="text-bold text-h4 q-ml-sm">Projects</div>
+            <div class="q-ma-sm">
+        <div class="text-bold text-h3 q-mx-sm" >Projects</div>
         
         <div>
             <masonry-wall :items="projects" :ssr-columns="1" :column-width="320" :gap="0">
