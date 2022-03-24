@@ -1,19 +1,29 @@
+"""
+Django tests for API endpoints.
+
+Running tests is different because the project uses Docker:
+
+    1. Run all tests:
+        `docker exec -it osoc-be python manage.py test osoc.common.tests`
+
+    2. Run one test class:
+        `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>`
+
+    3. Run a single test:
+        `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>.<TESTMETHOD>`
+"""
 from rest_framework.test import APITestCase
+from django.test import TestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from osoc.common.models import Coach, Project, ProjectSuggestion, Skill, Student, Suggestion
+import osoc.common.utils as utils
 
-"""
-run all tests:
-`docker exec -it osoc-be python manage.py test osoc.common.tests`
-
-run one test class:
-`docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>`
-
-run a single test:
-`docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>.<TESTMETHOD>`
-"""
+class UtilityTestCases(TestCase):
+    def testStripAndLowerEmail(self):
+        self.assertEqual('admin@example.com', utils.strip_and_lower_email('Admin@Example.com'))
+        self.assertEqual('admin@example.com', utils.strip_and_lower_email('  Admin@Example.com    '))
 
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:
@@ -52,7 +62,7 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], Project.objects.count())
-    
+
     def test_get_project_instance(self):
         project = Project.objects.first()
         url = reverse("project-detail", args=(project.id,))
@@ -62,7 +72,7 @@ class ProjectTestsCoach(APITestCase):
         self.assertEqual(response.data["name"], project.name)
         self.assertEqual(response.data["partner_name"], project.partner_name)
         self.assertEqual(response.data["extra_info"], project.extra_info)
-    
+
     def test_get_project_instance_not_found(self):
         url = reverse("project-detail", args=(50,))
         response = self.client.get(url)
@@ -81,14 +91,14 @@ class ProjectTestsCoach(APITestCase):
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_delete_project_forbidden(self):
         id = Project.objects.first().id
         url = reverse("project-detail", args=(id,))
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_project_suggest_student(self):
         project = Project.objects.first()
         url = reverse("project-suggest-student", args=(project.id,))
@@ -96,7 +106,7 @@ class ProjectTestsCoach(APITestCase):
         skill = Skill.objects.first()
         data = {
             "student": reverse("student-detail", args=(student.id,)),
-            "role": reverse("skill-detail", args=(skill.id,)), 
+            "role": reverse("skill-detail", args=(skill.id,)),
             "reason": "a reason"
         }
         before_count = ProjectSuggestion.objects.filter(project=project).count()
@@ -105,7 +115,7 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(before_count, after_count-1)
-    
+
     def test_project_remove_student(self):
         project = Project.objects.first()
         url = reverse("project-suggest-student", args=(project.id,))
@@ -113,7 +123,7 @@ class ProjectTestsCoach(APITestCase):
         skill = Skill.objects.first()
         data = {
             "student": reverse("student-detail", args=(student.id,)),
-            "role": reverse("skill-detail", args=(skill.id,)), 
+            "role": reverse("skill-detail", args=(skill.id,)),
             "reason": "a reason"
         }
         response = self.client.post(url, data, format="json")
@@ -161,13 +171,13 @@ class ProjectTestsAdmin(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["name"], data["name"])
         self.assertEqual(before_count, after_count-1)
-    
+
     def test_create_project_bad_request(self):
         url = reverse("project-list")
         response = self.client.post(url, {}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_delete_project(self):
         id = Project.objects.first().id
         url = reverse("project-detail", args=(id,))
@@ -177,11 +187,11 @@ class ProjectTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
-    
+
     def test_delete_project_not_found(self):
         url = reverse("project-detail", args=(50,))
         response = self.client.delete(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -231,11 +241,11 @@ class SkillTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
-    
+
     def test_delete_skill_not_found(self):
         url = reverse("skill-detail", args=(50,))
         response = self.client.delete(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_skill(self):
@@ -251,7 +261,7 @@ class SkillTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["name"], data["name"])
         self.assertEqual(before_count, after_count-1)
-    
+
     def test_create_skill_bad_request(self):
         url = reverse("skill-list")
         response = self.client.post(url, {}, format="json")
@@ -310,11 +320,11 @@ class StudentTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
-    
+
     def test_delete_student_not_found(self):
         url = reverse("student-detail", args=(50,))
         response = self.client.delete(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_student(self):
@@ -338,7 +348,7 @@ class StudentTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["email"], data["email"])
         self.assertEqual(before_count, after_count-1)
-    
+
     def test_create_student_bad_request(self):
         url = reverse("student-list")
         response = self.client.post(url, {}, format="json")
@@ -352,10 +362,10 @@ class StudentTests(APITestCase):
         before_count = Suggestion.objects.filter(student=student).count()
         response = self.client.post(url, data, format="json")
         after_count = Suggestion.objects.filter(student=student).count()
-        
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(before_count, after_count-1)
-    
+
     def test_student_make_suggestion_bad_request(self):
         student = Student.objects.first()
         url = reverse("student-make-suggestion", args=(student.id,))
@@ -374,9 +384,9 @@ class CoachTestsCoach(APITestCase):
         )
 
         self.user = Coach.objects.create_user(
-            first_name="username", 
-            password="Pas$w0rd", 
-            last_name="last_name", 
+            first_name="username",
+            password="Pas$w0rd",
+            last_name="last_name",
             email="email@example.com")
         self.client.force_authenticate(self.user)
 
@@ -385,7 +395,7 @@ class CoachTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_get_coach_instance_forbidden(self):
         coach = Coach.objects.exclude(id=self.user.id).first()
         url = reverse("coach-detail", args=(coach.id,))
@@ -400,7 +410,7 @@ class CoachTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["email"], coach.email)
-    
+
     def test_update_coach_forbidden(self):
         coach = Coach.objects.exclude(id=self.user.id).first()
         old_name = coach.first_name
@@ -414,7 +424,7 @@ class CoachTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(coach.first_name, old_name)
-    
+
     def test_update_coach_owner(self):
         coach = self.user
         url = reverse("coach-detail", args=(coach.id,))
@@ -454,27 +464,27 @@ class CoachTestsAdmin(APITestCase):
         )
 
         self.admin = Coach.objects.create_user(
-            first_name="admin", 
-            password="Pas$w0rd", 
-            last_name="last_name", 
-            email="admin@example.com", 
+            first_name="admin",
+            password="Pas$w0rd",
+            last_name="last_name",
+            email="admin@example.com",
             is_admin=True)
         self.client.force_authenticate(self.admin)
-    
+
     def test_coach_list(self):
         url = reverse("coach-list")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], Coach.objects.count())
-    
+
     def test_coach_instance(self):
         coach = Coach.objects.exclude(id=self.admin.id).first()
         url = reverse("coach-detail", args=(coach.id,))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
+
     def test_delete_coach(self):
         id = Coach.objects.first().id
         url = reverse("coach-detail", args=(id,))
@@ -484,13 +494,13 @@ class CoachTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
-    
+
     def test_delete_coach_not_found(self):
         url = reverse("coach-detail", args=(50,))
         response = self.client.delete(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_coach_make_admin(self):
         coach = Coach.objects.exclude(id=self.admin.id).first()
         coach.is_admin = False
@@ -500,7 +510,7 @@ class CoachTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Coach.objects.get(id=coach.id).is_admin, True)
-    
+
     def test_coach_remove_admin(self):
         coach = Coach.objects.exclude(id=self.admin.id).first()
         coach.is_admin = True
