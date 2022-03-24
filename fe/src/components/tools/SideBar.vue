@@ -131,7 +131,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import {ref} from 'vue'
 import SegmentedControl from "../SegmentedControl.vue";
 import StudentCard from "../cards/StudentCard.vue";

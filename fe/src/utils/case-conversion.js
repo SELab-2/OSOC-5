@@ -1,28 +1,28 @@
-const toCamel = (s: string) => {
-    return s.replace(/([_][a-z])/gi, ($1: string) => {
+const toCamel = (s) => {
+    return s.replace(/([_][a-z])/gi, ($1) => {
         return $1.toUpperCase().replace('_', '')
     })
 }
 
-const toSnake = (s: string) => {
-    return s.replace(/(.)([A-Z])/g, (_: any, $2: any, $3: string) => {
+const toSnake = (s) => {
+    return s.replace(/(.)([A-Z])/g, (_, $2, $3) => {
         return `${$2}_${$3.toLowerCase()}`
     })
 }
 
-const isArray = function (a: any) {
+const isArray = function (a) {
     return Array.isArray(a)
 }
 
-const isObject = function (o: any) {
+const isObject = function (o) {
     return o === Object(o) && !isArray(o) && typeof o !== 'function'
 }
 
-const keysToCamel = function (o: Object): Object {
+const keysToCamel = function (o) {
     if (isObject(o)) {
         const n = {}
 
-        Object.keys(o).forEach((k: string) => {
+        Object.keys(o).forEach((k) => {
             n[toCamel(k)] = keysToCamel(o[k])
         })
 
@@ -34,11 +34,11 @@ const keysToCamel = function (o: Object): Object {
     return o
 }
 
-const keysToSnake = function (o: Object): Object {
+const keysToSnake = function (o) {
     if (isObject(o)) {
         const n = {}
 
-        Object.keys(o).forEach((k: string) => {
+        Object.keys(o).forEach((k) => {
             // Ignore private variables as they start with an underscore.
             // These can be recursive references leading to a recursive loop.
             if (!k.startsWith('_')) {

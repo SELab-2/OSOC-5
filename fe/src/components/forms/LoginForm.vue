@@ -59,8 +59,8 @@
   </q-form>
 </template>
 
-<script lang="ts">
-import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
+<script>
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore.js"
 import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
 import { useMeta } from 'quasar'
