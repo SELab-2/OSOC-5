@@ -24,6 +24,22 @@
       </div>
     </div>
 
+    <div class="row q-px-lg q-ml-sm items-center">
+      <label>Suggestion:</label>
+    </div>
+    <div class="row q-px-lg q-ml-sm items-center">
+      <SegmentedControl
+        color="primary"
+        v-model="suggestion"
+        :options="[
+                { name: 'yes', label: 'Yes' },
+                { name: 'maybe', label: 'Maybe' },
+                { name: 'no', label: 'No' },
+                { name: 'none', label: 'None' },
+              ]"
+      />
+    </div>
+
     <div class="q-gutter-sm q-pa-lg">
       <div class="row">
         <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -92,8 +108,10 @@ export default {
   setup() {
     const name = ref("Kelly Cruickshank")
     const officialSuggestion = ref("Not Decided")
+    const suggestion = ref('yes')
 
     return {
+      suggestion,
       name,
       officialSuggestion
     }
@@ -108,5 +126,9 @@ export default {
 
 .studentcol {
   padding: 5px;
+}
+
+.cornered {
+  border-radius: 10px !important
 }
 </style>

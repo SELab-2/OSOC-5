@@ -1,5 +1,5 @@
 <template>
-  <q-card class="full-height">
+  <q-card class="full-height cornered">
     <q-card-section >
       <div class="text-h6">{{ title }}</div>
     </q-card-section>
