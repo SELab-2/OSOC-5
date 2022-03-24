@@ -5,9 +5,10 @@
         @reset='onReset'
         window-height window-width row justify-center items-center
     >
-        <h2 class='appPageTitle'>Create project</h2>
-        <div class='row wrap justify-center items-start content-start'>
+
+        <div class='row wrap justify-center items-baseline content-start'>
             <div class='projectcol basiccol items-center col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3'>
+                <div class='text-bold text-h4'> Create project</div>
                 <h4 class='projectsubtitle'>Basic Info</h4>
                 <q-input
                     outlined
@@ -38,6 +39,26 @@
 
             <div class='projectcol coachescol items-center col-xs-12 col-sm-6 col-md-5 col-lg-3 col-xl-3'>
                 <h4 class='projectsubtitle'>Project Coaches</h4>
+                <div class='row'>
+                    <q-input
+                        outlined
+                        dense
+                        debounce='300'
+                        color='green'
+                        class='inputfield'
+                        v-model='filter_coaches'
+                        placeholder='Search'
+                    >
+                        <template v-slot:append>
+                            <q-icon v-if="filter_coaches !== ''"
+                                    name='close'
+                                    @click="filter_coaches = ''"
+                                    class='cursor-pointer'
+                            />
+                            <q-icon v-if="filter_coaches === ''" name='search' />
+                        </template>
+                    </q-input>
+                </div>
                 <q-table
                     class='table shadow-4'
                     :rows='rows_coaches'
@@ -48,31 +69,34 @@
                     :filter='filter_coaches'
                     :pagination.sync='pagination_coaches'
                 >
-                    <template v-slot:top>
-                        <q-input
-                            outlined
-                            dense
-                            debounce='300'
-                            color='green'
-                            class='inputfield'
-                            v-model='filter_coaches'
-                            placeholder='Search'
-                        >
-                            <template v-slot:append>
-                                <q-icon v-if="filter_coaches !== ''"
-                                        name='close'
-                                        @click="filter_coaches = ''"
-                                        class='cursor-pointer'
-                                />
-                                <q-icon v-if="filter_coaches === ''" name='search' />
-                            </template>
-                        </q-input>
-                    </template>
                 </q-table>
             </div>
 
             <div class='projectcol rolescol items-center col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-6'>
                 <h4 class='projectsubtitle'>Project Roles</h4>
+                <div class='row'>
+                    <q-btn class='cornered' color='primary' icon='add' label='Add role'
+                           @click='new_role_prompt = true ' />
+                    <q-space />
+                    <q-input
+                        outlined
+                        dense
+                        debounce='300'
+                        color='green'
+                        class='inputfield'
+                        v-model='filter_roles'
+                        placeholder='Search'
+                    >
+                        <template v-slot:append>
+                            <q-icon v-if="filter_roles !== ''"
+                                    name='close'
+                                    @click="filter_roles = ''"
+                                    class='cursor-pointer'
+                            />
+                            <q-icon v-if="filter_roles === ''" name='search' />
+                        </template>
+                    </q-input>
+                </div>
                 <q-table
                     class='table shadow-4'
                     :rows='rows_rols'
@@ -81,29 +105,6 @@
                     row-key='name'
                     :filter='filter_roles'
                 >
-                    <template v-slot:top>
-                        <q-btn class='cornered' color='primary' icon='add' label='Add role'
-                               @click='new_role_prompt = true ' />
-                        <q-space />
-                        <q-input
-                            outlined
-                            dense
-                            debounce='300'
-                            color='green'
-                            class='inputfield'
-                            v-model='filter_roles'
-                            placeholder='Search'
-                        >
-                            <template v-slot:append>
-                                <q-icon v-if="filter_roles !== ''"
-                                        name='close'
-                                        @click="filter_roles = ''"
-                                        class='cursor-pointer'
-                                />
-                                <q-icon v-if="filter_roles === ''" name='search' />
-                            </template>
-                        </q-input>
-                    </template>
                     <template v-slot:body='props'>
                         <q-tr :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''" :props='props'>
                             <q-td key='role' :props='props'> {{ props.row.name }}</q-td>
@@ -152,35 +153,34 @@
                     </template>
                 </q-table>
 
+                <br />
+
+                <div class='row'>
+                    <q-space />
+                    <q-btn
+                        elevated
+                        color='primary'
+                        label='Cancel'
+                        type='cancel'
+                        size='md'
+                        class='q-mx-md cornered'
+                        to='/projects'
+                    />
+                    <q-btn
+                        elevated
+                        color='primary'
+                        label='Submit'
+                        type='submit'
+                        size='md'
+                        class='q-mx-md cornered'
+                    />
+                </div>
 
             </div>
 
 
         </div>
 
-        <br />
-
-        <div class='row'>
-            <q-space />
-            <q-btn
-                elevated
-                color='primary'
-                label='Cancel'
-                type='cancel'
-                size='md'
-                class='q-mx-md cornered'
-                to='/projects'
-            />
-            <q-btn
-                elevated
-                color='primary'
-                label='Submit'
-                type='submit'
-                size='md'
-                class='q-mx-md cornered'
-            />
-            <q-space />
-        </div>
     </q-form>
 
     <q-dialog v-model='new_role_prompt' persistent>
@@ -362,6 +362,12 @@ export default {
 
 </script>
 
+<style>
+thead {
+    background-color: #44DBA4
+}
+
+</style>
 <style scoped lang='sass'>
 
 .cornered
@@ -374,19 +380,18 @@ export default {
 
 .projectsubtitle
     font-weight: 300
-    text-align: center
     margin-top: 10px
     margin-bottom: 15px
+    font-size: x-large
 
 .table
     border-radius: 10px
+    margin-top: 10px
 
 .createProjectForm
     margin: 25px
 
 .appPageTitle
-    font-weight: 800
-    font-size: xxx-large
     text-align: center
 
 .basiccol
@@ -397,6 +402,5 @@ export default {
 
 .coachescol
     max-width: 360px !important
-
 
 </style>
