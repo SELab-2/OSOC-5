@@ -2,13 +2,11 @@
   <div >
     <SideBar/>
     <div class="justify-between row q-px-lg q-pt-lg studentcol full-height">
-      <div class="row q-gutter-sm items-center">
+      <div class="row q-pa-sm q-gutter-sm items-center">
         <h class="text-bold text-h4">{{ name }}</h>
         <q-icon size="md" class="content-center" name="mdi-twitter"/>
         <q-icon size="md" name="mdi-linkedin"/>
         <q-icon size="md" name="mdi-github"/>
-      </div>
-      <div class="row q-pa-sm q-gutter-sm items-center">
         <q-btn size='12px' rounded outline color='black' label="CV" />
         <q-btn size='12px' rounded outline color='black' label='Portfolio' />
       </div>
