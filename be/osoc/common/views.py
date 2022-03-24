@@ -71,9 +71,11 @@ class CoachViewSet(viewsets.GenericViewSet,
         let an admin remove admin rights from another user
         """
         coach = self.get_object()
-        coach.is_admin = False
-        coach.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if coach != request.user:
+            coach.is_admin = False
+            coach.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
