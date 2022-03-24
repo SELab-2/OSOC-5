@@ -17,4 +17,4 @@ if __name__ == "__main__":
         Coach.objects.get(email='admin@example.com')
     except ObjectDoesNotExist:
         Coach.objects.create_superuser(
-            first_name='admin', last_name='admin', password='dev', email='admin@example.com')
+            first_name='admin', last_name='admin', password='dev', email='admin@example.com', is_admin=True)
