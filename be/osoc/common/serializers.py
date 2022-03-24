@@ -1,3 +1,6 @@
+"""
+Serializers definitions of the Django models defined in ./models.py.
+"""
 from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
