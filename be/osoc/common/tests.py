@@ -5,8 +5,14 @@ from rest_framework.reverse import reverse
 from osoc.common.models import Coach, Project, ProjectSuggestion, Skill, Student, Suggestion
 
 """
-run tests with the following command:
-`docker exec -it osoc-be python manage.py test osoc.common.tests.py`
+run all tests:
+`docker exec -it osoc-be python manage.py test osoc.common.tests`
+
+run one test class:
+`docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>`
+
+run a single test:
+`docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>.<TESTMETHOD>`
 """
 
 class ProjectTestsCoach(APITestCase):
@@ -493,7 +499,7 @@ class CoachTestsAdmin(APITestCase):
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(coach.is_admin, True)
+        self.assertEqual(Coach.objects.get(id=coach.id).is_admin, True)
     
     def test_coach_remove_admin(self):
         coach = Coach.objects.exclude(id=self.admin.id).first()
@@ -503,4 +509,4 @@ class CoachTestsAdmin(APITestCase):
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(coach.is_admin, False)
+        self.assertEqual(Coach.objects.get(id=coach.id).is_admin, False)
