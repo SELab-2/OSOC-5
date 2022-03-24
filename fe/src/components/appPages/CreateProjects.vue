@@ -1,13 +1,14 @@
 <template>
-  <div style="align-items: center; display: flex; justify-content: center; max-width: 2000px">
+  <div style="align-items: center; display: flex; justify-content: center;" >
     <q-form
+      style="max-width: 2000px"
       class='createProjectForm'
       @submit='onSubmit'
       @reset='onReset'
     >
       <div>
         <div class="row justify-between items-center q-gutter-sm">
-          <div class='text-bold text-h4'>
+          <div class='text-bold text-h4 projectcol'>
             Create project
           </div>
           <div>
