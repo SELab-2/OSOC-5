@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
-interface State {
-  users: Array<User>
-  isLoadingUsers: boolean
-}
+// interface State {
+//   users: Array<User>
+//   isLoadingUsers: boolean
+// }
 
 export const useCoachStore = defineStore('user/coach', {
-  state: (): State => ({
+  state: () => ({
     users: [],
     isLoadingUsers: false,
   }),

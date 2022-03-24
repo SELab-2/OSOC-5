@@ -19,7 +19,7 @@
   </q-card>
 </template>
 
-<script lang="ts">
+<script>
 export default {
   props: ['name', 'yes', 'maybe', 'no', 'official'],
   data() {

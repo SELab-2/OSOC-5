@@ -107,14 +107,14 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, onMounted } from '@vue/runtime-core'
 import {useCoachStore} from "../stores/useCoachStore"
 import { ref } from 'vue'
 import { exportFile, useQuasar } from 'quasar'
 import SegmentedControl from './SegmentedControl.vue'
 
-const wrapCsvValue = (val: String, formatFn: ((arg0: any) => any) | undefined) => {
+const wrapCsvValue = (val, formatFn) => {
   let formatted = formatFn !== void 0 ? formatFn(val) : val
 
   formatted =
@@ -195,12 +195,12 @@ export default defineComponent({
     // Method for searching the table.
     // Terms is equal to roleFilter.
     // The method filter to the elements which pass both filters.
-    useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: any, arg1: any) => string) {
+    useTableFilter(rows, terms, cols, cellValue) {
       const lowerTerms = this.filter?.toLowerCase() ?? ''
       
-      return rows.filter((row: any) =>
+      return rows.filter((row) =>
         (terms == 'all' || cellValue(cols[1], row) == terms) &&
-        cols.some((col: any) => {
+        cols.some((col) => {
           const val = cellValue(col, row) + ''
           const haystack =
             val === 'undefined' || val === 'null' ? '' : val.toLowerCase()
@@ -224,7 +224,7 @@ export default defineComponent({
         columns.slice(0, -1).map((col) => wrapCsvValue(col.label)),
       ]
         .concat(
-          this.users.map((row: { [x: string]: any }) =>
+          this.users.map((row) =>
             columns
               .slice(0, -1)
               .map((col) =>

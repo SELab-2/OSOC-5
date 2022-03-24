@@ -10,19 +10,19 @@
 </template>
 
 
-<script lang="ts">
-  import { ref, computed, defineComponent, PropType } from 'vue'
+<script>
+  import { ref, computed, defineComponent } from 'vue'
   
-  interface Option {
-    name: string
-    label: string
-  }
+  // interface Option {
+  //   name: string
+  //   label: string
+  // }
 
   export default defineComponent({
     props: {
       modelValue: String, 
       options: {
-        type: [Object as PropType<Option>], // [{ name: String, label: String}]
+        type: [], //[Object as PropType<Option>], // [{ name: String, label: String}]
         required: true
       },
       color: {
@@ -33,10 +33,10 @@
     emits: ['update:modelValue'],
     computed: {
       value: {
-        get(): String {
+        get() {
           return this.modelValue
         },
-        set(value: String) {
+        set(value) {
           this.$emit('update:modelValue', value)
         }
       }
