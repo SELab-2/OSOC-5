@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <SideBar/>
     <div class="justify-between row q-px-lg q-pt-lg studentcol full-height">
       <div class="row q-pa-sm q-gutter-sm items-center">
@@ -7,11 +7,11 @@
         <q-icon size="md" class="content-center" name="mdi-twitter"/>
         <q-icon size="md" name="mdi-linkedin"/>
         <q-icon size="md" name="mdi-github"/>
-        <q-btn size='12px' rounded outline color='black' label="CV" />
-        <q-btn size='12px' rounded outline color='black' label='Portfolio' />
+        <q-btn size='12px' rounded outline color='black' label="CV"/>
+        <q-btn size='12px' rounded outline color='black' label='Portfolio'/>
       </div>
       <div class="row q-gutter-sm items-center">
-        <q-btn size='12px' round outline color='black' icon='mail' />
+        <q-btn size='12px' round outline color='black' icon='mail'/>
         <q-select
           rounded
           outlined
@@ -24,8 +24,8 @@
       </div>
     </div>
 
-    <div class="row q-px-lg q-ml-sm items-center">
-      <label>Suggestion:</label>
+    <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+      <label>Suggest:</label>
     </div>
     <div class="row q-px-lg q-ml-sm items-center">
       <SegmentedControl
@@ -46,11 +46,12 @@
           <SuggestionsCard title="Suggestions"/>
         </div>
         <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-          <TitleTextCard title="Academia" content="
-            Enrolled at Anderson -Erdman
-            Studies: Assurance, Intranet
-            Type of degree: Bachelor’s degree
-            Years into degree: 5"
+          <AcademiaCard title="Academia" :content="[
+            'Enrolled at Anderson -Erdman',
+            'Studies: Assurance, Intranet',
+            'Type of degree: Bachelor’s degree',
+            'Years into degree: 5'
+            ]"
           />
         </div>
       </div>
@@ -63,14 +64,17 @@
       </div>
       <div class="row">
         <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-          <PracticalCard title="Practical" />
+          <PracticalCard title="Practical"/>
         </div>
-        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4" >
-          <DetailsCard title="Details" />
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <DetailsCard title="Details" :content="[
+            { description: 'First language', value: 'English'},
+            { description: 'Level of English', value: '1/5'}
+          ]"/>
         </div>
       </div>
       <div class="row">
-        <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6" >
+        <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">
           <TitleTextCard title="Why do you want to participate in osoc?" content="
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
           />
@@ -94,9 +98,11 @@ import TitleTextCard from "../cards/TitleTextCard.vue";
 import SuggestionsCard from "../cards/SuggestionsCard.vue";
 import PracticalCard from "../cards/PracticalCard.vue";
 import DetailsCard from "../cards/DetailsCard.vue";
+import AcademiaCard from "../cards/AcademiaCard.vue";
 
 export default {
   components: {
+    AcademiaCard,
     DetailsCard,
     PracticalCard,
     SuggestionsCard,

@@ -6,7 +6,7 @@
     <q-card-section class="q-pt-none">
       <div v-for="(w, key) in content" :key="key">
         <ul style="margin: 0px; padding-left: 10px;">
-          <li>{{ w.description }}: {{ w.value }}</li>
+          <li>{{ w }}</li>
         </ul>
       </div>
     </q-card-section>
