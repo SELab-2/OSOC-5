@@ -38,6 +38,7 @@
             </div>
 
             <div class='projectcol coachescol items-center col-xs-12 col-sm-6 col-md-5 col-lg-3 col-xl-3'>
+                <div class='text-bold text-h4'>⠀⠀</div>
                 <h4 class='projectsubtitle'>Project Coaches</h4>
                 <div class='row'>
                     <q-input
@@ -73,6 +74,7 @@
             </div>
 
             <div class='projectcol rolescol items-center col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-6'>
+                <div class='text-bold text-h4'>⠀⠀</div>
                 <h4 class='projectsubtitle'>Project Roles</h4>
                 <div class='row'>
                     <q-btn class='cornered' color='primary' icon='add' label='Add role'
