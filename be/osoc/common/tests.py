@@ -49,7 +49,8 @@ class ProjectTestsCoach(APITestCase):
         )
         Skill.objects.create(
             name="skill",
-            description="a skill"
+            description="a skill",
+            color="blue"
         )
 
         user = Coach.objects.create_user(
@@ -146,7 +147,8 @@ class ProjectTestsAdmin(APITestCase):
         )
         Skill.objects.create(
             name="skill",
-            description="a skill"
+            description="a skill",
+            color="blue"
         )
 
         admin = Coach.objects.create_user(
@@ -199,11 +201,13 @@ class SkillTests(APITestCase):
     def setUp(self):
         Skill.objects.create(
             name="skill",
-            description="a skill"
+            description="a skill",
+            color="blue"
         )
         Skill.objects.create(
             name="skill_2",
-            description="another skill"
+            description="another skill",
+            color="red"
         )
 
         user = Coach.objects.create_user(
@@ -251,7 +255,8 @@ class SkillTests(APITestCase):
     def test_create_skill(self):
         data = {
             "name": "skill_3",
-            "description": "yet another skill"
+            "description": "yet another skill",
+            "color": "green"
         }
         url = reverse("skill-list")
         before_count = Skill.objects.count()
@@ -283,7 +288,8 @@ class StudentTests(APITestCase):
         )
         Skill.objects.create(
             name="skill",
-            description="a skill"
+            description="a skill",
+            color="blue"
         )
 
         user = Coach.objects.create_user(
