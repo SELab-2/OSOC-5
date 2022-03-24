@@ -1,11 +1,13 @@
 <template>
     <q-form
+        class='createProjectForm'
         @submit='onSubmit'
         @reset='onReset'
+        window-height window-width row justify-center items-center
     >
         <h2 class='appPageTitle'>Create project</h2>
-        <div class='row'>
-            <div class='projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+        <div  class='row wrap justify-center items-start content-start'>
+            <div class='projectcol basiccol items-center col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-3'>
                 <h4 class='projectsubtitle'>Basic Info</h4>
                 <q-input
                     outlined
@@ -34,7 +36,7 @@
                 />
             </div>
 
-            <div class='projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+            <div class='projectcol rolescol items-center col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-6'>
                 <h4 class='projectsubtitle'>Project Roles</h4>
                 <q-table
                     class='table shadow-4'
@@ -67,7 +69,7 @@
                         </q-input>
                     </template>
                     <template v-slot:body='props'>
-                        <q-tr :class="props.rowIndex % 2 === 1 ? 'bg-yellow-1' : ''" :props='props'>
+                        <q-tr :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''" :props='props'>
                             <q-td key='role' :props='props'> {{ props.row.name }}</q-td>
                             <q-td key='amount' :props='props'>
                                 {{ props.row.amount }}
@@ -114,7 +116,7 @@
 
             </div>
 
-            <div class='projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+            <div class='projectcol coachescol items-center col-xs-6 col-sm-6 col-md-5 col-lg-3 col-xl-3'>
                 <h4 class='projectsubtitle'>Project Coaches</h4>
                 <q-table
                     class='table shadow-4'
@@ -155,7 +157,7 @@
         <div class='coachesrow row'>
             <q-space />
             <q-btn
-                unelevated
+                elevated
                 color='primary'
                 label='Cancel'
                 type='cancel'
@@ -164,7 +166,7 @@
                 to='/projects'
             />
             <q-btn
-                unelevated
+                elevated
                 color='primary'
                 label='Submit'
                 type='submit'
@@ -376,16 +378,21 @@ export default {
 .table
     border-radius: 10px
 
-    thead
-        /* bg color is important for th; just specify one */
-        background-color: $yellow-7
-
-.q-form
-    max-width: 90%
-    margin-left: 25px
-    margin-right: 25px
+.createProjectForm
+    margin: 25px
 
 .appPageTitle
     font-weight: 800
     font-size: xxx-large
+    text-align: center
+
+.basiccol
+    max-width: 360px !important
+
+.rolescol
+    max-width: 700px !important
+
+.coachescol
+    max-width: 360px !important
+
 </style>
