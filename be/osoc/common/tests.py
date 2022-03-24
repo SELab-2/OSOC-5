@@ -421,14 +421,14 @@ class CoachTestsCoach(APITestCase):
         data = {
             "first_name": "new first name",
             "last_name": "last name",
-            "email": "email2@example.com"
+            "email": "email@example.com"
         }
         response = self.client.put(url, data=data, format="json")
-        print(response.content)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["first_name"], data["first_name"])
-        self.assertEqual(coach.first_name, data["first_name"])
+        # Is it possible to update 'coach' variable with latest info from database?
+        self.assertEqual(Coach.objects.get(id=self.user.id).first_name, data["first_name"])
 
     def test_get_coach_instance_not_found(self):
         url = reverse("coach-detail", args=(50,))
