@@ -6,8 +6,8 @@
         window-height window-width row justify-center items-center
     >
         <h2 class='appPageTitle'>Create project</h2>
-        <div  class='row wrap justify-center items-start content-start'>
-            <div class='projectcol basiccol items-center col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-3'>
+        <div class='row wrap justify-center items-start content-start'>
+            <div class='projectcol basiccol items-center col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3'>
                 <h4 class='projectsubtitle'>Basic Info</h4>
                 <q-input
                     outlined
@@ -36,6 +36,41 @@
                 />
             </div>
 
+            <div class='projectcol coachescol items-center col-xs-12 col-sm-6 col-md-5 col-lg-3 col-xl-3'>
+                <h4 class='projectsubtitle'>Project Coaches</h4>
+                <q-table
+                    class='table shadow-4'
+                    :rows='rows_coaches'
+                    :columns='columns_coaches'
+                    row-key='name'
+                    selection='multiple'
+                    v-model:selected='selected'
+                    :filter='filter_coaches'
+                    :pagination.sync='pagination_coaches'
+                >
+                    <template v-slot:top>
+                        <q-input
+                            outlined
+                            dense
+                            debounce='300'
+                            color='green'
+                            class='inputfield'
+                            v-model='filter_coaches'
+                            placeholder='Search'
+                        >
+                            <template v-slot:append>
+                                <q-icon v-if="filter_coaches !== ''"
+                                        name='close'
+                                        @click="filter_coaches = ''"
+                                        class='cursor-pointer'
+                                />
+                                <q-icon v-if="filter_coaches === ''" name='search' />
+                            </template>
+                        </q-input>
+                    </template>
+                </q-table>
+            </div>
+
             <div class='projectcol rolescol items-center col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-6'>
                 <h4 class='projectsubtitle'>Project Roles</h4>
                 <q-table
@@ -47,14 +82,15 @@
                     :filter='filter_roles'
                 >
                     <template v-slot:top>
-                        <q-btn color='primary' icon='add' label='Add role'
+                        <q-btn class='cornered' color='primary' icon='add' label='Add role'
                                @click='new_role_prompt = true ' />
                         <q-space />
                         <q-input
                             outlined
                             dense
                             debounce='300'
-                            color='yellow-4'
+                            color='green'
+                            class='inputfield'
                             v-model='filter_roles'
                             placeholder='Search'
                         >
@@ -90,6 +126,7 @@
                                         :error-message='errorMessageRoleAmount'
                                         dense
                                         autofocus
+                                        borderless
                                         @keyup.enter='scope.set'
                                     />
                                 </q-popup-edit>
@@ -101,10 +138,12 @@
                                               v-slot='scope'
                                 >
                                     <q-input
-                                        type='textarea'
+                                        type='text'
+                                        autogrow
                                         v-model='scope.value'
                                         autofocus
                                         counter
+                                        borderless
                                         @keyup.enter.stop
                                     />
                                 </q-popup-edit>
@@ -116,45 +155,12 @@
 
             </div>
 
-            <div class='projectcol coachescol items-center col-xs-6 col-sm-6 col-md-5 col-lg-3 col-xl-3'>
-                <h4 class='projectsubtitle'>Project Coaches</h4>
-                <q-table
-                    class='table shadow-4'
-                    :rows='rows_coaches'
-                    :columns='columns_coaches'
-                    row-key='name'
-                    selection='multiple'
-                    v-model:selected='selected'
-                    :filter='filter_coaches'
-                    :pagination.sync='pagination_coaches'
-                >
-                    <template v-slot:top>
-                        <q-input
-                            outlined
-                            dense
-                            debounce='300'
-                            color='yellow-4'
-                            v-model='filter_coaches'
-                            placeholder='Search'
-                        >
-                            <template v-slot:append>
-                                <q-icon v-if="filter_coaches !== ''"
-                                        name='close'
-                                        @click="filter_coaches = ''"
-                                        class='cursor-pointer'
-                                />
-                                <q-icon v-if="filter_coaches === ''" name='search' />
-                            </template>
-                        </q-input>
-                    </template>
-                </q-table>
-            </div>
 
         </div>
 
         <br />
 
-        <div class='coachesrow row'>
+        <div class='row'>
             <q-space />
             <q-btn
                 elevated
@@ -358,12 +364,9 @@ export default {
 
 <style scoped lang='sass'>
 
-:deep(.q-field__control)
-    border-radius: 14px !important
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px
-
 .cornered
     border-radius: 10px !important
+
 
 .projectcol
     padding-left: 15px
@@ -372,7 +375,7 @@ export default {
 .projectsubtitle
     font-weight: 300
     text-align: center
-    margin-top: 0
+    margin-top: 10px
     margin-bottom: 15px
 
 .table
@@ -394,5 +397,6 @@ export default {
 
 .coachescol
     max-width: 360px !important
+
 
 </style>
