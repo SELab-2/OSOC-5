@@ -19,7 +19,7 @@
           style="width: 150px"
           v-model="officialSuggestion"
           :options="['Not decided', 'Yes', 'Maybe', 'No']"
-          label="Suggestion"
+          label="Final decision"
         />
       </div>
     </div>
