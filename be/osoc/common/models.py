@@ -27,6 +27,10 @@ class Skill(models.Model):
         _('description'),
         max_length=255
     )
+    color = models.CharField(
+        _('color'),
+        max_length=50
+    )
 
 
 class CoachManager(BaseUserManager):

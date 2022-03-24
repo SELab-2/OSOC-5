@@ -16,5 +16,5 @@ if __name__ == "__main__":
     try:
         Coach.objects.get(email=environ['DJANGO_SUPERUSER_EMAIL'])
     except ObjectDoesNotExist:
-        Coach.objects.create_superuser(first_name='admin', last_name='admin',
-                password=environ['DJANGO_SUPERUSER_PASSWORD'], email=environ['DJANGO_SUPERUSER_EMAIL'])
+        Coach.objects.create_superuser(first_name='admin', last_name='admin', is_admin=True,
+                email=environ['DJANGO_SUPERUSER_EMAIL'], password=environ['DJANGO_SUPERUSER_PASSWORD'])
