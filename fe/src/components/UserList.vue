@@ -37,8 +37,8 @@
         </template>
       </q-input>
     </div>
-
-
+    
+    
     <!-- filter cannot be empty, since this won't trigger the table filter function call.
          This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
     <q-table
