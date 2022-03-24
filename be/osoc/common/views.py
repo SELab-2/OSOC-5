@@ -1,3 +1,6 @@
+"""
+Views that create a connection between the database and the application.
+"""
 from django.contrib.auth.models import Group
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins, permissions, views, status, generics
@@ -146,6 +149,9 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 class LoginView(views.APIView):
+    """
+    API view that handles logging in users; Accessible to anyone.
+    """
     # This view should be accessible also for unauthenticated users.
     permission_classes = (permissions.AllowAny,)
 
@@ -163,6 +169,9 @@ class LoginView(views.APIView):
 
 
 class LogoutView(views.APIView):
+    """
+    API view that handles logging out users; Accessible to anyone.
+    """
     permission_classes = (permissions.AllowAny,)
 
     @classmethod
@@ -175,6 +184,10 @@ class LogoutView(views.APIView):
 
 
 class RegisterView(generics.GenericAPIView):
+    """
+    API view that handles registering users; Only admins can
+    register new users.
+    """
     serializer_class = RegisterSerializer
     permission_classes = (permissions.IsAdminUser,)
 
