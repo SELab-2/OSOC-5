@@ -1,109 +1,111 @@
 <template>
-  <div class="q-pa-md q-gutter-md">
-    <div class="row">
-      <div class="text-bold text-h4"> Users</div>
-      <q-space />
-      <q-btn
-        stack
-        flat
-        color="yellow"
-        icon="download"
-        label="csv"
-        @click="exportTable"
-      />
-    </div>
-    <div class="row q-mb-md vertical-middle">
-      <SegmentedControl
-        v-model="roleFilter"
-        :options="[
-          { name: 'all', label: 'All' },
-          { name: 'admin', label: 'Admins' },
-          { name: 'coach', label: 'Coaches' },
-          { name: 'inactive', label: 'Inactive' },
-        ]"
-      />
+  <div style="justify-content: center; display: flex; align-items: center;" >
+    <div class="q-pa-md q-gutter-md" style="max-width: 1000px">
+      <div class="row">
+        <div class="text-bold text-h4"> Users</div>
+        <q-space />
+        <q-btn
+          stack
+          flat
+          color="yellow"
+          icon="download"
+          label="csv"
+          @click="exportTable"
+        />
+      </div>
+      <div class="row justify-between items-center">
+        <SegmentedControl
+          v-model="roleFilter"
+          :options="[
+            { name: 'all', label: 'All' },
+            { name: 'admin', label: 'Admins' },
+            { name: 'coach', label: 'Coaches' },
+            { name: 'inactive', label: 'Inactive' },
+          ]"
+        />
 
-      <q-space />
-      <q-input
-        outlined
-        dense
-        debounce="300"
-        color="yellow-4"
-        v-model="filter"
-        placeholder="Search"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-    </div>
-
-
-    <!-- filter cannot be empty, since this won't trigger the table filter function call.
-         This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
-    <q-table
-      class="my-table user-table shadow-4"
-      :rows="coachStore.users"
-      :columns="columns"
-      row-key="id"
-      :filter="roleFilter"
-      :filter-method="useTableFilter"
-      separator="horizontal"
-    >
-      <template v-slot:body="props">
-        <q-tr
-          :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
-          :props="props"
+        <q-space />
+        <q-input
+          outlined
+          dense
+          debounce="300"
+          color="yellow-4"
+          v-model="filter"
+          placeholder="Search"
         >
-          <q-td key="name" @click="console.log(props)" :props="props">
-            {{ props.row.firstName }} {{ props.row.lastName }}
-          </q-td>
-          <q-td key="role" :props="props">
-            <q-select
-              v-ripple
-              color="yellow"
-              borderless
-              dense
-              style="border-radius: 5px; position: relative; width: 80px"
-              v-model="props.row.role"
-              :options="roles"
-              transition-show="jump-down"
-              transition-hide="jump-up"
-              transition-duration="300"
-              behavior="menu"
-              map-options
-              emit-value
-            >
-              <template v-slot:option="scope">
-                <q-item class="items-center" v-bind="scope.itemProps">
-                  <q-icon
-                    class="q-mr-md icon"
-                    size="xs"
-                    :name="scope.opt.icon"
-                  />
-                  <q-item-section>
-                    <q-item-label>{{ scope.opt.label }} </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-          </q-td>
-          <q-td key="assignedto" :props="props"
-            >{{ props.row.assignedto }}
-          </q-td>
-          <q-td key="email" :props="props">{{ props.row.email }} </q-td>
-          <q-td style="width: 10px" key="remove">
-            <q-btn
-              flat
-              round
-              style="color: #f14a3b"
-              @click="coachStore.removeUser(props.row.id)"
-              icon="mdi-trash-can-outline"
-            />
-          </q-td>
-        </q-tr>
-      </template>
-    </q-table>
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
+
+
+      <!-- filter cannot be empty, since this won't trigger the table filter function call.
+           This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
+      <q-table
+        class="my-table user-table shadow-4"
+        :rows="coachStore.users"
+        :columns="columns"
+        row-key="id"
+        :filter="roleFilter"
+        :filter-method="useTableFilter"
+        separator="horizontal"
+      >
+        <template v-slot:body="props">
+          <q-tr
+            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+            :props="props"
+          >
+            <q-td key="name" @click="console.log(props)" :props="props">
+              {{ props.row.firstName }} {{ props.row.lastName }}
+            </q-td>
+            <q-td key="role" :props="props">
+              <q-select
+                v-ripple
+                color="yellow"
+                borderless
+                dense
+                style="border-radius: 5px; position: relative; width: 80px"
+                v-model="props.row.role"
+                :options="roles"
+                transition-show="jump-down"
+                transition-hide="jump-up"
+                transition-duration="300"
+                behavior="menu"
+                map-options
+                emit-value
+              >
+                <template v-slot:option="scope">
+                  <q-item class="items-center" v-bind="scope.itemProps">
+                    <q-icon
+                      class="q-mr-md icon"
+                      size="xs"
+                      :name="scope.opt.icon"
+                    />
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }} </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </q-td>
+            <q-td key="assignedto" :props="props"
+              >{{ props.row.assignedto }}
+            </q-td>
+            <q-td key="email" :props="props">{{ props.row.email }} </q-td>
+            <q-td style="width: 10px" key="remove">
+              <q-btn
+                flat
+                round
+                style="color: #f14a3b"
+                @click="coachStore.removeUser(props.row.id)"
+                icon="mdi-trash-can-outline"
+              />
+            </q-td>
+          </q-tr>
+        </template>
+      </q-table>
+    </div>
   </div>
 </template>
 
