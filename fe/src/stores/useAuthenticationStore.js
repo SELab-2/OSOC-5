@@ -6,7 +6,7 @@ import { setCsrfToken } from '../utils/axios'
 //   loggedInUser: { email: string; password: string } | undefined
 // }
 
-const host = 'http://localhost:3000'
+const host = 'https://sel2-5.ugent.be'
 
 export const useAuthenticationStore = defineStore('user/authentication', {
   state: () => ({
@@ -16,7 +16,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     // https://sel2-5.ugent.be
     // admin@example.com
     async login({ email, password }) {
-      await axios.post('http://localhost:8000/api/login/', {
+      await axios.post('https://sel2-5.ugent.be/api/login/', {
         username: email,
         email,
         password,

@@ -26,13 +26,13 @@ SECRET_KEY = 'django-insecure-)glohf%v3h(8%5&zqfc)k*69&nz1!4bn#1g1s3_ndvf$zt37&4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'localhost:8000', '0.0.0.0', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', 'localhost:8000', '0.0.0.0', '127.0.0.1', 'sel2-5.ugent.be']
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
+    'http://localhost:3000', 'https://sel2-5.ugent.be',
 ]
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'https://sel2-5.ugent.be']
 
 AUTH_USER_MODEL = 'common.Coach'
 
