@@ -85,7 +85,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     API endpoint that allows projects to be viewed or edited.
     only admin users have permission for this endpoint, except for suggesting students or removing suggestions 
     """
-    queryset = Project.objects.all()
+    queryset = Project.objects.all().order_by('id')
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin]
 
@@ -153,7 +153,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows skills to be listed, created and deleted.
     """
-    queryset = Skill.objects.all()
+    queryset = Skill.objects.all().order_by('id')
     serializer_class = SkillSerializer
     permission_classes = [permissions.IsAuthenticated]
 

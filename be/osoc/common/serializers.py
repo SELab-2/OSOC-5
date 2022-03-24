@@ -31,11 +31,11 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ['is_admin']
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Project
-        fields = ['url', 'id', 'name', 'partner_name',
-                  'extra_info', 'skills', 'coaches']
+# class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = Project
+#         fields = ['url', 'id', 'name', 'partner_name',
+#                   'extra_info', 'skills', 'coaches']
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
@@ -49,13 +49,11 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
         model = RequiredSkills
         fields = ['amount', 'skill']
 
-
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'role', 'reason']
         read_only_fields = ['coach']
-
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     required_skills = RequiredSkillsSerializer(
@@ -77,7 +75,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
-      
+
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
