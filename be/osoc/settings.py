@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', 'localhost:8000', '0.0.0.0', '127.0.0.1']
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+
 AUTH_USER_MODEL = 'common.Coach'
 
 # Application definition
@@ -41,12 +47,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_nose',
     'rest_framework',
+    'corsheaders',
     'drf_yasg',
     'osoc',
     'osoc.common',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
