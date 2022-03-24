@@ -10,7 +10,6 @@ from urllib.parse import urlparse
 from .models import *
 from .permissions import IsAdmin, IsOwnerOrAdmin
 
-
 class StudentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows students to be viewed or edited.
