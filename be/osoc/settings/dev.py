@@ -1,3 +1,6 @@
+"""
+Django settings for development.
+"""
 from .common import *  # noqa
 from os import getenv
 
