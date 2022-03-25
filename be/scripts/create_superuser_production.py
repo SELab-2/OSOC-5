@@ -5,7 +5,7 @@ if __name__ == "__main__":
     from django.core.management import call_command
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    environ.setdefault("DJANGO_SETTINGS_MODULE", "osoc.settings")
+    environ.setdefault("DJANGO_SETTINGS_MODULE", "osoc.settings.prod")
 
     import django
     django.setup()
@@ -17,4 +17,4 @@ if __name__ == "__main__":
         Coach.objects.get(email=environ['DJANGO_SUPERUSER_EMAIL'])
     except ObjectDoesNotExist:
         Coach.objects.create_superuser(first_name='admin', last_name='admin', is_admin=True,
-                email=environ['DJANGO_SUPERUSER_EMAIL'], password=environ['DJANGO_SUPERUSER_PASSWORD'])
+                                       email=environ['DJANGO_SUPERUSER_EMAIL'], password=environ['DJANGO_SUPERUSER_PASSWORD'])

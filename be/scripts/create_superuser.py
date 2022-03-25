@@ -5,7 +5,7 @@ if __name__ == "__main__":
     from django.core.management import call_command
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    environ.setdefault("DJANGO_SETTINGS_MODULE", "osoc.settings")
+    environ.setdefault("DJANGO_SETTINGS_MODULE", "osoc.settings.dev")
 
     import django
     django.setup()
