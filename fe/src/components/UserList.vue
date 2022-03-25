@@ -114,7 +114,7 @@ import { ref } from 'vue'
 import { exportFile, useQuasar } from 'quasar'
 import SegmentedControl from './SegmentedControl.vue'
 
-const wrapCsvValue = (val: String, formatFn: ((arg0: any) => any) | undefined) => {
+const wrapCsvValue = (val, formatFn) => {
   let formatted = formatFn !== void 0 ? formatFn(val) : val
 
   formatted =

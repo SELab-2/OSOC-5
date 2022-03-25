@@ -1,3 +1,6 @@
+"""
+Serializers definitions of the Django models defined in ./models.py.
+"""
 from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
@@ -25,19 +28,20 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin']
+        read_only_fields = ['is_admin']
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Project
-        fields = ['url', 'id', 'name', 'partner_name',
-                  'extra_info', 'skills', 'coaches']
+# class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = Project
+#         fields = ['url', 'id', 'name', 'partner_name',
+#                   'extra_info', 'skills', 'coaches']
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Skill
-        fields = ['url', 'name', 'description']
+        fields = ['url', 'id', 'name', 'description', 'color']
 
 
 class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
@@ -45,13 +49,11 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
         model = RequiredSkills
         fields = ['amount', 'skill']
 
-
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'role', 'reason']
         read_only_fields = ['coach']
-
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     required_skills = RequiredSkillsSerializer(
@@ -73,7 +75,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
-      
+
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -125,11 +127,11 @@ class LoginSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coach
-        fields = ('id', 'username', 'email', 'password')
+        fields = ('id', 'first_name', 'last_name', 'email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = Coach.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['password'])
+            validated_data['email'], validated_data['password'], first_name=validated_data['first_name'], last_name=validated_data['last_name'])
 
         return user

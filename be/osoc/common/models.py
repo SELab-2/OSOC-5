@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
 
+# Phone number validation
 phone_regex = RegexValidator(
     regex=r'^\+?1?\d{9,15}$',
     message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
@@ -26,6 +27,10 @@ class Skill(models.Model):
     description = models.CharField(
         _('description'),
         max_length=255
+    )
+    color = models.CharField(
+        _('color'),
+        max_length=50
     )
 
 
@@ -120,8 +125,7 @@ class Coach(AbstractUser):  # models.Model):
     def save(self, *args, **kwargs):
         """
         Custom save method that calls the full_clean method.
-        See https://docs.djangoproject.com/en/dev/ref/models/instances/
-        #django.db.models.Model.clean_fields
+        See https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.clean_fields
         """
         self.full_clean()
         super(Coach, self).save(*args, **kwargs)
@@ -234,8 +238,7 @@ class Student(models.Model):
     def save(self, *args, **kwargs):
         """
         Custom save method that calls the full_clean method.
-        See https://docs.djangoproject.com/en/dev/ref/models/instances/
-        #django.db.models.Model.clean_fields
+        See https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.clean_fields
         """
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
