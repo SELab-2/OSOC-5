@@ -3,9 +3,9 @@ Django settings for production.
 
 Created to run on "sel2-5.ugent.be" domain.
 """
+from .common import *  # noqa
 import os
 # Import development environment
-from osoc.settings import *
 
 # General
 DEBUG = False
@@ -27,7 +27,3 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-
-# Static files
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')

@@ -3,11 +3,8 @@ FROM python:3.9
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# COPY requirements.txt requirements.txt
-# RUN pip3 install -r requirements.txt
-
-# RUN mkdir /src;
-# WORKDIR /src
+# Place for Django to find the project settings from the WORKDIR
+ENV DJANGO_SETTINGS_MODULE osoc.settings.dev
 
 ENV DJANGO_SETTINGS_MODULE osoc.production_settings
 ARG SECRET_KEY
@@ -28,8 +25,6 @@ WORKDIR /src
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
     pip install gunicorn
-
-# COPY . .
 
 CMD \
     chmod 755 ./docker/wait-for-it.sh && \
