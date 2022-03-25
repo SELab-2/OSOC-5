@@ -65,6 +65,7 @@ import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
 import { useMeta } from 'quasar'
 import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
+import router from "../../router/index"
 const metaData = {
   title: 'Sign In',
 }
@@ -73,25 +74,34 @@ export default defineComponent({
   setup() {
     const authenticationStore = useAuthenticationStore()
     const $q = useQuasar()
-    const email = ref(null)
-    const password = ref(null)
+    const email = ref('')
+    const password = ref('')
     useMeta(metaData)
     return {
       email,
       password,
       isPwd: ref(true),
       onSubmit() {
-        $q.notify({
-          icon: 'done',
-          color: 'positive',
-          message: 'Submitted',
-        })
-
         authenticationStore.login({email: email.value, password: password.value})
+          .then(() => {
+            router.push('/students') 
+            
+            $q.notify({
+              icon: 'done',
+              color: 'positive',
+              message: 'Submitted',
+            })
+          }).catch(() => {
+            $q.notify({
+              icon: 'close',
+              color: 'negative',
+              message: 'Could not log in',
+            })
+          })
       },
       onReset() {
-        email.value = null
-        password.value = null
+        email.value = ''
+        password.value = ''
       },
     }
   },

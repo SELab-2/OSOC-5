@@ -18,7 +18,10 @@ function getCookie(name: String) {
 
 export const instance = axios.create({
   withCredentials: true,
-  baseURL: 'https://sel2-5.ugent.be/api/',
+  baseURL:
+    process.env.NODE_ENV == 'development'
+      ? 'http://127.0.0.1:8000/'
+      : 'https://sel2-5.ugent.be/',
 })
 
 export const setCsrfToken = () =>

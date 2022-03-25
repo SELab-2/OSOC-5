@@ -20,22 +20,30 @@ export const useCoachStore = defineStore('user/coach', {
         .then(({ data }) => {
           this.isLoadingUsers = false
           this.users = convertObjectKeysToCamelCase(data).results
-          this.users.forEach(user => {user.role = user.isAdmin ? 'admin' : 'coach'})
+          this.users.forEach((user) => {
+            user.role = user.isAdmin ? 'admin' : 'coach'
+          })
         })
         .catch(() => (this.isLoadingUsers = false))
     },
-    async updateRole(user, newRole, callback) {
-      console.log(`Will update role to ${newRole} for ${user.firstName} ${user.lastName}`)
-      callback();
+    async updateRole(
+      user: { firstName: any; lastName: any },
+      newRole: any,
+      callback: () => void
+    ) {
+      console.log(
+        `Will update role to ${newRole} for ${user.firstName} ${user.lastName}`
+      )
+      callback()
     },
-    async removeUser(userId) {
+    async removeUser(userId: any) {
       await instance
-      .delete(`coaches/${userId}/`)
-      .then(() => {
-        const index = this.users.findIndex(user => user.id === userId)
-        this.users.splice(index,1)
-      })
-      .catch(() => console.log("Failed to delete"))
+        .delete(`coaches/${userId}/`)
+        .then(() => {
+          const index = this.users.findIndex((user) => user.id === userId)
+          this.users.splice(index, 1)
+        })
+        .catch(() => console.log('Failed to delete'))
     },
     clearUsers() {
       this.$reset()
