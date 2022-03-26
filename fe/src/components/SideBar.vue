@@ -134,8 +134,8 @@
 
 <script>
 import {ref} from 'vue'
-import SegmentedControl from "../SegmentedControl.vue";
-import StudentCard from "../cards/StudentCard.vue";
+import SegmentedControl from "./SegmentedControl.vue";
+import StudentCard from "./StudentCard.vue";
 
 export default {
   methods: {

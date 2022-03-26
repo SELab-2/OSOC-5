@@ -109,10 +109,10 @@
 
 <script>
 import { defineComponent, onMounted } from '@vue/runtime-core'
-import {useCoachStore} from "../stores/useCoachStore"
+import {useCoachStore} from "../../stores/useCoachStore"
 import { ref } from 'vue'
 import { exportFile, useQuasar } from 'quasar'
-import SegmentedControl from './SegmentedControl.vue'
+import SegmentedControl from '../../components/SegmentedControl.vue'
 
 const wrapCsvValue = (val, formatFn) => {
   let formatted = formatFn !== void 0 ? formatFn(val) : val
