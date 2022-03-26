@@ -9,7 +9,7 @@
           <q-icon v-if="suggestion.suggestion === '0'" size="xs" name="mdi-check" color="green" />
           <q-icon v-else-if="suggestion.suggestion === '1'" size="xs" name="mdi-help" color="yellow" />
           <q-icon v-else size="xs" name="mdi-close" color="red" />
-          <label class="q-pl-xs">{{ suggestion.coach }}</label>
+          <label class="q-pl-xs">{{ suggestion.first_name + ' ' + suggestion.last_name }}</label>
         </div>
       </div>
     </q-card-section>
@@ -18,6 +18,6 @@
 
 <script>
 export default {
-  props: ['title', 'suggestions']
+  props: ['title', 'suggestions'],
 }
 </script>

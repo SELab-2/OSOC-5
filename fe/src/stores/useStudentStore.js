@@ -3,21 +3,34 @@ import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 
 export const useStudentStore = defineStore('user/student', {
-    state: () => ({
-        students: [],
-        isLoadingStudents: false,
-    }),
-    actions: {
-        async loadStudents() {
-            this.isLoadingUsers = true
-            instance
-                .get('students/')
-                .then(({ data }) => {
-                    this.isLoadingUsers = false
-                    // console.log(data)
-                    this.students = convertObjectKeysToCamelCase(data).results
-                    // console.log(this.students)
+  state: () => ({
+    students: [],
+    isLoadingStudents: false,
+  }),
+  actions: {
+    async loadStudents() {
+      this.isLoadingUsers = true
+      instance
+        .get('students/')
+        .then(({data}) => {
+          this.isLoadingUsers = false
+          this.students = convertObjectKeysToCamelCase(data).results
+
+          console.log(data)
+          this.students.forEach((student, i) => {
+            student.suggestions.forEach((suggestion, j) => {
+              const pieces = suggestion.coach.split('/')
+              console.log(pieces)
+              const url = 'coaches/' + pieces.slice(-2)[0] + '/'
+
+              instance
+                .get(url)
+                .then(({data}) => {
+                  Object.assign(this.students[i].suggestions[j], data)
                 })
-        }
+            })
+          })
+        })
     }
+  }
 })
