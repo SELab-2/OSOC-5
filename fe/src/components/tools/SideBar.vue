@@ -23,7 +23,7 @@
               color="green"
               bg-color="white"
               v-model="search"
-              placeholder="Search"
+              label="Search..."
             >
               <template v-slot:append>
                 <q-icon name="search"/>
@@ -41,6 +41,7 @@
               ]"
             />
 
+            <label>Suggestion:</label>
             <SegmentedControl
               color="primary"
               v-model="suggestion"
