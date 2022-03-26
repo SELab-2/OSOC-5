@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SideBar/>
+    <SideBar color="bg-grey-3"/>
     <div class="justify-between row q-px-lg q-pt-lg studentcol full-height">
       <div class="row q-pa-sm q-gutter-sm items-center">
         <h class="text-bold text-h4">{{ name }}</h>

@@ -8,7 +8,8 @@
       :width="350"
       :breakpoint="100"
       bordered
-      class="bg-grey-3 full-height"
+      class="full-height"
+      :class="this.color"
     >
       <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
         <div class="">
@@ -138,6 +139,7 @@ import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 
 export default {
+  props: ['color'],
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
