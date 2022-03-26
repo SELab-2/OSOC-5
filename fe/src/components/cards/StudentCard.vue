@@ -4,9 +4,9 @@
       <div class="row justify-between">
         <div >
           <label class="text-bold q-pr-xs">{{ name }}</label>
-          <q-icon v-if="official === 'yes'" size="xs" name="mdi-check" color="green" />
-          <q-icon v-else-if="official === 'maybe'" size="xs" name="mdi-help" color="yellow" />
-          <q-icon v-else size="xs" name="mdi-close" color="red" />
+<!--          <q-icon v-if="official === 'yes'" size="xs" name="mdi-check" color="green" />-->
+<!--          <q-icon v-else-if="official === 'maybe'" size="xs" name="mdi-help" color="yellow" />-->
+<!--          <q-icon v-else size="xs" name="mdi-close" color="red" />-->
         </div>
         <label class="text-bold">{{ total }}</label>
       </div>
@@ -21,13 +21,17 @@
 
 <script>
 export default {
-  props: ['name', 'yes', 'maybe', 'no', 'official'],
+  props: ['student'],
   data() {
-    const totalSuggestions = this.yes + this.maybe + this.no
-    const widthYes = 100 * this.no / totalSuggestions
-    const widthMaybe = 100 * this.maybe / totalSuggestions
-    const widthNo = 100 * this.yes / totalSuggestions
+    const totalSuggestions = this.student.suggestions.length
+    const widthYes = 100 * this.student.suggestions.filter(sug => sug.suggestion === "0").length / totalSuggestions
+    const widthMaybe = 100 * this.student.suggestions.filter(sug => sug.suggestion === "1").length / totalSuggestions
+    const widthNo = 100 * this.student.suggestions.filter(sug => sug.suggestion === "2").length / totalSuggestions
+
+    const name = this.student.firstName + ' ' + this.student.lastName
+
     return {
+      name: name,
       total: totalSuggestions,
       yesStyle: {
         width: widthYes + "%"
@@ -40,9 +44,5 @@ export default {
       }
     }
   }
-
 }
 </script>
-
-<style scoped>
-</style>

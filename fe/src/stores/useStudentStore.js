@@ -14,9 +14,9 @@ export const useStudentStore = defineStore('user/student', {
                 .get('students/')
                 .then(({ data }) => {
                     this.isLoadingUsers = false
-                    console.log(data)
+                    // console.log(data)
                     this.students = convertObjectKeysToCamelCase(data).results
-                    console.log(this.students)
+                    // console.log(this.students)
                 })
         }
     }

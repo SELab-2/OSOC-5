@@ -84,22 +84,21 @@
 
             <div class="text-bold text-h5">Students</div>
             <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
-              <q-list
-
-                >
-                <q-item v-for="student in students" 
+              <q-list>
+                <q-item v-for="student in studentStore.students"
                     :key="student.name" 
                     draggable="true"
                     @dragstart="onDragStart($event, student.name)"
                     :id="student.name">
                   <StudentCard
-                    :name="student.name"
-                    :yes="student.yes"
-                    :maybe="student.maybe"
-                    :no="student.no"
-                    :official="student.official"
-                    
+                    :student="student"
                   />
+<!--                    :name="student.name"-->
+<!--                    :yes="student.yes"-->
+<!--                    :maybe="student.maybe"-->
+<!--                    :no="student.no"-->
+<!--                    :official="student.official"-->
+
                 </q-item>
               </q-list>
             </q-scroll-area>
@@ -147,7 +146,6 @@ export default {
     onMounted(() => {
       studentStore.loadStudents()
       studentStore.$subscribe((students, state) => {
-        console.log(students, state)
       })
     })
 
