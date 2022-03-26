@@ -101,7 +101,7 @@
                 </div>
                 <q-table
                     class='table shadow-4'
-                    :rows='rows_rols'
+                    :rows='skillStore.skills'
                     :columns='columns_roles'
                     :pagination.sync='pagination_roles'
                     row-key='name'
@@ -213,6 +213,8 @@
 <script>
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import { onMounted } from '@vue/runtime-core'
+import { useSkillStore } from '../../stores/useSkillStore'
 
 const columns_roles = [
     { name: 'role', align: 'left', label: 'Project Role', field: 'role' },
@@ -220,7 +222,7 @@ const columns_roles = [
     { name: 'comment', align: 'left', label: 'Comment', field: 'comment' },
 ]
 
-const original_rows_rols = [
+/*const original_rows_rols = [
     {
         name: 'Frond-End',
         amount: 0,
@@ -251,7 +253,7 @@ const original_rows_rols = [
         amount: 0,
         comment: '',
     },
-]
+]*/
 
 const columns_coaches = [ /* TODO: Could display existing projects of coaches  */
     { name: 'name', align: 'left', label: 'Coach name', field: 'name' },
@@ -274,6 +276,22 @@ const rows_coaches = [
 
 export default {
     setup() {
+        const skillStore = useSkillStore()
+        let rows_rols;
+
+        onMounted(() => {
+            skillStore.loadSkills();
+
+            skillStore.$subscribe((skills, state) => {
+                console.log(skills)
+                console.log("AAAAAAAAAAAAAAAAAAA")
+                console.log(state)
+
+
+            })
+        })
+
+
         const $q = useQuasar()
         const project_name = ref(null)
         const project_partner_name = ref(null)
@@ -287,10 +305,13 @@ export default {
         const new_role_prompt = ref(false)
         const new_role = ref('')
 
-        const rows_rols = ref([...original_rows_rols])
+        /*const rows_rols = ref([...original_rows_rols])*/
 
 
         return {
+            $q,
+            skillStore,
+
             pagination_roles: {
                 rowsPerPage: 5, // current rows per page being displayed
             },
