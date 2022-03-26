@@ -29,6 +29,22 @@ export const useSkillStore = defineStore('skills', {
             console.log(`Adding new skill: ${newSkill}.`)
             this.skills.push({ name: newSkill, amount: 0, comment: '' })
 
+            // TODO: verlopig maken we onmiddelijk een skill entry aan in de database
+            //       maar dit kan eigelijk ook wanneer het project wordt aangemaakt
+            //       zodanig dat je als je op cancel drukt de roles ook niet opslaat
+
+            //TODO remove description and add a ?color picker?
+            instance
+                .post('skills/', {})
+                .then(function (response) {
+                    console.log(response);
+                    //TODO: als gelukt -> display added
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    //TODO: als error -> display error
+                });
+
             // When finished run the callback so the popup closes.
             callback(newSkill);
         },

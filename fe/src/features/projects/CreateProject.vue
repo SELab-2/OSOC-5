@@ -349,7 +349,7 @@ export default {
                             return $q.notify({
                                 icon: 'done',
                                 color: 'warning',
-                                message: `Added new project role: ${added_role} `,
+                                message: `Added new project role: ${added_role}!`,
                                 textColor: 'black',
                             })
                         })
