@@ -1,6 +1,7 @@
 """
 Describes the database (PostgreSQL) models.
 """
+from xml.etree.ElementTree import Comment
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
@@ -22,10 +23,7 @@ class Skill(models.Model):
     """
     name = models.CharField(
         _('name'),
-        max_length=255
-    )
-    description = models.CharField(
-        _('description'),
+        unique=True,
         max_length=255
     )
     color = models.CharField(
@@ -283,8 +281,8 @@ class Project(models.Model):
 
 class RequiredSkills(models.Model):
     """
-        Intermediary model; A project can need a skill N times.
-        """
+    Intermediary model; A project can need a skill N times.
+    """
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE
@@ -296,6 +294,12 @@ class RequiredSkills(models.Model):
     amount = models.PositiveSmallIntegerField(
         _('amount'),
         default=1,
+    )
+    comment = models.CharField(
+        _('comment'),
+        blank=True,
+        null=True,
+        max_length=500
     )
 
 
@@ -322,10 +326,11 @@ class Suggestion(models.Model):
         max_length=1,
         choices=Suggestion.choices,
     )
-    reason = models.TextField(
+    reason = models.CharField(
         _('reason'),
         blank=True,
-        null=True
+        null=True,
+        max_length=500
     )
 
     class Meta:
@@ -339,10 +344,11 @@ class ProjectSuggestion(models.Model):
     """
     Intermediary model; A coach can suggest a student for a project.
     """
-    reason = models.TextField(
+    reason = models.CharField(
         _('reason'),
         blank=True,
-        null=True
+        null=True,
+        max_length=500
     )
     project = models.ForeignKey(
         Project,
@@ -356,12 +362,12 @@ class ProjectSuggestion(models.Model):
         Coach,
         on_delete=models.CASCADE
     )
+    # TODO: role must be one of the project required skills
     role = models.ForeignKey(
         Skill,
         on_delete=models.CASCADE
     )
 
     class Meta:
-
         unique_together = (("project", "student", "coach"))
 
