@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts">
-import LightDarkButton from "./tools/LightDarkButton.vue";
-import OsocLogo from "./tools/OsocLogo.vue";
+import LightDarkButton from "./components/LightDarkButton.vue";
+import OsocLogo from "./components/OsocLogo.vue";
 
 export default {
   components: {OsocLogo, LightDarkButton},
