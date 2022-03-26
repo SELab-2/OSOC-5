@@ -103,6 +103,7 @@
                     class='table shadow-4'
                     :rows='skillStore.skills'
                     :columns='columns_roles'
+                    :loading="skillStore.isLoadingSkills"
                     :pagination.sync='pagination_roles'
                     row-key='name'
                     :filter='filter_roles'
@@ -222,39 +223,6 @@ const columns_roles = [
     { name: 'comment', align: 'left', label: 'Comment', field: 'comment' },
 ]
 
-/*const original_rows_rols = [
-    {
-        name: 'Frond-End',
-        amount: 0,
-        comment: 'Must know react.',
-    },
-    {
-        name: 'Back-End',
-        amount: 0,
-        comment: '',
-    },
-    {
-        name: 'Data Engineer',
-        amount: 0,
-        comment: '',
-    },
-    {
-        name: 'Research',
-        amount: 0,
-        comment: '',
-    },
-    {
-        name: 'Comms',
-        amount: 0,
-        comment: '',
-    },
-    {
-        name: 'Full Stack Developer',
-        amount: 0,
-        comment: '',
-    },
-]*/
-
 const columns_coaches = [ /* TODO: Could display existing projects of coaches  */
     { name: 'name', align: 'left', label: 'Coach name', field: 'name' },
 ]
@@ -277,15 +245,12 @@ const rows_coaches = [
 export default {
     setup() {
         const skillStore = useSkillStore()
-        let rows_rols;
 
         onMounted(() => {
-            skillStore.loadSkills();
+            skillStore.loadSkills()
 
             skillStore.$subscribe((skills, state) => {
-                console.log(skills)
-                console.log("AAAAAAAAAAAAAAAAAAA")
-                console.log(state)
+                // handle callback
 
 
             })
@@ -293,19 +258,24 @@ export default {
 
 
         const $q = useQuasar()
+
+        // input fields
         const project_name = ref(null)
         const project_partner_name = ref(null)
         const project_link = ref(null)
 
+        // Role amount error handling
         const errorRoleAmount = ref(false)
         const errorMessageRoleAmount = ref('')
+
+        // Filters
         const filter_roles = ref('')
         const filter_coaches = ref('')
 
+        // variables for the new role dialog popup
         const new_role_prompt = ref(false)
         const new_role = ref('')
 
-        /*const rows_rols = ref([...original_rows_rols])*/
 
 
         return {
@@ -350,8 +320,6 @@ export default {
             },
 
             columns_roles,
-            rows_rols,
-
             columns_coaches,
             rows_coaches,
 
@@ -373,10 +341,19 @@ export default {
             new_role,
             new_role_confirm() {
                 if (new_role.value && new_role.value.length > 0) {
-                    rows_rols.value = [...rows_rols.value, { name: new_role.value, amount: 0, comment: '' }]
+                    skillStore.addSkill(
+                        new_role.value,
+                        (added_role) => {
+                            new_role_prompt.value = false
+                            new_role.value = ''
+                            return $q.notify({
+                                icon: 'done',
+                                color: 'warning',
+                                message: `Added new project role: ${added_role} `,
+                                textColor: 'black',
+                            })
+                        })
 
-                    new_role_prompt.value = false
-                    new_role.value = ''
                 }
             },
         }
