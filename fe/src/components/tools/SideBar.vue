@@ -135,8 +135,27 @@
 import {ref} from 'vue'
 import SegmentedControl from "../SegmentedControl.vue";
 import StudentCard from "../cards/StudentCard.vue";
+import {useStudentStore} from "../../stores/useStudentStore";
+import {useQuasar} from "quasar";
+import {onMounted} from "@vue/runtime-core";
 
 export default {
+  setup() {
+    const studentStore = useStudentStore()
+    const $q = useQuasar()
+
+    onMounted(() => {
+      studentStore.loadStudents()
+      studentStore.$subscribe((students, state) => {
+        console.log(students, state)
+      })
+    })
+
+    return {
+      studentStore,
+      $q
+    }
+  },
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
