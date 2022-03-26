@@ -103,7 +103,7 @@
                     class='table shadow-4'
                     :rows='skillStore.skills'
                     :columns='columns_roles'
-                    :loading="skillStore.isLoadingSkills"
+                    :loading='skillStore.isLoadingSkills'
                     :pagination.sync='pagination_roles'
                     row-key='name'
                     :filter='filter_roles'
@@ -275,7 +275,6 @@ export default {
         // variables for the new role dialog popup
         const new_role_prompt = ref(false)
         const new_role = ref('')
-
 
 
         return {
