@@ -91,7 +91,10 @@
                     @dragstart="onDragStart($event, student.name)"
                     :id="student.name">
                   <StudentCard
+                    clickable
+                    v-ripple
                     :student="student"
+                    @click="this.selectStudent(student)"
                   />
 <!--                    :name="student.name"-->
 <!--                    :yes="student.yes"-->
@@ -139,6 +142,7 @@ import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
 
 export default {
+  props: [ 'selectStudent' ],
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
