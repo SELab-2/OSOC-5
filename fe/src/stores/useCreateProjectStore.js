@@ -3,7 +3,7 @@ import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 
-export const useSkillStore = defineStore('skills', {
+export const useCreateProjectStore = defineStore('skills', {
     state: () => ({
         skills: [],
         isLoadingSkills: false,
@@ -57,6 +57,40 @@ export const useSkillStore = defineStore('skills', {
         },
         clearSkills() {
             this.$reset()
+        },
+        submitProject(projectName, projectURL, partnerName, callback) {
+
+            let data = {
+                'name': projectName,
+                'partner_name': partnerName,
+                'extra_info': projectURL,
+                'required_skills': [],
+            }
+
+            //
+            for (let skill of this.skills) {
+                if (skill.amount > 0) {
+                    // console.log(`${skill.amount}x ${skill.name}, comment:  ${skill.comment}.`)
+                    data['required_skills'].push({ 'skill': skill.name, 'amount': skill.amount })
+                }
+            }
+
+            // TODO: skills kloppen nog niet helemaal er kan nog geen comment bij
+            console.log(data)
+
+            // POST request to make a rpoject
+            instance
+                .post('projects/', data)
+                .then(function(response) {
+                    console.log(response)
+                    //TODO: als gelukt -> display added
+                })
+                .catch(function(error) {
+                    console.log(error)
+                    //TODO: als error -> display error
+                })
+
+            callback()
         },
     },
 })

@@ -101,9 +101,9 @@
                 </div>
                 <q-table
                     class='table shadow-4'
-                    :rows='skillStore.skills'
+                    :rows='createProjectStore.skills'
                     :columns='columns_roles'
-                    :loading='skillStore.isLoadingSkills'
+                    :loading='createProjectStore.isLoadingSkills'
                     :pagination.sync='pagination_roles'
                     row-key='name'
                     :filter='filter_roles'
@@ -215,11 +215,12 @@
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { onMounted } from '@vue/runtime-core'
-import { useSkillStore } from '../../stores/useSkillStore'
+import { useCreateProjectStore } from '../../stores/useCreateProjectStore'
+import router from '../../router'
 
 const columns_roles = [
     { name: 'role', align: 'left', label: 'Project Role', field: 'role' },
-    { name: 'amount', align: 'center', label: 'Amount', field: 'amount' },
+    { name: 'amount', align: 'left', label: 'Amount', field: 'amount' },
     { name: 'comment', align: 'left', label: 'Comment', field: 'comment' },
 ]
 
@@ -244,12 +245,12 @@ const rows_coaches = [
 
 export default {
     setup() {
-        const skillStore = useSkillStore()
+        const createProjectStore = useCreateProjectStore()
 
         onMounted(() => {
-            skillStore.loadSkills()
+            createProjectStore.loadSkills()
 
-            skillStore.$subscribe((skills, state) => {
+            createProjectStore.$subscribe((skills, state) => {
                 // handle callback
 
 
@@ -278,8 +279,7 @@ export default {
 
 
         return {
-            $q,
-            skillStore,
+            createProjectStore,
 
             pagination_roles: {
                 rowsPerPage: 5, // current rows per page being displayed
@@ -305,11 +305,22 @@ export default {
                 { label: 'Arthur', value: 'Arthur', color: 'yellow' },
             ],
             onSubmit() {
-                $q.notify({
-                    icon: 'done',
-                    color: 'positive',
-                    message: 'Submitted',
-                })
+                createProjectStore.submitProject(
+                    project_name.value,
+                    project_link.value,
+                    project_partner_name.value,
+                    () => {
+                        // TODO: add different outcome based on success
+
+                        // TODO: redirect to project page, could also make a page for each project
+                        router.push('/projects/')
+
+                        $q.notify({
+                            icon: 'done',
+                            color: 'positive',
+                            message: 'Submitted',
+                        })
+                    })
             },
             onReset() {
                 project_name.value = null
@@ -339,9 +350,12 @@ export default {
             new_role_prompt,
             new_role,
             new_role_confirm() {
+                // check if the new role value is valid
                 if (new_role.value && new_role.value.length > 0) {
-                    skillStore.addSkill(
+                    // when valid call the store object and add the skill
+                    createProjectStore.addSkill(
                         new_role.value,
+                        // callback
                         (added_role) => {
                             new_role_prompt.value = false
                             new_role.value = ''
