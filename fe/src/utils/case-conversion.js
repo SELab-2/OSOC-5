@@ -47,6 +47,8 @@ const keysToSnake = function (o) {
         })
 
         return n
+    } else if (isArray(o)) {
+        return o.map(obj => keysToSnake(obj))
     }
 
     return o
