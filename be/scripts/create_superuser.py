@@ -5,15 +5,16 @@ if __name__ == "__main__":
     from django.core.management import call_command
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    environ.setdefault("DJANGO_SETTINGS_MODULE", "osoc.settings")
+    environ.setdefault("DJANGO_SETTINGS_MODULE", "osoc.settings.dev")
 
     import django
     django.setup()
 
-    from django.contrib.auth.models import User
+    from osoc.common.models import Coach
     from django.core.exceptions import ObjectDoesNotExist
 
     try:
-        User.objects.get(username='admin')
+        Coach.objects.get(email='admin@example.com')
     except ObjectDoesNotExist:
-        User.objects.create_superuser('admin', 'admin@example.com', 'dev')
+        Coach.objects.create_superuser(
+            first_name='admin', last_name='admin', password='dev', email='admin@example.com', is_admin=True)
