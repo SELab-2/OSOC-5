@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia'
-import { instance } from '../utils/axios'
-import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 // interface State {
 //   users: Array<User>
@@ -24,9 +22,9 @@ export const useCoachStore = defineStore('user/coach', {
         })
         .catch(() => (this.isLoadingUsers = false))
     },
-    async updateRole(user, newRole, callback) {
-      console.log(`Will update role to ${newRole} for ${user.firstName} ${user.lastName}`)
-      callback();
+    async updateRole(user, newRole, callback) {      
+      return instance
+        .put(`coaches/${user.id}/${newRole === "admin" ? 'make' : 'remove'}_admin/`)
     },
     async removeUser(userId) {
       await instance
