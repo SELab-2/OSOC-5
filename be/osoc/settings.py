@@ -49,6 +49,9 @@ INSTALLED_APPS = [
     'allauth.account', # new
     'allauth.socialaccount', # new
     'allauth.socialaccount.providers.github', # new
+    'rest_framework.authtoken',
+    'dj_rest_auth',    
+    'dj_rest_auth.registration',  
 ]
 
 MIDDLEWARE = [
@@ -142,19 +145,32 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REST_FRAMEWORK = {
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+   ),
+}
+
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-SITE_ID = 1
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'osoc.common.serializers.CustomLoginSerializer',
+}
 
-ACCOUNT_FORMS = {'signup': 'osoc.common.forms.SimpleSignupForm'}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'osoc.common.serializers.CustomRegisterSerializer',
+}
+
+SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_LOGOUT_REDIRECT_URL ='/accounts/login/'
+ACCOUNT_LOGOUT_REDIRECT_URL ='/api/login/'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-SOCIALACCOUNT_ADAPTER = 'osoc.common.adapters.MySocialAccountAdapter'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

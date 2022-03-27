@@ -48,8 +48,9 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
-    path('api-auth/register/', views.RegisterView.as_view()),
-    path('accounts/', include('allauth.urls')), # new
+    path('api/', include('dj_rest_auth.urls')),
+    path('api/registration/', include('dj_rest_auth.registration.urls')),
+    path('api/github/', views.GithubLogin.as_view(), name='github_login'),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger',

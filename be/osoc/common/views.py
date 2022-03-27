@@ -1,15 +1,17 @@
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import login, logout
-from rest_framework import viewsets, mixins, views, status, generics
+from rest_framework import viewsets, mixins, generics
 from osoc.common.models import Skill, Student, Coach, Project
 from .serializers import SkillSerializer, UserSerializer, GroupSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, RegisterSerializer
 from rest_framework.response import Response
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdmin
-
-from . import serializers
-
+from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from django.urls import reverse
+from django.shortcuts import redirect
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
@@ -83,3 +85,9 @@ class RegisterView(generics.GenericAPIView):
         return Response({
             "user": CoachSerializer(user, context=self.get_serializer_context()).data
         })
+
+
+class GithubLogin(SocialLoginView):    
+    adapter_class = GitHubOAuth2Adapter    
+    callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"    
+    client_class = OAuth2Client
