@@ -20,7 +20,7 @@ export const useCreateProjectStore = defineStore('skills', {
 
                     let apiSkills = convertObjectKeysToCamelCase(data).results
                     for (let skill of apiSkills) {
-                        this.skills.push({ name: skill.name, amount: 0, comment: '' })
+                        this.skills.push({ name: skill.name, amount: 0, comment: '', url: skill.url })
                     }
 
                 })
@@ -65,13 +65,13 @@ export const useCreateProjectStore = defineStore('skills', {
                 'partner_name': partnerName,
                 'extra_info': projectURL,
                 'required_skills': [],
+                'coaches': [],
             }
 
-            //
+            // filter out the used skills
             for (let skill of this.skills) {
                 if (skill.amount > 0) {
-                    // console.log(`${skill.amount}x ${skill.name}, comment:  ${skill.comment}.`)
-                    data['required_skills'].push({ 'skill': skill.name, 'amount': skill.amount })
+                    data['required_skills'].push({ 'skill': skill.url, 'amount': skill.amount })
                 }
             }
 
