@@ -135,9 +135,9 @@
 
 <script>
 import {ref} from 'vue'
-import SegmentedControl from "../SegmentedControl.vue";
-import StudentCard from "../cards/StudentCard.vue";
-import {useStudentStore} from "../../stores/useStudentStore";
+import SegmentedControl from "./SegmentedControl.vue";
+import StudentCard from "../features/students/components/StudentCard.vue";
+import {useStudentStore} from "../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
 
