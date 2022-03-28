@@ -40,7 +40,7 @@
                 { name: 'yes', label: 'Yes' },
                 { name: 'maybe', label: 'Maybe' },
                 { name: 'no', label: 'No' },
-                { name: 'none', label: 'None' },
+                { name: 'none', label: 'Not decided' },
               ]"
         />
       </div>

@@ -8,7 +8,8 @@
       :width="350"
       :breakpoint="100"
       bordered
-      class="bg-grey-3 full-height"
+      class="full-height"
+      :class="this.color"
     >
       <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
         <div class="">
@@ -23,7 +24,7 @@
               color="green"
               bg-color="white"
               v-model="search"
-              placeholder="Search"
+              label="Search..."
             >
               <template v-slot:append>
                 <q-icon name="search"/>
@@ -41,6 +42,7 @@
               ]"
             />
 
+            <label>Suggestion:</label>
             <SegmentedControl
               color="primary"
               v-model="suggestion"
@@ -142,7 +144,7 @@ import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
 
 export default {
-  props: [ 'selectStudent' ],
+  props: [ 'selectStudent', 'color' ],
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
