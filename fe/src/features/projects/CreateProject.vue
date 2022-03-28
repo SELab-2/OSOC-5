@@ -1,214 +1,214 @@
 <template>
-    <q-form
+    <div style="align-items: center; display: flex; justify-content: center;" >
+      <q-form
+        style="max-width: 2500px"
         class='createProjectForm'
         @submit='onSubmit'
         @reset='onReset'
-        window-height window-width row justify-center items-center
-    >
-
-        <div class='row wrap justify-center items-baseline content-start'>
-            <div class='projectcol basiccol items-center col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3'>
-                <div class='text-bold text-h4'> Create project</div>
-                <h4 class='projectsubtitle'>Basic Info</h4>
-                <q-input
-                    outlined
-                    v-model='project_name'
-                    label='Project name'
-                    lazy-rules
-                    class='inputfield'
-                    :rules="[ (val) => (val && val.length > 0) || 'Please enter the name of the project.', ]"
+      >
+        <div>
+          <div class="row justify-between items-center q-gutter-sm">
+            <div class='text-bold text-h4 projectcol'>
+              Create project
+            </div>
+            <div>
+              <div class='q-gutter-sm'>
+                <q-btn
+                  elevated
+                  color='primary'
+                  label='Cancel'
+                  type='cancel'
+                  size='md'
+                  class='q-mx-md cornered'
+                  to='/projects'
                 />
-                <q-input
-                    outlined
-                    v-model='project_partner_name'
-                    label='Partner name'
-                    lazy-rules
-                    class='inputfield'
-                    :rules="[ (val) => (val && val.length > 0) || 'Please enter the name of the partner.', ]"
+                <q-btn
+                  elevated
+                  color='primary'
+                  label='Submit'
+                  type='submit'
+                  size='md'
+                  class='q-mx-md cornered'
                 />
-                <q-input
-                    outlined
-                    v-model='project_link'
-                    label='Project URL'
-                    lazy-rules
-                    class='inputfield'
-                    type='URL'
-                    :rules="[ (val) => (val && val.length > 0) || 'Please enter the URL of the project.', ]"
-                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="projectcol col-xs-12 col-sm-6 col-md-6 col-lg-3 col-xl-3'">
+              <h4 class='projectsubtitle'>Basic Info</h4>
+              <q-input
+                outlined
+                v-model='project_name'
+                label='Project name'
+                lazy-rules
+                class='inputfield'
+                :rules="[ (val) => (val && val.length > 0) || 'Please enter the name of the project.', ]"
+              />
+              <q-input
+                outlined
+                v-model='project_partner_name'
+                label='Partner name'
+                lazy-rules
+                class='inputfield'
+                :rules="[ (val) => (val && val.length > 0) || 'Please enter the name of the partner.', ]"
+              />
+              <q-input
+                outlined
+                v-model='project_link'
+                label='Project URL'
+                lazy-rules
+                class='inputfield'
+                type='URL'
+                :rules="[ (val) => (val && val.length > 0) || 'Please enter the URL of the project.', ]"
+              />
             </div>
 
-            <div class='projectcol coachescol items-center col-xs-12 col-sm-6 col-md-5 col-lg-3 col-xl-3'>
-                <div class='text-bold text-h4'>⠀⠀</div>
-                <h4 class='projectsubtitle'>Project Coaches</h4>
-                <div class='row'>
-                    <q-input
-                        outlined
-                        dense
-                        debounce='300'
-                        color='green'
-                        class='inputfield'
-                        v-model='filter_coaches'
-                        placeholder='Search'
-                    >
-                        <template v-slot:append>
-                            <q-icon v-if="filter_coaches !== ''"
-                                    name='close'
-                                    @click="filter_coaches = ''"
-                                    class='cursor-pointer'
-                            />
-                            <q-icon v-if="filter_coaches === ''" name='search' />
-                        </template>
-                    </q-input>
-                </div>
-                <q-table
-                    class='table shadow-4'
-                    :rows='rows_coaches'
-                    :columns='columns_coaches'
-                    row-key='name'
-                    selection='multiple'
-                    v-model:selected='selected'
-                    :filter='filter_coaches'
-                    :pagination.sync='pagination_coaches'
+            <div class="projectcol col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+              <h4 class='projectsubtitle'>Project Coaches</h4>
+              <div class='row'>
+                <q-input
+                  outlined
+                  dense
+                  debounce='300'
+                  color='green'
+                  class='inputfield'
+                  v-model='filter_coaches'
+                  placeholder='Search'
                 >
-                </q-table>
+                  <template v-slot:append>
+                    <q-icon v-if="filter_coaches !== ''"
+                            name='close'
+                            @click="filter_coaches = ''"
+                            class='cursor-pointer'
+                    />
+                    <q-icon v-if="filter_coaches === ''" name='search' />
+                  </template>
+                </q-input>
+              </div>
+              <q-table
+                class='table shadow-4'
+                :rows='rows_coaches'
+                :columns='columns_coaches'
+                row-key='name'
+                selection='multiple'
+                v-model:selected='selected'
+                :filter='filter_coaches'
+                :pagination.sync='pagination_coaches'
+              >
+              </q-table>
             </div>
 
-            <div class='projectcol rolescol items-center col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-6'>
-                <div class='text-bold text-h4'>⠀⠀</div>
-                <h4 class='projectsubtitle'>Project Roles</h4>
-                <div class='row'>
-                    <q-btn class='cornered' color='primary' icon='add' label='Add role'
-                           @click='new_role_prompt = true ' />
-                    <q-space />
-                    <q-input
-                        outlined
-                        dense
-                        debounce='300'
-                        color='green'
-                        class='inputfield'
-                        v-model='filter_roles'
-                        placeholder='Search'
-                    >
-                        <template v-slot:append>
-                            <q-icon v-if="filter_roles !== ''"
-                                    name='close'
-                                    @click="filter_roles = ''"
-                                    class='cursor-pointer'
-                            />
-                            <q-icon v-if="filter_roles === ''" name='search' />
-                        </template>
-                    </q-input>
-                </div>
-                <q-table
-                    class='table shadow-4'
-                    :rows='createProjectStore.skills'
-                    :columns='columns_roles'
-                    :loading='createProjectStore.isLoadingSkills'
-                    :pagination.sync='pagination_roles'
-                    row-key='name'
-                    :filter='filter_roles'
+            <div class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5">
+              <h4 class='projectsubtitle'>Project Roles</h4>
+              <div class='row'>
+                <q-btn class='cornered' color='primary' icon='add' label='Add role'
+                       @click='new_role_prompt = true ' />
+                <q-space />
+                <q-input
+                  outlined
+                  dense
+                  debounce='300'
+                  color='green'
+                  class='inputfield'
+                  v-model='filter_roles'
+                  placeholder='Search'
                 >
-                    <template v-slot:body='props'>
-                        <q-tr :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''" :props='props'>
-                            <q-td key='role' :props='props'> {{ props.row.name }}</q-td>
-                            <q-td key='amount' :props='props'>
-                                {{ props.row.amount }}
-                                <q-popup-edit
-                                    v-model.number='props.row.amount'
-                                    buttons
-                                    label-set='Save'
-                                    label-cancel='Close'
-                                    :validate='amountRangeValidation'
-                                    @hide='amountRangeValidation'
+                  <template v-slot:append>
+                    <q-icon v-if="filter_roles !== ''"
+                            name='close'
+                            @click="filter_roles = ''"
+                            class='cursor-pointer'
+                    />
+                    <q-icon v-if="filter_roles === ''" name='search' />
+                  </template>
+                </q-input>
+              </div>
+              <q-table
+                class='table shadow-4'
+                :rows='createProjectStore.skills'
+                :columns='columns_roles'
+                :loading='createProjectStore.isLoadingSkills'
+                :pagination.sync='pagination_roles'
+                row-key='name'
+                :filter='filter_roles'
+              >
+                <template v-slot:body='props'>
+                  <q-tr :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''" :props='props'>
+                    <q-td key='role' :props='props'> {{ props.row.name }}</q-td>
+                    <q-td key='amount' :props='props'>
+                      {{ props.row.amount }}
+                      <q-popup-edit
+                        v-model.number='props.row.amount'
+                        buttons
+                        label-set='Save'
+                        label-cancel='Close'
+                        :validate='amountRangeValidation'
+                        @hide='amountRangeValidation'
+                        v-slot='scope'
+                      >
+                        <q-input
+                          type='number'
+                          v-model.number='scope.value'
+                          hint='Enter a positive number.'
+                          :error='errorRoleAmount'
+                          :error-message='errorMessageRoleAmount'
+                          dense
+                          autofocus
+                          borderless
+                          @keyup.enter='scope.set'
+                        />
+                      </q-popup-edit>
+                    </q-td>
+                    <q-td key='comment' :props='props'>
+                      <div>{{ props.row.comment }}</div>
+                      <q-popup-edit buttons
+                                    v-model='props.row.comment'
                                     v-slot='scope'
-                                >
-                                    <q-input
-                                        type='number'
-                                        v-model.number='scope.value'
-                                        hint='Enter a positive number.'
-                                        :error='errorRoleAmount'
-                                        :error-message='errorMessageRoleAmount'
-                                        dense
-                                        autofocus
-                                        borderless
-                                        @keyup.enter='scope.set'
-                                    />
-                                </q-popup-edit>
-                            </q-td>
-                            <q-td key='comment' :props='props'>
-                                <div>{{ props.row.comment }}</div>
-                                <q-popup-edit buttons
-                                              v-model='props.row.comment'
-                                              v-slot='scope'
-                                >
-                                    <q-input
-                                        type='text'
-                                        autogrow
-                                        v-model='scope.value'
-                                        autofocus
-                                        counter
-                                        borderless
-                                        @keyup.enter.stop
-                                    />
-                                </q-popup-edit>
-                            </q-td>
-                        </q-tr>
-                    </template>
-                </q-table>
-
-                <br />
-
-                <div class='row'>
-                    <q-space />
-                    <q-btn
-                        elevated
-                        color='primary'
-                        label='Cancel'
-                        type='cancel'
-                        size='md'
-                        class='q-mx-md cornered'
-                        to='/projects'
-                    />
-                    <q-btn
-                        elevated
-                        color='primary'
-                        label='Submit'
-                        type='submit'
-                        size='md'
-                        class='q-mx-md cornered'
-                    />
-                </div>
-
+                      >
+                        <q-input
+                          type='text'
+                          autogrow
+                          v-model='scope.value'
+                          autofocus
+                          counter
+                          borderless
+                          @keyup.enter.stop
+                        />
+                      </q-popup-edit>
+                    </q-td>
+                  </q-tr>
+                </template>
+              </q-table>
             </div>
-
-
+          </div>
         </div>
 
-    </q-form>
+      </q-form>
+    </div>
 
-    <q-dialog v-model='new_role_prompt' persistent>
-        <q-card style='min-width: 350px'>
+        <q-dialog v-model='new_role_prompt' persistent>
+          <q-card style='min-width: 350px'>
             <q-card-section>
-                <div class='text-h6'>Create a new role</div>
+              <div class='text-h6'>Create a new role</div>
             </q-card-section>
 
             <q-card-section class='q-pt-none'>
-                <q-input outlined
-                         autofocus
-                         v-model='new_role'
-                         class='inputfield'
-                         label='Role name'
-                         lazy-rules
-                         :rules="[ (val) => (val && val.length > 0) || 'Enter the name of the new role.', ]"
-                />
+              <q-input outlined
+                       autofocus
+                       v-model='new_role'
+                       class='inputfield'
+                       label='Role name'
+                       lazy-rules
+                       :rules="[ (val) => (val && val.length > 0) || 'Enter the name of the new role.', ]"
+              />
             </q-card-section>
 
             <q-card-actions align='right' class='text-primary'>
-                <q-btn flat label='Cancel' v-close-popup />
-                <q-btn flat label='Add role' @click='new_role_confirm' />
+              <q-btn flat label='Cancel' v-close-popup />
+              <q-btn flat label='Add role' @click='new_role_confirm' />
             </q-card-actions>
-        </q-card>
-    </q-dialog>
+          </q-card>
+        </q-dialog>
 </template>
 
 <script>
