@@ -16,7 +16,6 @@ export const useStudentStore = defineStore('user/student', {
           this.isLoadingUsers = false
           this.students = convertObjectKeysToCamelCase(data).results
 
-          console.log(data)
           this.students.forEach((student, i) => {
             student.suggestions.forEach((suggestion, j) => {
               const pieces = suggestion.coach.split('/')
@@ -25,7 +24,6 @@ export const useStudentStore = defineStore('user/student', {
               instance
                 .get(url)
                 .then(({data}) => {
-                  console.log(data)
                   Object.assign(this.students[i].suggestions[j], data)
                 })
             })
