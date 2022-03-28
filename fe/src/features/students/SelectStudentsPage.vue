@@ -13,7 +13,6 @@
           <q-btn :href="this.student.portfolio" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
         </div>
         <div class="row q-gutter-sm items-center">
-          <q-btn size='12px' round outline color='black' icon='mail'/>
           <q-select
             rounded
             outlined
@@ -23,6 +22,7 @@
             :options="['Not decided', 'Yes', 'Maybe', 'No']"
             label="Final decision"
           />
+          <q-btn icon-right="mail" class="cornered" label="Confirm" outline color='black'/>
         </div>
       </div>
 
