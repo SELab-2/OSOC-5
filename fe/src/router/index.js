@@ -1,13 +1,13 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import SignupForm from "../components/forms/SignupForm.vue";
-import LoginForm from "../components/forms/LoginForm.vue";
+import SignupForm from "../features/authentication/SignupForm.vue";
+import LoginForm from "../features/authentication/LoginForm.vue";
 import NotFoundPage from "../components/NotFoundPage.vue";
-import Projects from "../components/appPages/Projects.vue"
-import CreateProjects from '../components/appPages/CreateProjects.vue'
-import FormPage from "../components/FormPage.vue";
+import Projects from "../features/projects/Projects.vue"
+import CreateProjects from '../features/projects/CreateProject.vue'
+import FormPage from "../features/authentication/FormPage.vue";
 import AppPage from "../components/AppPage.vue";
-import UserList from "../components/UserList.vue";
-import SelectStudentsPage from "../components/appPages/SelectStudentsPage.vue";
+import UserList from "../features/users/UserList.vue";
+import SelectStudentsPage from "../features/students/SelectStudentsPage.vue";
 import { hasCsrfToken } from '../utils/axios'
 
 

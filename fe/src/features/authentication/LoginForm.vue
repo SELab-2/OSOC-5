@@ -64,7 +64,7 @@ import {useAuthenticationStore} from "../../stores/useAuthenticationStore.js"
 import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
 import { useMeta } from 'quasar'
-import GitHubSignInButton from '../tools/GitHubSignInButton.vue'
+import GitHubSignInButton from './components/GitHubSignInButton.vue'
 const metaData = {
   title: 'Sign In',
 }
