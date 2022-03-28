@@ -1,7 +1,9 @@
 <template>
   <div class="q-pa-md q-gutter-md">
     <div class="row">
-      <div class="text-bold text-h4"> Users</div>
+      <div class="text-bold text-h4">
+        Users
+      </div>
       <q-space />
       <q-btn
         stack
@@ -25,14 +27,14 @@
 
       <q-space />
       <q-input
+        v-model="filter"
         outlined
         dense
         debounce="300"
         color="yellow-4"
-        v-model="filter"
         placeholder="Search"
       >
-        <template v-slot:append>
+        <template #append>
           <q-icon name="search" />
         </template>
       </q-input>
@@ -50,22 +52,29 @@
       :filter-method="useTableFilter"
       separator="horizontal"
     >
-      <template v-slot:body="props">
+      <template #body="props">
         <q-tr
           :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
           :props="props"
         >
-          <q-td key="name" @click="console.log(props)" :props="props">
+          <q-td
+            key="name"
+            :props="props"
+            @click="console.log(props)"
+          >
             {{ props.row.firstName }} {{ props.row.lastName }}
           </q-td>
-          <q-td key="role" :props="props">
+          <q-td
+            key="role"
+            :props="props"
+          >
             <q-select
+              v-model="props.row.role"
               v-ripple
               color="yellow"
               borderless
               dense
               style="border-radius: 5px; position: relative; width: 80px"
-              v-model="props.row.role"
               :options="roles"
               transition-show="jump-down"
               transition-hide="jump-up"
@@ -74,8 +83,11 @@
               map-options
               emit-value
             >
-              <template v-slot:option="scope">
-                <q-item class="items-center" v-bind="scope.itemProps">
+              <template #option="scope">
+                <q-item
+                  class="items-center"
+                  v-bind="scope.itemProps"
+                >
                   <q-icon
                     class="q-mr-md icon"
                     size="xs"
@@ -88,17 +100,28 @@
               </template>
             </q-select>
           </q-td>
-          <q-td key="assignedto" :props="props"
-            >{{ props.row.assignedto }}
+          <q-td
+            key="assignedto"
+            :props="props"
+          >
+            {{ props.row.assignedto }}
           </q-td>
-          <q-td key="email" :props="props">{{ props.row.email }} </q-td>
-          <q-td style="width: 10px" key="remove">
+          <q-td
+            key="email"
+            :props="props"
+          >
+            {{ props.row.email }}
+          </q-td>
+          <q-td
+            key="remove"
+            style="width: 10px"
+          >
             <q-btn
               flat
               round
               style="color: #f14a3b"
-              @click="coachStore.removeUser(props.row.id)"
               icon="mdi-trash-can-outline"
+              @click="coachStore.removeUser(props.row.id)"
             />
           </q-td>
         </q-tr>
@@ -114,8 +137,8 @@ import { ref } from 'vue'
 import { exportFile, useQuasar } from 'quasar'
 import SegmentedControl from './SegmentedControl.vue'
 
-const wrapCsvValue = (val, formatFn) => {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
+const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
+  let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
 
   formatted =
     formatted === void 0 || formatted === null ? '' : String(formatted)
@@ -191,16 +214,47 @@ const roles = [
 ]
 export default defineComponent({
   components: { SegmentedControl },
+  setup() {
+    const coachStore = useCoachStore()
+    const $q = useQuasar()
+    
+    onMounted(() => {
+      coachStore.loadUsers(); 
+      coachStore.$subscribe((users, state) => {
+        console.log(users, state)
+        switch (users.events.key) {
+            case 'role':
+              coachStore.updateRole(users.events.target, users.events.newValue, () => $q.notify({
+                icon: 'done',
+                color: 'warning',
+                message: `Will update role to ${users.events.newValue} for ${users.events.target.firstName} ${users.events.target.lastName}`,
+                textColor: 'black'
+              }))
+        }
+      })
+    })
+    
+
+    return {
+      active: ref(true),
+      filter: ref(''),
+      roleFilter: ref('all'),
+      columns,
+      roles,
+      coachStore,
+      $q
+    }
+  },
   methods: {
     // Method for searching the table.
     // Terms is equal to roleFilter.
     // The method filter to the elements which pass both filters.
-    useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: any, arg1: any) => string) {
+    useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: unknown, arg1: unknown) => string) {
       const lowerTerms = this.filter?.toLowerCase() ?? ''
       
-      return rows.filter((row: any) =>
+      return rows.filter((row: unknown) =>
         (terms == 'all' || cellValue(cols[1], row) == terms) &&
-        cols.some((col: any) => {
+        cols.some((col: unknown) => {
           const val = cellValue(col, row) + ''
           const haystack =
             val === 'undefined' || val === 'null' ? '' : val.toLowerCase()
@@ -254,37 +308,6 @@ export default defineComponent({
         })
       }
     },
-  },
-  setup() {
-    const coachStore = useCoachStore()
-    const $q = useQuasar()
-    
-    onMounted(() => {
-      coachStore.loadUsers();
-      coachStore.$subscribe((users, state) => {
-        console.log(users, state)
-        switch (users.events.key) {
-            case 'role':
-              coachStore.updateRole(users.events.target, users.events.newValue, () => $q.notify({
-                icon: 'done',
-                color: 'warning',
-                message: `Will update role to ${users.events.newValue} for ${users.events.target.firstName} ${users.events.target.lastName}`,
-                textColor: 'black'
-              }))
-        }
-      })
-    })
-    
-
-    return {
-      active: ref(true),
-      filter: ref(''),
-      roleFilter: ref('all'),
-      columns,
-      roles,
-      coachStore,
-      $q
-    }
   },
 })
 </script>

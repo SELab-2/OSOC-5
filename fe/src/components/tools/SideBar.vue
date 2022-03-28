@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <q-drawer
       v-model="drawer"
       show-if-above
@@ -10,30 +10,35 @@
       bordered
       class="bg-grey-3 full-height"
     >
-      <div :style="drawer && !miniState? '' : 'display: none'" class="fit full-height">
+      <div
+        :style="drawer && !miniState? '' : 'display: none'"
+        class="fit full-height"
+      >
         <div class="">
           <div class="absolute-full q-ma-sm column q-gutter-y-sm">
-            <div class="text-bold text-h5">Filters</div>
+            <div class="text-bold text-h5">
+              Filters
+            </div>
 
             <q-input
+              v-model="search"
               outlined
               dense
               rounded
               debounce="300"
               color="green"
               bg-color="white"
-              v-model="search"
               placeholder="Search"
             >
-              <template v-slot:append>
-                <q-icon name="search"/>
+              <template #append>
+                <q-icon name="search" />
               </template>
             </q-input>
 
             <SegmentedControl
+              v-model="roleFilter"
               color="primary"
               text-color="white"
-              v-model="roleFilter"
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
@@ -42,8 +47,8 @@
             />
 
             <SegmentedControl
-              color="primary"
               v-model="suggestion"
+              color="primary"
               :options="[
                 { name: 'yes', label: 'Yes' },
                 { name: 'maybe', label: 'Maybe' },
@@ -69,47 +74,47 @@
 
             <div class="row q-gutter-x-md">
               <q-checkbox
-                color="primary"
                 v-model="byMe"
+                color="primary"
                 label="Suggested by you"
                 right-label
               />
               <q-checkbox
-                color="primary"
                 v-model="onProject"
+                color="primary"
                 label="On project"
                 right-label
               />
             </div>
 
-            <div class="text-bold text-h5">Students</div>
-            <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
-              <q-list
-
+            <div class="text-bold text-h5">
+              Students
+            </div>
+            <q-scroll-area
+              class="scroll fadeOut"
+              :thumb-style="thumbStyle"
+              style="flex: 1 1 auto;"
+            >
+              <q-list>
+                <q-item
+                  v-for="student in students" 
+                  :id="student.name" 
+                  :key="student.name"
+                  draggable="true"
+                  @dragstart="onDragStart($event, student.name)"
                 >
-                <q-item v-for="student in students" 
-                    :key="student.name" 
-                    draggable="true"
-                    @dragstart="onDragStart($event, student.name)"
-                    :id="student.name">
                   <StudentCard
                     :name="student.name"
                     :yes="student.yes"
                     :maybe="student.maybe"
                     :no="student.no"
                     :official="student.official"
-                    
                   />
                 </q-item>
               </q-list>
             </q-scroll-area>
-
           </div>
-
-
         </div>
-
-
       </div>
 
       <!--
@@ -117,14 +122,17 @@
         so that user can switch back
         to mini-mode
       -->
-      <div class="absolute" style="top: 15px; right: -17px">
+      <div
+        class="absolute"
+        style="top: 15px; right: -17px"
+      >
         <q-btn
           dense
           round
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="this.miniState = !this.miniState"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -132,22 +140,14 @@
 </template>
 
 <script lang="ts">
-import {ref} from 'vue'
+import {defineComponent, ref} from 'vue'
 import SegmentedControl from "../SegmentedControl.vue";
 import StudentCard from "../cards/StudentCard.vue";
 
-export default {
-  methods: {
-    // Saves the component id and user name in the dataTransfer.
-    // TODO: send id of user instead of name.
-    onDragStart(e, item) {
-      const data = {
-        targetId: e.target.id,
-        name: item
-      }
-      e.dataTransfer.setData('text', JSON.stringify(data))
-      e.dataTransfer.dropEffect = 'copy'
-    }
+export default defineComponent({
+  components: {
+    StudentCard,
+    SegmentedControl,
   },
   data() {
     return {
@@ -168,11 +168,20 @@ export default {
       ]
     }
   },
-  components: {
-    StudentCard,
-    SegmentedControl,
-  }
-}
+  methods: {
+    // Saves the component id and user name in the dataTransfer.
+    // TODO: send id of user instead of name.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onDragStart(e: any, item: any) {
+      const data = {
+        targetId: e.target.id,
+        name: item
+      }
+      e.dataTransfer.setData('text', JSON.stringify(data))
+      e.dataTransfer.dropEffect = 'copy'
+    }
+  },
+})
 </script>
 
 <style scoped>

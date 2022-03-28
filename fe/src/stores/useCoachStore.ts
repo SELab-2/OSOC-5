@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { User } from '../models/User'
 import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
@@ -19,7 +20,7 @@ export const useCoachStore = defineStore('user/coach', {
         .get('coaches/')
         .then(({ data }) => {
           this.isLoadingUsers = false
-          this.users = convertObjectKeysToCamelCase(data).results
+          this.users = convertObjectKeysToCamelCase(data).results as User[]
           this.users.forEach((user) => {
             user.role = user.isAdmin ? 'admin' : 'coach'
           })
@@ -27,8 +28,8 @@ export const useCoachStore = defineStore('user/coach', {
         .catch(() => (this.isLoadingUsers = false))
     },
     async updateRole(
-      user: { firstName: any; lastName: any },
-      newRole: any,
+      user: { firstName: string; lastName: string },
+      newRole: string,
       callback: () => void
     ) {
       console.log(
@@ -36,7 +37,7 @@ export const useCoachStore = defineStore('user/coach', {
       )
       callback()
     },
-    async removeUser(userId: any) {
+    async removeUser(userId: string) {
       await instance
         .delete(`coaches/${userId}/`)
         .then(() => {
