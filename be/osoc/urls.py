@@ -23,7 +23,6 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 router = routers.DefaultRouter()
-router.register(r'groups', views.GroupViewSet)
 router.register(r'coaches', views.CoachViewSet)
 router.register(r'students', views.StudentViewSet)
 router.register(r'projects', views.ProjectViewSet)

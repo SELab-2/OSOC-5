@@ -51,3 +51,11 @@ class IsOwnerOrAdmin(permissions.BasePermission):
 
         # Write permissions are only allowed to the owner of the data
         return request.user==object
+
+class IsActive(permissions.BasePermission):
+    """
+    Custom permission class that checks if the current user is active
+    """
+
+    def has_permission(self, request, view):
+        return request.user.active

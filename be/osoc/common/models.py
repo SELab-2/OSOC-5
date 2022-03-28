@@ -89,6 +89,10 @@ class Coach(AbstractUser):  # models.Model):
         _('is admin'),
         default=False
     )
+    active = models.BooleanField(
+        _('active'),
+        default=True
+    )
     last_email_sent = models.DateTimeField(
         _('last email sent'),
         blank=True,
@@ -153,8 +157,8 @@ class Student(models.Model):
     call_name = models.CharField(
         _('call name'),
         max_length=255,
-        null=True,
-        blank=True
+        blank=True,
+        default=""
     )
     email = models.EmailField(
         _('email address'),
@@ -166,7 +170,7 @@ class Student(models.Model):
         validators=[phone_regex],
         max_length=17,
         blank=True,
-        null=True
+        default=""
     )
     language = models.CharField(
         _('language'),
@@ -177,7 +181,7 @@ class Student(models.Model):
     extra_info = models.TextField(
         _('extra info'),
         blank=True,
-        null=True
+        default=""
     )
     cv = models.URLField(
         _('cv'),
@@ -203,6 +207,10 @@ class Student(models.Model):
     studies = models.CharField(
         _("studies"),
         max_length=255
+    )
+    alum = models.BooleanField(
+        _("alum"),
+        default=False
     )
     skills = models.ManyToManyField(
         Skill,
@@ -296,8 +304,8 @@ class RequiredSkills(models.Model):
     )
     comment = models.CharField(
         _('comment'),
+        default="",
         blank=True,
-        null=True,
         max_length=500
     )
 
@@ -328,7 +336,7 @@ class Suggestion(models.Model):
     reason = models.CharField(
         _('reason'),
         blank=True,
-        null=True,
+        default="",
         max_length=500
     )
 
@@ -346,7 +354,7 @@ class ProjectSuggestion(models.Model):
     reason = models.CharField(
         _('reason'),
         blank=True,
-        null=True,
+        default="",
         max_length=500
     )
     project = models.ForeignKey(

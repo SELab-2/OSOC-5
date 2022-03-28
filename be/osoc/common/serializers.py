@@ -1,7 +1,6 @@
 """
 Serializers definitions of the Django models defined in ./models.py.
 """
-from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import *
@@ -20,15 +19,17 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Student
-        fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 'phone_number', 'language',
-                  'extra_info', 'cv', 'portfolio', 'school_name', 'degree', 'studies', 'skills', 'suggestions']
+        fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 
+                  'phone_number', 'language','extra_info', 'cv', 'portfolio', 
+                  'school_name', 'degree', 'studies', 'skills', 'suggestions', 
+                  'alum']
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin']
-        read_only_fields = ['is_admin']
+        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin', 'active']
+        read_only_fields = ['is_admin', 'active']
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
@@ -42,11 +43,13 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
         model = RequiredSkills
         fields = ['amount', 'skill', 'comment']
 
+
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'role', 'reason']
         read_only_fields = ['coach']
+
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     required_skills = RequiredSkillsSerializer(
@@ -70,10 +73,12 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return project
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ['url', 'name']
+class StudentOnlySerializer(serializers.Serializer):
+    student = serializers.URLField()
+
+
+class UpdateAdminSerializer(serializers.Serializer):
+    is_admin = serializers.BooleanField()
 
 
 class LoginSerializer(serializers.Serializer):

@@ -1,7 +1,6 @@
 """
 Views that create a connection between the database and the application.
 """
-from django.contrib.auth.models import Group
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins, permissions, views, status, generics
 from .serializers import *
@@ -11,7 +10,7 @@ from rest_framework.decorators import action
 from django.urls import resolve
 from urllib.parse import urlparse
 from .models import *
-from .permissions import IsAdmin, IsOwnerOrAdmin
+from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
@@ -19,7 +18,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     """
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsActive]
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -41,13 +40,28 @@ class StudentViewSet(viewsets.ModelViewSet):
             
             return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer)
+    def remove_suggestion(self, request, pk=None):
+        """
+        let a coach remove a suggestion he has made for the current student
+        a coach can only remove a suggestion from themselves
+        returns HTTP response:
+            404 NOT FOUND:      there was no suggestion found
+            204 NO CONTENT:     the suggestion was found and removed
+        """
+        # delete Suggestion object if it is found
+        deleted, _ = Suggestion.objects.filter(
+            student=self.get_object(), coach=request.user).delete()
+
+        return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
 
 class CoachViewSet(viewsets.GenericViewSet, 
                    mixins.ListModelMixin, 
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin):
+                   mixins.DestroyModelMixin):   # no create, this is handled in RegisterView
     """
     API endpoint that allows coaches to be viewed or removed.
     a coach cannot be created by this API endpoint
@@ -55,29 +69,29 @@ class CoachViewSet(viewsets.GenericViewSet,
     """
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
 
-    @action(detail=True, methods=['put'])
-    def make_admin(self, request, pk=None):
+    @action(detail=True, methods=['put'], serializer_class=UpdateAdminSerializer)
+    def update_admin_status(self, request, pk=None):
         """
-        let an admin give admin rights to another user
+        let an admin update admin rights of another user
+        returns HTTP response:
+            400 BAD REQUEST:    there was required data missing or the data could not be serialized
+            403 FORBIDDEN:      the user does not have the rights to do this action, or th user tries to update their own rights
+            204 NO CONTENT:     the user was updated
         """
-        coach = self.get_object()
-        coach.is_admin = True
-        coach.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    @action(detail=True, methods=['put'])
-    def remove_admin(self, request, pk=None):
-        """
-        let an admin remove admin rights from another user
-        """
-        coach = self.get_object()
-        if coach != request.user:
-            coach.is_admin = False
-            coach.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        serializer = UpdateAdminSerializer(
+            data=request.data, context={'request': request})
+        if serializer.is_valid():
+
+            coach = self.get_object()
+            if coach != request.user:
+                coach.is_admin = serializer.data['is_admin']
+                coach.save()
+            
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"error": "you can not update your own admin status"}, status=status.HTTP_403_FORBIDDEN)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -87,7 +101,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = Project.objects.all().order_by('id')
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
     def suggest_student(self, request, pk=None):
@@ -122,7 +136,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
+    # method should be delete but this is not possible because delete requests cannot handle request body
+    @action(detail=True, methods=['post'], serializer_class=StudentOnlySerializer)
     def remove_student(self, request, pk=None):
         """
         let a coach remove a projectsuggestion for this project
@@ -130,9 +145,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         returns HTTP response:
             400 BAD REQUEST: there was required data missing or the data could not be serialized
             404 NOT FOUND:   there was no projectsuggestion found
-            200 OK:          the projectsuggestion was found and removed
+            204 NO CONTENT:  the projectsuggestion was found and removed
         """
-        serializer = ProjectSuggestionSerializer(
+        serializer = StudentOnlySerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
 
@@ -145,7 +160,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             deleted, _ = ProjectSuggestion.objects.filter(
                 project=self.get_object(), coach=request.user, student=student).delete()
 
-            return Response(serializer.data, status=(status.HTTP_200_OK if deleted else status.HTTP_404_NOT_FOUND))
+            return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -155,16 +170,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     """
     queryset = Skill.objects.all().order_by('id')
     serializer_class = SkillSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsActive]
 
 
 class LoginView(views.APIView):
