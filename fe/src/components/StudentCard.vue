@@ -1,12 +1,12 @@
 <template>
-  <q-card class="full-width">
-    <q-card-section style="padding: 10px !important">
+  <q-card class="my-card full-width full-height">
+    <q-card-section rounded>
       <div class="row justify-between">
         <div >
           <label class="text-bold q-pr-xs">{{ name }}</label>
-          <q-icon v-if="official === 'yes'" size="xs" name="mdi-check" color="green" />
-          <q-icon v-else-if="official === 'maybe'" size="xs" name="mdi-help" color="yellow" />
-          <q-icon v-else size="xs" name="mdi-close" color="red" />
+          <!--          <q-icon v-if="official === 'yes'" size="xs" name="mdi-check" color="green" />-->
+          <!--          <q-icon v-else-if="official === 'maybe'" size="xs" name="mdi-help" color="yellow" />-->
+          <!--          <q-icon v-else size="xs" name="mdi-close" color="red" />-->
         </div>
         <label class="text-bold">{{ total }}</label>
       </div>
@@ -21,12 +21,26 @@
 
 <script>
 export default {
-  props: ['name', 'yes', 'maybe', 'no', 'official'],
+  props: ['student'],
   computed: {
-    total() { return this.yes + this.maybe + this.no },
-    yesStyle() { return { width: ((100 * this.yes / this.total) + '%')} },
-    maybeStyle() { return { width: ((100 * this.maybe / this.total) + '%')} },
-    noStyle() { return { width: ((100 * this.no / this.total) + '%')} },
+    total() {
+      return this.student.suggestions.length
+    },
+    yesStyle() {
+      const widthYes = 100 * this.student.suggestions.filter(sug => sug.suggestion === "0").length / this.total
+      return { width: (widthYes + '%')}
+    },
+    maybeStyle() {
+      const widthMaybe = 100 * this.student.suggestions.filter(sug => sug.suggestion === "1").length / this.total
+      return { width: (widthMaybe + '%')}
+    },
+    noStyle() {
+      const widthNo = 100 * this.student.suggestions.filter(sug => sug.suggestion === "2").length / this.total
+      return { width: (widthNo + '%')}
+    },
+    name() {
+      return this.student.firstName + ' ' + this.student.lastName
+    }
   }
 }
 </script>
