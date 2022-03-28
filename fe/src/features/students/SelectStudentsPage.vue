@@ -100,7 +100,7 @@ import {ref} from "vue"
 import { openURL } from 'quasar'
 import SideBar from "../../components/SideBar.vue"
 import SegmentedControl from "../../components/SegmentedControl.vue";
-import StudentCard from "./components/StudentCard.vue";
+import StudentCard from "../../components/StudentCard.vue";
 import TitleTextCard from "./components/TitleTextCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
 import PracticalCard from "./components/PracticalCard.vue";

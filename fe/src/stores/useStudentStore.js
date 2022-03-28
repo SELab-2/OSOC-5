@@ -20,12 +20,12 @@ export const useStudentStore = defineStore('user/student', {
           this.students.forEach((student, i) => {
             student.suggestions.forEach((suggestion, j) => {
               const pieces = suggestion.coach.split('/')
-              console.log(pieces)
               const url = 'coaches/' + pieces.slice(-2)[0] + '/'
 
               instance
                 .get(url)
                 .then(({data}) => {
+                  console.log(data)
                   Object.assign(this.students[i].suggestions[j], data)
                 })
             })
