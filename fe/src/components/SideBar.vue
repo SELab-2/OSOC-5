@@ -59,6 +59,7 @@
               outlined
               dense
               multiple
+              v-model="roles"
               color="primary"
               bg-color="white"
               :options="[
@@ -157,7 +158,14 @@ export default {
 
     return {
       studentStore,
-      $q
+      $q,
+      thumbStyle: {
+        right: '0px',
+        borderRadius: '7px',
+        backgroundColor: 'black',
+        width: '4px',
+        opacity: 0.75
+      },
     }
   },
   methods: {
@@ -181,6 +189,7 @@ export default {
       onProject: ref(false),
       roleFilter: ref('all'),
       suggestion: ref('yes'),
+      roles: ref([]),
       students: [
         {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
         {name: 'Echo Sierra', yes: 8, maybe: 3, no: 1, official: 'maybe'},
@@ -203,8 +212,7 @@ export default {
     border-radius: 10px !important;
   }
   
-  :deep(.q-item) {
-    padding: 8px 8px !important;
-  }
-
+:deep(.q-item) {
+  padding: 8px 8px !important;
+}
 </style>
