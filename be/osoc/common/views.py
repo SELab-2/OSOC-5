@@ -9,6 +9,7 @@ from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
 from django.urls import resolve
 from urllib.parse import urlparse
+from rest_framework.reverse import reverse
 from .models import *
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
@@ -162,6 +163,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def get_conflicting_projects(self, request):
+        students = Student.objects.all()
+        conflicts = []
+        for student in students:
+            projects = ProjectSuggestion.objects.filter(student=student)
+            if projects.count() > 1:
+                student_url = request.build_absolute_uri(reverse("student-detail", args=(student.id,)))
+                project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,))) 
+                                for project_sug in projects]
+                conflicts.append({student_url: project_urls})
+        print(conflicts)
+        return Response({"conflicts": conflicts}, status=status.HTTP_200_OK)
 
 
 class SkillViewSet(viewsets.ModelViewSet):
