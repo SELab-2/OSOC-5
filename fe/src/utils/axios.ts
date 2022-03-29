@@ -25,7 +25,7 @@ export const instance = axios.create({
 })
 
 export const setCsrfToken = () =>
-    (instance.defaults.headers.common['X-CSRFToken'] =
-        getCookie('csrftoken') || '')
+  (instance.defaults.headers.common['X-CSRFToken'] =
+    getCookie('csrftoken') || '')
 
 export const hasCsrfToken = () => getCookie('csrftoken') !== null
