@@ -3,7 +3,6 @@ import {instance} from '../utils/axios'
 import {convertObjectKeysToCamelCase} from '../utils/case-conversion'
 
 export const useSkillStore = defineStore('skills', {
-    // TODO: idk of coaches en skills gesplitst moeten worden
     state: () => ({
         skills: [],
         isLoadingSkills: false,
@@ -78,7 +77,7 @@ export const useSkillStore = defineStore('skills', {
         },
 
         /*
-         * PROJECT TODO: move to more logic place
+         * PROJECT TODO: move to a project store once that exists
          */
         submitProject(projectName, projectURL, partnerName, coaches, callback) {
             let data = {
