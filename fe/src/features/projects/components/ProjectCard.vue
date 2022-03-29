@@ -4,9 +4,9 @@
       <div class="row">
         <div class="col">
           <div class="text-h5 text-bold q-mt-sm q-mb-xs">
-            {{ project.title }}
+            {{ project.name }}
           </div>
-          <div class="text-overline">{{ project.client }}</div>
+          <div class="text-overline">{{ project.partnerName }}</div>
         </div>
         <div>
           <q-btn flat round size="12px" color="primary" icon="mail" />
@@ -16,7 +16,7 @@
       </div>
       <div class="text-caption text-grey">Coaches:</div>
       <q-chip v-for="coach in project.coaches" :key="coach.id" icon="person">{{
-        coach.name
+        coach.firstName
       }}</q-chip>
 
       <div
@@ -28,13 +28,13 @@
         <q-btn flat round size="sm" icon="mdi-eye" />
       </div>
       <project-role-chip
-        v-model="this.selectedRoles[role.type]"
-        v-for="(role, index) in project.roles"
+        v-model="this.selectedRoles[role.id]"
+        v-for="(role, index) in project.requiredSkills"
         @dragleave="onDragLeave($event, role)"
         @dragover="this.amountLeft(role) > 0 ? onDragOver($event, role) : ''"
         @drop="onDrop($event, role)"
         :key="index"
-        :role="role"
+        :role="role.skill"
         :placesLeft="amountLeft(role)"
       />
 
@@ -84,7 +84,7 @@ export default {
       // Marks all role lists as hidden.
       selectedRoles: reactive(
         Object.assign(
-          ...props.project.roles.map((role) => ({ [role.type]: false }))
+          ...props.project.requiredSkills.map((role) => ({ [role.id]: false }))
         )
       ),
     }
@@ -117,7 +117,7 @@ export default {
 
     // Calculates how many places of a role are occupied.
     amountLeft(role) {
-      const occupied = this.groupedStudents[role.type]
+      const occupied = this.groupedStudents[role.id]
       return role.amount - (occupied ? occupied.length : 0)
     },
 
@@ -162,7 +162,7 @@ export default {
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }
     groupedStudents() {
-      return this.groupBy(this.project.students, 'role')
+      return this.groupBy(this.project.suggestedStudents, 'id')
     },
   },
 }
