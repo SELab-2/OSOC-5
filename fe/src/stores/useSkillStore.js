@@ -31,6 +31,7 @@ export const useSkillStore = defineStore('skills', {
               amount: 0,
               comment: '',
               url: skill.url,
+              id: skill.id,
             })
           }
         })
@@ -65,6 +66,15 @@ export const useSkillStore = defineStore('skills', {
       this.isLoadingSkills = false
       // When finished run the callback so the popup closes.
       callback(newSkill)
+    },
+    async deleteSkill(deletedSkill) {
+      await instance
+          .delete(`skills/${deletedSkill.id}/`)
+          .then(() => {
+            const index = this.skills.findIndex(skill => skill.id === deletedSkill.id)
+            this.skills.splice(index,1)
+          })
+          .catch(() => console.log("Failed to delete"))
     },
 
     /*

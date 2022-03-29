@@ -1,7 +1,6 @@
 <template>
-    <div style="align-items: center; display: flex; justify-content: center;" >
+    <div style="align-items: center; justify-content: center;" >
       <q-form
-        style="max-width: 2500px"
         class='createProjectForm'
         @submit='onSubmit'
         @reset='onReset'
@@ -34,7 +33,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="projectcol col-xs-12 col-sm-6 col-md-6 col-lg-3 col-xl-3'">
+            <div class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3'">
               <h4 class='projectsubtitle'>Basic Info</h4>
               <q-input
                 outlined
@@ -63,7 +62,7 @@
               />
             </div>
 
-            <div class="projectcol col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+            <div class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
               <h4 class='projectsubtitle'>Project Coaches</h4>
               <div class='row'>
                 <q-input
@@ -74,6 +73,7 @@
                   class='inputfield'
                   v-model='filter_coaches'
                   placeholder='Search'
+                  @keydown.enter.prevent=''
                 >
                   <template v-slot:append>
                     <q-icon v-if="filter_coaches !== ''"
@@ -99,13 +99,14 @@
               </q-table>
             </div>
 
-            <div class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-5">
+            <div class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-6">
               <h4 class='projectsubtitle'>Project Roles</h4>
               <div class='row'>
                 <q-btn class='cornered' color='primary' icon='add' label='Add role'
                        @click='new_role_prompt = true ' />
                 <q-space />
                 <q-input
+                    style='max-width: 190px'
                   outlined
                   dense
                   debounce='300'
@@ -113,6 +114,7 @@
                   class='inputfield'
                   v-model='filter_roles'
                   placeholder='Search'
+                  @keydown.enter.prevent=''
                 >
                   <template v-slot:append>
                     <q-icon v-if="filter_roles !== ''"
@@ -176,7 +178,17 @@
                           @keyup.enter.stop
                         />
                       </q-popup-edit>
+
                     </q-td>
+                      <q-td style="width: 10px" key="remove">
+                        <q-btn
+                          flat
+                          round
+                          style="color: #f14a3b"
+                          @click="delete_role = props.row; delete_role_prompt = true"
+                          icon="mdi-trash-can-outline"
+                        />
+                      </q-td>
                   </q-tr>
                 </template>
               </q-table>
@@ -210,6 +222,29 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
+
+    <q-dialog v-model='delete_role_prompt' persistent>
+        <q-card style='min-width: 350px'>
+            <q-card-section horizontal>
+
+                <q-card-section class="col-3 flex flex-center">
+                    <q-icon name="warning" class="text-red" size="80px" />
+                </q-card-section>
+                <q-card-section class="q-pt-xs">
+                    <div class='text-h6 q-mt-sm q-mb-xs'>Are you sure you want to delete "{{ delete_role.name }}"?</div>
+                    <div class="text text-grey">
+                        This skill will be deleted immediately from all projects. You can't undo this action.
+                    </div>
+                </q-card-section>
+
+            </q-card-section>
+
+            <q-card-actions align='right' class='text-primary'>
+                <q-btn flat color='grey' label='Cancel' v-close-popup />
+                <q-btn flat color='red' label='Delete' @click='delete_role_confirm(delete_role)' />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
 </template>
 
 <script>
@@ -221,13 +256,17 @@ import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 
 const columns_roles = [
-    { name: 'role', align: 'left', label: 'Project Role', field: 'role' },
-    { name: 'amount', align: 'left', label: 'Amount', field: 'amount' },
-    { name: 'comment', align: 'left', label: 'Comment', field: 'comment' },
+    { name: 'role', align: 'left', label: 'Project Role', field: 'role', sortable: true },
+    { name: 'amount', align: 'left', label: 'Amount', field: 'amount', sortable: true },
+    { name: 'comment', align: 'left', label: 'Comment', field: 'comment', sortable: true},
+    { name: 'action',  align: 'right', label: '', field: '', sortable: false,
+    },
 ]
 
 const columns_coaches = [ /* TODO: Could display existing projects of coaches  */
-    { name: 'displayName', align: 'left', label: 'Coach name', field: 'displayName' },
+    { name: 'displayName', align: 'left', label: 'Coach name',
+        field: row => row.firstName + ' ' + row.lastName,
+        sortable: true},
 ]
 
 export default {
@@ -259,6 +298,10 @@ export default {
         // variables for the new role dialog popup
         const new_role_prompt = ref(false)
         const new_role = ref('')
+
+        // variables for the delete role dialog popup
+        const delete_role_prompt = ref(false)
+        const delete_role = ref(null)
 
         const selected = ref([])
 
@@ -330,6 +373,13 @@ export default {
                 errorMessageRoleAmount.value = ''
                 return true
             },
+            delete_role_prompt,
+
+            delete_role_confirm(deletedSkill){
+                console.log(deletedSkill)
+                skillStore.deleteSkill(deletedSkill)
+                delete_role_prompt.value = false
+            },
 
             /*
              * New Role
@@ -389,18 +439,12 @@ thead {
     margin-top: 10px
 
 .createProjectForm
-    margin: 25px
+    margin-top: 25px
+    margin-left: 10%
+    margin-right: 10%
 
 .appPageTitle
     text-align: center
 
-.basiccol
-    max-width: 360px !important
-
-.rolescol
-    max-width: 700px !important
-
-.coachescol
-    max-width: 360px !important
 
 </style>
