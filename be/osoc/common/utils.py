@@ -1,5 +1,5 @@
 """
-Custom Utility functions.
+Utilities.
 """
 
 def strip_and_lower_email(email):
