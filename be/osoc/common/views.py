@@ -72,6 +72,16 @@ class CoachViewSet(viewsets.GenericViewSet,
     serializer_class = CoachSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
 
+    def destroy(self, request, pk=None):
+        coach = self.get_object()
+        if coach != request.user:
+            # check if number of admins would not be zero after the delete
+            if not coach.is_admin or Coach.objects.filter(is_admin=True).count() > 1: 
+                self.perform_destroy(coach)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"error": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
+
     @action(detail=True, methods=['put'], serializer_class=UpdateAdminSerializer)
     def update_admin_status(self, request, pk=None):
         """
@@ -86,6 +96,7 @@ class CoachViewSet(viewsets.GenericViewSet,
         if serializer.is_valid():
 
             coach = self.get_object()
+            # check if coach is not current user
             if coach != request.user:
                 coach.is_admin = serializer.data['is_admin']
                 coach.save()
