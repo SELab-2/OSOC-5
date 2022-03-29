@@ -21,6 +21,8 @@ export const useStudentStore = defineStore('user/student', {
               const pieces = suggestion.coach.split('/')
               const url = 'coaches/' + pieces.slice(-2)[0] + '/'
 
+              suggestion.suggestion = parseInt(suggestion.suggestion)
+
               instance
                 .get(url)
                 .then(({data}) => {

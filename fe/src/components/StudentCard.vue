@@ -27,15 +27,15 @@ export default {
       return this.student.suggestions.length
     },
     yesStyle() {
-      const widthYes = 100 * this.student.suggestions.filter(sug => sug.suggestion === "0").length / this.total
+      const widthYes = 100 * this.student.suggestions.filter(sug => sug.suggestion === 0).length / this.total
       return { width: (widthYes + '%')}
     },
     maybeStyle() {
-      const widthMaybe = 100 * this.student.suggestions.filter(sug => sug.suggestion === "1").length / this.total
+      const widthMaybe = 100 * this.student.suggestions.filter(sug => sug.suggestion === 1).length / this.total
       return { width: (widthMaybe + '%')}
     },
     noStyle() {
-      const widthNo = 100 * this.student.suggestions.filter(sug => sug.suggestion === "2").length / this.total
+      const widthNo = 100 * this.student.suggestions.filter(sug => sug.suggestion === 2).length / this.total
       return { width: (widthNo + '%')}
     },
     name() {

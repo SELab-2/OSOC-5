@@ -152,8 +152,6 @@ export default {
 
     onMounted(() => {
       studentStore.loadStudents()
-      studentStore.$subscribe((students, state) => {
-      })
     })
 
     return {
