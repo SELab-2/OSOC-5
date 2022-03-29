@@ -479,6 +479,10 @@ export default {
 thead {
   background-color: #44dba4;
 }
+
+.q-card {
+  border-radius: 10px !important;
+}
 </style>
 <style scoped lang="sass">
 
