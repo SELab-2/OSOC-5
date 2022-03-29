@@ -1,2 +1,393 @@
 {
+  "0": {
+    "question": [
+      "Are you able to work 128 hours with a student employment agreement, or as a volunteer?*"
+    ],
+    "field": "availability",
+    "type": "MULTIPLE_CHOICE",
+    "answers": [
+      {
+        "answer": "Yes, I can work with a student employment agreement in Belgium",
+        "value": "Can work with a student employment agreement in Belgium"
+      },
+      {
+        "answer": "Yes, I can work as a volunteer in Belgium",
+        "value": "Can work as a volunteer in Belgium"
+      }
+    ],
+    "required": true
+  },
+  "1": {
+    "question": [
+      "Are there any responsibilities you might have which could hinder you during the day?"
+    ],
+    "field": "availability",
+    "type": "TEXT",
+    "required": true
+  },
+  "2": {
+    "question": [
+      "Birth name"
+    ],
+    "field": "first_name",
+    "type": "TEXT",
+    "required": true
+  },
+  "3": {
+    "question": [
+      "Last name"
+    ],
+    "field": "last_name",
+    "type": "TEXT",
+    "required": true
+  },
+  "4": {
+    "question": [
+      "How would you like to be called?"
+    ],
+    "field": "call_name",
+    "type": "TEXT",
+    "required": false
+  },
+  "5": {
+    "question": [
+      "What is your gender?"
+    ],
+    "field": "gender",
+    "type": "MULTIPLE_CHOICE",
+    "answers": [
+      {
+        "answer": "Female"
+      },
+      {
+        "answer": "Male"
+      },
+      {
+        "answer": "Transgender"
+      },
+      {
+        "answer": "Rather not say"
+      }
+    ],
+    "required": true
+  },
+  "6": {
+    "question": [
+      "Which pronouns do you prefer?"
+    ],
+    "field": "pronouns",
+    "type": "MULTIPLE_CHOICE",
+    "answers": [
+      {
+        "answer": "she/her/hers"
+      },
+      {
+        "answer": "he/him/his"
+      },
+      {
+        "answer": "they/them/theirs"
+      },
+      {
+        "answer": "ze/hir/hir"
+      },
+      {
+        "answer": "by firstname"
+      },
+      {
+        "answer": "by call name"
+      },
+      {
+        "answer": "other",
+        "value": {
+          "question": [ "Enter your pronouns" ],
+          "type": "TEXT"
+        }
+      }
+    ],
+    "required": false
+  },
+  "7": {
+    "question": [
+      "What language are you most fluent in?"
+    ],
+    "field": "language",
+    "type": "MULTIPLE_CHOICE",
+    "answers": [
+      {
+        "answer": "Dutch"
+      },
+      {
+        "answer": "English"
+      },
+      {
+        "answer": "French"
+      },
+      {
+        "answer": "German"
+      },
+      {
+        "answer": "Other",
+        "value": {
+          "question": [ "What language are you most fluent in?" ],
+          "type": "TEXT"
+        }
+      }
+    ],
+    "required": true
+  },
+  "8": {
+    "question": [
+      "How would you rate your English?"
+    ],
+    "field": "english_rating",
+    "type": "MULTIPLE_CHOICE",
+    "answers": [
+      {
+        "answer": "★ I can understand your form, but it is hard for me to reply.",
+        "value": 1
+      },
+      {
+        "answer": "★★ I can have simple conversations.",
+        "value": 2
+      },
+      {
+        "answer": "★★★ I can express myself, understand people and get a point across.",
+        "value": 3
+      },
+      {
+        "answer": "★★★★ I can have extensive and complicated conversations.",
+        "value": 4
+      },
+      {
+        "answer": "★★★★★ I am fluent.",
+        "value": 5
+      }
+    ],
+    "required": true
+  },
+  "9": {
+    "question": [
+      "Phone number"
+    ],
+    "field": "phone_number",
+    "type": "TEXT",
+    "required": true
+  },
+  "10": {
+    "question": [
+      "Your email address"
+    ],
+    "field": "email",
+    "type": "TEXT",
+    "required": true
+  },
+  "11": {
+    "question": [
+      "Upload your CV – size limit 10MB", "Or link to your CV"
+    ],
+    "field": "cv",
+    "type": "TEXT",
+    "required": true
+  },
+  "12": {
+    "question": [
+      "Upload your portfolio – size limit 10MB", "Or link to your portfolio / GitHub"
+    ],
+    "field": "portfolio",
+    "type": "TEXT",
+    "required": true
+  },
+  "13": {
+    "question": [
+      "Upload your motivation – size limit 10MB", "Or link to your motivation", "Or write about your motivation"
+    ],
+    "field": "extra_info",
+    "type": "TEXT",
+    "required": true
+  },
+  "14": {
+    "question": [
+      "Add a fun fact about yourself"
+    ],
+    "field": "fun_fact",
+    "type": "TEXT",
+    "required": true
+  },
+  "15": {
+    "question": [
+      "What do/did you study?"
+    ],
+    "field": "studies",
+    "type": "CHECKBOXES",
+    "answers": [
+      {
+        "answer": "Backend development"
+      },
+      {
+        "answer": "Business management"
+      },
+      {
+        "answer": "Communication Sciences"
+      },
+      {
+        "answer": "Computer Sciences"
+      },
+      {
+        "answer": "Design"
+      },
+      {
+        "answer": "Frontend development"
+      },
+      {
+        "answer": "Marketing"
+      },
+      {
+        "answer": "Photography"
+      },
+      {
+        "answer": "Videography"
+      },
+      {
+        "answer": "Other",
+        "value": {
+          "question": [ "What do/did you study?" ],
+          "type": "TEXT"
+        }
+      }
+    ],
+    "required": true
+  },
+  "16": {
+    "question": [
+      "What kind of diploma are you currently going for?"
+    ],
+    "field": "degree",
+    "type": "CHECKBOXES",
+    "answers": [
+      {
+        "answer": "A professional Bachelor"
+      },
+      {
+        "answer": "An academic Bachelor"
+      },
+      {
+        "answer": "An associate degree"
+      },
+      {
+        "answer": "A master's degree"
+      },
+      {
+        "answer": "Doctoral degree"
+      },
+      {
+        "answer": "No diploma, I am self taught",
+        "skip": [ "17", "18", "19" ]
+      },
+      {
+        "answer": "Other",
+        "value": {
+          "question": [ "What kind of diploma are you currently going for?" ],
+          "type": "TEXT"
+        }
+      }
+    ],
+    "required": true
+  },
+  "17": {
+    "question": [
+      "How many years does your degree take?"
+    ],
+    "field": "degree",
+    "type": "TEXT",
+    "required": true
+  },
+  "18": {
+    "question": [
+      "Which year of your degree are you in?"
+    ],
+    "field": "degree",
+    "type": "TEXT",
+    "required": true
+  },
+  "19": {
+    "question": [
+      "What is the name of your college or university?"
+    ],
+    "field": "school_name",
+    "type": "TEXT",
+    "required": true
+  },
+  "20": {
+    "question": [
+      "Which role are you applying for?"
+    ],
+    "field": "skills",
+    "type": "CHECKBOXES",
+    "answers": [
+      {
+        "answer": "Front-end developer"
+      },
+      {
+        "answer": "Back-end developer"
+      },
+      {
+        "answer": "UX / UI designer"
+      },
+      {
+        "answer": "Graphic designer"
+      },
+      {
+        "answer": "Business Modeller"
+      },
+      {
+        "answer": "Storyteller"
+      },
+      {
+        "answer": "Marketer"
+      },
+      {
+        "answer": "Copywriter"
+      },
+      {
+        "answer": "Video editor"
+      },
+      {
+        "answer": "Photographer"
+      },
+      {
+        "answer": "Other",
+        "value": {
+          "question": [ "Which role are you applying for that is not in the list above?" ],
+          "type": "TEXT"
+        }
+      }
+    ],
+    "required": true
+  },
+  "21": {
+    "question": [
+      "Which skill would you list as your best one?"
+    ],
+    "field": "best_skill",
+    "type": "TEXT",
+    "required": true
+  },
+  "22": {
+    "question": [
+      "Would you like to be a student coach this year?"
+    ],
+    "field": "skills",
+    "type": "MULTIPLE_CHOICE",
+    "answers": [
+      {
+        "answer": "Yes, I'd like to be a student coach",
+        "value": true
+      },
+      {
+        "answer": "No, I don't want to be a student coach",
+        "value": false
+      }
+    ],
+    "required": false
+  }
 }
