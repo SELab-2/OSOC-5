@@ -87,9 +87,10 @@
               </div>
               <q-table
                 class='table shadow-4'
-                :rows='rows_coaches'
+                :rows="coachStore.users"
                 :columns='columns_coaches'
-                row-key='name'
+                :loading='coachStore.isLoadingUsers'
+                row-key='displayName'
                 selection='multiple'
                 v-model:selected='selected'
                 :filter='filter_coaches'
@@ -125,9 +126,9 @@
               </div>
               <q-table
                 class='table shadow-4'
-                :rows='createProjectStore.skills'
+                :rows='skillStore.skills'
                 :columns='columns_roles'
-                :loading='createProjectStore.isLoadingSkills'
+                :loading='skillStore.isLoadingSkills'
                 :pagination.sync='pagination_roles'
                 row-key='name'
                 :filter='filter_roles'
@@ -212,11 +213,12 @@
 </template>
 
 <script>
+import router from '../../router'
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { onMounted } from '@vue/runtime-core'
-import { useCreateProjectStore } from '../../stores/useCreateProjectStore'
-import router from '../../router'
+import { useSkillStore } from '../../stores/useSkillStore'
+import { useCoachStore } from '../../stores/useCoachStore'
 
 const columns_roles = [
     { name: 'role', align: 'left', label: 'Project Role', field: 'role' },
@@ -225,36 +227,17 @@ const columns_roles = [
 ]
 
 const columns_coaches = [ /* TODO: Could display existing projects of coaches  */
-    { name: 'name', align: 'left', label: 'Coach name', field: 'name' },
-]
-const rows_coaches = [
-    { name: 'Ed SheRan' },
-    { name: 'Mario' },
-    { name: 'Luise' },
-    { name: 'Bob' },
-    { name: 'Gunter' },
-    { name: 'An' },
-    { name: 'Domien' },
-    { name: 'Florian' },
-    { name: 'Kees' },
-    { name: 'Gert' },
-    { name: 'Joris' },
-    { name: 'Frans' },
-    { name: 'Geert' },
+    { name: 'displayName', align: 'left', label: 'Coach name', field: 'displayName' },
 ]
 
 export default {
     setup() {
-        const createProjectStore = useCreateProjectStore()
+        const skillStore = useSkillStore()
+        const coachStore = useCoachStore()
 
         onMounted(() => {
-            createProjectStore.loadSkills()
-
-            createProjectStore.$subscribe((skills, state) => {
-                // handle callback
-
-
-            })
+            skillStore.loadSkills()
+            coachStore.loadUsers();
         })
 
 
@@ -277,9 +260,12 @@ export default {
         const new_role_prompt = ref(false)
         const new_role = ref('')
 
+        const selected = ref([])
+
 
         return {
-            createProjectStore,
+            skillStore,
+            coachStore,
 
             pagination_roles: {
                 rowsPerPage: 5, // current rows per page being displayed
@@ -295,20 +281,20 @@ export default {
             filter_roles,
             filter_coaches,
 
-            selected: ref([]),
-            coaches: ref([]),
-            coaches_options: [
-                { label: 'Ed Sheran', value: 'Sheran', color: 'yellow' },
-                { label: 'Charlie', value: 'Charlie', color: 'yellow' },
-                { label: 'Obama', value: 'Obama', color: 'yellow' },
-                { label: 'James', value: 'James', color: 'yellow' },
-                { label: 'Arthur', value: 'Arthur', color: 'yellow' },
-            ],
+            selected,
+            columns_roles,
+            columns_coaches,
+
+            /*
+             * Form Functions
+             */
             onSubmit() {
-                createProjectStore.submitProject(
+                console.log(selected.value)
+                skillStore.submitProject(
                     project_name.value,
                     project_link.value,
                     project_partner_name.value,
+                    selected.value,
                     () => {
                         // TODO: add different outcome based on success
 
@@ -329,13 +315,11 @@ export default {
                 /* TODO expand if actually used ... */
             },
 
-            columns_roles,
-            columns_coaches,
-            rows_coaches,
-
+            /*
+             * Role amount validation
+             */
             errorRoleAmount,
             errorMessageRoleAmount,
-
             amountRangeValidation(val) {
                 if (val < 0) {
                     errorRoleAmount.value = true
@@ -347,13 +331,16 @@ export default {
                 return true
             },
 
+            /*
+             * New Role
+             */
             new_role_prompt,
             new_role,
             new_role_confirm() {
                 // check if the new role value is valid
                 if (new_role.value && new_role.value.length > 0) {
                     // when valid call the store object and add the skill
-                    createProjectStore.addSkill(
+                    skillStore.addSkill(
                         new_role.value,
                         // callback
                         (added_role) => {
