@@ -1,36 +1,36 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import SignupForm from '../components/forms/SignupForm.vue'
-import LoginForm from '../components/forms/LoginForm.vue'
+import AppPageVue from '../components/AppPage.vue'
+import FormPageVue from '../features/authentication/FormPage.vue'
+import LoginFormVue from '../features/authentication/LoginForm.vue'
+import SignupFormVue from '../features/authentication/SignupForm.vue'
+import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
+import Projects from '../features/projects/Projects.vue'
+import CreateProjects from '../features/projects/CreateProject.vue'
+import UserList from '../features/users/UserList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
-import Projects from '../components/appPages/Projects.vue'
-import CreateProjects from '../components/appPages/CreateProjects.vue'
-import FormPage from '../components/FormPage.vue'
-import AppPage from '../components/AppPage.vue'
-import UserList from '../components/UserList.vue'
-import SelectStudentsPage from '../components/appPages/SelectStudentsPage.vue'
 import { hasCsrfToken } from '../utils/axios'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '',
-    component: FormPage,
+    component: FormPageVue,
     children: [
       {
         path: 'signup',
-        component: SignupForm,
+        component: SignupFormVue,
         name: 'Signup',
       },
       {
         path: 'login',
         alias: '',
-        component: LoginForm,
+        component: LoginFormVue,
         name: 'Login',
       },
     ],
   },
   {
     path: '',
-    component: AppPage,
+    component: AppPageVue,
     children: [
       {
         path: '/students',
@@ -38,7 +38,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        component: SelectStudentsPage,
+        component: SelectStudentsPageVue,
       },
       {
         path: '/projects',

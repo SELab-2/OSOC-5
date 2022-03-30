@@ -11,9 +11,9 @@ const baseURL =
 export const useAuthenticationStore: StoreDefinition<
   'user/authentication',
   {
-    loggedInUser: { email: string; password: string } | {}
+    loggedInUser: { email: string; password: string } | Record<string, unknown>
   },
-  {},
+  Record<string, never>,
   {
     login({
       email,

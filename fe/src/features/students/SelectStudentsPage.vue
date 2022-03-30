@@ -131,14 +131,14 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue"
-import SideBar from "../tools/SideBar.vue"
-import SegmentedControl from "../SegmentedControl.vue";
-import TitleTextCard from "../cards/TitleTextCard.vue";
-import SuggestionsCard from "../cards/SuggestionsCard.vue";
-import PracticalCard from "../cards/PracticalCard.vue";
-import DetailsCard from "../cards/DetailsCard.vue";
-import AcademiaCard from "../cards/AcademiaCard.vue";
+import {ref, defineComponent} from "vue"
+import SideBar from "../../components/SideBar.vue"
+import SegmentedControl from "../../components/SegmentedControl.vue";
+import TitleTextCard from "./components/TitleTextCard.vue";
+import SuggestionsCard from "./components/SuggestionsCard.vue";
+import PracticalCard from "./components/PracticalCard.vue";
+import DetailsCard from "./components/DetailsCard.vue";
+import AcademiaCard from "./components/AcademiaCard.vue";
 
 export default defineComponent({
   components: {

@@ -26,8 +26,8 @@
 
 <script>
 import { ref } from 'vue'
-import SideBar from '../tools/SideBar.vue'
-import ProjectCard from '../tools/ProjectCard.vue'
+import SideBar from '../../components/SideBar.vue'
+import ProjectCard from './components/ProjectCard.vue'
 
 export default {
     name: 'Projects.vue',
