@@ -1,7 +1,7 @@
 <template>
   <div class="full-width relative-position cursor-pointer">
     <span class="dot bg-green" style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);"></span>
-    <q-card class="full-width position" :class="active? 'bg-grey-3' : ''">
+    <q-card class="full-width position" :class="active? 'bg-teal-1' : ''">
 
       <q-card-section rounded>
         <div class="row justify-between">
