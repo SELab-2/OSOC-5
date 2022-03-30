@@ -27,7 +27,7 @@
       </div>
 
       <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
-        <label>{{ 'test:' + authenticationStore.loggedInUser }}</label>
+<!--        <label>{{ 'test:' + authenticationStore.loggedInUser }}</label>-->
         <label>Suggest:</label>
       </div>
       <div class="row q-px-lg q-ml-sm items-center">
