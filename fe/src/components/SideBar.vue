@@ -92,29 +92,26 @@
             </div>
 
             <div class="text-bold text-h5">Students</div>
-            <q-scroll-area class="scroll fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto;">
+            <q-scroll-area class=" fadeOut" :thumb-style="thumbStyle" style="flex: 1 1 auto">
               <q-list>
                 <q-item v-for="student in studentStore.students"
-                    :key="student.name" 
+                    :key="student.email"
                     :draggable="this.draggable"
                     @dragstart="onDragStart($event, student.name)"
-                    :id="student.name">
+                    :id="student.email">
                   <StudentCard
                     clickable
                     v-ripple
                     :student="student"
-                    @click="this.selectStudent(student)"
+                    :active="this.active === student.email"
+                    @click="this.clickStudent(student)"
                   />
                 </q-item>
               </q-list>
             </q-scroll-area>
 
           </div>
-
-
         </div>
-
-
       </div>
 
       <div class="absolute" style="top: 15px; right: -17px">
@@ -159,6 +156,7 @@ export default {
         width: '4px',
         opacity: 0.75
       },
+      active: ref('')
     }
   },
   methods: {
@@ -179,6 +177,10 @@ export default {
       console.log(this.roles)
       console.log(this.byMe)
       console.log(this.onProject)
+    },
+    clickStudent(student) {
+      this.active = student.email
+      this.selectStudent(student)
     }
   },
   data() {
