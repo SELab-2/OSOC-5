@@ -281,7 +281,7 @@
       },
       {
         "answer": "No diploma, I am self taught",
-        "skip": [ "17", "18", "19" ]
+        "skip": [ 17, 18, 19 ]
       },
       {
         "answer": "Other",
@@ -373,6 +373,24 @@
     "required": true
   },
   "22": {
+    "question": [
+      "Have you participated in osoc before?"
+    ],
+    "field": "alum",
+    "type": "MULTIPLE_CHOICE",
+    "answers": [
+      {
+        "answer": "Yes, I have been part of osoc before",
+        "value": true
+      },
+      {
+        "answer": "No, it's my first time participating in osoc",
+        "value": false
+      }
+    ],
+    "required": true
+  },
+  "23": {
     "question": [
       "Would you like to be a student coach this year?"
     ],
