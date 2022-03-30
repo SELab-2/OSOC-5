@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { setCsrfToken } from '../utils/axios'
+import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 // 
 // interface State {
 //   loggedInUser: { email: string; password: string } | undefined
@@ -20,13 +21,16 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         username: email,
         email,
         password,
-      },{withCredentials: true}).then(function() {
+      },{withCredentials: true}).then(({data}) => {
+        console.log({ email: email, password: password })
+        setCsrfToken()
+
+        // this.loggedInUser = convertObjectKeysToCamelCase(data).results // doesn't work yet!
+
+        this.loggedInUser = { email: email, password: password }
+
         window.location.href = host + '/students'
       })
-
-      setCsrfToken()
-
-      this.loggedInUser = { email, password }
     },
     logout() {
       this.$reset()

@@ -27,6 +27,7 @@
       </div>
 
       <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+        <label>{{ 'test:' + authenticationStore.loggedInUser }}</label>
         <label>Suggest:</label>
       </div>
       <div class="row q-px-lg q-ml-sm items-center">
@@ -92,9 +93,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import {ref} from "vue"
-import { openURL } from 'quasar'
+import {openURL, useQuasar} from 'quasar'
 import SideBar from "../../components/SideBar.vue"
 import SegmentedControl from "../../components/SegmentedControl.vue";
 import StudentCard from "../../components/StudentCard.vue";
@@ -103,6 +104,8 @@ import SuggestionsCard from "./components/SuggestionsCard.vue";
 import PracticalCard from "./components/PracticalCard.vue";
 import DetailsCard from "./components/DetailsCard.vue";
 import AcademiaCard from "./components/AcademiaCard.vue";
+import {onMounted} from "@vue/runtime-core";
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
 
 export default {
   components: {
@@ -115,6 +118,14 @@ export default {
     SegmentedControl,
     SideBar,
     openURL
+  },
+  setup() {
+    const authenticationStore = useAuthenticationStore()
+    const $q = useQuasar()
+
+    return {
+      authenticationStore
+    }
   },
   data() {
     const student = ref(null)
@@ -130,6 +141,9 @@ export default {
   computed: {
     name: function () {
       return this.student.firstName + ' ' + this.student.lastName
+    },
+    mySuggestion: function () {
+
     }
   }
 }
