@@ -24,7 +24,8 @@
               color="green"
               bg-color="white"
               v-model="search"
-              label="Search..."
+              label="Search by name..."
+              @keydown.enter="fetchStudents"
             >
               <template v-slot:append>
                 <q-icon name="search"/>
@@ -40,6 +41,7 @@
                 { name: 'alumni', label: 'Alumni' },
                 { name: 'studentCoaches', label: 'Student Coaches' },
               ]"
+              @click="fetchStudents"
             />
 
             <label>Suggestion:</label>
@@ -52,6 +54,7 @@
                 { name: 'no', label: 'No' },
                 { name: 'none', label: 'None' },
               ]"
+              @click="fetchStudents"
             />
 
             <q-select
@@ -68,6 +71,7 @@
                 { name: 'frontend', label: 'Front-end developer'}
               ]"
               label="Roles"
+              @update:model-value="fetchStudents"
             />
 
             <div class="row q-gutter-x-md">
@@ -76,12 +80,14 @@
                 v-model="byMe"
                 label="Suggested by you"
                 right-label
+                @click="fetchStudents"
               />
               <q-checkbox
                 color="primary"
                 v-model="onProject"
                 label="On project"
                 right-label
+                @click="fetchStudents"
               />
             </div>
 
@@ -99,12 +105,6 @@
                     :student="student"
                     @click="this.selectStudent(student)"
                   />
-<!--                    :name="student.name"-->
-<!--                    :yes="student.yes"-->
-<!--                    :maybe="student.maybe"-->
-<!--                    :no="student.no"-->
-<!--                    :official="student.official"-->
-
                 </q-item>
               </q-list>
             </q-scroll-area>
@@ -117,11 +117,6 @@
 
       </div>
 
-      <!--
-        in this case, we use a button (can be anything)
-        so that user can switch back
-        to mini-mode
-      -->
       <div class="absolute" style="top: 15px; right: -17px">
         <q-btn
           dense
@@ -176,6 +171,14 @@ export default {
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
+    },
+    fetchStudents() {
+      console.log(this.search)
+      console.log(this.roleFilter)
+      console.log(this.suggestion)
+      console.log(this.roles)
+      console.log(this.byMe)
+      console.log(this.onProject)
     }
   },
   data() {
@@ -188,14 +191,6 @@ export default {
       roleFilter: ref('all'),
       suggestion: ref('yes'),
       roles: ref([]),
-      students: [
-        {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
-        {name: 'Echo Sierra', yes: 8, maybe: 3, no: 1, official: 'maybe'},
-        {name: 'November Quebec', yes: 0, maybe: 3, no: 1, official: 'no'},
-        {name: 'Charles Callender', yes: 3, maybe: 3, no: 5, official: 'maybe'},
-        {name: 'Ressie Rosser', yes: 0, maybe: 1, no: 5, official: 'yes'},
-        {name: 'Jane Johnson', yes: 3, maybe: 3, no: 5, official: 'no'}
-      ]
     }
   },
   components: {
