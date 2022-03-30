@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SideBar :selectStudent="selectStudent"/>
+    <SideBar :selectStudent="selectStudent" :draggable="false"/>
     <div v-if="!this.student" class="q-pa-lg full-height flex-center">
       <label>Select a student from the sidebar to get started</label>
     </div>

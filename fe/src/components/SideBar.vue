@@ -90,7 +90,7 @@
               <q-list>
                 <q-item v-for="student in studentStore.students"
                     :key="student.name" 
-                    draggable="true"
+                    :draggable="this.draggable"
                     @dragstart="onDragStart($event, student.name)"
                     :id="student.name">
                   <StudentCard
@@ -145,7 +145,7 @@ import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
 
 export default {
-  props: [ 'selectStudent', 'color' ],
+  props: [ 'selectStudent', 'color', 'draggable' ],
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
