@@ -6,9 +6,6 @@ export const useSkillStore = defineStore('skills', {
     state: () => ({
         skills: [],
         isLoadingSkills: false,
-
-        coaches: [],
-        isLoadingCoaches: false,
     }),
     actions: {
         /*
@@ -17,6 +14,7 @@ export const useSkillStore = defineStore('skills', {
         async loadSkills() {
             // start the loading animation
             this.isLoadingSkills = true
+            this.skills = []
             instance
                 .get('skills/')
                 .then(({data}) => {
@@ -44,7 +42,7 @@ export const useSkillStore = defineStore('skills', {
             console.log(`Adding new skill: ${newSkill}.`)
             this.skills.push({name: newSkill, amount: 0, comment: ''})
 
-            // TODO: only push skills to database when project POST happens
+            // TODO: maybe only push skills to database when project POST happens
             // TODO: remove description (waiting for backend update)
             // TODO: add a ?color picker?
             instance
