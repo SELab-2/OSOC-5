@@ -25,6 +25,12 @@ class UtilityTestCases(TestCase):
         self.assertEqual('admin@example.com', utils.strip_and_lower_email('Admin@Example.com'))
         self.assertEqual('admin@example.com', utils.strip_and_lower_email('  Admin@Example.com    '))
 
+    def testGetNested(self):
+        self.assertEqual(None, utils.getNested({'a': {'b': True}}, None, 'a', 'c'))
+        self.assertEqual(None, utils.getNested({'a': {'b': True}}, None, 'b', 'a'))
+        self.assertEqual(True, utils.getNested({'a': {'b': True }}, None, 'a', 'b'))
+        self.assertEqual(True, utils.getNested({'a': {'b': { 'c': True }}}, None, 'a', 'b', 'c'))
+
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:
         Project.objects.create(
