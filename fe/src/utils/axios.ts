@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-function getCookie(name: String) {
+function getCookie(name: string) {
   let cookieValue = null
   if (document.cookie && document.cookie !== '') {
     const cookies = document.cookie.split(';')

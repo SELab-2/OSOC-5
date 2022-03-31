@@ -29,7 +29,10 @@
               debounce="300"
               color="green"
               bg-color="white"
+              label="Search by name..."
+              @keydown.enter="fetchStudents"
             >
+              >
               <template #append>
                 <q-icon name="search" />
               </template>
@@ -44,6 +47,7 @@
                 { name: 'alumni', label: 'Alumni' },
                 { name: 'studentCoaches', label: 'Student Coaches' },
               ]"
+              @click="fetchStudents"
             />
 
             <label>Suggestion:</label>
@@ -56,9 +60,11 @@
                 { name: 'no', label: 'No' },
                 { name: 'none', label: 'None' },
               ]"
+              @click="fetchStudents"
             />
 
             <q-select
+              v-model="roles"
               rounded
               outlined
               dense
@@ -71,6 +77,7 @@
                 { name: 'frontend', label: 'Front-end developer'}
               ]"
               label="Roles"
+              @update:model-value="fetchStudents"
             />
 
             <div class="row q-gutter-x-md">
@@ -79,12 +86,14 @@
                 color="primary"
                 label="Suggested by you"
                 right-label
+                @click="fetchStudents"
               />
               <q-checkbox
                 v-model="onProject"
                 color="primary"
                 label="On project"
                 right-label
+                @click="fetchStudents"
               />
             </div>
 
@@ -92,24 +101,24 @@
               Students
             </div>
             <q-scroll-area
-              class="scroll fadeOut"
+              class=" fadeOut"
               :thumb-style="thumbStyle"
-              style="flex: 1 1 auto;"
+              style="flex: 1 1 auto"
             >
               <q-list>
                 <q-item
-                  v-for="student in students" 
-                  :id="student.name" 
-                  :key="student.name"
-                  draggable="true"
+                  v-for="student in studentStore.students"
+                  :id="student.email"
+                  :key="student.email"
+                  :draggable="draggable"
                   @dragstart="onDragStart($event, student.name)"
                 >
                   <StudentCard
-                    :name="student.name"
-                    :yes="student.yes"
-                    :maybe="student.maybe"
-                    :no="student.no"
-                    :official="student.official"
+                    v-ripple
+                    clickable
+                    :student="student"
+                    :active="active === student.email"
+                    @click="clickStudent(student)"
                   />
                 </q-item>
               </q-list>
@@ -118,11 +127,6 @@
         </div>
       </div>
 
-      <!--
-        in this case, we use a button (can be anything)
-        so that user can switch back
-        to mini-mode
-      -->
       <div
         class="absolute"
         style="top: 15px; right: -17px"
@@ -144,13 +148,37 @@
 import {defineComponent, ref} from 'vue'
 import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
+import {useStudentStore} from "../stores/useStudentStore";
+import {useQuasar} from "quasar";
+import {onMounted} from "@vue/runtime-core";
 
 export default defineComponent({
   components: {
     StudentCard,
     SegmentedControl,
   },
-  props: ['color'],
+  props: [ 'selectStudent', 'color', 'draggable' ],
+  setup() {
+    const studentStore = useStudentStore()
+    const $q = useQuasar()
+
+    onMounted(() => {
+      studentStore.loadStudents()
+    })
+
+    return {
+      studentStore,
+      $q,
+      thumbStyle: {
+        right: '0px',
+        borderRadius: '7px',
+        backgroundColor: 'black',
+        width: '4px',
+        opacity: 0.75
+      },
+      active: ref('')
+    }
+  },
   data() {
     return {
       miniState: ref(false),
@@ -160,14 +188,7 @@ export default defineComponent({
       onProject: ref(false),
       roleFilter: ref('all'),
       suggestion: ref('yes'),
-      students: [
-        {name: 'Charlie Delta', yes: 2, maybe: 3, no: 1, official: 'yes'},
-        {name: 'Echo Sierra', yes: 8, maybe: 3, no: 1, official: 'maybe'},
-        {name: 'November Quebec', yes: 0, maybe: 3, no: 1, official: 'no'},
-        {name: 'Charles Callender', yes: 3, maybe: 3, no: 5, official: 'maybe'},
-        {name: 'Ressie Rosser', yes: 0, maybe: 1, no: 5, official: 'yes'},
-        {name: 'Jane Johnson', yes: 3, maybe: 3, no: 5, official: 'no'}
-      ]
+      roles: ref([]),
     }
   },
   methods: {
@@ -181,6 +202,18 @@ export default defineComponent({
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
+    },
+    fetchStudents() {
+      console.log(this.search)
+      console.log(this.roleFilter)
+      console.log(this.suggestion)
+      console.log(this.roles)
+      console.log(this.byMe)
+      console.log(this.onProject)
+    },
+    clickStudent(student) {
+      this.active = student.email
+      this.selectStudent(student)
     }
   },
 })
@@ -191,8 +224,7 @@ export default defineComponent({
     border-radius: 10px !important;
   }
   
-  :deep(.q-item) {
-    padding: 8px 8px !important;
-  }
-
+:deep(.q-item) {
+  padding: 8px 8px !important;
+}
 </style>
