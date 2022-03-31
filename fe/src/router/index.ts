@@ -4,7 +4,7 @@ import FormPageVue from '../features/authentication/FormPage.vue'
 import LoginFormVue from '../features/authentication/LoginForm.vue'
 import SignupFormVue from '../features/authentication/SignupForm.vue'
 import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
-import Projects from '../features/projects/Projects.vue'
+import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
@@ -46,7 +46,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        component: Projects,
+        component: ProjectList,
       },
       {
         path: '/projects/create',

@@ -1,6 +1,6 @@
 <template>
-  <q-card class="full-width">
-    <q-card-section style="padding: 10px !important">
+  <q-card class="my-card full-width full-height">
+    <q-card-section rounded>
       <div class="row justify-between">
         <div>
           <label class="text-bold q-pr-xs">{{ name }}</label>
@@ -56,8 +56,8 @@
 import { defineComponent } from "@vue/runtime-core"
 
 export default defineComponent({
-  props: {name: String, yes: Number, maybe: Number, no: Number, official: String},
-  computed: {
+ props: {name: String, yes: Number, maybe: Number, no: Number, official: String},
+ computed: {
     total() { return this.yes + this.maybe + this.no },
     yesStyle() { return { width: ((100 * this.yes / this.total) + '%')} },
     maybeStyle() { return { width: ((100 * this.maybe / this.total) + '%')} },
@@ -65,3 +65,6 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+</style>

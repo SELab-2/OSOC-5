@@ -8,7 +8,8 @@
       :width="350"
       :breakpoint="100"
       bordered
-      class="bg-grey-3 full-height"
+      class="full-height"
+      :class="color"
     >
       <div
         :style="drawer && !miniState? '' : 'display: none'"
@@ -28,7 +29,6 @@
               debounce="300"
               color="green"
               bg-color="white"
-              placeholder="Search"
             >
               <template #append>
                 <q-icon name="search" />
@@ -46,6 +46,7 @@
               ]"
             />
 
+            <label>Suggestion:</label>
             <SegmentedControl
               v-model="suggestion"
               color="primary"
@@ -149,6 +150,7 @@ export default defineComponent({
     StudentCard,
     SegmentedControl,
   },
+  props: ['color'],
   data() {
     return {
       miniState: ref(false),

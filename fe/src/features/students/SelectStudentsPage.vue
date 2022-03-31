@@ -1,24 +1,11 @@
 <template>
   <div>
-    <SideBar />
+    <SideBar color="bg-grey-3" />
     <div class="justify-between row q-px-lg q-pt-lg studentcol full-height">
       <div class="row q-pa-sm q-gutter-sm items-center">
         <h class="text-bold text-h4">
           {{ name }}
         </h>
-        <q-icon
-          size="md"
-          class="content-center"
-          name="mdi-twitter"
-        />
-        <q-icon
-          size="md"
-          name="mdi-linkedin"
-        />
-        <q-icon
-          size="md"
-          name="mdi-github"
-        />
         <q-btn
           size="12px"
           rounded
@@ -35,13 +22,6 @@
         />
       </div>
       <div class="row q-gutter-sm items-center">
-        <q-btn
-          size="12px"
-          round
-          outline
-          color="black"
-          icon="mail"
-        />
         <q-select
           v-model="officialSuggestion"
           rounded
@@ -50,6 +30,13 @@
           style="width: 150px"
           :options="['Not decided', 'Yes', 'Maybe', 'No']"
           label="Final decision"
+        />
+        <q-btn
+          class="cornered"
+          outline
+          color="black"
+          label="Confirm"
+          icon-right="mail"
         />
       </div>
     </div>
@@ -65,7 +52,7 @@
           { name: 'yes', label: 'Yes' },
           { name: 'maybe', label: 'Maybe' },
           { name: 'no', label: 'No' },
-          { name: 'none', label: 'None' },
+          { name: 'none', label: 'Not decided' },
         ]"
       />
     </div>
@@ -153,7 +140,7 @@ export default defineComponent({
   setup() {
     const name = ref("Kelly Cruickshank")
     const officialSuggestion = ref("Not Decided")
-    const suggestion = ref('yes')
+    const suggestion = ref('none')
 
     return {
       suggestion,

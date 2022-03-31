@@ -1,44 +1,62 @@
 <template>
-    <div style='margin: 5px'>
-        <SideBar />
-            <div class="q-ma-sm">
-        <div class="text-bold text-h3 q-mx-sm" >Projects</div>
+  <div style="margin: 5px">
+    <SideBar color="bg-grey-3" />
+    <div class="q-ma-sm">
+      <div class="text-bold text-h3 q-mx-sm">
+        Projects
+      </div>
         
-        <div>
-            <masonry-wall :items="projects" :ssr-columns="1" :column-width="320" :gap="0">
-              <template #default="{ item, index }">
-                <project-card :project="item"/>
-              </template>
-            </masonry-wall>
+      <div>
+        <masonry-wall
+          :items="projects"
+          :ssr-columns="1"
+          :column-width="320"
+          :gap="0"
+        >
+          <template #default="{ item, index }">
+            <project-card :project="item" />
+          </template>
+        </masonry-wall>
 
-            <q-page-sticky position='top-right' :offset='[15, 10]'>
-                <q-btn padding='7px' icon='warning' color='red' label='Conflicts'
-                       to='/projects/conflicts' />
-            </q-page-sticky>
+        <q-page-sticky
+          position="top-right"
+          :offset="[15, 10]"
+        >
+          <q-btn
+            padding="7px"
+            icon="warning"
+            color="red"
+            label="Conflicts"
+            to="/projects/conflicts"
+          />
+        </q-page-sticky>
 
-            <q-page-sticky position='bottom-right' :offset='[18, 18]'>
-                <q-btn fab padding="10px" icon='add' color='yellow' to='/projects/create' />
-            </q-page-sticky>
-        </div>
-            </div>
+        <q-page-sticky
+          position="bottom-right"
+          :offset="[18, 18]"
+        >
+          <q-btn
+            fab
+            padding="10px"
+            icon="add"
+            color="yellow"
+            to="/projects/create"
+          />
+        </q-page-sticky>
+      </div>
     </div>
+  </div>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script lang="ts">
+import { defineComponent } from '@vue/runtime-core'
 import SideBar from '../../components/SideBar.vue'
 import ProjectCard from './components/ProjectCard.vue'
 
-export default {
-    name: 'Projects.vue',
-    
+export default defineComponent({
+    name: 'ProjectList',
     components: {
         SideBar, ProjectCard
-    },
-    computed() {
-        return {
-            
-        }
     },
     data() {
         return {
@@ -170,8 +188,8 @@ export default {
                 }
             ]
         }
-    }
-}
+    },
+})
 </script>
 
 <style lang='sass' scoped>
