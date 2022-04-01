@@ -6,10 +6,10 @@
     <q-card-section class="q-pt-none">
       <div class="column">
         <div v-for="(suggestion, key) in suggestions" :key="key">
-          <q-icon v-if="suggestion.suggestion === 'yes'" size="xs" name="mdi-check" color="green" />
-          <q-icon v-else-if="suggestion.suggestion === 'maybe'" size="xs" name="mdi-help" color="yellow" />
+          <q-icon v-if="suggestion.suggestion === 0" size="xs" name="mdi-check" color="green" />
+          <q-icon v-else-if="suggestion.suggestion === 1" size="xs" name="mdi-help" color="yellow" />
           <q-icon v-else size="xs" name="mdi-close" color="red" />
-          <label class="q-pl-xs">{{ suggestion.name }}</label>
+          <label class="q-pl-xs">{{ suggestion.first_name + ' ' + suggestion.last_name }}</label>
         </div>
       </div>
     </q-card-section>
@@ -18,17 +18,6 @@
 
 <script>
 export default {
-  props: ['title', 'content'],
-  setup() {
-    const suggestions = [
-      { name: 'Michiel Leyman', suggestion: 'yes'},
-      { name: 'Dayana Stark', suggestion: 'maybe'},
-      { name: 'Echo Sierra', suggestion: 'no'}
-    ]
-
-    return {
-      suggestions
-    }
-  }
+  props: ['title', 'suggestions'],
 }
 </script>
