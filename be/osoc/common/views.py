@@ -184,7 +184,9 @@ class LoginView(views.APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
-        return Response(None, status=status.HTTP_202_ACCEPTED)
+        return Response({
+            "user": CoachSerializer(user, context=serializer.context).data
+        })
 
 
 class LogoutView(views.APIView):
