@@ -44,14 +44,14 @@ INSTALLED_APPS = [
     'drf_yasg',
     'osoc',
     'osoc.common',
-    'django.contrib.sites', # new
-    'allauth', # new
-    'allauth.account', # new
-    'allauth.socialaccount', # new
-    'allauth.socialaccount.providers.github', # new
+    'django.contrib.sites',  # new
+    'allauth',  # new
+    'allauth.account',  # new
+    'allauth.socialaccount',  # new
+    'allauth.socialaccount.providers.github',  # new
     'rest_framework.authtoken',
-    'dj_rest_auth',    
-    'dj_rest_auth.registration',  
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -145,11 +145,17 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REST_USE_JWT = True
+
+JWT_AUTH_COOKIE = 'my-app-auth'
+JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+
 REST_FRAMEWORK = {
-   'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-   ),
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+    ),
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -167,7 +173,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_LOGOUT_REDIRECT_URL ='/api/login/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/api/login/'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True

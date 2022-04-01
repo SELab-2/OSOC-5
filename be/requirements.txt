@@ -7,3 +7,4 @@ django
 django-rest-auth
 dj-rest-auth
 dj-rest-auth[with_social]
+djangorestframework-simplejwt
