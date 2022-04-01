@@ -1,12 +1,11 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import { setCsrfToken } from '../utils/axios'
 import { StoreDefinition } from 'pinia'
 
 const baseURL =
   process.env.NODE_ENV == 'development'
-    ? 'http://127.0.0.1:8000/'
-    : 'https://sel2-5.ugent.be/'
+    ? 'http://127.0.0.1:8000/api/'
+    : 'https://sel2-5.ugent.be/api/'
 
 export const useAuthenticationStore: StoreDefinition<
   'user/authentication',
@@ -30,17 +29,14 @@ export const useAuthenticationStore: StoreDefinition<
   }),
   actions: {
     async login({ email, password }) {
-      await axios.post(
-        baseURL + 'api/login/',
-        {
-          username: email,
-          email,
-          password,
-        },
-        { withCredentials: true }
-      )
+      const { data } = await axios.post(baseURL + 'auth/login/', {
+        username: email,
+        email,
+        password,
+      })
 
-      setCsrfToken()
+      localStorage.setItem('refreshToken', data.refresh_token)
+      localStorage.setItem('accessToken', data.access_token)
 
       this.loggedInUser = { email, password }
     },

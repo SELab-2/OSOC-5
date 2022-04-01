@@ -8,7 +8,6 @@ import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
-import { hasCsrfToken } from '../utils/axios'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -81,7 +80,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!hasCsrfToken()) {
+    if (!localStorage.getItem('accessToken')) {
       next({ name: 'Login' })
     } else {
       next() // go to wherever I'm going

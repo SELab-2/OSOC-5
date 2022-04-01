@@ -1,34 +1,58 @@
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
-function getCookie(name: string) {
-  let cookieValue = null
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';')
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim()
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === name + '=') {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-        break
-      }
-    }
-  }
-  return cookieValue
-}
-
-export const instance = axios.create({
-  withCredentials: true,
+export const instance: AxiosInstance = axios.create({
   baseURL:
     process.env.NODE_ENV == 'development'
-      ? 'http://127.0.0.1:8000/'
-      : 'https://sel2-5.ugent.be/',
-  headers: {
-    'X-CSRFToken': `${getCookie('csrftoken')}`,
-  },
+      ? 'http://127.0.0.1:8000/api/'
+      : 'https://sel2-5.ugent.be/api/',
 })
 
-export const setCsrfToken = () =>
-  (instance.defaults.headers.common['X-CSRFToken'] =
-    getCookie('csrftoken') || '')
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken')
+    if (token) {
+      config.headers && (config.headers.Authorization = `Bearer ${token}`)
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
-export const hasCsrfToken = () => getCookie('csrftoken') !== null
+instance.interceptors.response.use(
+  (res) => {
+    return res
+  },
+  async (err) => {
+    const originalConfig = err.config
+    if (err.response) {
+      // Access Token was expired
+      if (err.response.status === 401 && !originalConfig._retry) {
+        originalConfig._retry = true
+        try {
+          const rs = await refreshToken(instance)
+          const { accessToken } = rs.data
+          localStorage.setItem('accessToken', accessToken)
+          instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+          return instance(originalConfig)
+        } catch (_error: any) {
+          if (_error.response && _error.response.data) {
+            return Promise.reject(_error.response.data)
+          }
+          return Promise.reject(_error)
+        }
+      }
+      if (err.response.status === 403 && err.response.data) {
+        return Promise.reject(err.response.data)
+      }
+    }
+    return Promise.reject(err)
+  }
+)
+
+function refreshToken(instance: AxiosInstance) {
+  return instance.post('/auth/refreshtoken', {
+    refreshToken: localStorage.getItem('refreshToken'),
+  })
+}
