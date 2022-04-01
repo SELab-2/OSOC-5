@@ -55,7 +55,7 @@
 
         <q-card-actions align="right" class="text-primary">
           <q-btn flat color="grey" label="Cancel" v-close-popup/>
-          <q-btn flat label="Suggest" v-close-popup/>
+          <q-btn flat label="Suggest" @click="makeSuggestion" v-close-popup/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -154,7 +154,7 @@ export default {
   },
   methods: {
     makeSuggestion: function (suggestion) {
-      this.studentStore.updateSuggestion(this.student.id, suggestion)
+      this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion)
     },
     selectStudent: function (selected_student) {
       this.student = selected_student
