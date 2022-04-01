@@ -343,6 +343,9 @@ class Suggestion(models.Model):
     class Meta:
         unique_together = (("student", "coach"))
 
+    def coach_name(self):
+        return self.coach.get_full_name()
+
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
 

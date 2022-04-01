@@ -79,8 +79,8 @@ class CoachViewSet(viewsets.GenericViewSet,
             if not coach.is_admin or Coach.objects.filter(is_admin=True).count() > 1: 
                 self.perform_destroy(coach)
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({"error": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
-        return Response({"error": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=['put'], serializer_class=UpdateAdminSerializer)
     def update_admin_status(self, request, pk=None):
@@ -102,7 +102,7 @@ class CoachViewSet(viewsets.GenericViewSet,
                 coach.save()
             
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({"error": "you can not update your own admin status"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "you can not update your own admin status"}, status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
