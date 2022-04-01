@@ -18,7 +18,7 @@ function getCookie(name: String) {
 
 export const instance: AxiosInstance = axios.create({
   withCredentials: true,
-  baseURL: 'http://localhost:8000/api/',
+  baseURL: 'http://localhost:8000/api/'
 })
 
 instance.interceptors.request.use(
