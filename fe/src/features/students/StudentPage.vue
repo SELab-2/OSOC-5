@@ -170,10 +170,9 @@ export default {
       return this.student.firstName + ' ' + this.student.lastName
     },
     mySuggestion: function () {
+      const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
 
-      const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach === this.authenticationStore.loggedInUser.url)
-
-      return mySuggestions ? (mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1): null
+      return mySuggestions ? (mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1) : null
     },
     suggestionName: function () {
       return this.possibleSuggestion === 0 ? "yes" : (this.possibleSuggestion === 1 ? "maybe" : "no")
