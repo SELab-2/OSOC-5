@@ -3,6 +3,9 @@ Views that create a connection between the database and the application.
 """
 from django.contrib.auth import login, logout
 from rest_framework import viewsets, mixins, permissions, views, status, generics
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import *
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins, permissions, status
@@ -17,9 +20,12 @@ class StudentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows students to be viewed or edited.
     """
-    queryset = Student.objects.all()
+    queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, OnProjectFilter, SuggestedByUserFilter]
+    search_fields = ['first_name', 'last_name', 'call_name', 'email', 'alum', 'language', 'degree', 'studies', 'extra_info']
+    filterset_fields = ['alum', 'language', 'skills'] # TODO practical info, final decision, student coach
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -68,11 +74,15 @@ class CoachViewSet(viewsets.GenericViewSet,
     a coach cannot be created by this API endpoint
     a coach can only update and view its own data, except for admins
     """
-    queryset = Coach.objects.all()
+    queryset = Coach.objects.all().order_by('id')
     serializer_class = CoachSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['first_name', 'last_name', 'email']
+    filterset_fields = ['is_admin', 'active']
 
     def destroy(self, request, pk=None):
+        # override delete method to add a check
         coach = self.get_object()
         if coach != request.user:
             # check if number of admins would not be zero after the delete
@@ -114,6 +124,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all().order_by('id')
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['name', 'partner_name', 'extra_info']
+    filterset_fields = ['required_skills', 'coaches', 'suggested_students']
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
     def suggest_student(self, request, pk=None):
@@ -186,7 +199,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,))) 
                                 for project_sug in projects]
                 conflicts.append({student_url: project_urls})
-        print(conflicts)
         return Response({"conflicts": conflicts}, status=status.HTTP_200_OK)
 
 
@@ -197,6 +209,8 @@ class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all().order_by('id')
     serializer_class = SkillSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
 
 class LoginView(views.APIView):
