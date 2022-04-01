@@ -27,18 +27,17 @@
       </div>
 
       <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
-<!--        <label>{{ 'test:' + authenticationStore.loggedInUser }}</label>-->
         <label>Suggest:</label>
       </div>
       <div class="row q-px-lg q-ml-sm items-center">
         <SegmentedControl
           color="primary"
-          v-model="suggestion"
+          v-model="mySuggestion"
           :options="[
-                { name: 'yes', label: 'Yes' },
-                { name: 'maybe', label: 'Maybe' },
-                { name: 'no', label: 'No' },
-                { name: 'none', label: 'Not decided' },
+                { name: 0, label: 'Yes' },
+                { name: 1, label: 'Maybe' },
+                { name: 2, label: 'No' },
+                { name: -1, label: 'Not decided' },
               ]"
         />
       </div>
@@ -116,8 +115,7 @@ export default {
     TitleTextCard,
     StudentCard,
     SegmentedControl,
-    SideBar,
-    openURL
+    SideBar
   },
   setup() {
     const authenticationStore = useAuthenticationStore()
@@ -143,7 +141,9 @@ export default {
       return this.student.firstName + ' ' + this.student.lastName
     },
     mySuggestion: function () {
+      const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach === this.authenticationStore.loggedInUser)
 
+      return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
     }
   }
 }
