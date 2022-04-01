@@ -15,9 +15,9 @@
         </div>
       </div>
       <div class="text-caption text-grey">Coaches:</div>
-      <q-chip v-for="coach in project.coaches" :key="coach.id" icon="person">{{
-        coach.firstName
-      }}</q-chip>
+      <q-chip v-for="coach in project.coaches" :key="coach.id" icon="person">
+        {{ coach.firstName }} {{ coach.lastName.split(" ").map(res => res.charAt(0)).join("") }}.
+      </q-chip>
 
       <div
         class="row"
@@ -55,9 +55,9 @@
             v-for="student in groupedStudents[role.skill.id]"
             :key="student.student.id"
           >
-            <q-item-section lines="1" class="text-weight-medium">{{
-              student.student.firstName
-            }}</q-item-section>
+            <q-item-section lines="1" class="text-weight-medium">
+              {{ student.student.firstName}} {{ student.student.lastName }}
+            </q-item-section>
 
             <div class="text-grey-8">
               <q-btn class="gt-xs" size="sm" flat dense round icon="comment" />
@@ -113,7 +113,7 @@ export default {
 
     // Calculates how many places of a role are occupied.
     amountLeft(role) {
-      const occupied = this.groupedStudents[role.id]
+      const occupied = this.groupedStudents[role.skill.id]
       return role.amount - (occupied ? occupied.length : 0)
     },
 
@@ -121,14 +121,14 @@ export default {
     onDragOver(e, role) {
       e.preventDefault()
       e.stopPropagation()
-      this.selectedRoles[role.type] = true
+      this.selectedRoles[role.skill.id] = true
     },
 
     // Hide the students assigned to a role when dragging away from the chip of that role.
     onDragLeave(e, role) {
       e.target.classList.remove('drag-enter')
       if (!this.expanded) {
-        this.selectedRoles[role.type] = false
+        this.selectedRoles[role.skill.id] = false
       }
     },
 
@@ -150,7 +150,7 @@ export default {
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
       if (!this.expanded) {
-        setTimeout(() => (this.selectedRoles[role.type] = false), 1000)
+        setTimeout(() => (this.selectedRoles[role.skill.id] = false), 1000)
       }
     },
   },
