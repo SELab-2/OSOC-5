@@ -32,12 +32,15 @@ export const useStudentStore = defineStore('user/student', {
           })
         })
     },
-    async updateRole(student, newSuggestion, callback) {
-      return instance
-        .put(`students/${id}/make_suggestion/`)
-        .then(() => {
-
+    async updateSuggestion(studentId, suggestion) {
+      await instance
+        .post(`students/${studentId}/make_suggestion/`, {
+          suggestion: suggestion,
+          reason: ""
+        }, {withCredentials: true})
+        .then(({data}) => {
+          console.log(data)
         })
-    }
+    },
   }
 })
