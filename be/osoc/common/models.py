@@ -134,6 +134,23 @@ class Coach(AbstractUser):  # models.Model):
         return self.get_full_name()
 
 
+class GithubUser(models.Model):
+    """
+    Skill; A talent or ability of a Student.
+
+    Students can more than one skill (many-to-many relationship).
+    """
+    login = models.CharField(
+        _('login'),
+        max_length=255,
+        unique=True
+    )
+    coach = models.ForeignKey(
+        Coach,
+        on_delete=models.CASCADE
+    )
+
+
 class Student(models.Model):
     """
     Student; Person who would like to participate in an OSOC project.
@@ -216,24 +233,24 @@ class Student(models.Model):
         blank=True
     )
 
-    def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        (method is required to implement by Django)
-        """
-        full_name = f'{self.first_name} {self.last_name}'
-        return full_name.strip()
+#     def get_full_name(self):
+#         """
+#         Returns the first_name plus the last_name, with a space in between.
+#         (method is required to implement by Django)
+#         """
+#         full_name = f'{self.first_name} {self.last_name}'
+#         return full_name.strip()
 
-    def clean(self):
-        """
-        Will be called before saving.
-        """
-        # strip first name and last name
-        self.first_name = self.first_name.strip()
-        self.last_name = self.last_name.strip()
+#     def clean(self):
+#         """
+#         Will be called before saving.
+#         """
+#         # strip first name and last name
+#         self.first_name = self.first_name.strip()
+#         self.last_name = self.last_name.strip()
 
-        # strip email and transform it to lowercase
-        self.email = strip_and_lower_email(self.email)
+#         # strip email and transform it to lowercase
+#         self.email = strip_and_lower_email(self.email)
 
     def save(self, *args, **kwargs):
         """
@@ -242,9 +259,6 @@ class Student(models.Model):
         """
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.get_full_name()
 
 
 class Project(models.Model):
@@ -364,4 +378,3 @@ class ProjectSuggestion(models.Model):
     class Meta:
 
         unique_together = (("project", "student", "coach"))
-
