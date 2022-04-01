@@ -10,27 +10,37 @@ export const useStudentStore = defineStore('user/student', {
   actions: {
     async loadStudents() {
       this.isLoadingUsers = true
+      let url = ""
+      const urlCoaches = new Set()
+
       await instance
         .get('students/')
         .then(({data}) => {
           this.isLoadingUsers = false
           this.students = convertObjectKeysToCamelCase(data)
-
-          this.students.forEach((student, i) => {
-            student.suggestions.forEach((suggestion, j) => {
-              const pieces = suggestion.coach.split('/')
-
-              suggestion.suggestion = parseInt(suggestion.suggestion)
-
-              instance
-                .get(`coaches/${pieces.slice(-2)[0]}/`)
-                .then(({coach}) => {
-                  console.log(coach)
-                  Object.assign(this.students[i].suggestions[j], coach)
-                })
-            })
-          })
         })
+
+      const coaches = new Map()
+
+      for (let i = 0; i < this.students.length; i++) {
+        for (let j = 0; j < this.students[i].suggestions.length; j++) {
+          this.students[i].suggestions[j].suggestion = parseInt(this.students[i].suggestions[j].suggestion)
+
+          let coach_url = this.students[i].suggestions[j].coach
+
+          if (! coaches.has(coach_url)) {
+            await instance
+              .get(coach_url)
+              .then(({data}) => {
+                Object.assign(this.students[i].suggestions[j], data)
+                coaches.set(coach_url, data)
+              })
+          } else {
+            Object.assign(this.students[i].suggestions[j], coaches.get(coach_url))
+          }
+
+        }
+      }
     },
     async updateSuggestion(studentId, suggestion) {
       await instance
