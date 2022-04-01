@@ -22,6 +22,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'https://sel2-5.ugent.be']
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

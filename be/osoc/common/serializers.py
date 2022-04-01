@@ -5,6 +5,8 @@ from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import *
+from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.serializers import LoginSerializer
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
@@ -85,14 +87,9 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
-class LoginSerializer(serializers.Serializer):
-    """
-    This serializer defines two fields for authentication:
-      * username
-      * password.
-    It will try to authenticate the user with when validated.
-    """
-    username = serializers.CharField(
+class CustomLoginSerializer(LoginSerializer):
+    username = None
+    email = serializers.CharField(
         label="Username",
         write_only=True
     )
@@ -126,14 +123,17 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Coach
-        fields = ('id', 'first_name', 'last_name', 'email', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
+class CustomRegisterSerializer(RegisterSerializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    username = None
 
-    def create(self, validated_data):
-        user = Coach.objects.create_user(
-            validated_data['email'], validated_data['password'], first_name=validated_data['first_name'], last_name=validated_data['last_name'])
-
-        return user
+    def get_cleaned_data(self):
+        super(CustomRegisterSerializer, self).get_cleaned_data()
+        return {
+            'password1': self.validated_data.get('password1', ''),
+            'password2': self.validated_data.get('password2', ''),
+            'email': self.validated_data.get('email', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', '')
+        }

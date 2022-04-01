@@ -171,41 +171,6 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class LoginView(views.APIView):
-    """
-    API view that handles logging in users; Accessible to anyone.
-    """
-    # This view should be accessible also for unauthenticated users.
-    permission_classes = (permissions.AllowAny,)
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def post(self, request, format=None):
-        serializer = LoginSerializer(data=self.request.data,
-                                     context={'request': self.request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        login(request, user)
-        return Response(None, status=status.HTTP_202_ACCEPTED)
-
-
-class LogoutView(views.APIView):
-    """
-    API view that handles logging out users; Accessible to anyone.
-    """
-    permission_classes = (permissions.AllowAny,)
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def get(self, request):
-        logout(request)
-        return Response()
-
-
 class RegisterView(generics.GenericAPIView):
     """
     API view that handles registering users; Only admins can
