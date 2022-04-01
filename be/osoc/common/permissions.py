@@ -9,13 +9,6 @@ class IsAdmin(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        """
-        Check if the current user can complete the request;
-
-        Coaches that are not admins have some writing permissions:
-         - Suggesting a student to a project
-         - Removing their own suggestion from a project
-        """
 
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.

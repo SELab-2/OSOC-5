@@ -73,15 +73,18 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return project
     
 
-    #### TODO
-    # # overwrite create method to be able to create RequiredSkills objects
-    # def update(self, instance, validated_data):
-    #     nested_serializer = self.fields['required_skills']
-    #     nested_instance = instance.required_skills
-    #     nested_data = validated_data.pop('requiredskills_set')
-    #     for skill_data in nested_data:
-    #         nested_serializer.child.update(nested_instance, skill_data)
-    #     return super().update(instance, validated_data)
+    # overwrite update method to be able to create/update/delete RequiredSkills objects
+    def update(self, instance, validated_data):
+        
+        # first update required skills
+        skills_data = validated_data.pop('requiredskills_set')
+        # update or create skills from request
+        for skill_data in skills_data:
+            RequiredSkills.objects.update_or_create(project=instance, **skill_data)
+        # delete skills not in request
+        skills = [skill_data['skill'] for skill_data in skills_data]
+        RequiredSkills.objects.filter(project=instance).exclude(skill__in=skills).delete()
+        return super().update(instance, validated_data)
 
 
 class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):

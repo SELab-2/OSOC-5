@@ -13,7 +13,7 @@ class OnProjectFilter(filters.BaseFilterBackend):
         if request.query_params.get('on_project') is not None:
             suggested_students = Student.objects.none()
             for project in Project.objects.all():
-                suggested_students |= project.suggested_students.all()
+                suggested_students |= project.suggested_students.all()  # union
 
             # subquery is needed because filtering is not possible on a union of queries for some reason
             subquery = suggested_students.distinct()
@@ -35,7 +35,9 @@ class FinalDecisionFilter(filters.BaseFilterBackend):
     filters students based on final decision
     query parameter 'suggestion' should be one of ['yes', 'no', 'maybe', 'none']
     """
-    param2enum = {'yes': Suggestion.Suggestion.YES, 'no': Suggestion.Suggestion.NO, 'maybe': Suggestion.Suggestion.MAYBE}
+    param2enum = {'yes': Suggestion.Suggestion.YES, 
+                  'no': Suggestion.Suggestion.NO, 
+                  'maybe': Suggestion.Suggestion.MAYBE}
 
     def filter_queryset(self, request, queryset, view):
         param = request.query_params.get('suggestion')
