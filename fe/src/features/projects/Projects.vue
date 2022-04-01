@@ -1,6 +1,6 @@
 <template>
     <div style='margin: 5px'>
-        <SideBar color="bg-grey-3"/>
+        <SideBar color="bg-grey-3" :draggable="true"/>
             <div class="q-ma-sm">
         <div class="text-bold text-h3 q-mx-sm" >Projects</div>
         
