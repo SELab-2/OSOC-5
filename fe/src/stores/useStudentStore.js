@@ -47,8 +47,7 @@ export const useStudentStore = defineStore('user/student', {
         .post(`students/${studentId}/make_suggestion/`, {
           suggestion: suggestion,
           reason: ""
-        }, {withCredentials: true})
-        .then(({data}) => {
+        }).then(({data}) => {
           console.log(data)
         })
     },

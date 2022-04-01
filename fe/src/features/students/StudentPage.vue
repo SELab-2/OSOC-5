@@ -23,7 +23,7 @@
   </div>
   <div class="row q-px-lg q-ml-sm items-center">
     <SegmentedControl
-      color="primary"
+      :color="mySuggestionColor"
       @update:modelValue="showDialog"
       v-model="mySuggestion"
       :options="[
@@ -173,6 +173,10 @@ export default {
       const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
 
       return mySuggestions ? (mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1) : null
+    },
+    mySuggestionColor: function () {
+      let mySuggestion = this.mySuggestion
+      return mySuggestion === 0 ? "green" : (mySuggestion === 1 ? "yellow" : (mySuggestion === 2 ? "red" : "grey"))
     },
     suggestionName: function () {
       return this.possibleSuggestion === 0 ? "yes" : (this.possibleSuggestion === 1 ? "maybe" : "no")
