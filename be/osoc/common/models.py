@@ -220,6 +220,13 @@ class Student(models.Model):
         through='Suggestion',
         blank=True
     )
+    final_decision = models.ForeignKey(
+        'Suggestion',
+        on_delete=models.SET_NULL,
+        related_name='final_decision_student',
+        blank=True,
+        null=True
+    )
 
     def get_full_name(self):
         """

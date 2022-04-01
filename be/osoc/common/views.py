@@ -62,6 +62,46 @@ class StudentViewSet(viewsets.ModelViewSet):
             student=self.get_object(), coach=request.user).delete()
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
+    
+    @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def make_final_decision(self, request, pk=None):
+        """
+        let an admin make a final decision for the current student
+        if the admin has already made a final decision for this student, it is updated
+        returns HTTP response:
+            400 BAD REQUEST: there was required data missing or the data could not be serialized
+            201 CREATED:     the final decision was created
+            200 OK:          an existing final decision was found for this student from the current user, it was updated
+        """
+        serializer = SuggestionSerializer(
+            data=request.data, context={'request': request})
+        if serializer.is_valid():
+
+            # create Suggestion object if it doesnt exist yet, else update it
+            suggestion, created = Suggestion.objects.update_or_create(
+                student=self.get_object(), coach=request.user, defaults=serializer.data)
+            
+            student = self.get_object()
+            student.final_decision = suggestion
+            student.save()
+            
+            return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def remove_final_decision(self, request, pk=None):
+        """
+        let an admin remove the final decision he has made for the current student
+        an admin can only remove a final decision from themselves
+        returns HTTP response:
+            404 NOT FOUND:      there was no final decision found
+            204 NO CONTENT:     the final decision was found and removed
+        """
+        # delete Suggestion object if it is found
+        deleted, _ = Suggestion.objects.filter(
+            student=self.get_object(), coach=request.user).delete()
+
+        return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
 
 class CoachViewSet(viewsets.GenericViewSet, 
@@ -92,7 +132,7 @@ class CoachViewSet(viewsets.GenericViewSet,
             return Response({"detail": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
         return Response({"detail": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
 
-    @action(detail=True, methods=['put'], serializer_class=UpdateAdminSerializer)
+    @action(detail=True, methods=['put'], serializer_class=UpdateAdminSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def update_admin_status(self, request, pk=None):
         """
         let an admin update admin rights of another user
@@ -128,7 +168,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
 
-    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer)
+    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
     def suggest_student(self, request, pk=None):
         """
         let a coach suggest a student for this project
@@ -162,7 +202,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body
-    @action(detail=True, methods=['post'], serializer_class=StudentOnlySerializer)
+    @action(detail=True, methods=['post'], serializer_class=StudentOnlySerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
     def remove_student(self, request, pk=None):
         """
         let a coach remove a projectsuggestion for this project
@@ -188,7 +228,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive])
     def get_conflicting_projects(self, request):
         students = Student.objects.all()
         conflicts = []

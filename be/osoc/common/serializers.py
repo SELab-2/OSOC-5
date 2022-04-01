@@ -16,12 +16,13 @@ class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     suggestions = SuggestionSerializer(
         many=True, source='suggestion_set', read_only=True)
+    final_decision = SuggestionSerializer(read_only=True)
 
     class Meta:
         model = Student
         fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 
                   'phone_number', 'alum', 'language', 'extra_info', 'cv', 'portfolio', 
-                  'school_name', 'degree', 'studies', 'skills', 'suggestions']
+                  'school_name', 'degree', 'studies', 'skills', 'suggestions', 'final_decision']
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
@@ -70,10 +71,23 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
+    
+
+    #### TODO
+    # # overwrite create method to be able to create RequiredSkills objects
+    # def update(self, instance, validated_data):
+    #     nested_serializer = self.fields['required_skills']
+    #     nested_instance = instance.required_skills
+    #     nested_data = validated_data.pop('requiredskills_set')
+    #     for skill_data in nested_data:
+    #         nested_serializer.child.update(nested_instance, skill_data)
+    #     return super().update(instance, validated_data)
 
 
-class StudentOnlySerializer(serializers.Serializer):
-    student = serializers.URLField()
+class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['student']
 
 
 class UpdateAdminSerializer(serializers.Serializer):

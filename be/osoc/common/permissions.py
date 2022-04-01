@@ -19,7 +19,7 @@ class IsAdmin(permissions.BasePermission):
 
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS or view.action in ['suggest_student', 'remove_student']:
+        if request.method in permissions.SAFE_METHODS:
             return True
 
         # Write permissions are only allowed to the admin
@@ -42,15 +42,8 @@ class IsOwnerOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, object):
 
         # admins have all permissions
-        if request.user.is_admin:
-            return True
-
-        # coaches are not allowed to change their admin status
-        if view.action in ['make_admin', 'remove_admin']:
-            return False
-
         # Write permissions are only allowed to the owner of the data
-        return request.user==object
+        return request.user.is_admin or request.user==object
 
 class IsActive(permissions.BasePermission):
     """
