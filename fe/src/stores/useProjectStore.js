@@ -10,14 +10,12 @@ export const useProjectStore = defineStore('project', {
   actions: {
     async loadProjects() {
       this.isLoadingProjects = true
-      await instance
+      let data = await instance
         .get('projects/')
-        .then(({ data }) => {
-          this.isLoadingProjects = false
-          this.projects = convertObjectKeysToCamelCase(data).results
-          console.log(this.projects)
-        })
         .catch(() => (this.isLoadingProjects = false))
+        
+      this.isLoadingProjects = false
+      this.projects = convertObjectKeysToCamelCase(data).data
 
       for (var [i, project] of this.projects.entries()) {
         const data = await Promise.all(
