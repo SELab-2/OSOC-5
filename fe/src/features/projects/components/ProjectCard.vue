@@ -28,7 +28,7 @@
         <q-btn flat round size="sm" icon="mdi-eye" />
       </div>
       <project-role-chip
-        v-model="this.selectedRoles[role.id]"
+        v-model="this.selectedRoles[role.skill.id]"
         v-for="(role, index) in project.requiredSkills"
         @dragleave="onDragLeave($event, role)"
         @dragover="this.amountLeft(role) > 0 ? onDragOver($event, role) : ''"
@@ -39,24 +39,24 @@
       />
 
       <q-slide-transition
-        v-for="(role, index) in project.roles"
+        v-for="(role, index) in project.requiredSkills"
         :key="index"
         style="margin-top: 10px; margin-bottom: -10px"
       >
-        <div v-show="this.selectedRoles[role.type]">
+        <div v-show="this.selectedRoles[role.skill.id]">
           <q-item-label
             class="text-subtitle1 text-bold"
-            :class="'text-' + role.color + '-8'"
+            :class="'text-' + role.skill.color + '-8'"
           >
             {{ role.label }}
           </q-item-label>
           <q-item
             dense
-            v-for="student in groupedStudents[role.type]"
-            :key="student.id"
+            v-for="student in groupedStudents[role.skill.id]"
+            :key="student.student.id"
           >
             <q-item-section lines="1" class="text-weight-medium">{{
-              student.name
+              student.student.firstName
             }}</q-item-section>
 
             <div class="text-grey-8">
@@ -79,20 +79,16 @@ var test = 0
 export default {
   props: { project: {} },
   components: { ProjectRoleChip },
-  setup(props) {
-    return {
-      // Marks all role lists as hidden.
-      selectedRoles: reactive(
-        Object.assign(
-          ...props.project.requiredSkills.map((role) => ({ [role.id]: false }))
-        )
-      ),
-    }
-  },
 
   data() {
+    console.log(this.project.requiredSkills.map(role => role.skill))
     return {
       expanded: ref(false),
+      selectedRoles: reactive(
+        Object.assign(
+          ...this.project.requiredSkills.map((role) => ({ [role.skill.id]: false }))
+        )
+      ),
     }
   },
 
@@ -162,7 +158,16 @@ export default {
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }
     groupedStudents() {
-      return this.groupBy(this.project.suggestedStudents, 'id')
+      const result = {}
+      this.project.suggestedStudents.forEach(student => {
+        if (!result[student.role.id]) {
+          result[student.role.id] = []
+        }
+        result[student.role.id].push(student)
+      })
+      return result
+      // console.log(this.groupBy(this.project.suggestedStudents, 'role.id'))
+      // return this.groupBy(this.project.suggestedStudents, 'role.id')
     },
   },
 }

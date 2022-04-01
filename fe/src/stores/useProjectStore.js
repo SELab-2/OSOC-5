@@ -8,6 +8,15 @@ export const useProjectStore = defineStore('project', {
     isLoadingProjects: false,
   }),
   actions: {
+    async fetchSuggestedStudents(students) {
+      for (var [i, student] of students.entries()) {
+        student.student = await instance.get(student.student).then(res => res.data)
+        student.coach = await instance.get(student.coach).then(res => res.data)
+        student.role = await instance.get(student.role).then(res => res.data)
+        students[i] = student
+      }
+      return students
+    },
     async loadProjects() {
       this.isLoadingProjects = true
       let data = await instance
@@ -15,9 +24,9 @@ export const useProjectStore = defineStore('project', {
         .catch(() => (this.isLoadingProjects = false))
         
       this.isLoadingProjects = false
-      this.projects = convertObjectKeysToCamelCase(data).data
+      var projects = convertObjectKeysToCamelCase(data).data
 
-      for (var [i, project] of this.projects.entries()) {
+      for (var [i, project] of projects.entries()) {
         const data = await Promise.all(
           project.coaches.map((coach) => {
             return instance.get(coach)
@@ -37,9 +46,15 @@ export const useProjectStore = defineStore('project', {
           skill.skill = convertObjectKeysToCamelCase(data2[j].data)
           return skill
         })
-        this.projects[i] = project
+        
+        var students = await this.fetchSuggestedStudents(project.suggestedStudents)
+        students = convertObjectKeysToCamelCase(students)
+        project.suggestedStudents = students
+        projects[i] = project
         console.log("parsed")
       }
+      
+      this.projects = projects
 
       console.log(this.projects)
     },
