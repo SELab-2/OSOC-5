@@ -23,7 +23,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, OnProjectFilter, SuggestedByUserFilter]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, OnProjectFilter, SuggestedByUserFilter, FinalDecisionFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'alum', 'language', 'degree', 'studies', 'extra_info']
     filterset_fields = ['alum', 'language', 'skills'] # TODO practical info, final decision, student coach
 
