@@ -1,10 +1,12 @@
-psycopg2-binary
-Django >= 2.0, <4.0
-djangorestframework
-drf-yasg
 django-oauth-toolkit
-django
 django-rest-auth
 dj-rest-auth
 dj-rest-auth[with_social]
 djangorestframework-simplejwt
+psycopg2
+Django >= 2.0
+djangorestframework
+drf-yasg
+django-nose
+coverage
+django-cors-headers

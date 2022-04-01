@@ -1,0 +1,348 @@
+[
+  {
+    "model": "common.skill",
+    "pk": 1,
+    "fields": {
+      "name": "Front-end developer",
+      "description": "Develops the front-end",
+      "color": "yellow"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 2,
+    "fields": {
+      "name": "Back-end developer",
+      "description": "Back-ends the developer",
+      "color": "blue"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 3,
+    "fields": {
+      "name": "Sysadmin",
+      "description": "System administrator",
+      "color": "red"
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$320000$5rgqbJ6R9kNXbeQbRgsQ9w$rcwylWX8M8F2dBSQJ3mId5uxXRARO0hIVJGSGaS62T0=",
+      "last_login": "2022-03-19T13:31:16Z",
+      "is_superuser": true,
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2022-03-19T13:30:53Z",
+      "first_name": "admin",
+      "last_name": "admin",
+      "email": "admin@example.com",
+      "is_admin": true,
+      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 2,
+    "fields": {
+      "password": "abcdef",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-03-19T13:31:49Z",
+      "first_name": "Friedrich",
+      "last_name": "Vandenberghe",
+      "email": "friedrich.vandenberghe@ugent.be",
+      "is_admin": false,
+      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 3,
+    "fields": {
+      "password": "abcdef",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-03-27T12:38:40Z",
+      "first_name": "Lander",
+      "last_name": "Saerens",
+      "email": "lander.saerens@ugent.be",
+      "is_admin": true,
+      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 4,
+    "fields": {
+      "password": "abcdef",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-03-27T12:39:14Z",
+      "first_name": "Henri",
+      "last_name": "Cattoire",
+      "email": "henri.cattoire@ugent.be",
+      "is_admin": false,
+      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 1,
+    "fields": {
+      "first_name": "Jan",
+      "last_name": "Pieter",
+      "call_name": null,
+      "email": "jan.pieter@example.com",
+      "phone_number": null,
+      "language": "0",
+      "extra_info": "",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "last_email_sent": null,
+      "school_name": "UGent",
+      "degree": "MaNaMa",
+      "studies": "Computer Science",
+      "skills": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 2,
+    "fields": {
+      "first_name": "Wouter",
+      "last_name": "Siemens",
+      "call_name": null,
+      "email": "wouter.siemens@example.com",
+      "phone_number": null,
+      "language": "3",
+      "extra_info": "",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "last_email_sent": null,
+      "school_name": "VUB",
+      "degree": "500 Masters",
+      "studies": "Zeverologie",
+      "skills": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 3,
+    "fields": {
+      "first_name": "Florence",
+      "last_name": "Nightingale",
+      "call_name": "Flo",
+      "email": "flo.floflo@flo.flo",
+      "phone_number": "+32444444444",
+      "language": "4",
+      "extra_info": "",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "last_email_sent": null,
+      "school_name": "KUL",
+      "degree": "Bachelor",
+      "studies": "Taal- en letterkunde",
+      "skills": [
+        3
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 1,
+    "fields": {
+      "name": "Project A",
+      "partner_name": "Belfius",
+      "extra_info": "Project A",
+      "coaches": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 2,
+    "fields": {
+      "name": "Project B",
+      "partner_name": "Nelfius",
+      "extra_info": "Project B",
+      "coaches": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 3,
+    "fields": {
+      "name": "Project C",
+      "partner_name": "Discsoft",
+      "extra_info": "urlke",
+      "coaches": [
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 4,
+    "fields": {
+      "name": "Project D",
+      "partner_name": "MicroBook",
+      "extra_info": "urlke",
+      "coaches": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 5,
+    "fields": {
+      "name": "Project E",
+      "partner_name": "3M & M",
+      "extra_info": "oui",
+      "coaches": [
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 1,
+    "fields": {
+      "project": 1,
+      "skill": 2,
+      "amount": 4
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 2,
+    "fields": {
+      "project": 3,
+      "skill": 2,
+      "amount": 4
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 3,
+    "fields": {
+      "project": 4,
+      "skill": 3,
+      "amount": 3
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 4,
+    "fields": {
+      "project": 5,
+      "skill": 1,
+      "amount": 3
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 5,
+    "fields": {
+      "project": 2,
+      "skill": 2,
+      "amount": 1
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 6,
+    "fields": {
+      "project": 4,
+      "skill": 1,
+      "amount": 1
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 1,
+    "fields": {
+      "student": 1,
+      "coach": 2,
+      "suggestion": "0",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 2,
+    "fields": {
+      "student": 2,
+      "coach": 4,
+      "suggestion": "2",
+      "reason": "Een goeie uitleg"
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 3,
+    "fields": {
+      "student": 3,
+      "coach": 2,
+      "suggestion": "1",
+      "reason": "Ze is te dom"
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 4,
+    "fields": {
+      "student": 3,
+      "coach": 4,
+      "suggestion": "0",
+      "reason": "Ze is te slim"
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 5,
+    "fields": {
+      "student": 1,
+      "coach": 3,
+      "suggestion": "0",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 6,
+    "fields": {
+      "student": 1,
+      "coach": 4,
+      "suggestion": "2",
+      "reason": ""
+    }
+  }
+]

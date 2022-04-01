@@ -17,14 +17,16 @@ from osoc.common import views
 from rest_framework import routers
 from django.urls import include, path, re_path
 from django.contrib import admin
-from django.urls import path
+
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'coaches', views.CoachViewSet)
 router.register(r'students', views.StudentViewSet)
@@ -46,11 +48,12 @@ schema_view = get_schema_view(
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path('', include(router.urls)),
-    path('admin/', admin.site.urls),
-    path('api/', include('dj_rest_auth.urls')),
-    path('api/registration/', include('dj_rest_auth.registration.urls')),
-    path('api/github/', views.GithubLogin.as_view(), name='github_login'),
+    path('api/', include(router.urls)),
+    path('api/admin/', admin.site.urls),
+    path('api/login/', views.LoginView.as_view()),
+    path('api/logout/', views.LogoutView.as_view()),
+    path('api/register/', views.RegisterView.as_view()),
+    path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger',
