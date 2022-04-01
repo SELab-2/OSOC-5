@@ -11,7 +11,6 @@
         outlined
         dense
         style="width: 150px"
-        v-model="officialSuggestion"
         :options="['Not decided', 'Yes', 'Maybe', 'No']"
         label="Final decision"
       />
@@ -25,15 +24,41 @@
   <div class="row q-px-lg q-ml-sm items-center">
     <SegmentedControl
       color="primary"
-      @click="suggestionDialog = true"
+      @update:modelValue="showDialog"
       v-model="mySuggestion"
       :options="[
-                { name: 0, label: 'Yes' },
-                { name: 1, label: 'Maybe' },
-                { name: 2, label: 'No' },
-                { name: -1, label: 'Not decided' },
-              ]"
+        { name: 0, label: 'Yes' },
+        { name: 1, label: 'Maybe' },
+        { name: 2, label: 'No' },
+        { name: -1, label: 'Not decided' },
+      ]"
     />
+
+    <q-dialog v-model="this.suggestionDialog" >
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Suggest
+            <label class="text-h6" :class="{color: suggestionColor}">
+              {{ this.suggestionName }}
+            </label>
+            for {{ this.name }}</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          Why are you making this decision? (optional)
+          <q-input
+            v-model="reason"
+            filled
+            type="textarea"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat color="grey" label="Cancel" v-close-popup/>
+          <q-btn flat label="Suggest" v-close-popup/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 
   <div class="q-gutter-sm q-pa-lg">
@@ -112,9 +137,19 @@ export default {
     const $q = useQuasar()
 
     return {
-      suggestionDialog: ref(false),
       authenticationStore,
-      studentStore
+      studentStore,
+    }
+  },
+  data() {
+    const possibleSuggestion = ref(null)
+    const suggestionDialog = ref(false)
+    const reason = ref(null)
+
+    return {
+      possibleSuggestion,
+      suggestionDialog,
+      reason
     }
   },
   methods: {
@@ -124,7 +159,10 @@ export default {
     selectStudent: function (selected_student) {
       this.student = selected_student
     },
-
+    showDialog: function (value) {
+      this.possibleSuggestion = value
+      this.suggestionDialog = true
+    }
   },
   computed: {
     name: function () {
@@ -134,6 +172,12 @@ export default {
       const mySuggestions = this.student ? this.student.suggestions.filter(suggestion => suggestion.coach === this.authenticationStore.loggedInUser) : null
 
       return mySuggestions ? (mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1): null
+    },
+    suggestionName: function () {
+      return this.possibleSuggestion === 0 ? "yes" : this.suggestion === 1 ? "maybe" : "no"
+    },
+    suggestionColor: function () {
+      return this.possibleSuggestion === 0 ? "green" : this.suggestion === 1 ? "yellow" : "red"
     }
   }
 }
