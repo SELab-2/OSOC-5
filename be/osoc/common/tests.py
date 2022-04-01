@@ -19,6 +19,7 @@ from rest_framework.reverse import reverse
 
 from osoc.common.models import Coach, Project, ProjectSuggestion, Skill, Student, Suggestion
 import osoc.common.utils as utils
+from osoc.common.tally import TallyForm
 
 class UtilityTestCases(TestCase):
     def testStripAndLowerEmail(self):
@@ -30,6 +31,34 @@ class UtilityTestCases(TestCase):
         self.assertEqual(None, utils.getNested({'a': {'b': True}}, None, 'b', 'a'))
         self.assertEqual(True, utils.getNested({'a': {'b': True }}, None, 'a', 'b'))
         self.assertEqual(True, utils.getNested({'a': {'b': { 'c': True }}}, None, 'a', 'b', 'c'))
+
+class TallyTestCases(TestCase):
+    def testTallyFormValidationErrors(self):
+        tally = TallyForm.fromDict({})
+        # Formatting Errors
+        with self.assertRaisesMessage(TallyForm.TallyFormError, "Format error"):
+            tally.validate({}) # No fields
+        with self.assertRaisesMessage(TallyForm.TallyFormError, "Format error"):
+            # Event type and no fields
+            tally.validate({ "eventType": "FORM_RESPONSE" })
+        with self.assertRaisesMessage(TallyForm.TallyFormError, "Format error"):
+            # Fields no event type
+            tally.validate({ "data": { "fields": [] }})
+        # Question required error
+        tally = TallyForm.fromDict({
+            3: {
+                "question": [
+                    "Birth name"
+                    ],
+                "field": "first_name",
+                "type": "INPUT_TEXT",
+                "required": True
+                }
+            })
+        with self.assertRaisesMessage(TallyForm.TallyFormError, "Question is required"):
+            tally.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
+                { "key": "question_mRoXgd", "label": "Birth name", "type": "INPUT_TEXT", "value": None }
+                ] } })
 
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:

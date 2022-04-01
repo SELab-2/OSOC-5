@@ -1,7 +1,7 @@
 """
 Tally form (https://tally.so); method for students to register.
 """
-from utils import getNested
+from .utils import getNested
 import json
 
 class TallyForm:
@@ -14,9 +14,18 @@ class TallyForm:
         """
         pass
 
-    def __init__(self, questionsFile='osoc/common/tally/questions.json'):
+    def __init__(self, questions):
+        self.questions = questions
+
+    @classmethod
+    def fromFile(cls, questionsFile='osoc/common/tally/questions.json'):
         with open(questionsFile, 'r') as f:
-            self.questions = json.load(f)
+            questions = json.load(f)
+        return cls(questions)
+
+    @classmethod
+    def fromDict(cls, questions):
+        return cls(questions)
 
     def validate(self, form):
         """
