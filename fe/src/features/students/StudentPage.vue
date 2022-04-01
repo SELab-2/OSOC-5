@@ -38,9 +38,9 @@
       <q-card>
         <q-card-section>
           <div class="text-h6">Suggest
-            <label class="text-h6" :class="{color: suggestionColor}">
+            <q-btn dense rounded class="text-h6" :class="this.suggestionColor">
               {{ this.suggestionName }}
-            </label>
+            </q-btn>
             for {{ this.name }}</div>
         </q-card-section>
 
@@ -174,10 +174,10 @@ export default {
       return mySuggestions ? (mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1): null
     },
     suggestionName: function () {
-      return this.possibleSuggestion === 0 ? "yes" : this.suggestion === 1 ? "maybe" : "no"
+      return this.possibleSuggestion === 0 ? "yes" : (this.possibleSuggestion === 1 ? "maybe" : "no")
     },
     suggestionColor: function () {
-      return this.possibleSuggestion === 0 ? "green" : this.suggestion === 1 ? "yellow" : "red"
+      return this.possibleSuggestion === 0 ? "bg-green" : (this.possibleSuggestion === 1 ? "bg-yellow" : "bg-red")
     }
   }
 }
