@@ -8,7 +8,6 @@ import FormPage from "../features/authentication/FormPage.vue";
 import AppPage from "../components/AppPage.vue";
 import UserList from "../features/users/UserList.vue";
 import SelectStudentsPage from "../features/students/SelectStudentsPage.vue";
-import { hasCsrfToken } from '../utils/axios'
 
 
 
@@ -86,7 +85,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!hasCsrfToken()) {
+    if (!localStorage.getItem("accessToken")) {
       next({ name: 'Login' })
     } else {
 
