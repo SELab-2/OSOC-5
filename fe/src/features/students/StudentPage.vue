@@ -154,6 +154,7 @@ export default {
   },
   methods: {
     makeSuggestion: function (suggestion) {
+      console.log(suggestion)
       this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion)
     },
     selectStudent: function (selected_student) {

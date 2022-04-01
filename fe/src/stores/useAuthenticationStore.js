@@ -21,14 +21,14 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         username: email,
         email,
         password,
-      }).then(({data}) => {
-        this.loggedInUser = convertObjectKeysToCamelCase(data).user // doesn't work yet!
-
-        router.push('/students')
       })
+
+      this.loggedInUser = convertObjectKeysToCamelCase(data).user // doesn't work yet!
 
       localStorage.setItem("refreshToken", data.refresh_token)
       localStorage.setItem("accessToken", data.access_token)
+
+      router.push('/students')
     },
     logout() {
       this.$reset()

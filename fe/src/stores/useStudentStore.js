@@ -10,23 +10,23 @@ export const useStudentStore = defineStore('user/student', {
   actions: {
     async loadStudents() {
       this.isLoadingUsers = true
-      instance
+      await instance
         .get('students/')
         .then(({data}) => {
           this.isLoadingUsers = false
-          this.students = convertObjectKeysToCamelCase(data).results
+          this.students = convertObjectKeysToCamelCase(data)
 
           this.students.forEach((student, i) => {
             student.suggestions.forEach((suggestion, j) => {
               const pieces = suggestion.coach.split('/')
-              const url = 'coaches/' + pieces.slice(-2)[0] + '/'
 
               suggestion.suggestion = parseInt(suggestion.suggestion)
 
               instance
-                .get(url)
-                .then(({data}) => {
-                  Object.assign(this.students[i].suggestions[j], data)
+                .get(`coaches/${pieces.slice(-2)[0]}/`)
+                .then(({coach}) => {
+                  console.log(coach)
+                  Object.assign(this.students[i].suggestions[j], coach)
                 })
             })
           })
