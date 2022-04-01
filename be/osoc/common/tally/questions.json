@@ -22,7 +22,7 @@
       "Are there any responsibilities you might have which could hinder you during the day?"
     ],
     "field": "availability",
-    "type": "TEXT",
+    "type": "TEXTAREA",
     "required": true
   },
   "2": {
@@ -30,7 +30,7 @@
       "Birth name"
     ],
     "field": "first_name",
-    "type": "TEXT",
+    "type": "INPUT_TEXT",
     "required": true
   },
   "3": {
@@ -38,7 +38,7 @@
       "Last name"
     ],
     "field": "last_name",
-    "type": "TEXT",
+    "type": "INPUT_TEXT",
     "required": true
   },
   "4": {
@@ -46,7 +46,7 @@
       "How would you like to be called?"
     ],
     "field": "call_name",
-    "type": "TEXT",
+    "type": "INPUT_TEXT",
     "required": false
   },
   "5": {
@@ -100,7 +100,7 @@
         "answer": "other",
         "value": {
           "question": [ "Enter your pronouns" ],
-          "type": "TEXT"
+          "type": "INPUT_TEXT"
         }
       }
     ],
@@ -129,7 +129,7 @@
         "answer": "Other",
         "value": {
           "question": [ "What language are you most fluent in?" ],
-          "type": "TEXT"
+          "type": "INPUT_TEXT"
         }
       }
     ],
@@ -170,7 +170,7 @@
       "Phone number"
     ],
     "field": "phone_number",
-    "type": "TEXT",
+    "type": "INPUT_PHONE_NUMBER",
     "required": true
   },
   "10": {
@@ -178,7 +178,7 @@
       "Your email address\n"
     ],
     "field": "email",
-    "type": "TEXT",
+    "type": "INPUT_EMAIL",
     "required": true
   },
   "11": {
@@ -186,7 +186,7 @@
       "Upload your CV – size limit 10MB", "Or link to your CV"
     ],
     "field": "cv",
-    "type": "TEXT",
+    "type": [ "FILE_UPLOAD", "INPUT_LINK" ],
     "required": true
   },
   "12": {
@@ -194,7 +194,7 @@
       "Upload your portfolio – size limit 10MB", "Or link to your portfolio / GitHub"
     ],
     "field": "portfolio",
-    "type": "TEXT",
+    "type": [ "FILE_UPLOAD", "INPUT_LINK" ],
     "required": true
   },
   "13": {
@@ -202,7 +202,7 @@
       "Upload your motivation – size limit 10MB", "Or link to your motivation", "Or write about your motivation"
     ],
     "field": "extra_info",
-    "type": "TEXT",
+    "type": [ "FILE_UPLOAD", "INPUT_LINK", "TEXTAREA" ],
     "required": true
   },
   "14": {
@@ -210,7 +210,7 @@
       "Add a fun fact about yourself"
     ],
     "field": "fun_fact",
-    "type": "TEXT",
+    "type": "TEXTAREA",
     "required": true
   },
   "15": {
@@ -251,7 +251,7 @@
         "answer": "Other",
         "value": {
           "question": [ "What do/did you study?" ],
-          "type": "TEXT"
+          "type": "INPUT_TEXT"
         }
       }
     ],
@@ -287,7 +287,7 @@
         "answer": "Other",
         "value": {
           "question": [ "What kind of diploma are you currently going for?" ],
-          "type": "TEXT"
+          "type": "INPUT_TEXT"
         }
       }
     ],
@@ -298,7 +298,7 @@
       "How many years does your degree take?"
     ],
     "field": "degree",
-    "type": "TEXT",
+    "type": "INPUT_NUMBER",
     "required": true
   },
   "18": {
@@ -306,7 +306,7 @@
       "Which year of your degree are you in?"
     ],
     "field": "degree",
-    "type": "TEXT",
+    "type": "INPUT_TEXT",
     "required": true
   },
   "19": {
@@ -314,7 +314,7 @@
       "What is the name of your college or university?"
     ],
     "field": "school_name",
-    "type": "TEXT",
+    "type": "INPUT_TEXT",
     "required": true
   },
   "20": {
@@ -358,7 +358,7 @@
         "answer": "Other",
         "value": {
           "question": [ "Which role are you applying for that is not in the list above?" ],
-          "type": "TEXT"
+          "type": "INPUT_TEXT"
         }
       }
     ],
@@ -369,7 +369,7 @@
       "Which skill would you list as your best one?"
     ],
     "field": "best_skill",
-    "type": "TEXT",
+    "type": "INPUT_TEXT",
     "required": true
   },
   "22": {

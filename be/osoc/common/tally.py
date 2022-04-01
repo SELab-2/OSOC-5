@@ -28,6 +28,7 @@ class TallyForm:
         # Questions should be in the fields as formatted
         # TODO: add skip values
         for i, question in self.questions.items():
+            # only required questions need to be checked when validating
             if not question["required"]:
                 continue
             twinFields = self.findQuestions(question, fields)
@@ -43,11 +44,12 @@ class TallyForm:
 
     def findQuestions(self, question, fields):
         """
-        Find a question (self.questions) in the fields of a Tally form.
+        Find a question (from questions) in the fields of a Tally form.
         """
         twinFields = []
         for field in fields:
-            if field["label"] in question["question"]:
+            sameType = lambda x : x in question["type"] if isinstance(question["type"], list) else x == question["type"]
+            if field["label"] in question["question"] and sameType(field["type"]):
                 twinFields.append(field)
 
         if question["required"] and not twinFields: # still empty
@@ -58,9 +60,7 @@ class TallyForm:
         """
         Get value from field with the given type.
         """
-        if fieldType == "TEXT":
-            return field["value"]
-        elif fieldType == "MULTIPLE_CHOICE":
+        if fieldType == "MULTIPLE_CHOICE":
             optionId = field["value"]
             for option in field["options"]:
                 if option["id"] == optionId:
@@ -73,10 +73,36 @@ class TallyForm:
                     values.append(option["text"])
             return values
         else:
-            raise self.TallyFormError("Unknown question type")
+            # text as value
+            return field["value"]
 
     def transform(self, form):
         """
-        Transform validate Tally form to python dictionary with accessible fields.
+        Transform validate Tally form to python dictionary with accessible fields;
+        this function does not validate fields, make sure to run validate before
+        running this function.
         """
-        pass
+        newForm = {}
+        fields = getNested(form, None, "data", "fields")
+        for i, question in self.questions.items():
+            # only required questions need to be checked when validating
+            twinFields = self.findQuestions(question, fields)
+
+            value = None
+            for field in twinFields:
+                value = self.getFieldValue(field, question["type"])
+                if value:
+                    break
+            if value:
+                # TODO: map based on value type and set rules for if question already in newForm
+                newForm[question["field"]] = self.mapValue(value, question.get("answers", None))
+        return newForm
+
+    def mapValue(self, value, answers):
+        if answers == None:
+            return value
+
+        for answer in answers:
+            if answer["answer"] == value:
+                print(answer)
+                return answer.get("value", value)
