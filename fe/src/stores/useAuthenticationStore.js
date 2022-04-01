@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import { setCsrfToken } from '../utils/axios'
+import { instance } from '../utils/axios'
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import router from "../router/index"
 
@@ -9,27 +9,26 @@ import router from "../router/index"
 //   loggedInUser: { email: string; password: string } | undefined
 // }
 
-const host = 'http://localhost:3000'
+const host = 'http://localhost:8000/api/'
 
 export const useAuthenticationStore = defineStore('user/authentication', {
   state: () => ({
     loggedInUser: undefined,
   }),
   actions: {
-    // https://sel2-5.ugent.be
-    // admin@example.com
     async login({ email, password }) {
-      await axios.post('http://localhost:8000/api/login/', {
+      const {data} = await axios.post('http://localhost:8000/api/auth/login/', {
         username: email,
         email,
         password,
-      },{withCredentials: true}).then(({data}) => {
-        setCsrfToken()
-
+      }).then(({data}) => {
         this.loggedInUser = convertObjectKeysToCamelCase(data).user // doesn't work yet!
 
         router.push('/students')
       })
+
+      localStorage.setItem("refreshToken", data.refresh_token)
+      localStorage.setItem("accessToken", data.access_token)
     },
     logout() {
       this.$reset()

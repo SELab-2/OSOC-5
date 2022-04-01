@@ -14,8 +14,6 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = ['sel2-5.ugent.be']
 
-CSRF_TRUSTED_ORIGINS = ['https://sel2-5.ugent.be']
-
 # Database
 DATABASES = {
     'default': {
