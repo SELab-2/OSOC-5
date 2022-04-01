@@ -169,7 +169,8 @@ export default {
       return this.student.firstName + ' ' + this.student.lastName
     },
     mySuggestion: function () {
-      const mySuggestions = this.student ? this.student.suggestions.filter(suggestion => suggestion.coach === this.authenticationStore.loggedInUser) : null
+
+      const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach === this.authenticationStore.loggedInUser.url)
 
       return mySuggestions ? (mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1): null
     },
