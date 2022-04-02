@@ -23,6 +23,13 @@ export const useProjectStore = defineStore('project', {
         role: suggestion.role.url
       })
     },
+    async addSuggestion(projectId, studentUrl, skillUrl, reason) {
+      return await instance.post(`projects/${projectId}/suggest_student/`, {
+        student: studentUrl,
+        role: skillUrl,
+        reason: reason
+      })
+    },
     async loadProjects() {
       this.isLoadingProjects = true
       let data = await instance

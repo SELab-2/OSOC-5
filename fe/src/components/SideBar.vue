@@ -97,7 +97,7 @@
                 <q-item v-for="student in studentStore.students"
                     :key="student.email"
                     :draggable="this.draggable"
-                    @dragstart="onDragStart($event, student.name)"
+                    @dragstart="onDragStart($event, student)"
                     :id="student.email">
                   <StudentCard
                     clickable
@@ -163,9 +163,10 @@ export default {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
     onDragStart(e, item) {
+      console.log(item)
       const data = {
         targetId: e.target.id,
-        name: item
+        student: item
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
