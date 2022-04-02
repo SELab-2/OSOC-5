@@ -169,10 +169,13 @@ export default {
       }
       const data = JSON.parse(e.dataTransfer.getData('text'))
       const draggedEl = document.getElementById(data.targetId)
-
+      console.log(data)
       // Add a student to the project and remove the student card from the sidebar.
       e.target.classList.remove('drag-enter')
-      this.project.students.push({ id: 10, name: data.name, role: role.type })
+      const reason = "mimimi"
+      let result = await this.projectStore.addSuggestion(this.project.id, data.student.url, role.skill.url, reason)
+      console.log(result)
+      this.project.suggestedStudents.push({coach:undefined, reason: reason, role: role.skill, student: data.student})
       draggedEl.parentNode.removeChild(draggedEl)
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.

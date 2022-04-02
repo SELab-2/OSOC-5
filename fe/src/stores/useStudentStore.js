@@ -14,7 +14,7 @@ export const useStudentStore = defineStore('user/student', {
         .get('students/')
         .then(({data}) => {
           this.isLoadingUsers = false
-          this.students = convertObjectKeysToCamelCase(data).results
+          this.students = convertObjectKeysToCamelCase(data)
 
           this.students.forEach((student, i) => {
             student.suggestions.forEach((suggestion, j) => {
