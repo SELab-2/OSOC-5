@@ -20,7 +20,7 @@ class IsAdmin(permissions.BasePermission):
 
 class IsOwnerOrAdmin(permissions.BasePermission):
     """
-    Custom permission that allows users to edit their own data, EXCEPT their admin status
+    Custom permission that allows users to edit their own data
     """
 
     def has_permission(self, request, view):

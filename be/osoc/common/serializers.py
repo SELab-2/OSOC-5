@@ -47,7 +47,7 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
-        fields = ['student', 'coach', 'role', 'reason']
+        fields = ['student', 'coach', 'skill', 'reason']
         read_only_fields = ['coach']
 
 

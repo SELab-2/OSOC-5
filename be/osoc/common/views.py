@@ -25,7 +25,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, OnProjectFilter, SuggestedByUserFilter, FinalDecisionFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'alum', 'language', 'degree', 'studies', 'extra_info']
-    filterset_fields = ['alum', 'language', 'skills'] # TODO practical info, final decision, student coach
+    filterset_fields = ['alum', 'language', 'skills'] # TODO practical info, student coach
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -190,8 +190,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 **resolve(urlparse(student_url).path).kwargs)
 
             # replace skill url with skill object
-            skill_url = data.pop('role')
-            data['role'] = Skill.objects.get(
+            skill_url = data.pop('skill')
+            data['skill'] = Skill.objects.get(
                 **resolve(urlparse(skill_url).path).kwargs)
 
             # create ProjectSuggestion if it doesnt exist yet, else update it
