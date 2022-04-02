@@ -47,8 +47,12 @@ class StudentViewSet(viewsets.ModelViewSet):
             # create Suggestion object if it doesnt exist yet, else update it
             _, created = Suggestion.objects.update_or_create(
                 student=self.get_object(), coach=request.user, defaults=serializer.data)
+
+            response_data = serializer.data
+            response_data['coach_name'] = request.user.get_full_name()
+            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
             
-            return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer)
@@ -87,8 +91,12 @@ class StudentViewSet(viewsets.ModelViewSet):
             student = self.get_object()
             student.final_decision = suggestion
             student.save()
+
+            response_data = serializer.data
+            response_data['coach_name'] = request.user.get_full_name()
+            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
             
-            return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
@@ -208,7 +216,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
             _, created = ProjectSuggestion.objects.update_or_create(
                 project=self.get_object(), student=student, coach=request.user, defaults=data)
 
-            return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            response_data = serializer.data
+            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
+            response_data['coach_name'] = request.user.get_full_name()
+
+            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body

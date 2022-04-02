@@ -387,4 +387,6 @@ class ProjectSuggestion(models.Model):
 
     class Meta:
         unique_together = (("project", "student", "coach"))
-
+    
+    def coach_name(self):
+        return self.coach.get_full_name()
