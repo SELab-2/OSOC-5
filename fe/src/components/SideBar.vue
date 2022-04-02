@@ -200,21 +200,6 @@ export default {
       roles: ref([]),
     }
   },
-  computed: {
-    mySuggestion: function () {
-      if (this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
-
-        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
-      } else {
-        return null
-      }
-    },
-    mySuggestionColor: function () {
-      let mySuggestion = this.mySuggestion
-      return mySuggestion === 0 ? "bg-green" : (mySuggestion === 1 ? "bg-yellow" : (mySuggestion === 2 ? "bg-red" : "bg-grey"))
-    },
-  }
 }
 </script>
 

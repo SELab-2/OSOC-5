@@ -1,7 +1,7 @@
 <template>
   <div class="full-width relative-position cursor-pointer">
     <span class="dot"
-          :class="color"
+          :class="mySuggestionColor"
           style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);" />
     <q-card class="full-width position" :class="active? 'bg-teal-1' : ''">
 
@@ -26,8 +26,20 @@
 </template>
 
 <script>
+import {useStudentStore} from "../stores/useStudentStore";
+import {useAuthenticationStore} from "../stores/useAuthenticationStore";
+
 export default {
-  props: ['student', 'active', 'color'],
+  props: ['student', 'active'],
+  setup() {
+    const authenticationStore = useAuthenticationStore()
+    const studentStore = useStudentStore()
+
+    return {
+      studentStore,
+      authenticationStore
+    }
+  },
   computed: {
     total() {
       return this.student.suggestions.length
@@ -46,7 +58,20 @@ export default {
     },
     name() {
       return this.student.firstName + ' ' + this.student.lastName
-    }
+    },
+    mySuggestion: function () {
+      if (this.student) {
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
+
+        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
+      } else {
+        return null
+      }
+    },
+    mySuggestionColor: function () {
+      let mySuggestion = this.mySuggestion
+      return mySuggestion === 0 ? "bg-green" : (mySuggestion === 1 ? "bg-yellow" : (mySuggestion === 2 ? "bg-red" : "bg-grey"))
+    },
   }
 }
 </script>
