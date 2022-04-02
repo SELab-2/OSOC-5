@@ -1,6 +1,8 @@
 <template>
   <div class="full-width relative-position cursor-pointer">
-    <span class="dot bg-green" style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);"></span>
+    <span class="dot"
+          :class="color"
+          style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);" />
     <q-card class="full-width position" :class="active? 'bg-teal-1' : ''">
 
       <q-card-section rounded>
@@ -25,7 +27,7 @@
 
 <script>
 export default {
-  props: ['student', 'active'],
+  props: ['student', 'active', 'color'],
   computed: {
     total() {
       return this.student.suggestions.length

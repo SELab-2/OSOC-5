@@ -102,8 +102,9 @@
                   <StudentCard
                     clickable
                     v-ripple
+                    :color="mySuggestionColor"
                     :student="student"
-                    :active="this.active === student.email"
+                    :active="this.student ? student.email === this.student.email : false"
                     @click="this.clickStudent(student)"
                   />
                 </q-item>
@@ -137,7 +138,11 @@ import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
 
 export default {
-  props: [ 'selectStudent', 'color', 'draggable' ],
+  components: {
+    StudentCard,
+    SegmentedControl,
+  },
+  props: [ 'selectStudent', 'color', 'draggable', 'student' ],
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
@@ -156,7 +161,6 @@ export default {
         width: '4px',
         opacity: 0.75
       },
-      active: ref('')
     }
   },
   methods: {
@@ -179,8 +183,9 @@ export default {
       console.log(this.onProject)
     },
     clickStudent(student) {
-      this.active = student.email
       this.selectStudent(student)
+      console.log(this.mySuggestion)
+      console.log(this.mySuggestionColor)
     }
   },
   data() {
@@ -195,9 +200,20 @@ export default {
       roles: ref([]),
     }
   },
-  components: {
-    StudentCard,
-    SegmentedControl,
+  computed: {
+    mySuggestion: function () {
+      if (this.student) {
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
+
+        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
+      } else {
+        return null
+      }
+    },
+    mySuggestionColor: function () {
+      let mySuggestion = this.mySuggestion
+      return mySuggestion === 0 ? "bg-green" : (mySuggestion === 1 ? "bg-yellow" : (mySuggestion === 2 ? "bg-red" : "bg-grey"))
+    },
   }
 }
 </script>

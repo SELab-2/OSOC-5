@@ -1,11 +1,11 @@
 <template>
-  <SideBar :selectStudent="selectStudent" :draggable="false"/>
+  <SideBar :student="this.student" :selectStudent="selectStudent" :draggable="false"/>
 
   <div class="justify-between row q-px-lg q-pt-lg studentcol full-height">
     <div class="row q-pa-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ name }}</h>
-      <q-btn :href="this.student.cv" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="this.student.portfolio" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
+      <q-btn :href="this.student ? this.student.cv : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
+      <q-btn :href="this.student ? this.student.portfolio : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
     <div class="row q-gutter-sm items-center">
       <q-select
@@ -66,15 +66,15 @@
   <div class="q-gutter-sm q-pa-lg">
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SuggestionsCard title="Suggestions" :suggestions="this.student.suggestions"/>
+        <SuggestionsCard title="Suggestions"/>
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <AcademiaCard title="Academia" :content="[
+        <AcademiaCard title="Academia" :content="this.student ? [
               'Enrolled at: ' + this.student.schoolName,
               'Studies: ' + this.student.studies,
               'Degree: ' + this.student.degree
               // 'Years into degree: 5'
-            ]"
+            ] : []"
         />
       </div>
     </div>
@@ -179,12 +179,17 @@ export default {
       return this.studentStore.currentStudent
     },
     name: function () {
-      return this.student.firstName + ' ' + this.student.lastName
+      return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     mySuggestion: function () {
-      const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
+      if (this.student) {
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
 
-      return mySuggestions ? (mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1) : null
+        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
+      } else {
+        return null
+      }
+
     },
     mySuggestionColor: function () {
       let mySuggestion = this.mySuggestion

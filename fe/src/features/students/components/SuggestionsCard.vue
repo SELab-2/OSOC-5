@@ -9,7 +9,7 @@
       </div>
 
       <div v-else class="column">
-        <div v-for="(suggestion, key) in suggestions" :key="key">
+        <div v-for="(suggestion, key) in this.studentStore.currentStudent.suggestions" :key="key">
           <q-icon v-if="suggestion.suggestion === 0" size="xs" name="mdi-check" color="green" />
           <q-icon v-else-if="suggestion.suggestion === 1" size="xs" name="mdi-help" color="yellow" />
           <q-icon v-else size="xs" name="mdi-close" color="red" />
@@ -26,7 +26,7 @@ import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 
 export default {
   components: {LoadingSpinner},
-  props: ['title', 'suggestions'],
+  props: ['title'],
   setup() {
     const studentStore = useStudentStore()
 

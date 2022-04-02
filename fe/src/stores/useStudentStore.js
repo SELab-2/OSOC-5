@@ -61,7 +61,6 @@ export const useStudentStore = defineStore('user/student', {
           .get(coachUrl)
           .then(({data}) => {
             Object.assign(this.currentStudent.suggestions[i], data)
-            console.log(this.currentStudent.suggestions[i])
           })
       }
 
