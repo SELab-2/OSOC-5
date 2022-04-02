@@ -59,6 +59,11 @@ class TallyTestCases(TestCase):
             tally.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
                 { "key": "question_mRoXgd", "label": "Birth name", "type": "INPUT_TEXT", "value": None }
                 ] } })
+        # Missing question
+        with self.assertRaisesMessage(TallyForm.TallyFormError, "Missing question in form"):
+            tally.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
+                { "key": "question_mRoXgd", "label": "Last name", "type": "INPUT_TEXT", "value": None }
+                ] } })
 
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:

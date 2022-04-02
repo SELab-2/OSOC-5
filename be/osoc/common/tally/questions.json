@@ -399,11 +399,11 @@
     "answers": [
       {
         "answer": "Yes, I'd like to be a student coach",
-        "value": true
+        "value": "Student Coach"
       },
       {
         "answer": "No, I don't want to be a student coach",
-        "value": false
+        "value": null
       }
     ],
     "required": false
