@@ -34,13 +34,13 @@ export const useSkillStore = defineStore('skills', {
         })
         .catch(() => (this.isLoadingSkills = false))
     },
-    async addSkill(newSkill, callback) {
+    async addSkill(newSkill, color, callback) {
       // start the loading animation
       this.isLoadingSkills = true
 
       // Process the new skill
       console.log(`Adding new skill: ${newSkill}.`)
-      this.skills.push({ name: newSkill, amount: 0, comment: '' })
+      this.skills.push({ name: newSkill, color: color, amount: 0, comment: '' })
 
       // TODO: maybe only push skills to database when project POST happens
       // TODO: remove description (waiting for backend update)
@@ -49,7 +49,7 @@ export const useSkillStore = defineStore('skills', {
         .post('skills/', {
           name: newSkill,
           description: 'string',
-          color: 'string',
+          color: color,
         })
         //TODO: response based feedback
         .then(function (response) {

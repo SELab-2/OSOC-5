@@ -243,7 +243,15 @@
           ]"
         />
       </q-card-section>
-
+      <q-card-section class="q-pt-none">
+        <q-select
+          v-model="selected"
+          :options="['red', 'blue', 'green', 'yellow']"
+          label="Color choice"
+          map-options
+          emit-value
+        ></q-select>
+      </q-card-section>
       <q-card-actions align="right" class="text-primary">
         <q-btn flat label="Cancel" v-close-popup />
         <q-btn flat label="Add role" @click="new_role_confirm" />
@@ -450,12 +458,14 @@ export default {
        */
       new_role_prompt,
       new_role,
+      selected,
       new_role_confirm() {
         // check if the new role value is valid
         if (new_role.value && new_role.value.length > 0) {
           // when valid call the store object and add the skill
           skillStore.addSkill(
             new_role.value,
+            selected.value,
             // callback
             (added_role) => {
               new_role_prompt.value = false
