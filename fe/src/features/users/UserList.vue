@@ -1,123 +1,153 @@
 <template>
-    <div class="relative-position container flex flex-center" style="width: 100vw">
-      <div class="q-pa-md q-gutter-md" style="width: 1000px">
-        <div class="row">
-          <div class="text-bold text-h4">Users</div>
-          <q-space/>
-          <q-btn
-            stack
-            flat
-            color="yellow"
-            icon="download"
-            label="csv"
-            @click="exportTable"
-          />
+  <div
+    class="relative-position container flex flex-center"
+    style="width: 100vw"
+  >
+    <div
+      class="q-pa-md q-gutter-md"
+      style="width: 1000px"
+    >
+      <div class="row">
+        <div class="text-bold text-h4">
+          Users
         </div>
-        <div class="row q-mb-md vertical-middle">
-          <SegmentedControl
-            v-model="roleFilter"
-            :options="[
-          { name: 'all', label: 'All' },
-          { name: 'admin', label: 'Admins' },
-          { name: 'coach', label: 'Coaches' },
-          { name: 'inactive', label: 'Inactive' },
-        ]"
-          />
+        <q-space />
+        <q-btn
+          stack
+          flat
+          color="yellow"
+          icon="download"
+          label="csv"
+          @click="exportTable"
+        />
+      </div>
+      <div class="row q-mb-md vertical-middle">
+        <SegmentedControl
+          v-model="roleFilter"
+          :options="[
+            { name: 'all', label: 'All' },
+            { name: 'admin', label: 'Admins' },
+            { name: 'coach', label: 'Coaches' },
+            { name: 'inactive', label: 'Inactive' },
+          ]"
+        />
 
-          <q-space/>
-          <q-input
-            outlined
-            dense
-            debounce="300"
-            color="yellow-4"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search"/>
-            </template>
-          </q-input>
-        </div>
-
-
-        <!-- filter cannot be empty, since this won't trigger the table filter function call.
-             This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
-        <q-table
-          class="my-table user-table shadow-4"
-          :rows="coachStore.users"
-          :columns="columns"
-          row-key="id"
-          :filter="roleFilter"
-          :filter-method="useTableFilter"
-          separator="horizontal"
+        <q-space />
+        <q-input
+          v-model="filter"
+          outlined
+          dense
+          debounce="300"
+          color="yellow-4"
+          placeholder="Search"
         >
-          <template v-slot:body="props">
-            <q-tr
-              :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+          <template #append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
+
+
+      <!-- filter cannot be empty, since this won't trigger the table filter function call.
+             This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
+      <q-table
+        class="my-table user-table shadow-4"
+        :rows="coachStore.users"
+        :columns="columns"
+        row-key="id"
+        :filter="roleFilter"
+        :filter-method="useTableFilter"
+        separator="horizontal"
+      >
+        <template #body="props">
+          <q-tr
+            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+            :props="props"
+          >
+            <q-td
+              key="name"
+              :props="props"
+              @click="console.log(props)"
+            >
+              {{ props.row.firstName }} {{ props.row.lastName }}
+            </q-td>
+            <q-td
+              key="role"
               :props="props"
             >
-              <q-td key="name" @click="console.log(props)" :props="props">
-                {{ props.row.firstName }} {{ props.row.lastName }}
-              </q-td>
-              <q-td key="role" :props="props">
-                <q-select
-                  v-ripple
-                  color="yellow"
-                  borderless
-                  dense
-                  style="border-radius: 5px; position: relative; width: 80px"
-                  v-model="props.row.role"
-                  :options="roles"
-                  transition-show="jump-down"
-                  transition-hide="jump-up"
-                  transition-duration="300"
-                  behavior="menu"
-                  map-options
-                  emit-value
-                >
-                  <template v-slot:option="scope">
-                    <q-item  @click="() => updateRole(props.row, props.row.role)" class="items-center" v-bind="scope.itemProps">
-                      <q-icon
-                        class="q-mr-md icon"
-                        size="xs"
-                        :name="scope.opt.icon"
-                      />
-                      <q-item-section>
-                        <q-item-label>{{ scope.opt.label }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                </q-select>
-              </q-td>
-              <q-td key="assignedto" :props="props"
-              >{{ props.row.assignedto }}
-              </q-td>
-              <q-td key="email" :props="props">{{ props.row.email }}</q-td>
-              <q-td style="width: 10px" key="remove">
-                <q-btn
-                  flat
-                  round
-                  style="color: #f14a3b"
-                  @click="coachStore.removeUser(props.row.id)"
-                  icon="mdi-trash-can-outline"
-                />
-              </q-td>
-            </q-tr>
-          </template>
-        </q-table>
-      </div>
+              <q-select
+                v-model="props.row.role"
+                v-ripple
+                color="yellow"
+                borderless
+                dense
+                style="border-radius: 5px; position: relative; width: 80px"
+                :options="roles"
+                transition-show="jump-down"
+                transition-hide="jump-up"
+                transition-duration="300"
+                behavior="menu"
+                map-options
+                emit-value
+              >
+                <template #option="scope">
+                  <q-item
+                    class="items-center"
+                    v-bind="scope.itemProps"
+                    @click="() => updateRole(props.row, props.row.role)"
+                  >
+                    <q-icon
+                      class="q-mr-md icon"
+                      size="xs"
+                      :name="scope.opt.icon"
+                    />
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </q-td>
+            <q-td
+              key="assignedto"
+              :props="props"
+            >
+              {{ props.row.assignedto }}
+            </q-td>
+            <q-td
+              key="email"
+              :props="props"
+            >
+              {{ props.row.email }}
+            </q-td>
+            <q-td
+              key="remove"
+              style="width: 10px"
+            >
+              <q-btn
+                flat
+                round
+                style="color: #f14a3b"
+                icon="mdi-trash-can-outline"
+                @click="coachStore.removeUser(props.row.id)"
+              />
+            </q-td>
+          </q-tr>
+        </template>
+      </q-table>
     </div>
+  </div>
 </template>
 
-<script>
+<script lang="ts">
 import {defineComponent, onMounted} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 
-const wrapCsvValue = (val, formatFn) => {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
+const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
+  let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
 
   formatted =
     formatted === void 0 || formatted === null ? '' : String(formatted)
@@ -192,17 +222,54 @@ const roles = [
   },
 ]
 export default defineComponent({
-  components: {SegmentedControl},
+  components: { SegmentedControl },
+  setup() {
+    const coachStore = useCoachStore()
+    const $q = useQuasar()
+    
+    onMounted(() => {
+      coachStore.loadUsers();
+      coachStore.$subscribe((users, state) => {
+        console.log(users, state)
+        switch (users.events.key) {
+            case 'role':
+              coachStore
+              .updateRole(users.events.target, users.events.newValue)
+              .catch((error) => {
+                  $q.notify({
+                  icon: 'warning',
+                  color: 'warning',
+                  message: `Error ${error.response.status} while updating role to ${users.events.newValue} for ${users.events.target.firstName} ${users.events.target.lastName}`,
+                  textColor: 'black'
+                });
+                coachStore.users.find((user) => user.id === users.events.target.id).role = users.events.oldValue
+              }
+            )
+        }
+      })
+    })
+    
+
+    return {
+      active: ref(true),
+      filter: ref(''),
+      roleFilter: ref('all'),
+      columns,
+      roles,
+      coachStore,
+      $q
+    }
+  },
   methods: {
     // Method for searching the table.
     // Terms is equal to roleFilter.
     // The method filter to the elements which pass both filters.
-    useTableFilter(rows, terms, cols, cellValue) {
+    useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: unknown, arg1: unknown) => string) {
       const lowerTerms = this.filter?.toLowerCase() ?? ''
-
-      return rows.filter((row) =>
+      
+      return rows.filter((row: unknown) =>
         (terms == 'all' || cellValue(cols[1], row) == terms) &&
-        cols.some((col) => {
+        cols.some((col: unknown) => {
           const val = cellValue(col, row) + ''
           const haystack =
             val === 'undefined' || val === 'null' ? '' : val.toLowerCase()
@@ -226,7 +293,7 @@ export default defineComponent({
         columns.slice(0, -1).map((col) => wrapCsvValue(col.label)),
       ]
         .concat(
-          this.users.map((row) =>
+          this.users.map((row: { [x: string]: any }) =>
             columns
               .slice(0, -1)
               .map((col) =>
@@ -274,26 +341,6 @@ export default defineComponent({
         })
       })
       
-    }
-  },
-
-  setup() {
-    const coachStore = useCoachStore()
-    const $q = useQuasar()
-
-    onMounted(() => {
-      coachStore.loadUsers();
-    })
-
-
-    return {
-      active: ref(true),
-      filter: ref(''),
-      roleFilter: ref('all'),
-      columns,
-      roles,
-      coachStore,
-      $q
     }
   },
 })

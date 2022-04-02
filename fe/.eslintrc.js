@@ -1,6 +1,6 @@
 module.exports = {
     extends: [
-        'plugin:vue/vue3-essential',
-        'prettier',
+      "plugin:vue/vue3-recommended",
+      "@vue/typescript/recommended"
     ],
 }
