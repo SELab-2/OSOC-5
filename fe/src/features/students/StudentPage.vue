@@ -1,7 +1,8 @@
 <template>
-  <SideBar :student="this.student" :selectStudent="selectStudent" :draggable="false"/>
+  <SideBar :key="sideBarKey" :student="this.student" :selectStudent="selectStudent" :draggable="false"/>
 
-  <div class="justify-between row q-px-lg q-pt-lg studentcol full-height">
+  <div :key="studentKey"
+    class="justify-between row q-px-lg q-pt-lg studentcol full-height">
     <div class="row q-pa-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ name }}</h>
       <q-btn :href="this.student ? this.student.cv : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
@@ -12,7 +13,7 @@
         rounded
         outlined
         dense
-        style="width: 150px"
+        style="width: 200px"
         :options="['Not decided', 'Yes', 'Maybe', 'No']"
         label="Final decision"
       />
@@ -66,7 +67,7 @@
   <div class="q-gutter-sm q-pa-lg">
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SuggestionsCard title="Suggestions"/>
+        <SuggestionsCard :index="studentKey" title="Suggestions"/>
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
         <AcademiaCard title="Academia" :content="this.student ? [
@@ -122,6 +123,7 @@ import PracticalCard from "./components/PracticalCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
 import TitleTextCard from "./components/TitleTextCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
+import {onMounted} from "@vue/runtime-core";
 
 export default {
   components: {
@@ -151,6 +153,8 @@ export default {
     this.studentStore.loadStudent(this.id)
 
     return {
+      sideBarKey: 0,
+      studentKey: 0,
       possibleSuggestion,
       suggestionDialog,
       reason
@@ -163,8 +167,12 @@ export default {
     }, {immediate: true})
   },
   methods: {
-    makeSuggestion: function (suggestion) {
-      this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion)
+    makeSuggestion: async function () {
+      await this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion, this.reason)
+
+      // Make components update
+      this.sideBarKey += 1
+      this.studentKey += 1
     },
     selectStudent: function (selected_student) {
       this.$router.push(`/students/${selected_student.id}`)

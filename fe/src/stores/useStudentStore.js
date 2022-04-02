@@ -2,6 +2,7 @@ import {defineStore} from "pinia";
 import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import router from "../router";
+import {useAuthenticationStore} from "./useAuthenticationStore";
 
 export const useStudentStore = defineStore('user/student', {
   state: () => ({
@@ -67,15 +68,14 @@ export const useStudentStore = defineStore('user/student', {
 
       this.isLoading = false
     },
-    async updateSuggestion(studentId, suggestion) {
+    async updateSuggestion(studentId, suggestion, reason) {
       await instance
         .post(`students/${studentId}/make_suggestion/`, {
           suggestion: suggestion,
-          reason: ""
-        }).then(({data}) => {
-          console.log(data)
-          // router.go()
+          reason: reason
         })
+
+      await this.loadStudent(studentId)
     },
   }
 })
