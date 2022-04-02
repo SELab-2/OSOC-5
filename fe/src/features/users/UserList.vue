@@ -1,140 +1,149 @@
 <template>
-  <div class="q-pa-md q-gutter-md">
-    <div class="row">
-      <div class="text-bold text-h4">
-        Users
-      </div>
-      <q-space />
-      <q-btn
-        stack
-        flat
-        color="yellow"
-        icon="download"
-        label="csv"
-        @click="exportTable"
-      />
-    </div>
-    <div class="row q-mb-md vertical-middle">
-      <SegmentedControl
-        v-model="roleFilter"
-        :options="[
-          { name: 'all', label: 'All' },
-          { name: 'admin', label: 'Admins' },
-          { name: 'coach', label: 'Coaches' },
-          { name: 'inactive', label: 'Inactive' },
-        ]"
-      />
-
-      <q-space />
-      <q-input
-        v-model="filter"
-        outlined
-        dense
-        debounce="300"
-        color="yellow-4"
-        placeholder="Search"
-      >
-        <template #append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-    </div>
-    
-    
-    <!-- filter cannot be empty, since this won't trigger the table filter function call.
-         This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
-    <q-table
-      class="my-table user-table shadow-4"
-      :rows="coachStore.users"
-      :columns="columns"
-      row-key="id"
-      :filter="roleFilter"
-      :filter-method="useTableFilter"
-      separator="horizontal"
+  <div
+    class="relative-position container flex flex-center"
+    style="width: 100vw"
+  >
+    <div
+      class="q-pa-md q-gutter-md"
+      style="width: 1000px"
     >
-      <template #body="props">
-        <q-tr
-          :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
-          :props="props"
+      <div class="row">
+        <div class="text-bold text-h4">
+          Users
+        </div>
+        <q-space />
+        <q-btn
+          stack
+          flat
+          color="yellow"
+          icon="download"
+          label="csv"
+          @click="exportTable"
+        />
+      </div>
+      <div class="row q-mb-md vertical-middle">
+        <SegmentedControl
+          v-model="roleFilter"
+          :options="[
+            { name: 'all', label: 'All' },
+            { name: 'admin', label: 'Admins' },
+            { name: 'coach', label: 'Coaches' },
+            { name: 'inactive', label: 'Inactive' },
+          ]"
+        />
+
+        <q-space />
+        <q-input
+          v-model="filter"
+          outlined
+          dense
+          debounce="300"
+          color="yellow-4"
+          placeholder="Search"
         >
-          <q-td
-            key="name"
+          <template #append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
+
+
+      <!-- filter cannot be empty, since this won't trigger the table filter function call.
+             This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
+      <q-table
+        class="my-table user-table shadow-4"
+        :rows="coachStore.users"
+        :columns="columns"
+        row-key="id"
+        :filter="roleFilter"
+        :filter-method="useTableFilter"
+        separator="horizontal"
+      >
+        <template #body="props">
+          <q-tr
+            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
             :props="props"
-            @click="console.log(props)"
           >
-            {{ props.row.firstName }} {{ props.row.lastName }}
-          </q-td>
-          <q-td
-            key="role"
-            :props="props"
-          >
-            <q-select
-              v-model="props.row.role"
-              v-ripple
-              color="yellow"
-              borderless
-              dense
-              style="border-radius: 5px; position: relative; width: 80px"
-              :options="roles"
-              transition-show="jump-down"
-              transition-hide="jump-up"
-              transition-duration="300"
-              behavior="menu"
-              map-options
-              emit-value
+            <q-td
+              key="name"
+              :props="props"
+              @click="console.log(props)"
             >
-              <template #option="scope">
-                <q-item
-                  class="items-center"
-                  v-bind="scope.itemProps"
-                >
-                  <q-icon
-                    class="q-mr-md icon"
-                    size="xs"
-                    :name="scope.opt.icon"
-                  />
-                  <q-item-section>
-                    <q-item-label>{{ scope.opt.label }} </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-          </q-td>
-          <q-td
-            key="assignedto"
-            :props="props"
-          >
-            {{ props.row.assignedto }}
-          </q-td>
-          <q-td
-            key="email"
-            :props="props"
-          >
-            {{ props.row.email }}
-          </q-td>
-          <q-td
-            key="remove"
-            style="width: 10px"
-          >
-            <q-btn
-              flat
-              round
-              style="color: #f14a3b"
-              icon="mdi-trash-can-outline"
-              @click="coachStore.removeUser(props.row.id)"
-            />
-          </q-td>
-        </q-tr>
-      </template>
-    </q-table>
+              {{ props.row.firstName }} {{ props.row.lastName }}
+            </q-td>
+            <q-td
+              key="role"
+              :props="props"
+            >
+              <q-select
+                v-model="props.row.role"
+                v-ripple
+                color="yellow"
+                borderless
+                dense
+                style="border-radius: 5px; position: relative; width: 80px"
+                :options="roles"
+                transition-show="jump-down"
+                transition-hide="jump-up"
+                transition-duration="300"
+                behavior="menu"
+                map-options
+                emit-value
+              >
+                <template #option="scope">
+                  <q-item
+                    class="items-center"
+                    v-bind="scope.itemProps"
+                    @click="() => updateRole(props.row, props.row.role)"
+                  >
+                    <q-icon
+                      class="q-mr-md icon"
+                      size="xs"
+                      :name="scope.opt.icon"
+                    />
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </q-td>
+            <q-td
+              key="assignedto"
+              :props="props"
+            >
+              {{ props.row.assignedto }}
+            </q-td>
+            <q-td
+              key="email"
+              :props="props"
+            >
+              {{ props.row.email }}
+            </q-td>
+            <q-td
+              key="remove"
+              style="width: 10px"
+            >
+              <q-btn
+                flat
+                round
+                style="color: #f14a3b"
+                icon="mdi-trash-can-outline"
+                @click="coachStore.removeUser(props.row.id)"
+              />
+            </q-td>
+          </q-tr>
+        </template>
+      </q-table>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from '@vue/runtime-core'
+import {defineComponent, onMounted} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
-import { ref } from 'vue'
-import { exportFile, useQuasar } from 'quasar'
+import {ref} from 'vue'
+import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
@@ -314,11 +323,31 @@ export default defineComponent({
         })
       }
     },
+    // Not so clean method for updating the role of an user. This is done this way because pinia events don't work in production mode andthe vue watcher doesn't work here.
+    updateRole(user, oldRole) {
+      // nextTick is used cause the user param contains the old role. We need to wait for the next tick to get the new role.
+      this.$nextTick(() => {
+        let newRole = this.coachStore.users.find(u => u.id === user.id).role
+        this.coachStore
+        .updateRole(user, newRole)
+        .catch((error) => {
+            this.$q.notify({
+            icon: 'warning',
+            color: 'warning',
+            message: `Error ${error.response.status} while updating role to ${user.role} for ${user.firstName} ${user.lastName}`,
+            textColor: 'black'
+          });
+          this.coachStore.users.find((u) => u.id === user.id).role = oldRole
+        })
+      })
+      
+    }
   },
 })
 </script>
 
 <style scoped>
+
 :deep(.q-field__control) {
   border-radius: 10px !important;
 }
@@ -338,7 +367,7 @@ export default defineComponent({
 
 <style lang="sass">
 .my-table
-    thead
-        /* bg color is important for th; just specify one */
-        background-color: $yellow-7
+  thead
+    /* bg color is important for th; just specify one */
+    background-color: $yellow-7
 </style>
