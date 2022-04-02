@@ -48,7 +48,7 @@
             class="text-subtitle1 text-bold"
             :class="'text-' + role.skill.color + '-8'"
           >
-            {{ role.label }}
+            {{ role.skill.name }}
           </q-item-label>
           <q-item
             dense
