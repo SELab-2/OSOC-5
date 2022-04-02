@@ -1,4 +1,6 @@
 <template>
+  <SideBar :selectStudent="selectStudent" :draggable="false"/>
+
   <div class="justify-between row q-px-lg q-pt-lg studentcol full-height">
     <div class="row q-pa-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ name }}</h>
@@ -112,8 +114,8 @@
 <script>
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import {useStudentStore} from "../../stores/useStudentStore";
-import {useQuasar} from "quasar";
 import {ref} from "vue";
+import SideBar from "../../components/SideBar.vue"
 import AcademiaCard from "./components/AcademiaCard.vue";
 import DetailsCard from "./components/DetailsCard.vue";
 import PracticalCard from "./components/PracticalCard.vue";
@@ -129,12 +131,12 @@ export default {
     SuggestionsCard,
     TitleTextCard,
     SegmentedControl,
+    SideBar,
   },
-  props: ['student'],
+  props: ['id'],
   setup() {
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
-    const $q = useQuasar()
 
     return {
       authenticationStore,
@@ -146,19 +148,26 @@ export default {
     const suggestionDialog = ref(false)
     const reason = ref(null)
 
+    this.studentStore.loadStudent(this.id)
+
     return {
       possibleSuggestion,
       suggestionDialog,
       reason
     }
   },
+  mounted() {
+    // Reload when new student is selected
+    this.$watch('id', id => {
+      this.studentStore.loadStudent(this.id)
+    }, {immediate: true})
+  },
   methods: {
     makeSuggestion: function (suggestion) {
-      console.log(suggestion)
       this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion)
     },
     selectStudent: function (selected_student) {
-      this.student = selected_student
+      this.$router.push(`/students/${selected_student.id}`)
     },
     showDialog: function (value) {
       this.possibleSuggestion = value
@@ -166,6 +175,9 @@ export default {
     }
   },
   computed: {
+    student: function() {
+      return this.studentStore.currentStudent
+    },
     name: function () {
       return this.student.firstName + ' ' + this.student.lastName
     },

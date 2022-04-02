@@ -8,7 +8,7 @@ import FormPage from "../features/authentication/FormPage.vue";
 import AppPage from "../components/AppPage.vue";
 import UserList from "../features/users/UserList.vue";
 import SelectStudentsPage from "../features/students/SelectStudentsPage.vue";
-
+import StudentPage from "../features/students/StudentPage.vue"
 
 
 const routes = [
@@ -66,7 +66,15 @@ const routes = [
                 },
                 component: UserList
             },
-
+            {
+                path: '/students/:id',
+                name: 'Student Page',
+                meta: {
+                    requiresAuth: true
+                },
+                props: true,
+                component: StudentPage
+            },
         ],
     },
     {
