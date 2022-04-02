@@ -1,6 +1,6 @@
 <template>
-  <q-header elevated class="bg-white text-white" height-hint="98">
-    <q-toolbar class="text-blue bg-white">
+  <q-header class="bg-white text-white" height-hint="98">
+    <q-toolbar class="text-blue bg-white shadow-2">
       <q-btn flat round>
         <q-avatar size="42px">
           <img src="../assets/logo.svg" />
