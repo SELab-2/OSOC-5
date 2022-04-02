@@ -17,6 +17,12 @@ export const useProjectStore = defineStore('project', {
       }
       return students
     },
+    async removeSuggestion(project, suggestion) {
+      return instance.post(`projects/${project.id}/remove_student/`, {
+        student: suggestion.student.url,
+        role: suggestion.role.url
+      })
+    },
     async loadProjects() {
       this.isLoadingProjects = true
       let data = await instance

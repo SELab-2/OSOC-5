@@ -52,17 +52,17 @@
           </q-item-label>
           <q-item
             dense
-            v-for="student in groupedStudents[role.skill.id]"
-            :key="student.student.id"
+            v-for="suggestion in groupedStudents[role.skill.id]"
+            :key="suggestion.student.id"
           >
             <q-item-section lines="1" class="text-weight-medium">
-              {{ student.student.firstName}} {{ student.student.lastName }}
+              {{ suggestion.student.firstName}} {{ suggestion.student.lastName }}
             </q-item-section>
 
             <div class="text-grey-8">
               <q-btn class="gt-xs" size="sm" flat dense round icon="comment" />
               <q-btn class="gt-xs" size="sm" flat dense round icon="info" />
-              <q-btn class="gt-xs" size="sm" flat dense round icon="delete" />
+              <q-btn class="gt-xs" size="sm" flat dense round icon="delete" @click="removeSuggestion(suggestion)"/>
             </div>
           </q-item>
         </div>
@@ -73,12 +73,21 @@
 
 <script>
 import ProjectRoleChip from './ProjectRoleChip.vue'
+import { useProjectStore } from "../../../stores/useProjectStore"
 import { reactive, ref, nextTick } from 'vue'
+import { useQuasar } from 'quasar'
+
 
 var test = 0
 export default {
   props: { project: {} },
   components: { ProjectRoleChip },
+  setup() {
+    return {
+      $q: useQuasar(),
+      projectStore: useProjectStore()
+    }
+  },
 
   data() {
     console.log(this.project.requiredSkills.map(role => role.skill))
@@ -109,6 +118,24 @@ export default {
         result[item[key]].push(item)
       })
       return result
+    },
+    
+    removeSuggestion(suggestion) {
+      const i = this.project.suggestedStudents.findIndex(s => s.student.id === suggestion.student.id && s.role.id === suggestion.role.id)
+      console.log(i)
+      this.project.suggestedStudents.splice(i,1)
+      this.projectStore
+        .removeSuggestion(this.project, suggestion)
+        .catch(error => {
+            this.$q.notify({
+              icon: 'warning',
+              color: 'warning',
+              message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.role.name}`,
+              textColor: 'black'
+            });
+            this.project.suggestedStudents.splice(i, 0, suggestion)
+          }
+        )
     },
 
     // Calculates how many places of a role are occupied.
