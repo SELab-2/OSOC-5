@@ -76,7 +76,7 @@
                   emit-value
                 >
                   <template v-slot:option="scope">
-                    <q-item class="items-center" v-bind="scope.itemProps">
+                    <q-item  @click="() => updateRole(props.row, props.row.role)" class="items-center" v-bind="scope.itemProps">
                       <q-icon
                         class="q-mr-md icon"
                         size="xs"
@@ -256,31 +256,33 @@ export default defineComponent({
         })
       }
     },
+    // Not so clean method for updating the role of an user. This is done this way because pinia events don't work in production mode andthe vue watcher doesn't work here.
+    updateRole(user, oldRole) {
+      // nextTick is used cause the user param contains the old role. We need to wait for the next tick to get the new role.
+      this.$nextTick(() => {
+        let newRole = this.coachStore.users.find(u => u.id === user.id).role
+        this.coachStore
+        .updateRole(user, newRole)
+        .catch((error) => {
+            this.$q.notify({
+            icon: 'warning',
+            color: 'warning',
+            message: `Error ${error.response.status} while updating role to ${user.role} for ${user.firstName} ${user.lastName}`,
+            textColor: 'black'
+          });
+          this.coachStore.users.find((u) => u.id === user.id).role = oldRole
+        })
+      })
+      
+    }
   },
+
   setup() {
     const coachStore = useCoachStore()
     const $q = useQuasar()
 
     onMounted(() => {
       coachStore.loadUsers();
-      coachStore.$subscribe((users, state) => {
-        console.log(users, state)
-        switch (users.events.key) {
-          case 'role':
-            coachStore
-              .updateRole(users.events.target, users.events.newValue)
-              .catch((error) => {
-                  $q.notify({
-                    icon: 'warning',
-                    color: 'warning',
-                    message: `Error ${error.response.status} while updating role to ${users.events.newValue} for ${users.events.target.firstName} ${users.events.target.lastName}`,
-                    textColor: 'black'
-                  });
-                  coachStore.users.find((user) => user.id === users.events.target.id).role = users.events.oldValue
-                }
-              )
-        }
-      })
     })
 
 
