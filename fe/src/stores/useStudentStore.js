@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
+import router from "../router";
 
 export const useStudentStore = defineStore('user/student', {
   state: () => ({
@@ -73,6 +74,7 @@ export const useStudentStore = defineStore('user/student', {
           reason: ""
         }).then(({data}) => {
           console.log(data)
+          // router.go()
         })
     },
   }
