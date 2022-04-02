@@ -19,6 +19,9 @@ from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 class StudentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows students to be viewed or edited.
+    Search students with the query parameter '?search='
+    Filter students with the query parameters '?alum=', '?language=', '?skills=', '?on_project', '?suggested_by_user' and '?suggestion='
+    example query: /api/students/?alum=true&language=0&skills=1&suggestion=yes&on_project
     """
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
@@ -113,13 +116,16 @@ class CoachViewSet(viewsets.GenericViewSet,
     API endpoint that allows coaches to be viewed or removed.
     a coach cannot be created by this API endpoint
     a coach can only update and view its own data, except for admins
+    Search coaches with the query parameter '?search='
+    Filter coaches with the query parameters '?is_admin=' and '?is_active='
+    example query: /api/coaches/?is_admin=false&is_active=true
     """
     queryset = Coach.objects.all().order_by('id')
     serializer_class = CoachSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
-    filterset_fields = ['is_admin', 'active']
+    filterset_fields = ['is_admin', 'is_active']
 
     def destroy(self, request, pk=None):
         # override delete method to add a check
@@ -132,8 +138,8 @@ class CoachViewSet(viewsets.GenericViewSet,
             return Response({"detail": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
         return Response({"detail": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
 
-    @action(detail=True, methods=['put'], serializer_class=UpdateAdminSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def update_admin_status(self, request, pk=None):
+    @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def update_status(self, request, pk=None):
         """
         let an admin update admin rights of another user
         returns HTTP response:
@@ -141,7 +147,7 @@ class CoachViewSet(viewsets.GenericViewSet,
             403 FORBIDDEN:      the user does not have the rights to do this action, or th user tries to update their own rights
             204 NO CONTENT:     the user was updated
         """
-        serializer = UpdateAdminSerializer(
+        serializer = UpdateCoachSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
 
@@ -149,6 +155,7 @@ class CoachViewSet(viewsets.GenericViewSet,
             # check if coach is not current user
             if coach != request.user:
                 coach.is_admin = serializer.data['is_admin']
+                coach.is_active = serializer.data['is_active']
                 coach.save()
             
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -160,6 +167,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
     only admin users have permission for this endpoint, except for suggesting students or removing suggestions 
+    Search projects with the query parameter '?search='
+    Filter projects with the query parameters '?required_skills=', '?coaches=' and '?suggested_students='
+    example query: /api/projects/?required_skills=1&coaches=2&suggested_students=1
     """
     queryset = Project.objects.all().order_by('id')
     serializer_class = ProjectSerializer
@@ -245,6 +255,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class SkillViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows skills to be listed, created and deleted.
+    Search skills with the query parameter '?search='
     """
     queryset = Skill.objects.all().order_by('id')
     serializer_class = SkillSerializer

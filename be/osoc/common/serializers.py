@@ -28,8 +28,8 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin', 'active']
-        read_only_fields = ['is_admin', 'active']
+        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin', 'is_active']
+        read_only_fields = ['is_admin', 'is_active']
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
@@ -93,8 +93,10 @@ class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
         fields = ['student']
 
 
-class UpdateAdminSerializer(serializers.Serializer):
-    is_admin = serializers.BooleanField()
+class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Coach
+        fields = ['is_admin', 'is_active']
 
 
 class LoginSerializer(serializers.Serializer):

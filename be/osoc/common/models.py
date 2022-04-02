@@ -89,8 +89,8 @@ class Coach(AbstractUser):  # models.Model):
         _('is admin'),
         default=False
     )
-    active = models.BooleanField(
-        _('active'),
+    is_active = models.BooleanField(
+        _('is active'),
         default=True
     )
     last_email_sent = models.DateTimeField(
