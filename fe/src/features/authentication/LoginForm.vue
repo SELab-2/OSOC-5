@@ -46,8 +46,9 @@
       label="Sign in"
       type="submit"
       size="md"
-      class="q-mx-md cornered primarybuttonshadow"
+      class="q-mx-md cornered"
       glow-color="#00FFB5"
+      shadow-color="#57bf98"
     />
     <!--     <br/> -->
     <label class="text-bold">or</label>
@@ -142,10 +143,6 @@ export default defineComponent({
 }
 .router-link {
   color: inherit;
-}
-
-.primarybuttonshadow {
-  box-shadow: 0px 5px 20px -4px #57bf98;
 }
 
 .cornered {

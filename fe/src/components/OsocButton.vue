@@ -4,14 +4,18 @@
     glow-size (optional, default: 100px): size of the glow on hover (e.g. '100px') .
     glow-scale (optional, default: 1): scale of the glow when clicked.
     disable-glow: disables the glow effect.
+    disable-click: disables the scale effect on click.
+    shadow-color: color of the shadow.
 -->
 
 <template>
   <q-btn
-    class="bttn box"
+    ref="glowbutton"
+    :class="this.disableGlow ? '' : 'bttn'"
     @mousemove="mousemove"
     :color="color"
     :style="this.disableGlow ? '' : glowStyle"
+    ripple="false"
   >
   </q-btn>
 </template>
@@ -26,7 +30,15 @@ export default {
     'glowSize': String,
     'glowScale': Number,
     'disableGlow': Boolean,
-    'color': String
+    'color': String,
+    'shadowColor': String,
+    'disableClick': Boolean
+  },
+  mounted() {
+    
+    // This class produces a tint change on hover, but is unwanted for the glow button.
+    this.$refs.glowbutton.$el.classList.remove('q-hoverable')
+    this.$refs.glowbutton.$el.removeChild(this.$refs.glowbutton.$el.children[0])
   },
   data() {
     return {
@@ -54,7 +66,10 @@ export default {
         '--y': `${this.y}px`,
         '--size': (this.glowSize ? this.glowSize : '100px'),
         '--prop-scale': (this.glowScale ? this.glowScale : 1),
-        '--color': this.glow
+        '--color': this.glow,
+        '--shadow-color': this.shadowColor ? this.shadowColor : 'transparent',
+        '--button-scale': this.disableClick ? 1 : 0.98,
+        '--shadow-scale': this.disableClick ? 1 : 1.5
       }
     }
   },
@@ -68,11 +83,7 @@ export default {
 }
 </script>
 
-<style scoped>
-  :deep(.q-focus-helper) {
-    background-color: inherit !important 
-  }
-</style>
+
 
 <style lang="scss">
 
@@ -90,7 +101,7 @@ export default {
   &::before {
     --scale: 0;
     --opacity: 0;
-
+    
     content: '';
     position: absolute;
     left: calc(var(--x) - var(--size) / 2) !important;
@@ -115,6 +126,18 @@ export default {
     --scale: calc(3 * var(--prop-scale));
     --opacity: 1;
     transition-property: transform; /* opacity is excluded here due to webkit artifacts (and is not really visible after all) */
+  }
+  --spread: 1;
+  box-shadow: 0px 8px 20px calc(-4px * var(--spread)) var(--shadow-color);
+  /* Scale effect on click */
+  --press: 1;
+  transform: scale(var(--press));
+  transition-duration: 0.2s;
+  transition-property: transform box-shadow;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.32, 1);
+  &:active {
+    --press: var(--button-scale);
+    --spread: var(--shadow-scale);
   }
 }
 

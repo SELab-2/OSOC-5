@@ -96,7 +96,7 @@
          type="submit"
          size="md"
          color="primary"
-         class="q-mx-md cornered primarybuttonshadow"
+         class="q-mx-md cornered"
          glow-color="#00FFB5"
       />
       <label class="text-bold">or</label>
