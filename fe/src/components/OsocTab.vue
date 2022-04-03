@@ -12,10 +12,9 @@
   <q-route-tab
     style="padding: 0px 0px"
     ref="glowbutton"
-    :class="this.disableGlow ? '' : ''"
   >
   <template #default="prop">
-    <btn style="padding: 0px 16px !important; height: 50px !important; margin: 0px 0px !important" :color="color" :glow-color="glowColor" disable-click :label="label"/>
+    <btn style="padding: 0px 16px !important; height: 50px !important;" :color="color" :glow-color="glowColor" disable-click :label="label"/>
   </template>
   </q-route-tab>
 </template>
@@ -91,6 +90,7 @@ export default {
   }
 
   :deep(.q-tab__content) {
+    min-width: 50px !important;
     padding: 0px !important;
   }
 </style>
