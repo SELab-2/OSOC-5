@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { StoreDefinition } from 'pinia'
+import router from "../router/index"
 
 const baseURL =
   process.env.NODE_ENV == 'development'
@@ -10,7 +11,7 @@ const baseURL =
 export const useAuthenticationStore: StoreDefinition<
   'user/authentication',
   {
-    loggedInUser: { email: string; password: string } | Record<string, unknown>
+    loggedInUser: { first_name: string, last_name: string, email: string; password: string } | Record<string, unknown>
   },
   Record<string, never>,
   {
@@ -18,6 +19,8 @@ export const useAuthenticationStore: StoreDefinition<
       email,
       password,
     }: {
+      first_name: string
+      last_name: string
       email: string
       password: string
     }): Promise<void>
@@ -29,19 +32,24 @@ export const useAuthenticationStore: StoreDefinition<
   }),
   actions: {
     async login({ email, password }) {
-      const { data } = await axios.post(baseURL + 'auth/login/', {
+      const {data} = await axios.post('http://localhost:8000/api/auth/login/', {
         username: email,
         email,
         password,
       })
 
-      localStorage.setItem('refreshToken', data.refresh_token)
-      localStorage.setItem('accessToken', data.access_token)
+      localStorage.setItem("refreshToken", data.refresh_token)
+      localStorage.setItem("accessToken", data.access_token)
 
-      this.loggedInUser = { email, password }
+      this.loggedInUser = { first_name: data.user.first_name, last_name: data.user.last_name, email: email, password: password }
+
+      router.push('/users')
     },
-    logout() {
-      this.$reset()
+    async logout() {
+      localStorage.removeItem("refreshToken")
+      localStorage.removeItem("accessToken")
+      router.push('/')
+      // this.$reset()
     },
   },
 })

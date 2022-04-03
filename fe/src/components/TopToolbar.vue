@@ -19,7 +19,7 @@
           <q-avatar class="q-ml-sm" size="40px">
             <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
           </q-avatar>
-          <div class="text-subtitle1 q-mx-md">{{ user.name }}</div>
+          <div class="text-subtitle1 q-mx-md">{{ authenticationStore.loggedInUser.first_name + " " + authenticationStore.loggedInUser.last_name }}</div>
         </div>
         <q-separator />
         <q-list separator>
@@ -27,6 +27,7 @@
             v-for="(item, index) in dropdownitems"
             :key="`${index}`"
             clickable
+            @click=on_dropdown_click(index)
             v-close-popup
             tabindex="0"
           >
@@ -45,8 +46,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-
-import { useMeta } from 'quasar'
+import {useAuthenticationStore} from '../stores/useAuthenticationStore';
+import { useMeta, useQuasar } from 'quasar'
 
 const metaData = {
   meta: {
@@ -57,9 +58,6 @@ const metaData = {
 export default defineComponent({
   data() {
     return {
-      user: {
-        name: 'Miet Claeys',
-      },
       dropdownitems: [
         {
           name: 'Email Templates',
@@ -71,15 +69,27 @@ export default defineComponent({
         },
         {
           name: 'Sign Out',
-          icon: 'logout',
+          icon: 'key',
         },
       ],
     }
   },
   setup() {
+    const authenticationStore = useAuthenticationStore()
+
     return {
       color: useMeta(metaData),
       tab: ref('students'),
+      authenticationStore,
+      on_dropdown_click(test: number) {
+        if (test == 0) {
+          // implementation to navigate to email templates
+        } else if (test == 1) {
+          // implementation to change password
+        } else {
+          authenticationStore.logout()
+        }
+      }
     }
   },
 })
