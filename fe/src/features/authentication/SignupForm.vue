@@ -91,12 +91,13 @@
     <br/>
 
     <div>
-      <q-btn unelevated
-             label="Sign up"
-             type="submit"
-             size="md"
-             color="primary"
-             class="q-mx-md cornered primarybuttonshadow"
+      <btn unelevated
+         label="Sign up"
+         type="submit"
+         size="md"
+         color="primary"
+         class="q-mx-md cornered primarybuttonshadow"
+         glow-color="#00FFB5"
       />
       <label class="text-bold">or</label>
       <GitHubSignInButton/>

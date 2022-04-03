@@ -40,13 +40,14 @@
     <label class="fpwd cursor-pointer underlined">Forgot your password?</label>
     <br>
 
-    <q-btn
+    <btn
       unelevated
       color="primary"
       label="Sign in"
       type="submit"
       size="md"
       class="q-mx-md cornered primarybuttonshadow"
+      glow-color="#00FFB5"
     />
     <!--     <br/> -->
     <label class="text-bold">or</label>
@@ -108,10 +109,23 @@ export default defineComponent({
       },
     }
   },
+  methods: {
+    
+    mousemove(e) {
+      const test = e.target.getBoundingClientRect()
+      const x = e.clientX - test.left
+      const y = e.clientY - test.top
+  
+      e.target.style.setProperty('--x', `${x}px`)
+      e.target.style.setProperty('--y', `${y}px`)
+      e.target.style.setProperty('--color', `#00FFB5`)
+    },
+  },
 })
 </script>
 
 <style scoped>
+
 .sep {
   margin-left: 10em;
   margin-right: 10em;
