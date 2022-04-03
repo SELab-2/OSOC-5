@@ -23,10 +23,6 @@ class TallyForm:
             questions = json.load(f)
         return cls(questions)
 
-    @classmethod
-    def fromDict(cls, questions):
-        return cls(questions)
-
     def validate(self, form):
         """
         Validate Tally form; make sure all student data is present.
@@ -35,9 +31,10 @@ class TallyForm:
         self.__raiseIfTrue(form.get("eventType", None) != "FORM_RESPONSE", "Format error", "Event type should be 'FORM_RESPONSE'")
         self.__raiseIfTrue(fields == None, "Format error", "No fields (root > data > fields)!")
         # Questions should be in the fields as formatted
+        skip = []
         for i, question in self.questions.items():
             # just check required questions
-            if not self.__gor(question, "required"):
+            if not self.__gor(question, "required") or i in skip:
                 continue
             matching = self.findFields(question, fields)
             # required questions should have matching fields in the form
@@ -48,6 +45,7 @@ class TallyForm:
             while value == None and i < len(matching):
                 # TODO: add skip values
                 value = self.getFieldValue(matching[i], question["type"])
+                skip.extend(self.__getAnswer(value, question.get("answers", [])).get("skip", []))
                 i += 1
             # required questions should have a value
             self.__raiseIfTrue(value == None, "Question is required", ";".join(self.__gor(question, "question")))
@@ -114,26 +112,27 @@ class TallyForm:
         this function does not validate fields, make sure to run validate before
         running this function.
         """
-        newForm = {}
+        transformed = {}
         fields = getNested(form, None, "data", "fields")
         for i, question in self.questions.items():
             # only required questions need to be checked when validating
-            twinFields = self.findQuestions(question, fields)
+            matching = self.findQuestions(question, fields)
 
             value = None
-            for field in twinFields:
-                value = self.getFieldValue(field, question["type"])
-                if value:
-                    break
+            i = 0
+            while value == None and i < len(matching):
+                value = self.getFieldValue(matching[i], question["type"])
+                i += 1
+
             if value:
-                # TODO: map based on value type and set rules for if question already in newForm
-                newForm[question["field"]] = self.mapValue(value, question.get("answers", None))
-        return newForm
+                answer = self.__getAnswer(value, question.get("answers", []))
+                # TODO: list items and atoms and recursive value questions
+                transformed[question["field"]] = answer.get("value", answer["answer"])
+        return transformed
 
-    def mapValue(self, value, answers):
-        if answers == None:
-            return value
-
+    def __getAnswer(self, value, answers):
+        answerBody = None
         for answer in answers:
-            if answer["answer"] == value:
-                return answer.get("value", value)
+            if self.__gor(answer, "answer") == value:
+                answerBody = answer
+        return { 'answer': value } if answerBody == None else answerBody

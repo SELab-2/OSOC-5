@@ -34,7 +34,7 @@ class UtilityTestCases(TestCase):
 
 class TallyTestCases(TestCase):
     def testTallyFormValidationErrors(self):
-        tally = TallyForm.fromDict({})
+        tally = TallyForm({})
         # Formatting Errors
         with self.assertRaisesMessage(TallyForm.TallyFormError, "Format error"):
             tally.validate({}) # No fields
@@ -45,7 +45,7 @@ class TallyTestCases(TestCase):
             # Fields no event type
             tally.validate({ "data": { "fields": [] }})
         # Question required error
-        tally = TallyForm.fromDict({
+        tally = TallyForm({
             3: {
                 "question": [
                     "Birth name"
@@ -64,6 +64,44 @@ class TallyTestCases(TestCase):
             tally.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
                 { "key": "question_mRoXgd", "label": "Last name", "type": "INPUT_TEXT", "value": None }
                 ] } })
+
+    def testSkipValidation(self):
+        tally = TallyForm({
+            2: {
+                "question": [
+                    "Are you a student?"
+                    ],
+                "field": "student",
+                "type": "MULTIPLE_CHOICE",
+                "answers": [
+                    {
+                        "answer": "Yes",
+                        "skip": [3]
+                        },
+                    ],
+                "required": True
+            },
+            3: {
+                "question": [
+                    "Birth name"
+                    ],
+                "field": "first_name",
+                "type": "INPUT_TEXT",
+                "required": True
+                }
+            })
+        form = {
+                "eventType": "FORM_RESPONSE",
+                "data": {
+                    "fields": [
+                        {
+                            "key": "question_mRoXgd", "label": "Are you a student?", "type": "MULTIPLE_CHOICE", "value": "abc", "options": [ { "id": "abc", "text": "Yes" } ]
+                        }
+                    ]
+                }
+        }
+        self.assertEqual(tally.validate(form), form)
+
 
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:

@@ -3,7 +3,7 @@
     "question": [
       "Are you able to work 128 hours with a student employment agreement, or as a volunteer?*"
     ],
-    "field": "availability",
+    "field": "available",
     "type": "MULTIPLE_CHOICE",
     "answers": [
       {
@@ -21,7 +21,7 @@
     "question": [
       "Are there any responsibilities you might have which could hinder you during the day?"
     ],
-    "field": "availability",
+    "field": "hinder",
     "type": "TEXTAREA",
     "required": true
   },
