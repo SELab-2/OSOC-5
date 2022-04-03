@@ -8,19 +8,19 @@
       </q-btn>
 
       <q-space />
-      <q-tabs class="absolute-center" v-model="tab" shrink>
-        <q-route-tab name="students" label="Select Students" to="/students" exact />
-        <q-route-tab name="projects" label="Projects" to="/projects" exact />
-        <q-route-tab name="users" label="Manage Users" to="/users" exact />
+      <q-tabs v-model="tab" shrink>
+        <osoc-tab name="students" label="Select Students" to="/students" exact glow-color="primary"/>
+        <osoc-tab name="projects" label="Projects" to="/projects" exact glow-color="red"/>
+        <osoc-tab name="users" label="Manage Users" to="/users" exact glow-color="yellow"/>
       </q-tabs>
       <q-space />
       <q-btn-dropdown flat rounded icon="mdi-account">
-        <div class="row items-center q-my-sm">
+        <!-- <div class="row items-center q-my-sm"> -->
           <q-avatar class="q-ml-sm" size="40px">
             <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
           </q-avatar>
           <div class="text-subtitle1 q-mx-md">{{ user.name }}</div>
-        </div>
+        <!-- </div> -->
         <q-separator />
         <q-list separator>
           <q-item
@@ -47,7 +47,7 @@
 import { defineComponent, ref } from 'vue'
 
 import { useMeta } from 'quasar'
-
+import OsocTab from './OsocTab.vue'
 const metaData = {
   meta: {
     themecolor: { name: 'theme-color', content: '#24a3cb' },
@@ -55,6 +55,7 @@ const metaData = {
 }
 
 export default defineComponent({
+  components: { OsocTab },
   data() {
     return {
       user: {

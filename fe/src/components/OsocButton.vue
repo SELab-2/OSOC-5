@@ -1,7 +1,7 @@
 <!-- 
   Props:
     glow-color (optional, default: lighter color than button): color of the glow on hover (e.g. 'purple', '#00FFB5', 'primary').
-    glow-size (optional, default: 100px): size of the glow on hover (e.g. '100px') .
+    glow-size (optional, default: 500px): size of the glow on hover (e.g. '1000px') .
     glow-scale (optional, default: 1): scale of the glow when clicked.
     disable-glow: disables the glow effect.
     disable-click: disables the scale effect on click.
@@ -15,10 +15,14 @@
     @mousemove="mousemove"
     :color="color"
     :style="this.disableGlow ? '' : glowStyle"
-    ripple="false"
-  >
-  </q-btn>
+  />
 </template>
+
+<style scoped>
+  :deep(.q-ripple) {
+    display:none;
+  }
+</style>
 
 <script lang="ts">
   import { ref } from 'vue'
@@ -28,7 +32,7 @@ export default {
   props: {
     'glowColor': String,
     'glowSize': String,
-    'glowScale': Number,
+    'glowScale': String,
     'disableGlow': Boolean,
     'color': String,
     'shadowColor': String,
@@ -64,7 +68,7 @@ export default {
       return {
         '--x': `${this.x}px`,
         '--y': `${this.y}px`,
-        '--size': (this.glowSize ? this.glowSize : '100px'),
+        '--size': (this.glowSize ? this.glowSize : '500px'),
         '--prop-scale': (this.glowScale ? this.glowScale : 1),
         '--color': this.glow,
         '--shadow-color': this.shadowColor ? this.shadowColor : 'transparent',
@@ -94,7 +98,6 @@ export default {
   overflow: hidden;
   
   span {
-    position: relative;
     pointer-events: none;
   }
 
@@ -108,7 +111,8 @@ export default {
     top: calc(var(--y) - var(--size) / 2) !important;
     width: var(--size);
     height: var(--size);
-    background: radial-gradient(circle closest-side, var(--color), transparent);
+    background: radial-gradient(circle closest-side, var(--color), transparent 20%);
+    
     transform: scale(var(--scale));
     opacity: var(--opacity);
     
