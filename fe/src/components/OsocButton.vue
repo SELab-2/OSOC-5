@@ -1,7 +1,9 @@
 <!-- 
   Props:
-    glow-color: color of the glow on hover (e.g. 'purple', '#00FFB5'). Quasar-specific colors (e.g. 'primary') are not supported.
-    glow-size: size of the glow on hover (e.g. '100px') 
+    glow-color (optional, default: lighter color than button): color of the glow on hover (e.g. 'purple', '#00FFB5', 'primary').
+    glow-size (optional, default: 100px): size of the glow on hover (e.g. '100px') .
+    glow-scale (optional, default: 1): scale of the glow when clicked.
+    disable-glow: disables the glow effect.
 -->
 
 <template>
@@ -9,7 +11,7 @@
     class="bttn box"
     @mousemove="mousemove"
     :color="color"
-    :style="glowStyle"
+    :style="this.disableGlow ? '' : glowStyle"
   >
   </q-btn>
 </template>
@@ -19,7 +21,13 @@
   import { colors } from 'quasar'
 export default {
   name: 'btn',
-  props: ['glowColor', 'glowSize', 'glowScale', 'color'],
+  props: {
+    'glowColor': String,
+    'glowSize': String,
+    'glowScale': Number,
+    'disableGlow': Boolean,
+    'color': String
+  },
   data() {
     return {
       x: ref(0),
@@ -28,7 +36,7 @@ export default {
   },
   computed: {
     glow() {
-      var color;
+      var color: String;
       if (this.glowColor) {
         color = (colors.getPaletteColor(this.glowColor) !== "#000000") ? colors.getPaletteColor(this.glowColor) : this.glowColor
       } else if (!this.color) {
@@ -51,7 +59,7 @@ export default {
     }
   },
   methods: {
-    mousemove(e) {
+    mousemove(e: MouseEvent) {
       const test = e.target.getBoundingClientRect()
       this.x = e.clientX - test.left
       this.y = e.clientY - test.top
