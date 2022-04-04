@@ -370,7 +370,6 @@ class ProjectSuggestion(models.Model):
         Coach,
         on_delete=models.CASCADE
     )
-    # TODO: skill must be one of the project required skills
     skill = models.ForeignKey(
         Skill,
         on_delete=models.CASCADE
