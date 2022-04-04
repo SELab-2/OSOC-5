@@ -87,6 +87,12 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return super().update(instance, validated_data)
 
 
+class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = SentEmail
+        fields = ['sender', 'receiver', 'time', 'info']
+
+
 class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion

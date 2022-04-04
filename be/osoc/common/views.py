@@ -18,7 +18,7 @@ from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows students to be viewed or edited.
+    API endpoint that allows students to be viewed, edited or searched.
     Search students with the query parameter '?search='
     Filter students with the query parameters '?alum=', '?language=', '?skills=', '?on_project', '?suggested_by_user' and '?suggestion='
     example query: /api/students/?alum=true&language=0&skills=1&suggestion=yes&on_project
@@ -26,7 +26,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, OnProjectFilter, SuggestedByUserFilter, FinalDecisionFilter]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter, StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'alum', 'language', 'degree', 'studies', 'extra_info']
     filterset_fields = ['alum', 'language', 'skills'] # TODO practical info, student coach
 
@@ -121,7 +121,7 @@ class CoachViewSet(viewsets.GenericViewSet,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):   # no create, this is handled in RegisterView
     """
-    API endpoint that allows coaches to be viewed or removed.
+    API endpoint that allows coaches to be viewed, edited or searched.
     a coach cannot be created by this API endpoint
     a coach can only update and view its own data, except for admins
     Search coaches with the query parameter '?search='
@@ -173,7 +173,7 @@ class CoachViewSet(viewsets.GenericViewSet,
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows projects to be viewed or edited.
+    API endpoint that allows projects to be viewed, edited or searched.
     only admin users have permission for this endpoint, except for suggesting students or removing suggestions 
     Search projects with the query parameter '?search='
     Filter projects with the query parameters '?required_skills=', '?coaches=' and '?suggested_students='
@@ -266,7 +266,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 class SkillViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows skills to be listed, created and deleted.
+    API endpoint that allows skills to be viewed, edited or searched.
     Search skills with the query parameter '?search='
     """
     queryset = Skill.objects.all().order_by('id')
@@ -274,6 +274,21 @@ class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
+
+
+class SentEmailViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows sent emails to be viewed, edited or searched.
+    Search emails with the query parameter '?search='
+    Filter emails with the query parameters '?sender=', '?receiver=', '?date=', '?before=' and '?after='
+    example query: /api/emails/?sender=1&after=2022-04-03
+    """
+    queryset = SentEmail.objects.all().order_by('id')
+    serializer_class = SentEmailSerializer
+    permission_classes = [permissions.IsAuthenticated, IsActive]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, EmailDateTimeFilter]
+    search_fields = ['info']
+    filterset_fields = ['sender', 'receiver']
 
 
 class LoginView(views.APIView):

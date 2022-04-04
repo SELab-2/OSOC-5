@@ -7,6 +7,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
+from datetime import datetime
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -92,11 +93,6 @@ class Coach(AbstractUser):  # models.Model):
     is_active = models.BooleanField(
         _('is active'),
         default=True
-    )
-    last_email_sent = models.DateTimeField(
-        _('last email sent'),
-        blank=True,
-        null=True
     )
 
     USERNAME_FIELD = 'email'
@@ -190,11 +186,6 @@ class Student(models.Model):
     portfolio = models.URLField(
         _('portfolio'),
         max_length=200
-    )
-    last_email_sent = models.DateTimeField(
-        _('last email sent'),
-        null=True,
-        blank=True
     )
     school_name = models.CharField(
         _("school name"),
@@ -390,3 +381,28 @@ class ProjectSuggestion(models.Model):
     
     def coach_name(self):
         return self.coach.get_full_name()
+
+
+class SentEmail(models.Model):
+    """
+    Information about which emails have been sent to which students
+    """
+    sender = models.ForeignKey(
+        Coach,
+        on_delete=models.CASCADE
+    )
+    receiver = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE
+    )
+    time = models.DateTimeField(
+        _("send date and time"),
+        default=datetime.now, 
+        blank=True
+    )
+    info = models.CharField(
+        _("email info"),
+        max_length=255,
+        blank=True,
+        default=""
+    )
