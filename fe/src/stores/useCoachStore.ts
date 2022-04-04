@@ -20,7 +20,7 @@ export const useCoachStore = defineStore('user/coach', {
         .get('coaches/')
         .then(({ data }) => {
           this.isLoadingUsers = false
-          this.users = convertObjectKeysToCamelCase(data).results as User[]
+          this.users = convertObjectKeysToCamelCase(data) as User[]
           this.users.forEach((user) => {
             user.role = user.isAdmin ? 'admin' : 'coach'
           })
@@ -28,13 +28,12 @@ export const useCoachStore = defineStore('user/coach', {
         .catch(() => (this.isLoadingUsers = false))
     },
     async updateRole(
-      user: { firstName: string; lastName: string },
+      user: { id: Number },
       newRole: string,
       callback: () => void
     ) {
-      console.log(
-        `Will update role to ${newRole} for ${user.firstName} ${user.lastName}`
-      )
+      return instance
+       .put(`coaches/${user.id}/${newRole === "admin" ? 'make' : 'remove'}_admin/`)
       callback()
     },
     async removeUser(userId: string) {
