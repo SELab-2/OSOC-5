@@ -26,18 +26,18 @@
             </q-page-sticky>
 
     </div>
+  </div>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script lang="ts">
+import { defineComponent } from '@vue/runtime-core'
 import SideBar from '../../components/SideBar.vue'
 import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from "../../stores/useProjectStore"
 import { defineComponent, onMounted } from '@vue/runtime-core'
 
-export default {
-    name: 'Projects.vue',
-    
+export default defineComponent({
+    name: 'ProjectList',
     components: {
         SideBar, ProjectCard
     },
@@ -55,9 +55,8 @@ export default {
         return {
           projectStore
         }
-      },
-
-}
+    },
+})
 </script>
 
 <style lang='sass' scoped>

@@ -1,11 +1,16 @@
 <template>
   <div class="full-width relative-position cursor-pointer">
-    <span class="dot bg-green" style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);"></span>
-    <q-card class="full-width position" :class="active? 'bg-teal-1' : ''">
-
+    <span
+      class="dot bg-green"
+      style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);"
+    />
+    <q-card
+      class="full-width position"
+      :class="active? 'bg-teal-1' : ''"
+    >
       <q-card-section rounded>
         <div class="row justify-between">
-          <div >
+          <div>
             <label class="text-bold q-pr-xs">{{ name }}</label>
             <!--          <q-icon v-if="official === 'yes'" size="xs" name="mdi-check" color="green" />-->
             <!--          <q-icon v-else-if="official === 'maybe'" size="xs" name="mdi-help" color="yellow" />-->
@@ -13,18 +18,38 @@
           </div>
           <label class="text-bold">{{ total }}</label>
         </div>
-        <div class="row" style="width: 100%; height: 4px">
-          <div class="bg-red" style="height: 4px" :style="noStyle" label="Test"/>
-          <div class="bg-yellow" style="height: 4px" :style="maybeStyle" label="Test"/>
-          <div class="bg-green" style="height: 4px" :style="yesStyle" label="Test"/>
+        <div
+          class="row"
+          style="width: 100%; height: 4px"
+        >
+          <div
+            class="bg-red"
+            style="height: 4px"
+            :style="noStyle"
+            label="Test"
+          />
+          <div
+            class="bg-yellow"
+            style="height: 4px"
+            :style="maybeStyle"
+            label="Test"
+          />
+          <div
+            class="bg-green"
+            style="height: 4px"
+            :style="yesStyle"
+            label="Test"
+          />
         </div>
       </q-card-section>
     </q-card>
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "@vue/runtime-core"
+
+export default defineComponent({
   props: ['student', 'active'],
   computed: {
     total() {
@@ -46,7 +71,7 @@ export default {
       return this.student.firstName + ' ' + this.student.lastName
     }
   }
-}
+})
 </script>
 
 <style>
