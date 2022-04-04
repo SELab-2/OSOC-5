@@ -25,12 +25,14 @@
           position="top-right"
           :offset="[15, 10]"
         >
-          <q-btn
+          <btn
             padding="7px"
             icon="warning"
             color="red"
             label="Conflicts"
             to="/projects/conflicts"
+            shadow-color="red"
+            shadow-strength="2.5"
           />
         </q-page-sticky>
 
@@ -38,12 +40,13 @@
           position="bottom-right"
           :offset="[18, 18]"
         >
-          <q-btn
+          <btn
             fab
             padding="10px"
             icon="add"
             color="yellow"
             to="/projects/create"
+            shadow-color="orange"
           />
         </q-page-sticky>
       </div>

@@ -10,6 +10,7 @@
 
 <template>
   <q-btn
+    unelevated
     ref="glowbutton"
     :class="this.disableGlow ? '' : 'bttn'"
     @mousemove="mousemove"
@@ -36,6 +37,7 @@ export default {
     'disableGlow': Boolean,
     'color': String,
     'shadowColor': String,
+    'shadowStrength': String,
     'disableClick': Boolean
   },
   mounted() {
@@ -73,7 +75,8 @@ export default {
         '--color': this.glow,
         '--shadow-color': this.shadowColor ? this.shadowColor : 'transparent',
         '--button-scale': this.disableClick ? 1 : 0.98,
-        '--shadow-scale': this.disableClick ? 1 : 1.5
+        '--shadow-scale': this.disableClick ? 1 : 1.5,
+        '--shadow-strength': this.shadowStrength ? this.shadowStrength : 1
       }
     }
   },
@@ -131,7 +134,7 @@ export default {
     --opacity: 1;
     transition-property: transform; /* opacity is excluded here due to webkit artifacts (and is not really visible after all) */
   }
-  --spread: 1;
+  --spread: var(--shadow-strength);
   box-shadow: 0px 8px 20px calc(-4px * var(--spread)) var(--shadow-color);
   /* Scale effect on click */
   --press: 1;
@@ -141,7 +144,7 @@ export default {
   transition-timing-function: cubic-bezier(0.22, 1, 0.32, 1);
   &:active {
     --press: var(--button-scale);
-    --spread: var(--shadow-scale);
+    --spread: calc(var(--shadow-strength) * var(--shadow-scale));
   }
 }
 
