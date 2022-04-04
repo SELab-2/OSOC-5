@@ -20,7 +20,7 @@ export const useCoachStore = defineStore('user/coach', {
         .get('coaches/')
         .then(({ data }) => {
           this.isLoadingUsers = false
-          this.users = convertObjectKeysToCamelCase(data).results as User[]
+          this.users = convertObjectKeysToCamelCase(data) as User[]
           this.users.forEach((user) => {
             user.role = user.isAdmin ? 'admin' : 'coach'
           })

@@ -24,13 +24,11 @@
             <q-page-sticky position='bottom-right' :offset='[18, 18]'>
                 <q-btn fab padding="10px" icon='add' color='yellow' to='/projects/create' />
             </q-page-sticky>
-
-    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/runtime-core'
+import { ref, defineComponent } from '@vue/runtime-core'
 import SideBar from '../../components/SideBar.vue'
 import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from "../../stores/useProjectStore"

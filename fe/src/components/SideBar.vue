@@ -69,7 +69,6 @@
               outlined
               dense
               multiple
-              v-model="roles"
               color="primary"
               bg-color="white"
               :options="[
