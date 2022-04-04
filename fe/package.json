@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.13.5",
-    "@yeger/vue-masonry-wall": "^3.0.24",
+    "@yeger/vue-masonry-wall": "^3.0.26",
     "axios": "^0.26.1",
     "pinia": "^2.0.13",
     "quasar": "^2.6.2",
