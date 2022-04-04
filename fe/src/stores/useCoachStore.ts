@@ -29,12 +29,10 @@ export const useCoachStore = defineStore('user/coach', {
     },
     async updateRole(
       user: { id: Number },
-      newRole: string,
-      callback: () => void
+      newRole: string
     ) {
       return instance
        .put(`coaches/${user.id}/${newRole === "admin" ? 'make' : 'remove'}_admin/`)
-      callback()
     },
     async removeUser(userId: string) {
       await instance

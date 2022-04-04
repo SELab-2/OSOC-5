@@ -92,9 +92,9 @@
               >
                 <template #option="scope">
                   <q-item
+                    @click="() => updateRole(props.row, props.row.role)"
                     class="items-center"
                     v-bind="scope.itemProps"
-                    @click="() => updateRole(props.row, props.row.role)"
                   >
                     <q-icon
                       class="q-mr-md icon"
