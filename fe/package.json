@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@quasar/extras": "^1.12.5",
+    "@quasar/extras": "^1.13.5",
     "@yeger/vue-masonry-wall": "^3.0.24",
     "axios": "^0.26.1",
     "pinia": "^2.0.11",
