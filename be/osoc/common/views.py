@@ -202,25 +202,32 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             data = serializer.data
 
+            project = self.get_object()
+
             # get student object from url
             student_url = data.pop('student')
-            student = Student.objects.get(
-                **resolve(urlparse(student_url).path).kwargs)
+            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
 
-            # replace skill url with skill object
+            # get skill object from url
             skill_url = data.pop('skill')
-            data['skill'] = Skill.objects.get(
-                **resolve(urlparse(skill_url).path).kwargs)
+            skill = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
 
-            # create ProjectSuggestion if it doesnt exist yet, else update it
-            _, created = ProjectSuggestion.objects.update_or_create(
-                project=self.get_object(), student=student, coach=request.user, defaults=data)
+            # check if skill is one of the required skills of the project
+            if skill in project.required_skills.all():
+                
+                # replace skill url with skill object
+                data['skill'] = skill
 
-            response_data = serializer.data
-            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
-            response_data['coach_name'] = request.user.get_full_name()
+                # create ProjectSuggestion if it doesnt exist yet, else update it
+                _, created = ProjectSuggestion.objects.update_or_create(
+                    project=project, student=student, coach=request.user, defaults=data)
 
-            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+                response_data = serializer.data
+                response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
+                response_data['coach_name'] = request.user.get_full_name()
+
+                return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body
