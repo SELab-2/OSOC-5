@@ -3,7 +3,6 @@
     glow-color (optional, default: lighter color than button): color of the glow on hover (e.g. 'purple', '#00FFB5', 'primary').
     glow-size (optional, default: 500px): size of the glow on hover (e.g. '1000px') .
     glow-scale (optional, default: 1): scale of the glow when clicked.
-    disable-glow: disables the glow effect.
     disable-click: disables the scale effect on click.
     shadow-color: color of the shadow.
 -->
@@ -12,10 +11,10 @@
   <q-btn
     unelevated
     ref="glowbutton"
-    :class="this.disableGlow ? '' : 'bttn'"
+    class="bttn"
     @mousemove="mousemove"
     :color="color"
-    :style="this.disableGlow ? '' : glowStyle"
+    :style="glowStyle"
   />
 </template>
 
@@ -26,25 +25,36 @@
 </style>
 
 <script lang="ts">
-  import { ref } from 'vue'
+  import { ref, defineComponent } from 'vue'
   import { colors } from 'quasar'
-export default {
+export default defineComponent({
   name: 'btn',
   props: {
     'glowColor': String,
-    'glowSize': String,
-    'glowScale': String,
-    'disableGlow': Boolean,
+    'glowSize': {
+      type: String,
+      default: "500px"
+    },
+    'glowScale': {
+      type: Number,
+      default: 1
+    },
     'color': String,
-    'shadowColor': String,
-    'shadowStrength': String,
+    'shadowColor': {
+      type: String,
+      default: 'transparent'
+    },
+    'shadowStrength': {
+      type: Number,
+      default: 1
+    },
     'disableClick': Boolean
   },
   mounted() {
-    
     // This class produces a tint change on hover, but is unwanted for the glow button.
-    this.$refs.glowbutton.$el.classList.remove('q-hoverable')
-    this.$refs.glowbutton.$el.removeChild(this.$refs.glowbutton.$el.children[0])
+    const button = this.$refs.glowbutton as any
+    button.$el.classList.remove('q-hoverable')
+    button.$el.removeChild(button.$el.children[0])
   },
   data() {
     return {
@@ -70,24 +80,24 @@ export default {
       return {
         '--x': `${this.x}px`,
         '--y': `${this.y}px`,
-        '--size': (this.glowSize ? this.glowSize : '500px'),
-        '--prop-scale': (this.glowScale ? this.glowScale : 1),
+        '--size': this.glowSize,
+        '--prop-scale': this.glowScale,
         '--color': this.glow,
-        '--shadow-color': this.shadowColor ? this.shadowColor : 'transparent',
+        '--shadow-color': this.shadowColor,
         '--button-scale': this.disableClick ? 1 : 0.98,
         '--shadow-scale': this.disableClick ? 1 : 1.5,
-        '--shadow-strength': this.shadowStrength ? this.shadowStrength : 1
+        '--shadow-strength': this.shadowStrength
       }
     }
   },
   methods: {
     mousemove(e: MouseEvent) {
-      const test = e.target.getBoundingClientRect()
+      const test = (e.target as HTMLElement)?.getBoundingClientRect()
       this.x = e.clientX - test.left
       this.y = e.clientY - test.top
     },
   },
-}
+})
 </script>
 
 
