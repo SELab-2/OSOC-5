@@ -4,7 +4,7 @@ dj-rest-auth
 dj-rest-auth[with_social]
 djangorestframework-simplejwt
 psycopg2
-Django >= 2.0, < 4
+Django >= 2.0, < 5
 djangorestframework
 drf-yasg
 django-nose
