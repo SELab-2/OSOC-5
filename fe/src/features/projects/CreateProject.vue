@@ -276,7 +276,7 @@
   </q-dialog>
 </template>
 
-<script>
+<script lang="ts">
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { onMounted } from '@vue/runtime-core'
@@ -320,7 +320,7 @@ const columns_coaches = [
     name: 'displayName',
     align: 'left',
     label: 'Coach name',
-    field: (row) => row.firstName + ' ' + row.lastName,
+    field: (row: { firstName: string; lastName: string }) => row.firstName + ' ' + row.lastName,
     sortable: true,
   },
 ]
@@ -338,9 +338,9 @@ export default {
     const $q = useQuasar()
 
     // input fields
-    const project_name = ref(null)
-    const project_partner_name = ref(null)
-    const project_link = ref(null)
+    const project_name = ref('')
+    const project_partner_name = ref('')
+    const project_link = ref('')
 
     // Role amount error handling
     const errorRoleAmount = ref(false)
@@ -356,7 +356,7 @@ export default {
 
     // variables for the delete role dialog popup
     const delete_role_prompt = ref(false)
-    const delete_role = ref(null)
+    const delete_role = ref('')
 
     const selected = ref([])
 
@@ -407,9 +407,9 @@ export default {
         )
       },
       onReset() {
-        project_name.value = null
-        project_partner_name.value = null
-        project_link.value = null
+        project_name.value = ''
+        project_partner_name.value = ''
+        project_link.value = ''
         /* TODO expand if actually used ... */
       },
 
@@ -418,7 +418,7 @@ export default {
        */
       errorRoleAmount,
       errorMessageRoleAmount,
-      amountRangeValidation(val) {
+      amountRangeValidation(val: number) {
         if (val < 0) {
           errorRoleAmount.value = true
           errorMessageRoleAmount.value = 'The value must be positive!'
@@ -435,7 +435,7 @@ export default {
       delete_role_confirm() {
         skillStore.deleteSkill(delete_role.value)
         delete_role_prompt.value = false
-        delete_role.value.value = ''
+        delete_role.value = ''
 
         $q.notify({
           icon: 'done',

@@ -82,7 +82,7 @@ export const useSkillStore = defineStore('skills', {
       // When finished run the callback so the popup closes.
       // callback(newSkill) // TODO: other way to do this
     },
-    async deleteSkill(deletedSkill: Skill) {
+    async deleteSkill(deletedSkill: any) {
       await instance
         .delete(`skills/${deletedSkill.id}/`)
         .then(() => {
