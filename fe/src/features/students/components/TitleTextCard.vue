@@ -9,8 +9,17 @@
   </q-card>
 </template>
 
-<script>
+<script lang="ts">
 export default {
-  props: ['title', 'content'],
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    content: {
+      type: String,
+      required: true
+    }
+  }
 }
 </script>
