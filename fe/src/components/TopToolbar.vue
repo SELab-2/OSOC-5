@@ -9,7 +9,7 @@
 
       <q-space />
       <q-tabs v-model="tab" shrink>
-        <osoc-tab name="students" label="Select Students" to="/students" exact glow-color="green-3"/>
+        <osoc-tab name="students" label="Select Students" to="/students" exact glow-color="#B6FFD2"/>
         <osoc-tab name="projects" label="Projects" to="/projects" exact glow-color="deep-orange-3"/>
         <osoc-tab name="users" label="Manage Users" to="/users" exact glow-color="amber-2"/>
       </q-tabs>

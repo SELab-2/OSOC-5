@@ -6,7 +6,7 @@
           <div class="text-bold text-h4 projectcol">Create project</div>
           <div>
             <div class="q-gutter-sm">
-              <q-btn
+              <btn
                 elevated
                 color="primary"
                 label="Cancel"
@@ -14,14 +14,20 @@
                 size="md"
                 class="q-mx-md cornered"
                 to="/projects"
+                glow-color="#00FFB5"
+                shadow-color="#57bf98"
+                shadow-strength="2"
               />
-              <q-btn
+              <btn
                 elevated
                 color="primary"
                 label="Submit"
                 type="submit"
                 size="md"
                 class="q-mx-md cornered"
+                glow-color="#00FFB5"
+                shadow-color="#57bf98"
+                shadow-strength="2"
               />
             </div>
           </div>
@@ -115,12 +121,15 @@
           >
             <h4 class="projectsubtitle">Project Roles</h4>
             <div class="row">
-              <q-btn
+              <btn
                 class="cornered"
                 color="primary"
                 icon="add"
                 label="Add role"
                 @click="new_role_prompt = true"
+                glow-color="#00FFB5"
+                shadow-color="#57bf98"
+                shadow-strength="2"
               />
               <q-space />
               <q-input
@@ -245,8 +254,8 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" v-close-popup />
-        <q-btn flat label="Add role" @click="new_role_confirm" />
+        <btn flat label="Cancel" v-close-popup glow-color="#C0FFF4"/>
+        <btn flat label="Add role" @click="new_role_confirm" glow-color="#C0FFF4"/>
       </q-card-actions>
     </q-card>
   </q-dialog>

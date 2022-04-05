@@ -12,13 +12,14 @@
           Users
         </div>
         <q-space />
-        <q-btn
+        <btn
           stack
           flat
           color="yellow"
           icon="download"
           label="csv"
           @click="exportTable"
+          glow-color="amber-2"
         />
       </div>
       <div class="row q-mb-md vertical-middle">
