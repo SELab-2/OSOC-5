@@ -121,7 +121,7 @@ export default {
     },
     
     removeSuggestion(suggestion) {
-      const i = this.project.suggestedStudents.findIndex(s => s.student.id === suggestion.student.id && s.role.id === suggestion.role.id)
+      const i = this.project.suggestedStudents.findIndex(s => s.student.id === suggestion.student.id && s.skill.id === suggestion.skill.id)
       console.log(i)
       this.project.suggestedStudents.splice(i,1)
       this.projectStore
@@ -175,7 +175,7 @@ export default {
       const reason = "mimimi"
       let result = await this.projectStore.addSuggestion(this.project.id, data.student.url, role.skill.url, reason)
       console.log(result)
-      this.project.suggestedStudents.push({coach:undefined, reason: reason, role: role.skill, student: data.student})
+      this.project.suggestedStudents.push({coach:undefined, reason: reason, skill: role.skill, student: data.student})
       draggedEl.parentNode.removeChild(draggedEl)
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
@@ -190,10 +190,10 @@ export default {
     groupedStudents() {
       const result = {}
       this.project.suggestedStudents.forEach(student => {
-        if (!result[student.role.id]) {
-          result[student.role.id] = []
+        if (!result[student.skill.id]) {
+          result[student.skill.id] = []
         }
-        result[student.role.id].push(student)
+        result[student.skill.id].push(student)
       })
       return result
       // console.log(this.groupBy(this.project.suggestedStudents, 'role.id'))

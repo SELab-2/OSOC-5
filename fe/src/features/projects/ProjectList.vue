@@ -7,7 +7,7 @@
                         <div class="text-bold text-h4 q-ml-md" >Projects</div>
                         <q-space/>
                         <div>
-                            <q-input dense outlined v-model="text" label="Outlined" />
+                            <q-input dense outlined v-model="" label="Outlined" />
                         </div>
                         <q-btn padding='7px' icon='warning' color='red' label='Conflicts'
                            to='/projects/conflicts' />
@@ -28,11 +28,10 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from '@vue/runtime-core'
+import { ref, defineComponent, onMounted } from 'vue'
 import SideBar from '../../components/SideBar.vue'
 import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from "../../stores/useProjectStore"
-import { defineComponent, onMounted } from '@vue/runtime-core'
 
 export default defineComponent({
     name: 'ProjectList',

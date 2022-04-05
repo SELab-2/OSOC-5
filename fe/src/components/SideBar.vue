@@ -198,7 +198,7 @@ export default defineComponent({
     onDragStart(e: any, item: any) {
       const data = {
         targetId: e.target.id,
-        name: item
+        student: item
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
