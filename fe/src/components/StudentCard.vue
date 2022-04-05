@@ -48,7 +48,6 @@ import { defineComponent } from "@vue/runtime-core"
 import {useStudentStore} from "../stores/useStudentStore";
 import {useAuthenticationStore} from "../stores/useAuthenticationStore";
 import { Suggestion } from "../models/Suggestion";
-import { Student } from "../models/Student";
 
 export default defineComponent({
   props: ['student', 'active'],

@@ -115,7 +115,6 @@
                 >
                   <StudentCard
                     v-ripple
-                    :color="mySuggestionColor"
                     :student="student"
                     :active="this.student ? student.email === this.student.email : false"
                     @click="this.clickStudent(student)"

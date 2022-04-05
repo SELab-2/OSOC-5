@@ -3,7 +3,6 @@ import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import { User } from '../models/User'
 import {Student} from "../models/Student";
-import {Suggestion} from "../models/Suggestion";
 
 interface State {
     coaches: Map<string, User>
@@ -20,7 +19,7 @@ export const useStudentStore = defineStore('user/student', {
         currentStudent: null,
     }),
     actions: {
-        async loadStudents() {
+        async loadStudents(): Promise<void> {
             this.isLoading = true
 
             await instance

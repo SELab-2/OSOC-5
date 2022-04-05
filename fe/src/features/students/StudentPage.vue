@@ -112,7 +112,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import {useStudentStore} from "../../stores/useStudentStore";
 import {ref} from "vue";
@@ -123,9 +123,10 @@ import PracticalCard from "./components/PracticalCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
 import TitleTextCard from "./components/TitleTextCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
-import {onMounted} from "@vue/runtime-core";
+import { Student } from "../../models/Student";
+import {defineComponent} from "@vue/runtime-core";
 
-export default {
+export default defineComponent ({
   components: {
     AcademiaCard,
     DetailsCard,
@@ -135,7 +136,12 @@ export default {
     SegmentedControl,
     SideBar,
   },
-  props: ['id'],
+  props: {
+    id: {
+      type: Number,
+      required: true
+    },
+  },
   setup() {
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
@@ -146,11 +152,9 @@ export default {
     }
   },
   data() {
-    const possibleSuggestion = ref(null)
+    const possibleSuggestion = ref(-1)
     const suggestionDialog = ref(false)
     const reason = ref(null)
-
-    this.studentStore.loadStudent(this.id)
 
     return {
       sideBarKey: 0,
@@ -160,10 +164,63 @@ export default {
       reason
     }
   },
+  computed: {
+    student(): Student | null {
+      return this.studentStore.currentStudent
+    },
+    name(): string {
+      return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
+    },
+    mySuggestion(): number | null {
+      if (this.student) {
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
+
+        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
+      } else {
+        return null
+      }
+
+    },
+    mySuggestionColor(): string {
+      let mySuggestion = this.mySuggestion
+      if (mySuggestion !== null) {
+        return mySuggestion === 0 ? "green" : (mySuggestion === 1 ? "yellow" : (mySuggestion === 2 ? "red" : "grey"))
+      } else {
+        return "gray"
+      }
+    },
+    suggestionName(): string {
+      switch (this.possibleSuggestion) {
+        case 0:
+          return "yes"
+        case 1:
+          return "maybe"
+        case 2:
+          return "no"
+        default:
+          return ""
+      }
+    },
+    suggestionColor(): string {
+      switch (this.possibleSuggestion) {
+        case 0:
+          return "bg-green"
+        case 1:
+          return "bg-yellow"
+        case 2:
+          return "bg-red"
+        default:
+          return "bg-grey"
+      }
+    }
+  },
+  created() {
+    this.studentStore.loadStudent(this.id)
+  },
   mounted() {
     // Reload when new student is selected
-    this.$watch('id', id => {
-      this.studentStore.loadStudent(this.id)
+    this.$watch('id', (id: number) => {
+      this.studentStore.loadStudent(id)
     }, {immediate: true})
   },
   methods: {
@@ -174,41 +231,13 @@ export default {
       this.sideBarKey += 1
       this.studentKey += 1
     },
-    selectStudent: function (selected_student) {
+    selectStudent: function (selected_student: Student) {
       this.$router.push(`/students/${selected_student.id}`)
     },
-    showDialog: function (value) {
+    showDialog: function (value: number) {
       this.possibleSuggestion = value
       this.suggestionDialog = true
     }
   },
-  computed: {
-    student: function() {
-      return this.studentStore.currentStudent
-    },
-    name: function () {
-      return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
-    },
-    mySuggestion: function () {
-      if (this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
-
-        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
-      } else {
-        return null
-      }
-
-    },
-    mySuggestionColor: function () {
-      let mySuggestion = this.mySuggestion
-      return mySuggestion === 0 ? "green" : (mySuggestion === 1 ? "yellow" : (mySuggestion === 2 ? "red" : "grey"))
-    },
-    suggestionName: function () {
-      return this.possibleSuggestion === 0 ? "yes" : (this.possibleSuggestion === 1 ? "maybe" : "no")
-    },
-    suggestionColor: function () {
-      return this.possibleSuggestion === 0 ? "bg-green" : (this.possibleSuggestion === 1 ? "bg-yellow" : "bg-red")
-    }
-  }
-}
+})
 </script>

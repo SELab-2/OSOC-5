@@ -9,7 +9,7 @@
   </q-card>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   props: ['title', 'content'],
 }

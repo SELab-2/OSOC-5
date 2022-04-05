@@ -20,7 +20,7 @@
   </q-card>
 </template>
 
-<script>
+<script lang="ts">
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 
