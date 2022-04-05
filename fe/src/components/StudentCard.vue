@@ -48,9 +48,19 @@ import { defineComponent } from "@vue/runtime-core"
 import {useStudentStore} from "../stores/useStudentStore";
 import {useAuthenticationStore} from "../stores/useAuthenticationStore";
 import { Suggestion } from "../models/Suggestion";
+import {Student} from "../models/Student";
 
 export default defineComponent({
-  props: ['student', 'active'],
+  props: {
+    student: {
+      type: Student,
+      required: true
+    },
+    active: {
+      type: Boolean,
+      required: true
+    }
+  },
   setup() {
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
@@ -81,9 +91,6 @@ export default defineComponent({
     },
     mySuggestion(): number | null {
       if (this.student) {
-        console.log(this.student)
-        console.log(this.authenticationStore.loggedInUser)
-
         const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
           if (this.authenticationStore.loggedInUser != null) {
             return suggestion.email === this.authenticationStore.loggedInUser.email

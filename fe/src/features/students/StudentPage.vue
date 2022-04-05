@@ -173,7 +173,7 @@ export default defineComponent ({
     },
     mySuggestion(): number | null {
       if (this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser?.email)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
@@ -186,7 +186,7 @@ export default defineComponent ({
       if (mySuggestion !== null) {
         return mySuggestion === 0 ? "green" : (mySuggestion === 1 ? "yellow" : (mySuggestion === 2 ? "red" : "grey"))
       } else {
-        return "gray"
+        return ""
       }
     },
     suggestionName(): string {
@@ -198,7 +198,7 @@ export default defineComponent ({
         case 2:
           return "no"
         default:
-          return ""
+          return "not decided"
       }
     },
     suggestionColor(): string {

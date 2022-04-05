@@ -26,7 +26,12 @@ import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 
 export default {
   components: {LoadingSpinner},
-  props: ['title'],
+  props: {
+  title: {
+    type: String,
+      required: true
+  },
+},
   setup() {
     const studentStore = useStudentStore()
 

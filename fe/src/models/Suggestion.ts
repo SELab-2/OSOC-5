@@ -8,19 +8,22 @@ export interface SuggestionInterface {
 
 export class Suggestion implements SuggestionInterface {
   student: number
-  coach: number
+  coach: string
   suggestion: number
   reason: string
+  email: string | null
 
   constructor(
     student: number,
-    coach: number,
+    coach: string,
     suggestion: number,
-    reason: string
+    reason: string,
+    email: string | null
   ) {
     this.student = student
     this.coach = coach
     this.suggestion = suggestion
     this.reason = reason
+    this.email = email
   }
 }

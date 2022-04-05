@@ -157,7 +157,24 @@ export default defineComponent({
     StudentCard,
     SegmentedControl,
   },
-  props: [ 'selectStudent', 'color', 'draggable', 'student' ],
+  props: {
+    selectStudent: {
+      type: Function,
+      required: true
+    },
+    color: {
+      type: String,
+      required: true
+    },
+    draggable: {
+      type: Boolean,
+      required: true
+    },
+    student: {
+      type: Student,
+      required: true
+    }
+  },
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
