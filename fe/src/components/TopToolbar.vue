@@ -60,10 +60,6 @@ export default defineComponent({
     return {
       dropdownitems: [
         {
-          name: 'Email Templates',
-          icon: 'email',
-        },
-        {
           name: 'Change Password',
           icon: 'key',
         },
@@ -83,8 +79,6 @@ export default defineComponent({
       authenticationStore,
       on_dropdown_click(test: number) {
         if (test == 0) {
-          // implementation to navigate to email templates
-        } else if (test == 1) {
           // implementation to change password
         } else {
           authenticationStore.logout()
