@@ -92,9 +92,9 @@
               >
                 <template #option="scope">
                   <q-item
+                    @click="() => updateRole(props.row, props.row.role)"
                     class="items-center"
                     v-bind="scope.itemProps"
-                    @click="() => updateRole(props.row, props.row.role)"
                   >
                     <q-icon
                       class="q-mr-md icon"
@@ -229,24 +229,6 @@ export default defineComponent({
     
     onMounted(() => {
       coachStore.loadUsers();
-      coachStore.$subscribe((users, state) => {
-        console.log(users, state)
-        switch (users.events.key) {
-            case 'role':
-              coachStore
-              .updateRole(users.events.target, users.events.newValue)
-              .catch((error) => {
-                  $q.notify({
-                  icon: 'warning',
-                  color: 'warning',
-                  message: `Error ${error.response.status} while updating role to ${users.events.newValue} for ${users.events.target.firstName} ${users.events.target.lastName}`,
-                  textColor: 'black'
-                });
-                coachStore.users.find((user) => user.id === users.events.target.id).role = users.events.oldValue
-              }
-            )
-        }
-      })
     })
     
 
