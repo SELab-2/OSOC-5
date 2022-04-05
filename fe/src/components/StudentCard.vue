@@ -47,6 +47,8 @@
 import { defineComponent } from "@vue/runtime-core"
 import {useStudentStore} from "../stores/useStudentStore";
 import {useAuthenticationStore} from "../stores/useAuthenticationStore";
+import { Suggestion } from "../models/Suggestion";
+import { Student } from "../models/Student";
 
 export default defineComponent({
   props: ['student', 'active'],
@@ -60,27 +62,34 @@ export default defineComponent({
     }
   },
   computed: {
-    total() {
+    total(): number {
       return this.student.suggestions.length
     },
-    yesStyle() {
-      const widthYes = 100 * this.student.suggestions.filter(sug => sug.suggestion === 0).length / this.total
+    yesStyle(): { width: string } {
+      const widthYes = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === 0).length / this.total
       return { width: (widthYes + '%')}
     },
-    maybeStyle() {
-      const widthMaybe = 100 * this.student.suggestions.filter(sug => sug.suggestion === 1).length / this.total
+    maybeStyle(): { width: string } {
+      const widthMaybe = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === 1).length / this.total
       return { width: (widthMaybe + '%')}
     },
-    noStyle() {
-      const widthNo = 100 * this.student.suggestions.filter(sug => sug.suggestion === 2).length / this.total
+    noStyle(): { width: string } {
+      const widthNo = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === 2).length / this.total
       return { width: (widthNo + '%')}
     },
-    name() {
+    name(): string {
       return this.student.firstName + ' ' + this.student.lastName
     },
-    mySuggestion: function () {
+    mySuggestion(): number | null {
       if (this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser.email)
+        console.log(this.student)
+        console.log(this.authenticationStore.loggedInUser)
+
+        const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
+          if (this.authenticationStore.loggedInUser != null) {
+            return suggestion.email === this.authenticationStore.loggedInUser.email
+          }
+        })
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {

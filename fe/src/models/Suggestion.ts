@@ -1,12 +1,7 @@
 export interface Suggestion {
+  email: string | null  // must be deleted later
   student: number
-  coach: number
-  suggestion: SuggestionChoice
+  coach: string
+  suggestion: number
   reason: string
-}
-
-enum SuggestionChoice {
-  Yes = 0,
-  No = 1,
-  Maybe = 2,
 }

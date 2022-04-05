@@ -4,6 +4,7 @@ import FormPageVue from '../features/authentication/FormPage.vue'
 import LoginFormVue from '../features/authentication/LoginForm.vue'
 import SignupFormVue from '../features/authentication/SignupForm.vue'
 import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
+import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
@@ -38,6 +39,15 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: SelectStudentsPageVue,
+      },
+      {
+        path: '/students/:id',
+        name: 'Student Page',
+        meta: {
+          requiresAuth: true,
+        },
+        props: true,
+        component: StudentPage,
       },
       {
         path: '/projects',

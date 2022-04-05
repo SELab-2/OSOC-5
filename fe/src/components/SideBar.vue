@@ -137,7 +137,7 @@
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = !miniState"
+          @click="miniState.value = !miniState"
         />
       </div>
     </q-drawer>
@@ -151,6 +151,7 @@ import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
+import { Student } from '../models/Student';
 
 export default defineComponent({
   components: {
@@ -210,13 +211,11 @@ export default defineComponent({
       console.log(this.byMe)
       console.log(this.onProject)
     },
-    clickStudent(student) {
+    clickStudent(student: Student) {
       this.selectStudent(student)
-      console.log(this.mySuggestion)
-      console.log(this.mySuggestionColor)
-    }
+    },
   }
-}
+})
 </script>
 
 <style scoped>
