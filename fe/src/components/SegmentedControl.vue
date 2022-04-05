@@ -1,28 +1,33 @@
 <template>
   <q-tabs
-    v-model="this.value"
+    v-model="value"
     class="bg-white text-black shadow-2"
-    :indicator-color="this.color"
+    :indicator-color="color"
     style="border-radius: 10px;"
   >
-    <q-tab v-for="(option, index) in this.options" :key="index" no-caps :ripple="false" :name="option.name" :label="option.label"/>
+    <q-tab
+      v-for="(option, index) in options"
+      :key="index"
+      no-caps
+      :ripple="false"
+      :name="option.name"
+      :label="option.label"
+    />
   </q-tabs>
 </template>
 
 
-<script>
-  import { ref, computed, defineComponent } from 'vue'
-  
-  // interface Option {
-  //   name: string
-  //   label: string
-  // }
+<script lang="ts">
+  import { defineComponent, PropType } from 'vue'
 
   export default defineComponent({
     props: {
-      modelValue: String, 
+      modelValue: {
+        type: String,
+        required: true
+      }, 
       options: {
-        type: [], //[Object as PropType<Option>], // [{ name: String, label: String}]
+        type:  [Object] as PropType<{name: string, label: string}[]>, 
         required: true
       },
       color: {
@@ -33,10 +38,10 @@
     emits: ['update:modelValue'],
     computed: {
       value: {
-        get() {
+        get(): string {
           return this.modelValue
         },
-        set(value) {
+        set(value: string) {
           this.$emit('update:modelValue', value)
         }
       }

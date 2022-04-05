@@ -1,24 +1,10 @@
 import axios, { AxiosInstance } from 'axios'
 
-function getCookie(name: String) {
-  let cookieValue = null
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';')
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim()
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === name + '=') {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-        break
-      }
-    }
-  }
-  return cookieValue
-}
-
 export const instance: AxiosInstance = axios.create({
-  withCredentials: true,
-  baseURL: 'http://localhost:8000/api/',
+  baseURL:
+    process.env.NODE_ENV == 'development'
+      ? 'http://127.0.0.1:8000/api/'
+      : 'https://sel2-5.ugent.be/api/',
 })
 
 instance.interceptors.request.use(
@@ -50,7 +36,7 @@ instance.interceptors.response.use(
           localStorage.setItem('accessToken', accessToken)
           instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
           return instance(originalConfig)
-        } catch (_error) {
+        } catch (_error: any) {
           if (_error.response && _error.response.data) {
             return Promise.reject(_error.response.data)
           }

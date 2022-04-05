@@ -7,11 +7,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {ref} from "vue"
 import SideBar from "../../components/SideBar.vue"
 
-export default {
+export default defineComponent({
   components: {
     SideBar,
   },
@@ -27,7 +27,7 @@ export default {
       this.$router.push(`/students/${selected_student.id}`)
     },
   }
-}
+})
 </script>
 
 <style>
