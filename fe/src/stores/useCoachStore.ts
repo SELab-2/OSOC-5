@@ -34,7 +34,7 @@ export const useCoachStore = defineStore('user/coach', {
       return instance
        .put(`coaches/${user.id}/${newRole === "admin" ? 'make' : 'remove'}_admin/`)
     },
-    async removeUser(userId: string) {
+    async removeUser(userId: number) {
       await instance
         .delete(`coaches/${userId}/`)
         .then(() => {
