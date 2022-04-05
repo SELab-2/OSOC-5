@@ -50,6 +50,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
             response_data = serializer.data
             response_data['coach_name'] = request.user.get_full_name()
+            response_data['coach_id'] = request.user.id
             response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
             
             return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
@@ -94,6 +95,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
             response_data = serializer.data
             response_data['coach_name'] = request.user.get_full_name()
+            response_data['coach_id'] = request.user.id
             response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
             
             return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
@@ -225,6 +227,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 response_data = serializer.data
                 response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
                 response_data['coach_name'] = request.user.get_full_name()
+                response_data['coach_id'] = request.user.id
 
                 return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
             return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)

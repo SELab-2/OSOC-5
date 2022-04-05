@@ -343,6 +343,9 @@ class Suggestion(models.Model):
 
     def coach_name(self):
         return self.coach.get_full_name()
+    
+    def coach_id(self):
+        return self.coach.id
 
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
@@ -380,6 +383,9 @@ class ProjectSuggestion(models.Model):
     
     def coach_name(self):
         return self.coach.get_full_name()
+    
+    def coach_id(self):
+        return self.coach.id
 
 
 class SentEmail(models.Model):

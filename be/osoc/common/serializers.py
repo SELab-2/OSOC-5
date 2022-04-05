@@ -9,7 +9,7 @@ from .models import *
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Suggestion
-        fields = ['suggestion', 'reason', 'coach_name', 'coach']
+        fields = ['suggestion', 'reason', 'coach_name', 'coach_id', 'coach']
         read_only_fields = ['coach']
 
 
@@ -47,7 +47,7 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
-        fields = ['student', 'coach', 'coach_name', 'skill', 'reason']
+        fields = ['student', 'coach', 'coach_name', 'coach_id', 'skill', 'reason']
         read_only_fields = ['coach']
 
 
