@@ -2,9 +2,9 @@ import { Project } from './Project'
 import { Suggestion } from './Suggestion'
 
 export interface User {
-  id: string
+  id: number
   firstName: string
-  surname: string
+  lastName: string
   email: string
   isAdmin: boolean
   role: string
