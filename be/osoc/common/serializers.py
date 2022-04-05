@@ -90,7 +90,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = SentEmail
-        fields = ['sender', 'receiver', 'time', 'info']
+        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
 
 
 class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
