@@ -1,9 +1,17 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
+import { ProjectSkill, Skill } from '../models/Skill'
+import { Project } from '../models/Project'
+import { User } from '../models/User'
+
+interface State {
+  skills: Array<ProjectSkill>
+  isLoadingSkills: boolean
+}
 
 export const useSkillStore = defineStore('skills', {
-  state: () => ({
+  state: (): State => ({
     skills: [],
     isLoadingSkills: false,
   }),
@@ -21,26 +29,36 @@ export const useSkillStore = defineStore('skills', {
           // turn of the loading animation
           this.isLoadingSkills = false
           // set the store
-          let apiSkills = convertObjectKeysToCamelCase(data).results
-          for (let skill of apiSkills) {
+          const apiSkills = convertObjectKeysToCamelCase(data)
+            .results as Skill[]
+          for (const skill of apiSkills) {
             this.skills.push({
               name: skill.name,
               amount: 0,
               comment: '',
               url: skill.url,
               id: skill.id,
+              description: '', // TODO REMOVE ON DATABASE UPDATE ISSUE #110
             })
           }
         })
         .catch(() => (this.isLoadingSkills = false))
     },
-    async addSkill(newSkill, callback) {
+    async addSkill(newSkill: string) {
       // start the loading animation
       this.isLoadingSkills = true
 
       // Process the new skill
       console.log(`Adding new skill: ${newSkill}.`)
-      this.skills.push({ name: newSkill, amount: 0, comment: '' })
+      // TODO: this new skill also needs to know it's url and id
+      this.skills.push({
+        name: newSkill,
+        amount: 0,
+        comment: '',
+        url: '',
+        id: -1,
+        description: '',
+      })
 
       // TODO: maybe only push skills to database when project POST happens
       // TODO: remove description (waiting for backend update)
@@ -62,9 +80,9 @@ export const useSkillStore = defineStore('skills', {
       // turn of the loading animation
       this.isLoadingSkills = false
       // When finished run the callback so the popup closes.
-      callback(newSkill)
+      // callback(newSkill) // TODO: other way to do this
     },
-    async deleteSkill(deletedSkill) {
+    async deleteSkill(deletedSkill: Skill) {
       await instance
         .delete(`skills/${deletedSkill.id}/`)
         .then(() => {
@@ -79,17 +97,23 @@ export const useSkillStore = defineStore('skills', {
     /*
      * PROJECT TODO: move to a project store once that exists
      */
-    submitProject(projectName, projectURL, partnerName, coaches, callback) {
-      let data = {
+    submitProject(
+      projectName: string,
+      projectURL: string,
+      partnerName: string,
+      coaches: User[]
+    ) {
+      const data: Project = {
         name: projectName,
         partner_name: partnerName,
         extra_info: projectURL,
         required_skills: [],
         coaches: [],
+        suggested_students: []
       }
 
       // filter out the used skills
-      for (let skill of this.skills) {
+      for (const skill of this.skills) {
         if (skill.amount > 0) {
           data['required_skills'].push({
             skill: skill.url,
@@ -114,7 +138,7 @@ export const useSkillStore = defineStore('skills', {
           console.log(error)
         })
 
-      callback()
+      // callback()
     },
   },
 })

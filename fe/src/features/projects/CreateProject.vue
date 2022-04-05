@@ -277,7 +277,6 @@
 </template>
 
 <script>
-import router from '../../router'
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { onMounted } from '@vue/runtime-core'
@@ -393,18 +392,18 @@ export default {
           project_link.value,
           project_partner_name.value,
           selected.value,
-          () => {
-            // TODO: add different outcome based on success
-
-            // TODO: redirect to project page, could also make a page for each project
-            router.push('/projects/')
-
-            $q.notify({
-              icon: 'done',
-              color: 'positive',
-              message: 'Submitted',
-            })
-          }
+          // () => {
+          //   // TODO: add different outcome based on success
+          //
+          //   // TODO: redirect to project page, could also make a page for each project
+          //   router.push('/projects/')
+          //
+          //   $q.notify({
+          //     icon: 'done',
+          //     color: 'positive',
+          //     message: 'Submitted',
+          //   })
+          // }
         )
       },
       onReset() {
@@ -457,16 +456,16 @@ export default {
           skillStore.addSkill(
             new_role.value,
             // callback
-            (added_role) => {
-              new_role_prompt.value = false
-              new_role.value = ''
-              return $q.notify({
-                icon: 'done',
-                color: 'warning',
-                message: `Added new project role: ${added_role}!`,
-                textColor: 'black',
-              })
-            }
+            // (added_role) => {
+            //   new_role_prompt.value = false
+            //   new_role.value = ''
+            //   return $q.notify({
+            //     icon: 'done',
+            //     color: 'warning',
+            //     message: `Added new project role: ${added_role}!`,
+            //     textColor: 'black',
+            //   })
+            // }
           )
         }
       },
