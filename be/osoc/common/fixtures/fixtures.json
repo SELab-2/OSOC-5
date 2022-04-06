@@ -27,11 +27,47 @@
     }
   },
   {
+    "model": "common.skill",
+    "pk": 4,
+    "fields": {
+      "name": "Full-stack developer",
+      "description": "Knows it all",
+      "color": "magenta"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 5,
+    "fields": {
+      "name": "Student coach",
+      "description": "The bridge between students and coaches",
+      "color": "cyan"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 6,
+    "fields": {
+      "name": "Communication Expert",
+      "description": "Muy bien at communicating",
+      "color": "white"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 7,
+    "fields": {
+      "name": "Tester",
+      "description": "Knows how to write tests",
+      "color": "black"
+    }
+  },
+  {
     "model": "common.coach",
     "pk": 1,
     "fields": {
-      "password": "pbkdf2_sha256$320000$5rgqbJ6R9kNXbeQbRgsQ9w$rcwylWX8M8F2dBSQJ3mId5uxXRARO0hIVJGSGaS62T0=",
-      "last_login": "2022-03-19T13:31:16Z",
+      "password": "pbkdf2_sha256$260000$KSkTj3rghH0hT1VHV6iiHl$asJxNBNnkwZeceqjETcr74rAcocEdX2ITGCnVbcERck=",
+      "last_login": "2022-04-06T13:16:36.880Z",
       "is_superuser": true,
       "is_staff": true,
       "is_active": true,
@@ -97,6 +133,63 @@
       "last_name": "Cattoire",
       "email": "henri.cattoire@ugent.be",
       "is_admin": false,
+      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 6,
+    "fields": {
+      "password": "test",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": false,
+      "date_joined": "2022-04-02T20:15:28Z",
+      "first_name": "test",
+      "last_name": "test",
+      "email": "test@example.com",
+      "is_admin": false,
+      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 7,
+    "fields": {
+      "password": "abcdef",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-04-06T13:18:32Z",
+      "first_name": "Lisa",
+      "last_name": "De Jonghe",
+      "email": "lisa.dejonghe@ugent.be",
+      "is_admin": false,
+      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 8,
+    "fields": {
+      "password": "abcdef",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-04-06T13:19:03Z",
+      "first_name": "Wouter",
+      "last_name": "Hennen",
+      "email": "wouter.hennen@ugent.be",
+      "is_admin": true,
       "last_email_sent": null,
       "groups": [],
       "user_permissions": []
@@ -170,6 +263,199 @@
     }
   },
   {
+    "model": "common.student",
+    "pk": 4,
+    "fields": {
+      "first_name": "Sarah",
+      "last_name": "Kerrigan",
+      "call_name": "Kerrigan",
+      "email": "sarah.kerrigan@example.com",
+      "phone_number": null,
+      "language": "1",
+      "extra_info": "",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "last_email_sent": null,
+      "school_name": "MIT",
+      "degree": "Masters",
+      "studies": "Computer Science",
+      "skills": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 5,
+    "fields": {
+      "first_name": "Jim",
+      "last_name": "Carrey",
+      "call_name": null,
+      "email": "jim.carrey@example.com",
+      "phone_number": null,
+      "language": "1",
+      "extra_info": "",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "last_email_sent": null,
+      "school_name": "UCL",
+      "degree": "Masters",
+      "studies": "Communication",
+      "skills": [
+        5,
+        6
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 6,
+    "fields": {
+      "first_name": "Lisa",
+      "last_name": "Simpsons",
+      "call_name": null,
+      "email": "lisa@simpsons.com",
+      "phone_number": null,
+      "language": "1",
+      "extra_info": "",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "last_email_sent": null,
+      "school_name": "Springfield Elementary",
+      "degree": "Lower School",
+      "studies": "Not applicable",
+      "skills": [
+        6
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 7,
+    "fields": {
+      "first_name": "Edsger",
+      "last_name": "Dijkstra",
+      "call_name": "Dijkstra",
+      "email": "edsger@dijkstra.nl",
+      "phone_number": null,
+      "language": "0",
+      "extra_info": "",
+      "cv": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
+      "portfolio": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
+      "last_email_sent": null,
+      "school_name": "Leiden",
+      "degree": "BS & MS",
+      "studies": "Mathematics",
+      "skills": [
+        1,
+        3,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 8,
+    "fields": {
+      "first_name": "Bertrand",
+      "last_name": "Meyer",
+      "call_name": null,
+      "email": "bertrand.meyer@france.fr",
+      "phone_number": null,
+      "language": "2",
+      "extra_info": "",
+      "cv": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
+      "portfolio": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
+      "last_email_sent": null,
+      "school_name": "École Polytechnique",
+      "degree": "Masters",
+      "studies": "Engineering",
+      "skills": [
+        2,
+        6,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 9,
+    "fields": {
+      "first_name": "Jean-Raymond",
+      "last_name": "Abrial",
+      "call_name": null,
+      "email": "jean@ariel.fr",
+      "phone_number": null,
+      "language": "2",
+      "extra_info": "",
+      "cv": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
+      "portfolio": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
+      "last_email_sent": null,
+      "school_name": "ETH Zurich",
+      "degree": "Professor",
+      "studies": "Engineering",
+      "skills": [
+        3,
+        6
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 10,
+    "fields": {
+      "first_name": "Jonathan",
+      "last_name": "Bowen",
+      "call_name": null,
+      "email": "bowen@bouwer.co.uk",
+      "phone_number": null,
+      "language": "1",
+      "extra_info": "",
+      "cv": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
+      "portfolio": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
+      "last_email_sent": null,
+      "school_name": "University College, Oxford",
+      "degree": "MA",
+      "studies": "Engineering Science",
+      "skills": [
+        2,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 11,
+    "fields": {
+      "first_name": "Egon",
+      "last_name": "Börger",
+      "call_name": null,
+      "email": "egon@bergerman.de",
+      "phone_number": null,
+      "language": "3",
+      "extra_info": "",
+      "cv": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
+      "portfolio": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
+      "last_email_sent": null,
+      "school_name": "University of Münster",
+      "degree": "Masters",
+      "studies": "Computer Science",
+      "skills": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  },
+  {
     "model": "common.project",
     "pk": 1,
     "fields": {
@@ -232,6 +518,88 @@
     }
   },
   {
+    "model": "common.project",
+    "pk": 6,
+    "fields": {
+      "name": "Project F",
+      "partner_name": "Inex",
+      "extra_info": "Iets",
+      "coaches": [
+        8,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 7,
+    "fields": {
+      "name": "Project K",
+      "partner_name": "OptiDisc",
+      "extra_info": "DiscOptie",
+      "coaches": [
+        8,
+        1,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 8,
+    "fields": {
+      "name": "Project ABC",
+      "partner_name": "R.E.M.",
+      "extra_info": "Automatic For The People",
+      "coaches": [
+        8,
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 9,
+    "fields": {
+      "name": "Combo Touch",
+      "partner_name": "Logitech",
+      "extra_info": "Touch die combo!",
+      "coaches": [
+        2,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 10,
+    "fields": {
+      "name": "Borderlands King",
+      "partner_name": "Stephen Eragon",
+      "extra_info": "Plop",
+      "coaches": [
+        8,
+        6,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 11,
+    "fields": {
+      "name": "Beiard",
+      "partner_name": "Massa",
+      "extra_info": "Snoopy",
+      "coaches": [
+        2
+      ]
+    }
+  },
+  {
     "model": "common.requiredskills",
     "pk": 1,
     "fields": {
@@ -282,6 +650,42 @@
     "fields": {
       "project": 4,
       "skill": 1,
+      "amount": 1
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 7,
+    "fields": {
+      "project": 4,
+      "skill": 5,
+      "amount": 5
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 8,
+    "fields": {
+      "project": 6,
+      "skill": 4,
+      "amount": 5
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 9,
+    "fields": {
+      "project": 5,
+      "skill": 4,
+      "amount": 2
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 10,
+    "fields": {
+      "project": 4,
+      "skill": 4,
       "amount": 1
     }
   },
@@ -343,6 +747,216 @@
       "coach": 4,
       "suggestion": "2",
       "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 7,
+    "fields": {
+      "student": 9,
+      "coach": 8,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 8,
+    "fields": {
+      "student": 3,
+      "coach": 8,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 9,
+    "fields": {
+      "student": 10,
+      "coach": 7,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 10,
+    "fields": {
+      "student": 11,
+      "coach": 3,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 11,
+    "fields": {
+      "student": 6,
+      "coach": 4,
+      "suggestion": "0",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 12,
+    "fields": {
+      "student": 5,
+      "coach": 1,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 13,
+    "fields": {
+      "student": 8,
+      "coach": 3,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 14,
+    "fields": {
+      "student": 10,
+      "coach": 8,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 15,
+    "fields": {
+      "student": 4,
+      "coach": 4,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 16,
+    "fields": {
+      "student": 8,
+      "coach": 4,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 1,
+    "fields": {
+      "reason": "",
+      "project": 1,
+      "student": 3,
+      "coach": 3,
+      "role": 3
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 2,
+    "fields": {
+      "reason": "",
+      "project": 5,
+      "student": 7,
+      "coach": 4,
+      "role": 7
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 3,
+    "fields": {
+      "reason": "",
+      "project": 11,
+      "student": 5,
+      "coach": 7,
+      "role": 2
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 4,
+    "fields": {
+      "reason": "",
+      "project": 8,
+      "student": 5,
+      "coach": 4,
+      "role": 5
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 5,
+    "fields": {
+      "reason": "",
+      "project": 10,
+      "student": 6,
+      "coach": 7,
+      "role": 3
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 6,
+    "fields": {
+      "reason": "",
+      "project": 9,
+      "student": 2,
+      "coach": 8,
+      "role": 2
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 7,
+    "fields": {
+      "reason": "",
+      "project": 6,
+      "student": 2,
+      "coach": 1,
+      "role": 2
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 8,
+    "fields": {
+      "reason": "",
+      "project": 5,
+      "student": 4,
+      "coach": 2,
+      "role": 4
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 9,
+    "fields": {
+      "reason": "",
+      "project": 3,
+      "student": 8,
+      "coach": 3,
+      "role": 4
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 10,
+    "fields": {
+      "reason": "",
+      "project": 7,
+      "student": 4,
+      "coach": 1,
+      "role": 3
     }
   }
 ]
