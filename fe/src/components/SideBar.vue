@@ -117,7 +117,7 @@
                     v-ripple
                     :student="student"
                     :active="this.student ? student.email === this.student.email : false"
-                    @click="this.clickStudent(student)"
+                    @click="clickStudent(student)"
                   />
                 </q-item>
               </q-list>
@@ -178,6 +178,8 @@ export default defineComponent({
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
+    const socket = new WebSocket('ws://localhost:8000/ws/socket_server/')
+
 
     onMounted(() => {
       studentStore.loadStudents()
@@ -186,6 +188,7 @@ export default defineComponent({
     return {
       studentStore,
       $q,
+      socket,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -207,6 +210,13 @@ export default defineComponent({
       roles: ref([]),
     }
   },
+  mounted() {
+        this.socket.onmessage = (event: { data: string }) => {
+            const data = JSON.parse(event.data)
+            console.log(data)
+            this.studentStore.receiveSuggestion(data)
+        }
+   },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.

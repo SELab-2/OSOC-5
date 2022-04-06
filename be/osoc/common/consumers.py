@@ -16,20 +16,32 @@ class CoachConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        studentId = text_data_json['studentId']
+        coachId = text_data_json['coachId']
+        suggestion = text_data_json['suggestion']
+        reason = text_data_json['reason']
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type': 'coach_action',
-                'message': message
+                'studentId': studentId,
+                'coachId': coachId,
+                'suggestion': suggestion,
+                'reason': reason
             }
         )
 
     def coach_action(self, event):
-        message = event['message']
+        studentId = event['studentId']
+        coachId = event['coachId']
+        suggestion = event['suggestion']
+        reason = event['reason']
 
         self.send(text_data=json.dumps({
-            'type': 'action',
-            'message': message
+            'type': 'coach_action',
+            'studentId': studentId,
+            'coachId': coachId,
+            'suggestion': suggestion,
+            'reason': reason
         }))

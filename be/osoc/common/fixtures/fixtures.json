@@ -4,7 +4,6 @@
     "pk": 1,
     "fields": {
       "name": "Front-end developer",
-      "description": "Develops the front-end",
       "color": "yellow"
     }
   },
@@ -13,7 +12,6 @@
     "pk": 2,
     "fields": {
       "name": "Back-end developer",
-      "description": "Back-ends the developer",
       "color": "blue"
     }
   },
@@ -22,7 +20,6 @@
     "pk": 3,
     "fields": {
       "name": "Sysadmin",
-      "description": "System administrator",
       "color": "red"
     }
   },
@@ -40,7 +37,6 @@
       "last_name": "admin",
       "email": "admin@example.com",
       "is_admin": true,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -59,7 +55,6 @@
       "last_name": "Vandenberghe",
       "email": "friedrich.vandenberghe@ugent.be",
       "is_admin": false,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -78,7 +73,6 @@
       "last_name": "Saerens",
       "email": "lander.saerens@ugent.be",
       "is_admin": true,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -97,7 +91,6 @@
       "last_name": "Cattoire",
       "email": "henri.cattoire@ugent.be",
       "is_admin": false,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -108,14 +101,13 @@
     "fields": {
       "first_name": "Jan",
       "last_name": "Pieter",
-      "call_name": null,
+      "call_name": "",
       "email": "jan.pieter@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "0",
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "UGent",
       "degree": "MaNaMa",
       "studies": "Computer Science",
@@ -130,14 +122,13 @@
     "fields": {
       "first_name": "Wouter",
       "last_name": "Siemens",
-      "call_name": null,
+      "call_name": "",
       "email": "wouter.siemens@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "3",
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "VUB",
       "degree": "500 Masters",
       "studies": "Zeverologie",
@@ -160,7 +151,6 @@
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "KUL",
       "degree": "Bachelor",
       "studies": "Taal- en letterkunde",

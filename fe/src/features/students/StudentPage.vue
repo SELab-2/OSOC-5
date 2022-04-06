@@ -1,12 +1,37 @@
 <template>
-  <SideBar :key="sideBarKey" :student="this.student" :selectStudent="selectStudent" :draggable="false"/>
+  <SideBar
+    :key="sideBarKey"
+    :student="student"
+    :select-student="selectStudent"
+    :draggable="false"
+  />
 
-  <div :key="studentKey"
-    class="justify-between row q-px-lg q-pt-lg studentcol full-height">
+  <div
+    :key="studentKey"
+    class="justify-between row q-px-lg q-pt-lg studentcol full-height"
+  >
     <div class="row q-pa-sm q-gutter-sm items-center">
-      <h class="text-bold text-h4">{{ name }}</h>
-      <q-btn :href="this.student ? this.student.cv : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="this.student ? this.student.portfolio : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
+      <h class="text-bold text-h4">
+        {{ name }}
+      </h>
+      <q-btn
+        :href="student ? student.cv : ''"
+        target="_blank"
+        size="12px"
+        rounded
+        outline
+        color="black"
+        label="CV"
+      />
+      <q-btn
+        :href="student ? student.portfolio : ''"
+        target="_blank"
+        size="12px"
+        rounded
+        outline
+        color="black"
+        label="Portfolio"
+      />
     </div>
     <div class="row q-gutter-sm items-center">
       <q-select
@@ -17,7 +42,13 @@
         :options="['Not decided', 'Yes', 'Maybe', 'No']"
         label="Final decision"
       />
-      <q-btn icon-right="mail" class="cornered" label="Confirm" outline color='black'/>
+      <q-btn
+        icon-right="mail"
+        class="cornered"
+        label="Confirm"
+        outline
+        color="black"
+      />
     </div>
   </div>
 
@@ -26,25 +57,32 @@
   </div>
   <div class="row q-px-lg q-ml-sm items-center">
     <SegmentedControl
-      :color="mySuggestionColor"
-      @update:modelValue="showDialog"
       v-model="mySuggestion"
+      :color="mySuggestionColor"
       :options="[
         { name: 0, label: 'Yes' },
         { name: 1, label: 'Maybe' },
         { name: 2, label: 'No' },
         { name: -1, label: 'Not decided' },
       ]"
+      @update:modelValue="showDialog"
     />
 
-    <q-dialog v-model="this.suggestionDialog" >
+    <q-dialog v-model="suggestionDialog">
       <q-card>
         <q-card-section>
-          <div class="text-h6">Suggest
-            <q-btn dense rounded class="text-h6" :class="this.suggestionColor">
-              {{ this.suggestionName }}
+          <div class="text-h6">
+            Suggest
+            <q-btn
+              dense
+              rounded
+              class="text-h6"
+              :class="suggestionColor"
+            >
+              {{ suggestionName }}
             </q-btn>
-            for {{ this.name }}</div>
+            for {{ name }}
+          </div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -56,9 +94,22 @@
           />
         </q-card-section>
 
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat color="grey" label="Cancel" v-close-popup/>
-          <q-btn flat label="Suggest" @click="makeSuggestion" v-close-popup/>
+        <q-card-actions
+          align="right"
+          class="text-primary"
+        >
+          <q-btn
+            v-close-popup
+            flat
+            color="grey"
+            label="Cancel"
+          />
+          <q-btn
+            v-close-popup
+            flat
+            label="Suggest"
+            @click="makeSuggestion"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -67,44 +118,58 @@
   <div class="q-gutter-sm q-pa-lg">
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SuggestionsCard :index="studentKey" title="Suggestions"/>
+        <SuggestionsCard
+          :index="studentKey"
+          title="Suggestions"
+        />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <AcademiaCard title="Academia" :content="this.student ? [
-              'Enrolled at: ' + this.student.schoolName,
-              'Studies: ' + this.student.studies,
-              'Degree: ' + this.student.degree
-              // 'Years into degree: 5'
-            ] : []"
+        <AcademiaCard
+          title="Academia"
+          :content="student ? [
+            'Enrolled at: ' + student.schoolName,
+            'Studies: ' + student.studies,
+            'Degree: ' + student.degree
+          // 'Years into degree: 5'
+          ] : []"
         />
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-12">
-        <TitleTextCard title="Project you're most proud of" content="
+        <TitleTextCard
+          title="Project you're most proud of"
+          content="
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         />
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <PracticalCard title="Practical"/>
+        <PracticalCard title="Practical" />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <DetailsCard title="Details" :content="[
+        <DetailsCard
+          title="Details"
+          :content="[
             { description: 'First language', value: 'English'},
             { description: 'Level of English', value: '1/5'}
-          ]"/>
+          ]"
+        />
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <TitleTextCard title="Why do you want to participate in osoc?" content="
+        <TitleTextCard
+          title="Why do you want to participate in osoc?"
+          content="
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <TitleTextCard title="Why do you think you're a good fit?" content="
+        <TitleTextCard
+          title="Why do you think you're a good fit?"
+          content="
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         />
       </div>
@@ -225,7 +290,8 @@ export default defineComponent ({
   },
   methods: {
     makeSuggestion: async function () {
-      await this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion, this.reason)
+      const loggedInUser = Object.assign({}, this.authenticationStore.loggedInUser);
+      await this.studentStore.updateSuggestion(this.student.id, loggedInUser.pk, this.possibleSuggestion, this.reason)
 
       // Make components update
       this.sideBarKey += 1
