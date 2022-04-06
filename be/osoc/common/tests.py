@@ -12,14 +12,14 @@ Running tests is different because the project uses Docker:
     3. Run a single test:
         `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>.<TESTMETHOD>`
 """
-from urllib import response
+from django.dispatch import receiver
 from rest_framework.test import APITestCase
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
 import json
 
-from osoc.common.models import Coach, Project, ProjectSuggestion, Skill, Student, Suggestion
+from osoc.common.models import Coach, Project, ProjectSuggestion, SentEmail, Skill, Student, Suggestion
 import osoc.common.utils as utils
 
 class UtilityTestCases(TestCase):
@@ -753,3 +753,118 @@ class SkillTests(APITestCase):
         response = self.client.post(url, {}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_update_skill(self):
+        skill = Skill.objects.first()
+        url = reverse("skill-detail", args=(skill.id,))
+        data = {
+            "name": "new name",
+            "color": "new color"
+        }
+        response = self.client.put(url, data, format="json")
+        skill = Skill.objects.get(id=skill.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(skill.name, data["name"])
+
+
+class SentEmailTests(APITestCase):
+    def setUp(self):
+        student = Student.objects.create(
+            first_name="First name",
+            last_name="Last name",
+            email="example@example.com",
+            cv="https://example.com",
+            portfolio="https://example.com",
+            school_name="Example",
+            degree="Example",
+            studies="Example"
+        )
+        user = Coach.objects.create_user(
+            first_name="username", 
+            password="Pas$w0rd", 
+            last_name="last_name", 
+            email="email@example.com"
+        )
+        self.client.force_authenticate(user)
+        SentEmail.objects.create(
+            sender=user,
+            receiver=student,
+            info="email info"
+        )
+
+    def test_get_email_list(self):
+        url = reverse("sentemail-list")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], SentEmail.objects.count())
+
+    def test_get_email_instance(self):
+        email = SentEmail.objects.first()
+        url = reverse("sentemail-detail", args=(email.id,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], email.id)
+
+    def test_get_email_instance_not_found(self):
+        url = reverse("sentemail-detail", args=(50,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_email(self):
+        id = SentEmail.objects.first().id
+        url = reverse("sentemail-detail", args=(id,))
+        before_count = SentEmail.objects.count()
+        response = self.client.delete(url)
+        after_count = SentEmail.objects.count()
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(before_count, after_count+1)
+
+    def test_delete_email_not_found(self):
+        url = reverse("sentemail-detail", args=(50,))
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_email(self):
+        student = Student.objects.first()
+        coach = Coach.objects.first()
+        data = {
+            "sender": reverse("coach-detail", args=(coach.id,)),
+            "receiver": reverse("student-detail", args=(student.id,)),
+            "info": "info about this email"
+        }
+        url = reverse("sentemail-list")
+        before_count = SentEmail.objects.count()
+        response = self.client.post(url, data, format="json")
+        after_count = SentEmail.objects.count()
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["info"], data["info"])
+        self.assertEqual(before_count, after_count-1)
+
+    def test_create_email_bad_request(self):
+        url = reverse("sentemail-list")
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_update_email(self):
+        email = SentEmail.objects.first()
+        student = Student.objects.first()
+        coach = Coach.objects.first()
+        url = reverse("sentemail-detail", args=(email.id,))
+        data = {
+            "sender": reverse("coach-detail", args=(coach.id,)),
+            "receiver": reverse("student-detail", args=(student.id,)),
+            "info": "new info"
+        }
+        response = self.client.put(url, data, format="json")
+        email = SentEmail.objects.get(id=email.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(email.info, data["info"])
