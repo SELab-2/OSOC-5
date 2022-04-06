@@ -1,9 +1,15 @@
 <template>
   <div style="align-items: center; justify-content: center">
-    <q-form class="createProjectForm" @submit="onSubmit" @reset="onReset">
+    <q-form
+      class="createProjectForm"
+      @submit="onSubmit"
+      @reset="onReset"
+    >
       <div>
         <div class="row justify-between items-center q-gutter-sm">
-          <div class="text-bold text-h4 projectcol">Create project</div>
+          <div class="text-bold text-h4 projectcol">
+            Create project
+          </div>
           <div>
             <div class="q-gutter-sm">
               <q-btn
@@ -30,10 +36,12 @@
           <div
             class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3'"
           >
-            <h4 class="projectsubtitle">Basic Info</h4>
+            <h4 class="projectsubtitle">
+              Basic Info
+            </h4>
             <q-input
-              outlined
               v-model="project_name"
+              outlined
               label="Project name"
               lazy-rules
               class="inputfield"
@@ -44,8 +52,8 @@
               ]"
             />
             <q-input
-              outlined
               v-model="project_partner_name"
+              outlined
               label="Partner name"
               lazy-rules
               class="inputfield"
@@ -56,12 +64,12 @@
               ]"
             />
             <q-input
-              outlined
               v-model="project_link"
+              outlined
               label="Project URL"
               lazy-rules
               class="inputfield"
-              type="URL"
+              type="url"
               :rules="[
                 (val) =>
                   (val && val.length > 0) ||
@@ -73,47 +81,53 @@
           <div
             class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
           >
-            <h4 class="projectsubtitle">Project Coaches</h4>
+            <h4 class="projectsubtitle">
+              Project Coaches
+            </h4>
             <div class="row">
               <q-input
+                v-model="filter_coaches"
                 outlined
                 dense
                 debounce="300"
                 color="green"
                 class="inputfield"
-                v-model="filter_coaches"
                 placeholder="Search"
                 @keydown.enter.prevent=""
               >
-                <template v-slot:append>
+                <template #append>
                   <q-icon
                     v-if="filter_coaches !== ''"
                     name="close"
-                    @click="filter_coaches = ''"
                     class="cursor-pointer"
+                    @click="filter_coaches = ''"
                   />
-                  <q-icon v-if="filter_coaches === ''" name="search" />
+                  <q-icon
+                    v-if="filter_coaches === ''"
+                    name="search"
+                  />
                 </template>
               </q-input>
             </div>
             <q-table
+              v-model:selected="selected"
+              v-model:pagination="pagination_coaches"
               class="table shadow-4"
               :rows="coachStore.users"
               :columns="columns_coaches"
               :loading="coachStore.isLoadingUsers"
               row-key="displayName"
               selection="multiple"
-              v-model:selected="selected"
               :filter="filter_coaches"
-              :pagination.sync="pagination_coaches"
-            >
-            </q-table>
+            />
           </div>
 
           <div
             class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-6"
           >
-            <h4 class="projectsubtitle">Project Roles</h4>
+            <h4 class="projectsubtitle">
+              Project Roles
+            </h4>
             <div class="row">
               <q-btn
                 class="cornered"
@@ -124,56 +138,67 @@
               />
               <q-space />
               <q-input
+                v-model="filter_roles"
                 style="max-width: 190px"
                 outlined
                 dense
                 debounce="300"
                 color="green"
                 class="inputfield"
-                v-model="filter_roles"
                 placeholder="Search"
                 @keydown.enter.prevent=""
               >
-                <template v-slot:append>
+                <template #append>
                   <q-icon
                     v-if="filter_roles !== ''"
                     name="close"
-                    @click="filter_roles = ''"
                     class="cursor-pointer"
+                    @click="filter_roles = ''"
                   />
-                  <q-icon v-if="filter_roles === ''" name="search" />
+                  <q-icon
+                    v-if="filter_roles === ''"
+                    name="search"
+                  />
                 </template>
               </q-input>
             </div>
             <q-table
+              v-model:pagination="pagination_roles"
               class="table shadow-4"
               :rows="skillStore.skills"
               :columns="columns_roles"
               :loading="skillStore.isLoadingSkills"
-              :pagination.sync="pagination_roles"
               row-key="name"
               :filter="filter_roles"
             >
-              <template v-slot:body="props">
+              <template #body="props">
                 <q-tr
                   :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''"
                   :props="props"
                 >
-                  <q-td key="role" :props="props"> {{ props.row.name }}</q-td>
-                  <q-td key="amount" :props="props">
+                  <q-td
+                    key="role"
+                    :props="props"
+                  >
+                    {{ props.row.name }}
+                  </q-td>
+                  <q-td
+                    key="amount"
+                    :props="props"
+                  >
                     {{ props.row.amount }}
                     <q-popup-edit
+                      v-slot="scope"
                       v-model.number="props.row.amount"
                       buttons
                       label-set="Save"
                       label-cancel="Close"
                       :validate="amountRangeValidation"
                       @hide="amountRangeValidation"
-                      v-slot="scope"
                     >
                       <q-input
-                        type="number"
                         v-model.number="scope.value"
+                        type="number"
                         hint="Enter a positive number."
                         :error="errorRoleAmount"
                         :error-message="errorMessageRoleAmount"
@@ -184,17 +209,20 @@
                       />
                     </q-popup-edit>
                   </q-td>
-                  <q-td key="comment" :props="props">
+                  <q-td
+                    key="comment"
+                    :props="props"
+                  >
                     <div>{{ props.row.comment }}</div>
                     <q-popup-edit
-                      buttons
-                      v-model="props.row.comment"
                       v-slot="scope"
+                      v-model="props.row.comment"
+                      buttons
                     >
                       <q-input
+                        v-model="scope.value"
                         type="text"
                         autogrow
-                        v-model="scope.value"
                         autofocus
                         counter
                         borderless
@@ -202,16 +230,19 @@
                       />
                     </q-popup-edit>
                   </q-td>
-                  <q-td style="width: 10px" key="remove">
+                  <q-td
+                    key="remove"
+                    style="width: 10px"
+                  >
                     <q-btn
                       flat
                       round
                       style="color: #f14a3b"
+                      icon="mdi-trash-can-outline"
                       @click="
                         delete_role = props.row;
                         delete_role_prompt = true
                       "
-                      icon="mdi-trash-can-outline"
                     />
                   </q-td>
                 </q-tr>
@@ -223,17 +254,22 @@
     </q-form>
   </div>
 
-  <q-dialog v-model="new_role_prompt" persistent>
+  <q-dialog
+    v-model="new_role_prompt"
+    persistent
+  >
     <q-card style="min-width: 350px">
       <q-card-section>
-        <div class="text-h6">Create a new role</div>
+        <div class="text-h6">
+          Create a new role
+        </div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
         <q-input
+          v-model="new_role"
           outlined
           autofocus
-          v-model="new_role"
           class="inputfield"
           label="Role name"
           lazy-rules
@@ -244,18 +280,36 @@
         />
       </q-card-section>
 
-      <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" v-close-popup />
-        <q-btn flat label="Add role" @click="new_role_confirm" />
+      <q-card-actions
+        align="right"
+        class="text-primary"
+      >
+        <q-btn
+          v-close-popup
+          flat
+          label="Cancel"
+        />
+        <q-btn
+          flat
+          label="Add role"
+          @click="new_role_confirm"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
 
-  <q-dialog v-model="delete_role_prompt" persistent>
+  <q-dialog
+    v-model="delete_role_prompt"
+    persistent
+  >
     <q-card style="min-width: 350px">
       <q-card-section horizontal>
         <q-card-section class="col-3 flex flex-center">
-          <q-icon name="warning" class="text-red" size="80px" />
+          <q-icon
+            name="warning"
+            class="text-red"
+            size="80px"
+          />
         </q-card-section>
         <q-card-section class="q-pt-xs">
           <div class="text-h6 q-mt-sm q-mb-xs">
@@ -268,9 +322,22 @@
         </q-card-section>
       </q-card-section>
 
-      <q-card-actions align="right" class="text-primary">
-        <q-btn flat color="grey" label="Cancel" v-close-popup />
-        <q-btn flat color="red" label="Delete" @click="delete_role_confirm" />
+      <q-card-actions
+        align="right"
+        class="text-primary"
+      >
+        <q-btn
+          v-close-popup
+          flat
+          color="grey"
+          label="Cancel"
+        />
+        <q-btn
+          flat
+          color="red"
+          label="Delete"
+          @click="delete_role_confirm"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -279,7 +346,7 @@
 <script lang="ts">
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
-import { onMounted } from '@vue/runtime-core'
+import { defineComponent, onMounted } from '@vue/runtime-core'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 
@@ -325,7 +392,7 @@ const columns_coaches = [
   },
 ]
 
-export default {
+export default defineComponent({
   setup() {
     const skillStore = useSkillStore()
     const coachStore = useCoachStore()
@@ -471,7 +538,7 @@ export default {
       },
     }
   },
-}
+})
 </script>
 
 <style>
