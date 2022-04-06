@@ -152,7 +152,7 @@ export default defineComponent ({
     }
   },
   data() {
-    const possibleSuggestion = ref(-1)
+    const possibleSuggestion = ref(null)
     const suggestionDialog = ref(false)
     const reason = ref(null)
 
@@ -172,7 +172,8 @@ export default defineComponent ({
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     mySuggestion(): number | null {
-      if (this.student) {
+      console.log(this.student)
+      if (! this.studentStore.isLoading && this.student) {
         const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser?.email)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
@@ -186,7 +187,7 @@ export default defineComponent ({
       if (mySuggestion !== null) {
         return mySuggestion === 0 ? "green" : (mySuggestion === 1 ? "yellow" : (mySuggestion === 2 ? "red" : "grey"))
       } else {
-        return ""
+        return "grey"
       }
     },
     suggestionName(): string {

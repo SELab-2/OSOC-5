@@ -25,8 +25,6 @@ export const useStudentStore = defineStore('user/student', {
             await instance
                 .get('students/')
                 .then(({data}) => {
-                    this.isLoading = false
-
                     for (const student of data) {
                         for (const suggestion of student.suggestions) {
                             suggestion.suggestion = parseInt(suggestion.suggestion)
@@ -54,6 +52,8 @@ export const useStudentStore = defineStore('user/student', {
 
                 }
             }
+
+            this.isLoading = false
         },
         async loadStudent(studentId: number) {
             this.isLoading = true
