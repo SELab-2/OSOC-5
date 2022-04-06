@@ -348,7 +348,8 @@ class Suggestion(models.Model):
         return self.coach.id
 
     def __str__(self):
-        return f"{self.suggestion}: {self.reason}"
+        suggestion_label = self.Suggestion(self.suggestion).label
+        return f"{suggestion_label}: {self.reason}"
 
 
 class ProjectSuggestion(models.Model):
