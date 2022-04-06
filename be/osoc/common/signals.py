@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
 
-from osoc.common.models import Coach, Student
+from osoc.common.models import Coach
 
 
 @receiver(pre_save, sender=Coach)
