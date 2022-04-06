@@ -90,10 +90,6 @@ class Coach(AbstractUser):  # models.Model):
         _('is admin'),
         default=False
     )
-    is_active = models.BooleanField(
-        _('is active'),
-        default=True
-    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
