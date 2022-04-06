@@ -167,6 +167,14 @@ class StudentTestsCoach(APITestCase):
     
     def test_student_remove_suggestion(self):
         student = Student.objects.first()
+        # first, make sure there is a suggestion
+        url = reverse("student-make-suggestion", args=(student.id,))
+        data = {
+            "suggestion": "0", 
+            "reason": "a reason"
+        }
+        self.client.post(url, data, format="json")
+
         url = reverse("student-remove-suggestion", args=(student.id,))
         before_count = Suggestion.objects.filter(student=student).count()
         response = self.client.delete(url, format="json")
@@ -188,7 +196,7 @@ class StudentTestsCoach(APITestCase):
 
     def test_student_make_final_decision_forbidden(self):
         student = Student.objects.first()
-        url = reverse("student-make-final_decision", args=(student.id,))
+        url = reverse("student-make-final-decision", args=(student.id,))
         data = {
             "suggestion": "0", 
             "reason": "a reason"
@@ -200,7 +208,7 @@ class StudentTestsCoach(APITestCase):
 
 class StudentTestsAdmin(APITestCase):
     def setUp(self) -> None:
-        student = Student.objects.create(
+        Student.objects.create(
             first_name="First name",
             last_name="Last name",
             call_name="call name",
@@ -224,14 +232,6 @@ class StudentTestsAdmin(APITestCase):
             is_admin=True
         )
         self.client.force_authenticate(admin)
-
-        suggestion = Suggestion.objects.create(
-            student=student,
-            coach=admin,
-            suggestion="1",
-            reason="a reason"
-        )
-        student.final_decision = suggestion
     
     def test_student_make_final_decision(self):
         student = Student.objects.first()
@@ -251,6 +251,13 @@ class StudentTestsAdmin(APITestCase):
 
     def test_student_remove_final_decision(self):
         student = Student.objects.first()
+        # first make sure there is a suggestion to delete
+        url = reverse("student-make-final-decision", args=(student.id,))
+        data = {
+            "suggestion": "0", 
+            "reason": "a reason"
+        }
+        self.client.post(url, data, format="json")
 
         url = reverse("student-remove-final-decision", args=(student.id,))
         before_count = Suggestion.objects.filter(student=student).count()
