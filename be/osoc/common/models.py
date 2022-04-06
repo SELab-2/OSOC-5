@@ -7,7 +7,9 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
+from datetime import datetime
 
+# Phone number validation
 phone_regex = RegexValidator(
     regex=r'^\+?1?\d{9,15}$',
     message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
@@ -21,10 +23,7 @@ class Skill(models.Model):
     """
     name = models.CharField(
         _('name'),
-        max_length=255
-    )
-    description = models.CharField(
-        _('description'),
+        unique=True,
         max_length=255
     )
     color = models.CharField(
@@ -91,10 +90,9 @@ class Coach(AbstractUser):  # models.Model):
         _('is admin'),
         default=False
     )
-    last_email_sent = models.DateTimeField(
-        _('last email sent'),
-        blank=True,
-        null=True
+    is_active = models.BooleanField(
+        _('is active'),
+        default=True
     )
 
     USERNAME_FIELD = 'email'
@@ -124,8 +122,7 @@ class Coach(AbstractUser):  # models.Model):
     def save(self, *args, **kwargs):
         """
         Custom save method that calls the full_clean method.
-        See https://docs.djangoproject.com/en/dev/ref/models/instances/
-        #django.db.models.Model.clean_fields
+        See https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.clean_fields
         """
         self.full_clean()
         super(Coach, self).save(*args, **kwargs)
@@ -156,8 +153,8 @@ class Student(models.Model):
     call_name = models.CharField(
         _('call name'),
         max_length=255,
-        null=True,
-        blank=True
+        blank=True,
+        default=""
     )
     email = models.EmailField(
         _('email address'),
@@ -169,7 +166,7 @@ class Student(models.Model):
         validators=[phone_regex],
         max_length=17,
         blank=True,
-        null=True
+        default=""
     )
     language = models.CharField(
         _('language'),
@@ -180,7 +177,7 @@ class Student(models.Model):
     extra_info = models.TextField(
         _('extra info'),
         blank=True,
-        null=True
+        default=""
     )
     cv = models.URLField(
         _('cv'),
@@ -189,11 +186,6 @@ class Student(models.Model):
     portfolio = models.URLField(
         _('portfolio'),
         max_length=200
-    )
-    last_email_sent = models.DateTimeField(
-        _('last email sent'),
-        null=True,
-        blank=True
     )
     school_name = models.CharField(
         _("school name"),
@@ -207,6 +199,10 @@ class Student(models.Model):
         _("studies"),
         max_length=255
     )
+    alum = models.BooleanField(
+        _("alum"),
+        default=False
+    )
     skills = models.ManyToManyField(
         Skill,
     )
@@ -214,6 +210,13 @@ class Student(models.Model):
         Coach,
         through='Suggestion',
         blank=True
+    )
+    final_decision = models.ForeignKey(
+        'Suggestion',
+        on_delete=models.SET_NULL,
+        related_name='final_decision_student',
+        blank=True,
+        null=True
     )
 
     def get_full_name(self):
@@ -238,8 +241,7 @@ class Student(models.Model):
     def save(self, *args, **kwargs):
         """
         Custom save method that calls the full_clean method.
-        See https://docs.djangoproject.com/en/dev/ref/models/instances/
-        #django.db.models.Model.clean_fields
+        See https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.clean_fields
         """
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
@@ -284,8 +286,8 @@ class Project(models.Model):
 
 class RequiredSkills(models.Model):
     """
-        Intermediary model; A project can need a skill N times.
-        """
+    Intermediary model; A project can need a skill N times.
+    """
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE
@@ -297,6 +299,12 @@ class RequiredSkills(models.Model):
     amount = models.PositiveSmallIntegerField(
         _('amount'),
         default=1,
+    )
+    comment = models.CharField(
+        _('comment'),
+        default="",
+        blank=True,
+        max_length=500
     )
 
 
@@ -323,14 +331,21 @@ class Suggestion(models.Model):
         max_length=1,
         choices=Suggestion.choices,
     )
-    reason = models.TextField(
+    reason = models.CharField(
         _('reason'),
         blank=True,
-        null=True
+        default="",
+        max_length=500
     )
 
     class Meta:
         unique_together = (("student", "coach"))
+
+    def coach_name(self):
+        return self.coach.get_full_name()
+    
+    def coach_id(self):
+        return self.coach.id
 
     def __str__(self):
         return f"{self.suggestion}: {self.reason}"
@@ -340,10 +355,11 @@ class ProjectSuggestion(models.Model):
     """
     Intermediary model; A coach can suggest a student for a project.
     """
-    reason = models.TextField(
+    reason = models.CharField(
         _('reason'),
         blank=True,
-        null=True
+        default="",
+        max_length=500
     )
     project = models.ForeignKey(
         Project,
@@ -357,12 +373,41 @@ class ProjectSuggestion(models.Model):
         Coach,
         on_delete=models.CASCADE
     )
-    role = models.ForeignKey(
+    skill = models.ForeignKey(
         Skill,
         on_delete=models.CASCADE
     )
 
     class Meta:
-
         unique_together = (("project", "student", "coach"))
+    
+    def coach_name(self):
+        return self.coach.get_full_name()
+    
+    def coach_id(self):
+        return self.coach.id
 
+
+class SentEmail(models.Model):
+    """
+    Information about which emails have been sent to which students
+    """
+    sender = models.ForeignKey(
+        Coach,
+        on_delete=models.CASCADE
+    )
+    receiver = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE
+    )
+    time = models.DateTimeField(
+        _("send date and time"),
+        default=datetime.now, 
+        blank=True
+    )
+    info = models.CharField(
+        _("email info"),
+        max_length=255,
+        blank=True,
+        default=""
+    )
