@@ -152,14 +152,12 @@ export default defineComponent ({
     }
   },
   data() {
-    const possibleSuggestion = ref(null)
     const suggestionDialog = ref(false)
-    const reason = ref(null)
+    const reason = ref("")
 
     return {
       sideBarKey: 0,
       studentKey: 0,
-      possibleSuggestion,
       suggestionDialog,
       reason
     }
@@ -168,17 +166,19 @@ export default defineComponent ({
     student(): Student | null {
       return this.studentStore.currentStudent
     },
+    possibleSuggestion(): number {
+      return this.studentStore.possibleSuggestion
+    },
     name(): string {
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     mySuggestion(): number | null {
-      console.log(this.student)
       if (! this.studentStore.isLoading && this.student) {
         const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser?.email)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
-        return null
+        return this.possibleSuggestion
       }
 
     },
@@ -226,7 +226,9 @@ export default defineComponent ({
   },
   methods: {
     makeSuggestion: async function () {
-      await this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion, this.reason)
+      if (this.student) {
+        await this.studentStore.updateSuggestion(this.student.id, this.reason)
+      }
 
       // Make components update
       this.sideBarKey += 1
@@ -236,7 +238,7 @@ export default defineComponent ({
       this.$router.push(`/students/${selected_student.id}`)
     },
     showDialog: function (value: number) {
-      this.possibleSuggestion = value
+      this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
     }
   },

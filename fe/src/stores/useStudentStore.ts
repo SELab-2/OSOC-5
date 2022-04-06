@@ -8,6 +8,7 @@ interface State {
     coaches: Map<string, User>
     students: Array<Student>
     isLoading: boolean
+    possibleSuggestion: number
     currentStudent: Student | null
 }
 
@@ -16,6 +17,7 @@ export const useStudentStore = defineStore('user/student', {
         coaches: new Map(),
         students: [],
         isLoading: false,
+        possibleSuggestion: -1,
         currentStudent: null,
     }),
     actions: {
@@ -84,10 +86,10 @@ export const useStudentStore = defineStore('user/student', {
                 this.isLoading = false
             }
         },
-        async updateSuggestion(studentId: number, suggestion: number, reason: string) {
+        async updateSuggestion(studentId: number, reason: string) {
             await instance
                 .post(`students/${studentId}/make_suggestion/`, {
-                    suggestion: suggestion,
+                    suggestion: this.possibleSuggestion,
                     reason: reason
                 })
 
