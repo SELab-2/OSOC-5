@@ -43,11 +43,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Project',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('partner_name', models.CharField(max_length=255, verbose_name='partner name')),
+                ('partner_name', models.CharField(
+                    max_length=255, verbose_name='partner name')),
                 ('extra_info', models.TextField(verbose_name='extra info')),
-                ('coaches', models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL)),
+                ('coaches', models.ManyToManyField(
+                    blank=True, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
@@ -103,7 +106,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='student',
             name='suggestions',
-            field=models.ManyToManyField(blank=True, through='common.Suggestion', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(
+                blank=True, through='common.Suggestion', to=settings.AUTH_USER_MODEL),
         ),
         migrations.CreateModel(
             name='SentEmail',
@@ -142,11 +146,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='project',
             name='required_skills',
-            field=models.ManyToManyField(through='common.RequiredSkills', to='common.skill'),
+            field=models.ManyToManyField(
+                through='common.RequiredSkills', to='common.skill'),
         ),
         migrations.AddField(
             model_name='project',
             name='suggested_students',
-            field=models.ManyToManyField(blank=True, through='common.ProjectSuggestion', to='common.student'),
+            field=models.ManyToManyField(
+                blank=True, through='common.ProjectSuggestion', to='common.student'),
         ),
     ]

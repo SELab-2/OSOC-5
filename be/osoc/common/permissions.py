@@ -3,6 +3,7 @@ Permission classes specific to the OSOC application.
 """
 from rest_framework import permissions
 
+
 class IsAdmin(permissions.BasePermission):
     """
     Custom permission class that allows OSOC admins to edit a view (PUT, POST and DELETE).
@@ -17,6 +18,7 @@ class IsAdmin(permissions.BasePermission):
 
         # Write permissions are only allowed to the admin
         return request.user.is_admin
+
 
 class IsOwnerOrAdmin(permissions.BasePermission):
     """
