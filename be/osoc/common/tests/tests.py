@@ -4,7 +4,7 @@ Django tests for API endpoints.
 Running tests is different because the project uses Docker:
 
     1. Run all tests:
-        `docker exec -it osoc-be python manage.py test osoc.common.tests`
+        `docker exec -it osoc-be python manage.py test`
 
     2. Run one test class:
         `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>`
@@ -12,7 +12,6 @@ Running tests is different because the project uses Docker:
     3. Run a single test:
         `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>.<TESTMETHOD>`
 """
-from django.dispatch import receiver
 from rest_framework.test import APITestCase
 from django.test import TestCase
 from rest_framework import status
@@ -24,8 +23,9 @@ import osoc.common.utils as utils
 
 class UtilityTestCases(TestCase):
     def testStripAndLowerEmail(self):
-        self.assertEqual('admin@example.com', utils.strip_and_lower_email('Admin@Example.com'))
-        self.assertEqual('admin@example.com', utils.strip_and_lower_email('  Admin@Example.com    '))
+        correct_email = 'admin@example.com'
+        test_email = utils.strip_and_lower_email('  Admin@Example.com    ')
+        self.assertEqual(correct_email, test_email)
 
 
 class StudentTestsCoach(APITestCase):

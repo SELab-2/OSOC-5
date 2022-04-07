@@ -65,9 +65,13 @@ WSGI_APPLICATION = 'osoc.wsgi.application'
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+
 NOSE_ARGS = [
+    '--cover-erase',
     '--with-coverage',
     '--cover-package=osoc.common',
+    # '--verbosity=3', # include for more output
+    '--exe' # include exe's for windows docker because windows thinks python files are exe's
 ]
 
 # Password validation
