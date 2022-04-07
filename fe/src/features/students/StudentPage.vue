@@ -79,45 +79,51 @@
 
   <div class="q-gutter-sm q-pa-lg">
     <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+      <div class="studentcol col-xs-12 col-sm-12 col-md-5 col-lg-5">
         <SuggestionsCard :index="studentKey" title="Suggestions"/>
       </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <AcademiaCard :index="studentKey"
-          title="Academia"
-        />
+      <div class="studentcol col-xs-12 col-sm-12 col-md-7 col-lg-7">
+        <AcademiaCard :index="studentKey" title="Academia"/>
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-12">
-        <TitleTextCard title="Project you're most proud of" content="
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        />
+        <SkillsCard :index="studentKey" title="Skills"/>
+      </div>
+      <div class="studentcol col-12">
+        <ExtraInfoCard :index="studentKey" title="Extra Info"/>
       </div>
     </div>
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <PracticalCard title="Practical"/>
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <DetailsCard title="Details" :content="[
-            { description: 'First language', value: 'English'},
-            { description: 'Level of English', value: '1/5'}
-          ]"/>
-      </div>
-    </div>
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <TitleTextCard title="Why do you want to participate in osoc?" content="
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        />
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <TitleTextCard title="Why do you think you're a good fit?" content="
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        />
-      </div>
-    </div>
+<!--    <div class="row">-->
+<!--      <div class="studentcol col-12">-->
+<!--        <TitleTextCard title="Project you're most proud of" content="-->
+<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+<!--        />-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="row">-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">-->
+<!--        <PracticalCard title="Practical"/>-->
+<!--      </div>-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
+<!--        <DetailsCard title="Details" :content="[-->
+<!--            { description: 'First language', value: 'English'},-->
+<!--            { description: 'Level of English', value: '1/5'}-->
+<!--          ]"/>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="row">-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
+<!--        <TitleTextCard title="Why do you want to participate in osoc?" content="-->
+<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+<!--        />-->
+<!--      </div>-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
+<!--        <TitleTextCard title="Why do you think you're a good fit?" content="-->
+<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+<!--        />-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -127,21 +133,19 @@ import {useStudentStore} from "../../stores/useStudentStore";
 import {ref} from "vue";
 import SideBar from "../../components/SideBar.vue"
 import AcademiaCard from "./components/AcademiaCard.vue";
-import DetailsCard from "./components/DetailsCard.vue";
-import PracticalCard from "./components/PracticalCard.vue";
+import SkillsCard from "./components/SkillsCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
-import TitleTextCard from "./components/TitleTextCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
 import {defineComponent} from "@vue/runtime-core";
+import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 
 export default defineComponent ({
   components: {
+    ExtraInfoCard,
     AcademiaCard,
-    DetailsCard,
-    PracticalCard,
     SuggestionsCard,
-    TitleTextCard,
+    SkillsCard,
     SegmentedControl,
     SideBar,
   },

@@ -4,6 +4,7 @@ import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import { User } from '../models/User'
 import {Student} from "../models/Student";
 import {Suggestion} from "../models/Suggestion";
+import {Skill} from "../models/Skill";
 
 interface State {
     coaches: Map<string, User>
@@ -48,7 +49,7 @@ export const useStudentStore = defineStore('user/student', {
 
             await instance
                 .get(`students/${studentId}/`)
-                .then(({data}) => {
+                .then(async ({data}) => {
                     for (const suggestion of data.suggestions) {
                         suggestion.suggestion = parseInt(suggestion.suggestion)
                     }
@@ -57,6 +58,18 @@ export const useStudentStore = defineStore('user/student', {
                         data.final_decision.suggestion = parseInt(data.final_decision.suggestion)
                     }
 
+                    const skills = [] as Skill[]
+
+                    for (let i = 0; i < data.skills.length; i++) {
+                        await instance
+                            .get(data.skills[i])
+                            .then(({data}) => {
+                                skills.push(data)
+                                console.log(skills)
+                            })
+                    }
+
+                    data.skillList = skills
                     this.currentStudent = convertObjectKeysToCamelCase(data) as never as Student
                 })
 
