@@ -24,7 +24,6 @@
           name="students"
           label="Select Students"
           to="/students"
-          exact
         />
         <q-route-tab
           name="projects"
