@@ -17,7 +17,7 @@
             <label class="q-pl-xs">
               {{ suggestion.first_name + ' ' + suggestion.last_name }}
             </label>
-            <q-icon v-if="suggestion.reason" name="mdi-information-outline">
+            <q-icon v-if="suggestion.reason" class="tooltip-icon" name="mdi-information-outline">
               <q-tooltip anchor="center right" self="center start">
                 {{ suggestion.reason }}
               </q-tooltip>
@@ -50,3 +50,10 @@ export default {
   },
 }
 </script>
+
+<style>
+.tooltip-icon {
+  left: 2px;
+  top: 4px
+}
+</style>
