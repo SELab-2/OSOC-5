@@ -52,7 +52,7 @@ instance.interceptors.response.use(
 )
 
 function refreshToken(instance: AxiosInstance) {
-  return instance.post('/auth/refreshtoken', {
+  return instance.post('/auth/token/refresh/', {
     refreshToken: localStorage.getItem('refreshToken'),
   })
 }
