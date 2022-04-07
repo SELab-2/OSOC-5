@@ -4,7 +4,6 @@
     "pk": 1,
     "fields": {
       "name": "Front-end developer",
-      "description": "Develops the front-end",
       "color": "yellow"
     }
   },
@@ -13,7 +12,6 @@
     "pk": 2,
     "fields": {
       "name": "Back-end developer",
-      "description": "Back-ends the developer",
       "color": "blue"
     }
   },
@@ -22,7 +20,6 @@
     "pk": 3,
     "fields": {
       "name": "Sysadmin",
-      "description": "System administrator",
       "color": "red"
     }
   },
@@ -31,7 +28,6 @@
     "pk": 4,
     "fields": {
       "name": "Full-stack developer",
-      "description": "Knows it all",
       "color": "magenta"
     }
   },
@@ -40,7 +36,6 @@
     "pk": 5,
     "fields": {
       "name": "Student coach",
-      "description": "The bridge between students and coaches",
       "color": "cyan"
     }
   },
@@ -49,7 +44,6 @@
     "pk": 6,
     "fields": {
       "name": "Communication Expert",
-      "description": "Muy bien at communicating",
       "color": "white"
     }
   },
@@ -58,7 +52,6 @@
     "pk": 7,
     "fields": {
       "name": "Tester",
-      "description": "Knows how to write tests",
       "color": "black"
     }
   },
@@ -76,7 +69,6 @@
       "last_name": "admin",
       "email": "admin@example.com",
       "is_admin": true,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -95,7 +87,6 @@
       "last_name": "Vandenberghe",
       "email": "friedrich.vandenberghe@ugent.be",
       "is_admin": false,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -114,7 +105,6 @@
       "last_name": "Saerens",
       "email": "lander.saerens@ugent.be",
       "is_admin": true,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -133,7 +123,6 @@
       "last_name": "Cattoire",
       "email": "henri.cattoire@ugent.be",
       "is_admin": false,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -152,7 +141,6 @@
       "last_name": "test",
       "email": "test@example.com",
       "is_admin": false,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -171,7 +159,6 @@
       "last_name": "De Jonghe",
       "email": "lisa.dejonghe@ugent.be",
       "is_admin": false,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -190,7 +177,6 @@
       "last_name": "Hennen",
       "email": "wouter.hennen@ugent.be",
       "is_admin": true,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -201,14 +187,13 @@
     "fields": {
       "first_name": "Jan",
       "last_name": "Pieter",
-      "call_name": null,
+      "call_name": "",
       "email": "jan.pieter@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "0",
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "UGent",
       "degree": "MaNaMa",
       "studies": "Computer Science",
@@ -223,14 +208,13 @@
     "fields": {
       "first_name": "Wouter",
       "last_name": "Siemens",
-      "call_name": null,
+      "call_name": "",
       "email": "wouter.siemens@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "3",
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "VUB",
       "degree": "500 Masters",
       "studies": "Zeverologie",
@@ -253,7 +237,6 @@
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "KUL",
       "degree": "Bachelor",
       "studies": "Taal- en letterkunde",
@@ -270,12 +253,11 @@
       "last_name": "Kerrigan",
       "call_name": "Kerrigan",
       "email": "sarah.kerrigan@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "1",
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "MIT",
       "degree": "Masters",
       "studies": "Computer Science",
@@ -292,14 +274,13 @@
     "fields": {
       "first_name": "Jim",
       "last_name": "Carrey",
-      "call_name": null,
+      "call_name": "",
       "email": "jim.carrey@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "1",
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "UCL",
       "degree": "Masters",
       "studies": "Communication",
@@ -315,14 +296,13 @@
     "fields": {
       "first_name": "Lisa",
       "last_name": "Simpsons",
-      "call_name": null,
+      "call_name": "",
       "email": "lisa@simpsons.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "1",
       "extra_info": "",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "Springfield Elementary",
       "degree": "Lower School",
       "studies": "Not applicable",
@@ -339,12 +319,11 @@
       "last_name": "Dijkstra",
       "call_name": "Dijkstra",
       "email": "edsger@dijkstra.nl",
-      "phone_number": null,
+      "phone_number": "",
       "language": "0",
       "extra_info": "",
       "cv": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
       "portfolio": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
-      "last_email_sent": null,
       "school_name": "Leiden",
       "degree": "BS & MS",
       "studies": "Mathematics",
@@ -362,14 +341,13 @@
     "fields": {
       "first_name": "Bertrand",
       "last_name": "Meyer",
-      "call_name": null,
+      "call_name": "",
       "email": "bertrand.meyer@france.fr",
-      "phone_number": null,
+      "phone_number": "",
       "language": "2",
       "extra_info": "",
       "cv": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
       "portfolio": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
-      "last_email_sent": null,
       "school_name": "École Polytechnique",
       "degree": "Masters",
       "studies": "Engineering",
@@ -386,14 +364,13 @@
     "fields": {
       "first_name": "Jean-Raymond",
       "last_name": "Abrial",
-      "call_name": null,
+      "call_name": "",
       "email": "jean@ariel.fr",
-      "phone_number": null,
+      "phone_number": "",
       "language": "2",
       "extra_info": "",
       "cv": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
       "portfolio": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
-      "last_email_sent": null,
       "school_name": "ETH Zurich",
       "degree": "Professor",
       "studies": "Engineering",
@@ -409,14 +386,13 @@
     "fields": {
       "first_name": "Jonathan",
       "last_name": "Bowen",
-      "call_name": null,
+      "call_name": "",
       "email": "bowen@bouwer.co.uk",
-      "phone_number": null,
+      "phone_number": "",
       "language": "1",
       "extra_info": "",
       "cv": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
       "portfolio": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
-      "last_email_sent": null,
       "school_name": "University College, Oxford",
       "degree": "MA",
       "studies": "Engineering Science",
@@ -433,14 +409,13 @@
     "fields": {
       "first_name": "Egon",
       "last_name": "Börger",
-      "call_name": null,
+      "call_name": "",
       "email": "egon@bergerman.de",
-      "phone_number": null,
+      "phone_number": "",
       "language": "3",
       "extra_info": "",
       "cv": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
       "portfolio": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
-      "last_email_sent": null,
       "school_name": "University of Münster",
       "degree": "Masters",
       "studies": "Computer Science",
@@ -857,7 +832,7 @@
       "project": 1,
       "student": 3,
       "coach": 3,
-      "role": 3
+      "skill_id": 3
     }
   },
   {
@@ -868,7 +843,7 @@
       "project": 5,
       "student": 7,
       "coach": 4,
-      "role": 7
+      "skill_id": 7
     }
   },
   {
@@ -879,7 +854,7 @@
       "project": 11,
       "student": 5,
       "coach": 7,
-      "role": 2
+      "skill_id": 2
     }
   },
   {
@@ -890,7 +865,7 @@
       "project": 8,
       "student": 5,
       "coach": 4,
-      "role": 5
+      "skill_id": 5
     }
   },
   {
@@ -901,7 +876,7 @@
       "project": 10,
       "student": 6,
       "coach": 7,
-      "role": 3
+      "skill_id": 3
     }
   },
   {
@@ -912,7 +887,7 @@
       "project": 9,
       "student": 2,
       "coach": 8,
-      "role": 2
+      "skill_id": 2
     }
   },
   {
@@ -923,7 +898,7 @@
       "project": 6,
       "student": 2,
       "coach": 1,
-      "role": 2
+      "skill_id": 2
     }
   },
   {
@@ -934,7 +909,7 @@
       "project": 5,
       "student": 4,
       "coach": 2,
-      "role": 4
+      "skill_id": 4
     }
   },
   {
@@ -945,7 +920,7 @@
       "project": 3,
       "student": 8,
       "coach": 3,
-      "role": 4
+      "skill_id": 4
     }
   },
   {
@@ -956,7 +931,7 @@
       "project": 7,
       "student": 4,
       "coach": 1,
-      "role": 3
+      "skill_id": 3
     }
   }
 ]
