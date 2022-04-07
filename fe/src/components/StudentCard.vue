@@ -4,14 +4,13 @@
           :class="mySuggestionColor"
           style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);" />
     <q-card class="full-width position" :class="active? 'bg-teal-1' : ''">
-
       <q-card-section rounded>
         <div class="row justify-between">
           <div>
             <label class="text-bold q-pr-xs">{{ name }}</label>
-            <!--          <q-icon v-if="official === 'yes'" size="xs" name="mdi-check" color="green" />-->
-            <!--          <q-icon v-else-if="official === 'maybe'" size="xs" name="mdi-help" color="yellow" />-->
-            <!--          <q-icon v-else size="xs" name="mdi-close" color="red" />-->
+              <q-icon class="final-decision-icon" v-if="official === 0" size="xs" name="mdi-check" color="green" />
+              <q-icon class="final-decision-icon" v-else-if="official === 1" size="xs" name="mdi-help" color="yellow" />
+              <q-icon class="final-decision-icon" v-else-if="official === 2" size="xs" name="mdi-close" color="red" />
           </div>
           <label class="text-bold">{{ total }}</label>
         </div>
@@ -89,11 +88,18 @@ export default defineComponent({
     name(): string {
       return this.student.firstName + ' ' + this.student.lastName
     },
+    official(): number {
+      if (this.student.finalDecision) {
+        return this.student.finalDecision.suggestion
+      } else {
+        return -1
+      }
+    },
     mySuggestion(): number | null {
       if (this.student) {
         const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
           if (this.authenticationStore.loggedInUser != null) {
-            return suggestion.email === this.authenticationStore.loggedInUser.email
+            return suggestion.coachId === this.authenticationStore.loggedInUser.id
           }
         })
 
@@ -117,5 +123,8 @@ export default defineComponent({
   background-color: #bbb;
   border-radius: 15%;
   display: inline-block;
+}
+.final-decision-icon {
+  top: -2px
 }
 </style>

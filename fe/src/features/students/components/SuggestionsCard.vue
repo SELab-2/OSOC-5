@@ -15,7 +15,7 @@
             <q-icon v-else-if="suggestion.suggestion === 1" size="xs" name="mdi-help" color="yellow" />
             <q-icon v-else size="xs" name="mdi-close" color="red" />
             <label class="q-pl-xs">
-              {{ suggestion.first_name + ' ' + suggestion.last_name }}
+              {{ suggestion.coachName }}
             </label>
             <q-icon v-if="suggestion.reason" class="tooltip-icon" name="mdi-information-outline">
               <q-tooltip anchor="center right" self="center start">

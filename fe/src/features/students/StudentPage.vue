@@ -10,14 +10,28 @@
     </div>
     <div class="row q-gutter-sm items-center">
       <q-select
+        v-model="possibleFinalDecision"
+        @update:modelValue="selectPossibleFinalDecision"
+        emit-value
+        map-options
         rounded
         outlined
         dense
         style="width: 200px"
-        :options="['Yes', 'Maybe', 'No']"
+        :options="[
+          { name: 0, label: 'Yes' },
+          { name: 1, label: 'Maybe' },
+          { name: 2, label: 'No' },
+          { name: -1, label: 'Not decided' },
+        ]"
         label="Final decision"
       />
-      <q-btn icon-right="mail" class="cornered" label="Confirm" outline color='black'/>
+      <q-btn @click="finalDecision"
+             icon-right="mail"
+             class="cornered"
+             label="Confirm"
+             outline
+             color='black'/>
     </div>
   </div>
 
@@ -170,6 +184,9 @@ export default defineComponent ({
     possibleSuggestion(): number {
       return this.studentStore.possibleSuggestion
     },
+    possibleFinalDecision(): number {
+      return this.studentStore.possibleFinalDecision
+    },
     name(): string {
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
@@ -242,6 +259,18 @@ export default defineComponent ({
     showDialog: function (value: number) {
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
+    },
+    selectPossibleFinalDecision: function (value: any) {
+      this.studentStore.possibleFinalDecision = value.name
+    },
+    finalDecision: async function () {
+      if (this.student) {
+        await this.studentStore.updateFinalDecision(this.student.id)
+      }
+
+      // Make components update
+      this.sideBarKey += 1
+      this.studentKey += 1
     }
   },
 })
