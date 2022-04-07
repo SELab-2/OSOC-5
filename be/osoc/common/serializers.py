@@ -1,7 +1,6 @@
 """
 Serializers definitions of the Django models defined in ./models.py.
 """
-from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import *
@@ -12,50 +11,46 @@ from dj_rest_auth.serializers import LoginSerializer
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Suggestion
-        fields = ['suggestion', 'reason', 'coach']
+        fields = ['suggestion', 'reason', 'coach_name', 'coach_id', 'coach']
         read_only_fields = ['coach']
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     suggestions = SuggestionSerializer(
         many=True, source='suggestion_set', read_only=True)
+    final_decision = SuggestionSerializer(read_only=True)
 
     class Meta:
         model = Student
-        fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 'phone_number', 'language',
-                  'extra_info', 'cv', 'portfolio', 'school_name', 'degree', 'studies', 'skills', 'suggestions']
+        fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 
+                  'phone_number', 'alum', 'language', 'extra_info', 'cv', 'portfolio', 
+                  'school_name', 'degree', 'studies', 'skills', 'suggestions', 'final_decision']
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin']
-        read_only_fields = ['is_admin']
-
-
-# class ProjectSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = Project
-#         fields = ['url', 'id', 'name', 'partner_name',
-#                   'extra_info', 'skills', 'coaches']
+        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin', 'is_active']
+        read_only_fields = ['is_admin', 'is_active']
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Skill
-        fields = ['url', 'id', 'name', 'description', 'color']
+        fields = ['url', 'id', 'name', 'color']
 
 
 class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RequiredSkills
-        fields = ['amount', 'skill']
+        fields = ['amount', 'skill', 'comment']
+
 
 
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
-        fields = ['student', 'coach', 'role', 'reason']
+        fields = ['student', 'coach', 'coach_name', 'coach_id', 'skill', 'reason']
         read_only_fields = ['coach']
 
 
@@ -79,12 +74,38 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
+    
+
+    # overwrite update method to be able to create/update/delete RequiredSkills objects
+    def update(self, instance, validated_data):
+        
+        # first update required skills
+        skills_data = validated_data.pop('requiredskills_set')
+        # update or create skills from request
+        for skill_data in skills_data:
+            RequiredSkills.objects.update_or_create(project=instance, **skill_data)
+        # delete skills not in request
+        skills = [skill_data['skill'] for skill_data in skills_data]
+        RequiredSkills.objects.filter(project=instance).exclude(skill__in=skills).delete()
+        return super().update(instance, validated_data)
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Group
-        fields = ['url', 'name']
+        model = SentEmail
+        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
+
+
+class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['student']
+
+
+class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Coach
+        fields = ['is_admin', 'is_active']
 
 
 class CustomLoginSerializer(LoginSerializer):
