@@ -79,17 +79,17 @@
 
   <div class="q-gutter-sm q-pa-lg">
     <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-5 col-lg-5">
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SuggestionsCard :index="studentKey" title="Suggestions"/>
       </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-7 col-lg-7">
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <AcademiaCard :index="studentKey" title="Academia"/>
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <SkillsCard :index="studentKey" title="Skills"/>
       </div>
     </div>
     <div class="row">
-      <div class="studentcol col-12">
-        <SkillsCard :index="studentKey" title="Skills"/>
-      </div>
       <div class="studentcol col-12">
         <ExtraInfoCard :index="studentKey" title="Extra Info"/>
       </div>

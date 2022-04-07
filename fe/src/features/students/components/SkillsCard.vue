@@ -11,10 +11,13 @@
       </div>
 
       <div v-else>
-        <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
-          <li v-for="skill in studentStore.currentStudent.skillList" :key="skill.name">
-            <StudentSkillChip :color="skill.color" :name="skill.name" />
-          </li>
+        <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 0px;">
+          <StudentSkillChip
+            v-for="(skill, index) in studentStore.currentStudent.skillList"
+            :key="index"
+            :color="skill.color"
+            :name="skill.name"
+          />
         </ul>
       </div>
     </q-card-section>
