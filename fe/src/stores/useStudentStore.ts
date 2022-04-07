@@ -65,7 +65,6 @@ export const useStudentStore = defineStore('user/student', {
                             .get(data.skills[i])
                             .then(({data}) => {
                                 skills.push(data)
-                                console.log(skills)
                             })
                     }
 

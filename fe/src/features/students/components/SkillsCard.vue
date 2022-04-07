@@ -39,7 +39,6 @@ export default {
   },
   setup() {
     const studentStore = useStudentStore()
-    console.log(studentStore.currentStudent)
 
     return {
       studentStore,
