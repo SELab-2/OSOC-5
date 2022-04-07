@@ -10,7 +10,6 @@ interface State {
     students: Array<Student>
     isLoading: boolean
     possibleSuggestion: number
-    possibleFinalDecision: number
     currentStudent: Student | null
 }
 
@@ -20,7 +19,6 @@ export const useStudentStore = defineStore('user/student', {
         students: [],
         isLoading: false,
         possibleSuggestion: -1,
-        possibleFinalDecision: -1,
         currentStudent: null,
     }),
     actions: {
@@ -60,7 +58,6 @@ export const useStudentStore = defineStore('user/student', {
                     }
 
                     this.currentStudent = convertObjectKeysToCamelCase(data) as never as Student
-                    this.possibleFinalDecision = this.currentStudent.finalDecision?.suggestion || -1
                 })
 
             this.isLoading = false
@@ -80,17 +77,22 @@ export const useStudentStore = defineStore('user/student', {
 
             await this.loadStudent(studentId)
         },
-        async updateFinalDecision(studentId: number) {
-            console.log(this.possibleFinalDecision)
+        async updateFinalDecision(studentId: number, possibleFinalDecision: number) {
+            let reason = ""
+
+            if (this.currentStudent?.finalDecision?.suggestion == possibleFinalDecision) {
+                reason = this.currentStudent.finalDecision.reason
+            }
+
             // check if -1 is selected to delete decision
-            if (this.possibleFinalDecision == null) {
+            if (possibleFinalDecision == -1) {
                 await instance
                     .delete(`students/${studentId}/remove_final_decision/`)
             } else {
                 await instance
                     .post(`students/${studentId}/make_final_decision/`, {
-                        suggestion: this.possibleFinalDecision,
-                        reason: ""
+                        suggestion: possibleFinalDecision,
+                        reason: reason
                     })
             }
 

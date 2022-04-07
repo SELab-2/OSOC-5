@@ -8,10 +8,9 @@
       <q-btn :href="this.student ? this.student.cv : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
       <q-btn :href="this.student ? this.student.portfolio : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
-    <div class="row q-gutter-sm items-center">
+    <div v-if="this.authenticationStore.loggedInUser" class="row q-gutter-sm items-center">
       <q-select
         v-model="possibleFinalDecision"
-        @update:modelValue="selectPossibleFinalDecision"
         emit-value
         map-options
         rounded
@@ -19,10 +18,10 @@
         dense
         style="width: 200px"
         :options="[
-          { name: 0, label: 'Yes' },
-          { name: 1, label: 'Maybe' },
-          { name: 2, label: 'No' },
-          { name: -1, label: 'Not decided' },
+          { value: 0, label: 'Yes' },
+          { value: 1, label: 'Maybe' },
+          { value: 2, label: 'No' },
+          { value: -1, label: 'Not decided' },
         ]"
         label="Final decision"
       />
@@ -163,6 +162,7 @@ export default defineComponent ({
     return {
       authenticationStore,
       studentStore,
+      possibleFinalDecision: ref(-1),
     }
   },
   data() {
@@ -178,21 +178,17 @@ export default defineComponent ({
   },
   computed: {
     student(): Student | null {
-      console.log(this.studentStore.currentStudent)
       return this.studentStore.currentStudent
     },
     possibleSuggestion(): number {
       return this.studentStore.possibleSuggestion
-    },
-    possibleFinalDecision(): number {
-      return this.studentStore.possibleFinalDecision
     },
     name(): string {
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     mySuggestion(): number | null {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser?.email)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.pk)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
@@ -233,13 +229,16 @@ export default defineComponent ({
       }
     }
   },
-  created() {
-    this.studentStore.loadStudent(this.id)
-  },
   mounted() {
     // Reload when new student is selected
-    this.$watch('id', (id: number) => {
-      this.studentStore.loadStudent(id)
+    this.$watch('id', async (id: number) => {
+      await this.studentStore.loadStudent(id)
+
+      if (this.student?.finalDecision) {
+        this.possibleFinalDecision = this.student.finalDecision.suggestion
+      } else {
+        this.possibleFinalDecision = -1
+      }
     }, {immediate: true})
   },
   methods: {
@@ -260,12 +259,9 @@ export default defineComponent ({
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
     },
-    selectPossibleFinalDecision: function (value: any) {
-      this.studentStore.possibleFinalDecision = value.name
-    },
     finalDecision: async function () {
       if (this.student) {
-        await this.studentStore.updateFinalDecision(this.student.id)
+        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
       }
 
       // Make components update
