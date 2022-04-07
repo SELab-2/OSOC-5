@@ -1,7 +1,9 @@
 <template>
   <q-card class="full-height cornered">
-    <q-card-section >
-      <div class="text-h6">{{ title }}</div>
+    <q-card-section>
+      <div class="text-h6">
+        {{ title }}
+      </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
       <div v-if="this.studentStore.isLoading">
@@ -36,11 +38,11 @@ import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 export default {
   components: {LoadingSpinner},
   props: {
-  title: {
-    type: String,
-      required: true
+    title: {
+      type: String,
+        required: true
+    },
   },
-},
   setup() {
     const studentStore = useStudentStore()
 

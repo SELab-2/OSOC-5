@@ -83,12 +83,8 @@
         <SuggestionsCard :index="studentKey" title="Suggestions"/>
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <AcademiaCard title="Academia" :content="this.student ? [
-              'Enrolled at: ' + this.student.schoolName,
-              'Studies: ' + this.student.studies,
-              'Degree: ' + this.student.degree
-              // 'Years into degree: 5'
-            ] : []"
+        <AcademiaCard :index="studentKey"
+          title="Academia"
         />
       </div>
     </div>
