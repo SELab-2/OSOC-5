@@ -87,11 +87,17 @@ export const useStudentStore = defineStore('user/student', {
             }
         },
         async updateSuggestion(studentId: number, reason: string) {
-            await instance
-                .post(`students/${studentId}/make_suggestion/`, {
-                    suggestion: this.possibleSuggestion,
-                    reason: reason
-                })
+            // check if -1 is selected to delete suggestion
+            if (this.possibleSuggestion == -1) {
+                await instance
+                    .delete(`students/${studentId}/remove_suggestion/`)
+            } else {
+                await instance
+                    .post(`students/${studentId}/make_suggestion/`, {
+                        suggestion: this.possibleSuggestion,
+                        reason: reason
+                    })
+            }
 
             await this.loadStudent(studentId)
         },

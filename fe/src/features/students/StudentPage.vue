@@ -14,7 +14,7 @@
         outlined
         dense
         style="width: 200px"
-        :options="['Not decided', 'Yes', 'Maybe', 'No']"
+        :options="['Yes', 'Maybe', 'No']"
         label="Final decision"
       />
       <q-btn icon-right="mail" class="cornered" label="Confirm" outline color='black'/>
@@ -164,6 +164,7 @@ export default defineComponent ({
   },
   computed: {
     student(): Student | null {
+      console.log(this.studentStore.currentStudent)
       return this.studentStore.currentStudent
     },
     possibleSuggestion(): number {
@@ -228,6 +229,7 @@ export default defineComponent ({
     makeSuggestion: async function () {
       if (this.student) {
         await this.studentStore.updateSuggestion(this.student.id, this.reason)
+        this.reason = ""
       }
 
       // Make components update
