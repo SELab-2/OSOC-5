@@ -1,6 +1,7 @@
 """
 Filters used in views.py
 """
+
 from django.forms import ValidationError
 from rest_framework import filters
 from .models import Project, Student, Suggestion

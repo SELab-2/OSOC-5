@@ -139,7 +139,7 @@ class CoachViewSet(viewsets.GenericViewSet,
     Search coaches with the query parameter ?search=
     Filter coaches with the query parameters 
         ?is_admin=[true, false],
-        ?is_active=[true, false]
+        ?is_active=[true, false
     example query: /api/coaches/?is_admin=false&is_active=true
     """
     queryset = Coach.objects.all().order_by('id')
