@@ -198,10 +198,17 @@ export default defineComponent ({
     },
     mySuggestionColor(): string {
       let mySuggestion = this.mySuggestion
-      if (mySuggestion !== null) {
-        return mySuggestion === 0 ? "green" : (mySuggestion === 1 ? "yellow" : (mySuggestion === 2 ? "red" : "grey"))
-      } else {
-        return "grey"
+      switch (mySuggestion) {
+        case null:
+          return "grey"
+        case 0:
+          return "green"
+        case 1:
+          return "yellow"
+        case 2:
+          return "red"
+        default:
+          return "grey"
       }
     },
     suggestionName(): string {
