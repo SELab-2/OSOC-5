@@ -104,7 +104,7 @@
               :loading="coachStore.isLoadingUsers"
               row-key="displayName"
               selection="multiple"
-              v-model:selected="selected"
+              v-model:selected="selected_coaches"
               :filter="filter_coaches"
               :pagination.sync="pagination_coaches"
             >
@@ -203,14 +203,15 @@
                       />
                     </q-popup-edit>
                   </q-td>
+                  <q-td key="color" :props="props"> {{ props.row.color }}</q-td>
                   <q-td style="width: 10px" key="remove">
                     <q-btn
                       flat
                       round
                       style="color: #f14a3b"
                       @click="
-                        delete_role = props.row.id;
-                        delete_role_prompt = true
+                        ;(delete_role = props.row.id) &&
+                          (delete_role_prompt = true)
                       "
                       icon="mdi-trash-can-outline"
                     />
@@ -225,7 +226,7 @@
   </div>
 
   <q-dialog v-model="new_role_prompt" persistent>
-    <q-card style="min-width: 350px">
+    <q-card class="create-role-popup">
       <q-card-section>
         <div class="text-h6">Create a new role</div>
       </q-card-section>
@@ -244,7 +245,16 @@
           ]"
         />
       </q-card-section>
-
+      <q-card-section class="q-pt-none">
+        <!--  INFO if picker gives conversion issues use-->
+        <!--  INFO https://quasar.dev/quasar-utils/color-utils#color-conversion-->
+        <q-color
+          v-model="new_role_color"
+          no-header
+          no-footer
+          class="color-picker"
+        />
+      </q-card-section>
       <q-card-actions align="right" class="text-primary">
         <q-btn flat label="Cancel" v-close-popup />
         <q-btn flat label="Add role" @click="new_role_confirm" />
@@ -308,6 +318,13 @@ const columns_roles = [
     sortable: true,
   },
   {
+    name: 'color',
+    align: 'right',
+    label: 'Color',
+    field: 'color',
+    sortable: true,
+  },
+  {
     name: 'action',
     align: 'right',
     label: '',
@@ -355,12 +372,13 @@ export default defineComponent({
     // variables for the new role dialog popup
     const new_role_prompt = ref(false)
     const new_role = ref('')
+    const new_role_color = ref('')
 
     // variables for the delete role dialog popup
     const delete_role_prompt = ref(false)
     const delete_role = ref(-1)
 
-    const selected = ref([])
+    const selected_coaches = ref([])
 
     return {
       skillStore,
@@ -380,7 +398,7 @@ export default defineComponent({
       filter_roles,
       filter_coaches,
 
-      selected,
+      selected_coaches,
       columns_roles,
       columns_coaches,
 
@@ -388,15 +406,15 @@ export default defineComponent({
        * Form Functions
        */
       onSubmit() {
-        console.log(selected.value)
+        console.log(selected_coaches.value)
 
-        let selected_coaches: Array<string> = [] // TODO selection is broken
+        let selected_coaches_urls: Array<string> = [] // TODO selection is broken
 
         skillStore.submitProject(
           project_name.value,
           project_link.value,
           project_partner_name.value,
-          selected_coaches,
+          selected_coaches_urls,
           (success: boolean) => {
             if (success) {
               router.push('/projects/')
@@ -453,12 +471,18 @@ export default defineComponent({
        */
       new_role_prompt,
       new_role,
+      new_role_color,
       new_role_confirm() {
         // check if the new role value is valid
-        if (new_role.value && new_role.value.length > 0) {
+        if (
+          new_role.value &&
+          new_role.value.length > 0 &&
+          new_role_color.value.length > 0
+        ) {
           // when valid call the store object and add the skill
           skillStore.addSkill(
             new_role.value,
+            new_role_color.value,
             // callback
             (success: boolean) => {
               if (success) {
@@ -470,6 +494,7 @@ export default defineComponent({
                 })
                 new_role_prompt.value = false
                 new_role.value = ''
+                new_role_color.value = ''
               } else {
                 $q.notify({
                   icon: 'close',
@@ -479,6 +504,12 @@ export default defineComponent({
               }
             }
           )
+        } else {
+          $q.notify({
+            icon: 'close',
+            color: 'negative',
+            message: 'Invalid name/color!',
+          })
         }
       },
     }
@@ -492,6 +523,8 @@ thead {
 }
 </style>
 <style scoped lang="sass">
+.create-role-popup
+    width: 300px
 
 .cornered
     border-radius: 10px !important

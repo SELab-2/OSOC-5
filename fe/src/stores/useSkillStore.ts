@@ -45,7 +45,7 @@ export const useSkillStore = defineStore('skills', {
         })
     },
 
-    async addSkill(newSkillName: string, callback: any) {
+    async addSkill(newSkillName: string, color: string, callback: any) {
       // start the loading animation
       this.isLoadingSkills = true
 
@@ -55,8 +55,8 @@ export const useSkillStore = defineStore('skills', {
 
       instance
         .post('skills/', {
-          name: newSkillName,
-          color: 'unknown', // TODO: use color picker data
+          'name': newSkillName,
+          'color': color,
         })
         .then((response) => {
           console.log(response['data'])
