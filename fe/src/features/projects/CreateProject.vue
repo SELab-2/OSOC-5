@@ -208,7 +208,7 @@
                       round
                       style="color: #f14a3b"
                       @click="
-                        delete_role = props.row;
+                        delete_role = props.row.id
                         delete_role_prompt = true
                       "
                       icon="mdi-trash-can-outline"
@@ -357,7 +357,7 @@ export default {
 
     // variables for the delete role dialog popup
     const delete_role_prompt = ref(false)
-    const delete_role = ref(null)
+    const delete_role = ref(-1)
 
     const selected = ref([])
 
@@ -388,22 +388,30 @@ export default {
        */
       onSubmit() {
         console.log(selected.value)
+
+        let selected_coaches = [] // TODO selection is broken
+
         skillStore.submitProject(
           project_name.value,
           project_link.value,
           project_partner_name.value,
-          selected.value,
-          () => {
-            // TODO: add different outcome based on success
+          selected_coaches,
+          (success) => {
+            if (success) {
+              router.push('/projects/')
 
-            // TODO: redirect to project page, could also make a page for each project
-            router.push('/projects/')
-
-            $q.notify({
-              icon: 'done',
-              color: 'positive',
-              message: 'Submitted',
-            })
+              $q.notify({
+                icon: 'done',
+                color: 'positive',
+                message: 'Submitted',
+              })
+            } else {
+              $q.notify({
+                icon: 'close',
+                color: 'negative',
+                message: 'Failed',
+              })
+            }
           }
         )
       },
@@ -436,7 +444,7 @@ export default {
       delete_role_confirm() {
         skillStore.deleteSkill(delete_role.value)
         delete_role_prompt.value = false
-        delete_role.value.value = ''
+        delete_role.value = -1
 
         $q.notify({
           icon: 'done',
@@ -457,15 +465,23 @@ export default {
           skillStore.addSkill(
             new_role.value,
             // callback
-            (added_role) => {
-              new_role_prompt.value = false
-              new_role.value = ''
-              return $q.notify({
-                icon: 'done',
-                color: 'warning',
-                message: `Added new project role: ${added_role}!`,
-                textColor: 'black',
-              })
+            (success) => {
+              if (success) {
+                new_role_prompt.value = false
+                new_role.value = ''
+                $q.notify({
+                  icon: 'done',
+                  color: 'warning',
+                  message: `Added new project role: ${new_role.value}!`,
+                  textColor: 'black',
+                })
+              } else {
+                $q.notify({
+                  icon: 'close',
+                  color: 'negative',
+                  message: 'Failed to add',
+                })
+              }
             }
           )
         }
