@@ -32,8 +32,8 @@
           >
             <h4 class="projectsubtitle">Basic Info</h4>
             <q-input
-              outlined
               v-model="project_name"
+              outlined
               label="Project name"
               lazy-rules
               class="inputfield"
@@ -44,8 +44,8 @@
               ]"
             />
             <q-input
-              outlined
               v-model="project_partner_name"
+              outlined
               label="Partner name"
               lazy-rules
               class="inputfield"
@@ -56,8 +56,8 @@
               ]"
             />
             <q-input
-              outlined
               v-model="project_link"
+              outlined
               label="Project URL"
               lazy-rules
               class="inputfield"
@@ -76,21 +76,21 @@
             <h4 class="projectsubtitle">Project Coaches</h4>
             <div class="row">
               <q-input
+                v-model="filter_coaches"
                 outlined
                 dense
                 debounce="300"
                 color="green"
                 class="inputfield"
-                v-model="filter_coaches"
                 placeholder="Search"
                 @keydown.enter.prevent=""
               >
-                <template v-slot:append>
+                <template #append>
                   <q-icon
                     v-if="filter_coaches !== ''"
                     name="close"
-                    @click="filter_coaches = ''"
                     class="cursor-pointer"
+                    @click="filter_coaches = ''"
                   />
                   <q-icon v-if="filter_coaches === ''" name="search" />
                 </template>
@@ -98,17 +98,16 @@
             </div>
 
             <q-table
+              v-model:selected="selected_coaches"
+              :pagination.sync="pagination_coaches"
               class="table shadow-4"
               :rows="coachStore.users"
               :columns="columns_coaches"
               :loading="coachStore.isLoadingUsers"
               row-key="displayName"
               selection="multiple"
-              v-model:selected="selected_coaches"
               :filter="filter_coaches"
-              :pagination.sync="pagination_coaches"
-            >
-            </q-table>
+            />
           </div>
 
           <div
@@ -125,22 +124,22 @@
               />
               <q-space />
               <q-input
+                v-model="filter_roles"
                 style="max-width: 190px"
                 outlined
                 dense
                 debounce="300"
                 color="green"
                 class="inputfield"
-                v-model="filter_roles"
                 placeholder="Search"
                 @keydown.enter.prevent=""
               >
-                <template v-slot:append>
+                <template #append>
                   <q-icon
                     v-if="filter_roles !== ''"
                     name="close"
-                    @click="filter_roles = ''"
                     class="cursor-pointer"
+                    @click="filter_roles = ''"
                   />
                   <q-icon v-if="filter_roles === ''" name="search" />
                 </template>
@@ -155,26 +154,28 @@
               row-key="name"
               :filter="filter_roles"
             >
-              <template v-slot:body="props">
+              <template #body="props">
                 <q-tr
                   :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''"
                   :props="props"
                 >
-                  <q-td key="role" :props="props"> {{ props.row.name }}</q-td>
+                  <q-td key="role" :props="props">
+                    {{ props.row.name }}
+                  </q-td>
                   <q-td key="amount" :props="props">
                     {{ props.row.amount }}
                     <q-popup-edit
+                      v-slot="scope"
                       v-model.number="props.row.amount"
                       buttons
                       label-set="Save"
                       label-cancel="Close"
                       :validate="amountRangeValidation"
                       @hide="amountRangeValidation"
-                      v-slot="scope"
                     >
                       <q-input
-                        type="number"
                         v-model.number="scope.value"
+                        type="number"
                         hint="Enter a positive number."
                         :error="errorRoleAmount"
                         :error-message="errorMessageRoleAmount"
@@ -188,14 +189,14 @@
                   <q-td key="comment" :props="props">
                     <div>{{ props.row.comment }}</div>
                     <q-popup-edit
-                      buttons
-                      v-model="props.row.comment"
                       v-slot="scope"
+                      v-model="props.row.comment"
+                      buttons
                     >
                       <q-input
+                        v-model="scope.value"
                         type="text"
                         autogrow
-                        v-model="scope.value"
                         autofocus
                         counter
                         borderless
@@ -203,17 +204,35 @@
                       />
                     </q-popup-edit>
                   </q-td>
-                  <q-td key="color" :props="props"> {{ props.row.color }}</q-td>
-                  <q-td style="width: 10px" key="remove">
+                  <q-td key="color" :props="props" auto-width>
+                    <div
+                      :style="`height: 50px; width:50px; background: ${props.row.color}`"
+                    ></div>
+                    <!-- TODO make this actually change in the database not locally-->
+                    <q-popup-edit
+                      v-slot="scope"
+                      v-model="props.row.color"
+                      buttons
+                    >
+                      <q-color
+                        v-model="scope.value"
+                        no-header
+                        no-footer
+                        class="color-picker"
+                        @keyup.enter.stop
+                      />
+                    </q-popup-edit>
+                  </q-td>
+                  <q-td key="remove" style="width: 10px">
                     <q-btn
                       flat
                       round
                       style="color: #f14a3b"
+                      icon="mdi-trash-can-outline"
                       @click="
                         ;(delete_role = props.row.id) &&
                           (delete_role_prompt = true)
                       "
-                      icon="mdi-trash-can-outline"
                     />
                   </q-td>
                 </q-tr>
@@ -233,9 +252,9 @@
 
       <q-card-section class="q-pt-none">
         <q-input
+          v-model="new_role"
           outlined
           autofocus
-          v-model="new_role"
           class="inputfield"
           label="Role name"
           lazy-rules
@@ -256,7 +275,7 @@
         />
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn v-close-popup flat label="Cancel" />
         <q-btn flat label="Add role" @click="new_role_confirm" />
       </q-card-actions>
     </q-card>
@@ -280,7 +299,7 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat color="grey" label="Cancel" v-close-popup />
+        <q-btn v-close-popup flat color="grey" label="Cancel" />
         <q-btn flat color="red" label="Delete" @click="delete_role_confirm" />
       </q-card-actions>
     </q-card>
@@ -294,7 +313,6 @@ import { ref } from 'vue'
 import { defineComponent, onMounted } from '@vue/runtime-core'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
-
 const columns_roles = [
   {
     name: 'role',
@@ -319,10 +337,10 @@ const columns_roles = [
   },
   {
     name: 'color',
-    align: 'right',
+    align: 'center',
     label: 'Color',
     field: 'color',
-    sortable: true,
+    sortable: false,
   },
   {
     name: 'action',
@@ -511,6 +529,10 @@ export default defineComponent({
             message: 'Invalid name/color!',
           })
         }
+      },
+
+      change_color(id: number) {
+        console.log(id)
       },
     }
   },
