@@ -8,6 +8,7 @@ interface State {
     coaches: Map<string, User>
     students: Array<Student>
     isLoading: boolean
+    possibleSuggestion: number
     currentStudent: Student | null
 }
 
@@ -16,6 +17,7 @@ export const useStudentStore = defineStore('user/student', {
         coaches: new Map(),
         students: [],
         isLoading: false,
+        possibleSuggestion: -1,
         currentStudent: null,
     }),
     actions: {
@@ -25,8 +27,6 @@ export const useStudentStore = defineStore('user/student', {
             await instance
                 .get('students/')
                 .then(({data}) => {
-                    this.isLoading = false
-
                     for (const student of data) {
                         for (const suggestion of student.suggestions) {
                             suggestion.suggestion = parseInt(suggestion.suggestion)
@@ -54,6 +54,8 @@ export const useStudentStore = defineStore('user/student', {
 
                 }
             }
+
+            this.isLoading = false
         },
         async loadStudent(studentId: number) {
             this.isLoading = true
@@ -84,10 +86,10 @@ export const useStudentStore = defineStore('user/student', {
                 this.isLoading = false
             }
         },
-        async updateSuggestion(studentId: number, suggestion: number, reason: string) {
+        async updateSuggestion(studentId: number, reason: string) {
             await instance
                 .post(`students/${studentId}/make_suggestion/`, {
-                    suggestion: suggestion,
+                    suggestion: this.possibleSuggestion,
                     reason: reason
                 })
 
