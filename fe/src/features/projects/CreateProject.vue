@@ -96,6 +96,7 @@
                 </template>
               </q-input>
             </div>
+
             <q-table
               class="table shadow-4"
               :rows="coachStore.users"
@@ -276,11 +277,11 @@
   </q-dialog>
 </template>
 
-<script>
+<script lang="ts">
 import router from '../../router'
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
-import { onMounted } from '@vue/runtime-core'
+import { defineComponent, onMounted } from '@vue/runtime-core'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 
@@ -316,17 +317,17 @@ const columns_roles = [
 ]
 
 const columns_coaches = [
-  /* TODO: Could display existing projects of coaches  */
   {
     name: 'displayName',
     align: 'left',
     label: 'Coach name',
-    field: (row) => row.firstName + ' ' + row.lastName,
+    field: (row: { firstName: string; lastName: string }) =>
+      row.firstName + ' ' + row.lastName,
     sortable: true,
   },
 ]
 
-export default {
+export default defineComponent({
   setup() {
     const skillStore = useSkillStore()
     const coachStore = useCoachStore()
@@ -339,9 +340,9 @@ export default {
     const $q = useQuasar()
 
     // input fields
-    const project_name = ref(null)
-    const project_partner_name = ref(null)
-    const project_link = ref(null)
+    const project_name = ref('')
+    const project_partner_name = ref('')
+    const project_link = ref('')
 
     // Role amount error handling
     const errorRoleAmount = ref(false)
@@ -389,37 +390,31 @@ export default {
       onSubmit() {
         console.log(selected.value)
 
-        let selected_coaches = [] // TODO selection is broken
+        let selected_coaches: Array<string> = [] // TODO selection is broken
 
         skillStore.submitProject(
           project_name.value,
           project_link.value,
           project_partner_name.value,
           selected_coaches,
-          (success) => {
+          (success: boolean) => {
             if (success) {
               router.push('/projects/')
 
               $q.notify({
                 icon: 'done',
                 color: 'positive',
-                message: 'Submitted',
+                message: 'Project created successfully!',
               })
             } else {
               $q.notify({
                 icon: 'close',
                 color: 'negative',
-                message: 'Failed',
+                message: 'Project creation failed',
               })
             }
           }
         )
-      },
-      onReset() {
-        project_name.value = null
-        project_partner_name.value = null
-        project_link.value = null
-        /* TODO expand if actually used ... */
       },
 
       /*
@@ -427,7 +422,7 @@ export default {
        */
       errorRoleAmount,
       errorMessageRoleAmount,
-      amountRangeValidation(val) {
+      amountRangeValidation(val: number) {
         if (val < 0) {
           errorRoleAmount.value = true
           errorMessageRoleAmount.value = 'The value must be positive!'
@@ -449,7 +444,7 @@ export default {
         $q.notify({
           icon: 'done',
           color: 'positive',
-          message: 'Deleted',
+          message: 'Successfully deleted!',
         })
       },
 
@@ -465,21 +460,21 @@ export default {
           skillStore.addSkill(
             new_role.value,
             // callback
-            (success) => {
+            (success: boolean) => {
               if (success) {
-                new_role_prompt.value = false
-                new_role.value = ''
                 $q.notify({
                   icon: 'done',
-                  color: 'warning',
-                  message: `Added new project role: ${new_role.value}!`,
+                  color: 'positive',
+                  message: `Added new project role: ${new_role.value}.`,
                   textColor: 'black',
                 })
+                new_role_prompt.value = false
+                new_role.value = ''
               } else {
                 $q.notify({
                   icon: 'close',
                   color: 'negative',
-                  message: 'Failed to add',
+                  message: 'Failed to add role!',
                 })
               }
             }
@@ -488,43 +483,39 @@ export default {
       },
     }
   },
-}
+})
 </script>
 
 <style>
 thead {
   background-color: #44dba4;
 }
-
-.q-card {
-  border-radius: 10px !important;
-}
 </style>
 <style scoped lang="sass">
 
 .cornered
-  border-radius: 10px !important
+    border-radius: 10px !important
 
 
 .projectcol
-  padding-left: 15px
-  padding-right: 15px
+    padding-left: 15px
+    padding-right: 15px
 
 .projectsubtitle
-  font-weight: 300
-  margin-top: 10px
-  margin-bottom: 15px
-  font-size: x-large
+    font-weight: 300
+    margin-top: 10px
+    margin-bottom: 15px
+    font-size: x-large
 
 .table
-  border-radius: 10px
-  margin-top: 10px
+    border-radius: 10px
+    margin-top: 10px
 
 .createProjectForm
-  margin-top: 25px
-  margin-left: 10%
-  margin-right: 10%
+    margin-top: 25px
+    margin-left: 10%
+    margin-right: 10%
 
 .appPageTitle
-  text-align: center
+    text-align: center
 </style>

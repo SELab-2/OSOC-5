@@ -52,12 +52,11 @@ export const useSkillStore = defineStore('skills', {
       // Process the new skill
       console.log(`Adding new skill: ${newSkillName}.`)
 
-      // TODO: maybe only push skills to database when project POST happens
-      // TODO: add a ?color picker?
+
       instance
         .post('skills/', {
           name: newSkillName,
-          color: 'unknown',
+          color: 'unknown', // TODO: use color picker data
         })
         .then((response) => {
           console.log(response['data'])
@@ -136,7 +135,6 @@ export const useSkillStore = defineStore('skills', {
       // POST request to make a project
       instance
         .post('projects/', data)
-        //TODO: response based feedback
         .then(function (response) {
           console.log(response)
           callback(true)
