@@ -208,7 +208,7 @@
                       round
                       style="color: #f14a3b"
                       @click="
-                        delete_role = props.row.id
+                        delete_role = props.row.id;
                         delete_role_prompt = true
                       "
                       icon="mdi-trash-can-outline"
