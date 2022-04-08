@@ -7,7 +7,7 @@
                         <div class="text-bold text-h4 q-ml-md" >Projects</div>
                         <q-space/>
                         <div>
-                            <q-input dense outlined v-model="" label="Outlined" />
+                            <q-input dense outlined label="Outlined" />
                         </div>
                         <q-btn padding='7px' icon='warning' color='red' label='Conflicts'
                            to='/projects/conflicts' />
