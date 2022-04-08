@@ -115,10 +115,9 @@
                 >
                   <StudentCard
                     v-ripple
-                    clickable
                     :student="student"
-                    :active="active === student.email"
-                    @click="clickStudent(student)"
+                    :active="this.student ? student.email === this.student.email : false"
+                    @click="this.clickStudent(student)"
                   />
                 </q-item>
               </q-list>
@@ -137,7 +136,7 @@
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = !miniState"
+          @click="miniState.value = !miniState"
         />
       </div>
     </q-drawer>
@@ -151,13 +150,31 @@ import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
+import { Student } from '../models/Student';
 
 export default defineComponent({
   components: {
     StudentCard,
     SegmentedControl,
   },
-  props: [ 'selectStudent', 'color', 'draggable' ],
+  props: {
+    selectStudent: {
+      type: Function,
+      required: true
+    },
+    color: {
+      type: String,
+      required: true
+    },
+    draggable: {
+      type: Boolean,
+      required: true
+    },
+    student: {
+      type: Student,
+      required: true
+    }
+  },
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
@@ -176,7 +193,6 @@ export default defineComponent({
         width: '4px',
         opacity: 0.75
       },
-      active: ref('')
     }
   },
   data() {
@@ -211,11 +227,10 @@ export default defineComponent({
       console.log(this.byMe)
       console.log(this.onProject)
     },
-    clickStudent(student) {
-      this.active = student.email
+    clickStudent(student: Student) {
       this.selectStudent(student)
-    }
-  },
+    },
+  }
 })
 </script>
 
