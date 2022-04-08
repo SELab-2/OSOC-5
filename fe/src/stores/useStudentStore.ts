@@ -7,6 +7,11 @@ import {Suggestion} from "../models/Suggestion";
 import {Skill} from "../models/Skill";
 
 interface State {
+    search: string
+    alumni: string
+    decision: string
+    byMe: boolean
+    onProject: boolean
     coaches: Map<string, User>
     students: Array<Student>
     isLoading: boolean
@@ -16,6 +21,11 @@ interface State {
 
 export const useStudentStore = defineStore('user/student', {
     state: (): State => ({
+        search: "",
+        alumni: "all",
+        decision: "none",
+        byMe: false,
+        onProject: false,
         coaches: new Map(),
         students: [],
         isLoading: false,
@@ -23,21 +33,35 @@ export const useStudentStore = defineStore('user/student', {
         currentStudent: null,
     }),
     actions: {
+        transformStudents(data: any): void {
+            for (const student of data) {
+                if (student.final_decision) {
+                    student.final_decision.suggestion = parseInt(student.final_decision.suggestion)
+                }
+
+                for (const suggestion of student.suggestions) {
+                    suggestion.suggestion = parseInt(suggestion.suggestion)
+                }
+            }
+        },
         async loadStudents(): Promise<void> {
             this.isLoading = true
 
-            await instance
-                .get('students/')
-                .then(({data}) => {
-                    for (const student of data) {
-                        if (student.final_decision) {
-                            student.final_decision.suggestion = parseInt(student.final_decision.suggestion)
-                        }
+            const filters = []
 
-                        for (const suggestion of student.suggestions) {
-                            suggestion.suggestion = parseInt(suggestion.suggestion)
-                        }
-                    }
+            if (this.search) filters.push(`search=${this.search}`)
+            if (this.alumni === "alumni") filters.push("alumni=true")
+            if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
+            if (this.byMe === true) filters.push("suggested_by_user")
+            if (this.onProject === true) filters.push("on_project")
+
+            let url = ""
+            if (filters) url = `?${filters.join('&')}`
+
+            await instance
+                .get(`students/${url}`)
+                .then(({data}) => {
+                    this.transformStudents(data)
 
                     this.students = convertObjectKeysToCamelCase(data) as never as Student[]
                 })

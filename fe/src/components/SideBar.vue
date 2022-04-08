@@ -22,7 +22,7 @@
             </div>
 
             <q-input
-              v-model="search"
+              v-model="this.studentStore.search"
               outlined
               dense
               rounded
@@ -38,20 +38,19 @@
             </q-input>
 
             <SegmentedControl
-              v-model="roleFilter"
+              v-model="this.studentStore.alumni"
               color="primary"
               text-color="white"
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
-                { name: 'studentCoaches', label: 'Student Coaches' },
               ]"
               @click="fetchStudents"
             />
 
             <label>Suggestion:</label>
             <SegmentedControl
-              v-model="suggestion"
+              v-model="this.studentStore.decision"
               color="primary"
               :options="[
                 { name: 'yes', label: 'Yes' },
@@ -81,14 +80,14 @@
 
             <div class="row q-gutter-x-md">
               <q-checkbox
-                v-model="byMe"
+                v-model="this.studentStore.byMe"
                 color="primary"
                 label="Suggested by you"
                 right-label
                 @click="fetchStudents"
               />
               <q-checkbox
-                v-model="onProject"
+                v-model="this.studentStore.onProject"
                 color="primary"
                 label="On project"
                 right-label
@@ -198,11 +197,6 @@ export default defineComponent({
     return {
       miniState: ref(false),
       drawer: ref(false),
-      search: ref(""),
-      byMe: ref(false),
-      onProject: ref(false),
-      roleFilter: ref('all'),
-      suggestion: ref('yes'),
       roles: ref([]),
     }
   },
@@ -219,12 +213,8 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
     },
     fetchStudents() {
-      console.log(this.search)
-      console.log(this.roleFilter)
-      console.log(this.suggestion)
       console.log(this.roles)
-      console.log(this.byMe)
-      console.log(this.onProject)
+      this.studentStore.loadStudents()
     },
     clickStudent(student: Student) {
       this.selectStudent(student)
