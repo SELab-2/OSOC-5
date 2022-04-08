@@ -23,9 +23,15 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 class StudentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows students to be viewed, edited or searched.
-    Search students with the query parameter '?search='
-    Filter students with the query parameters '?alum=', '?language=', '?skills=', '?on_project', '?suggested_by_user' and '?suggestion='
-    example query: /api/students/?alum=true&language=0&skills=1&suggestion=yes&on_project
+    Search students with the query parameter ?search=
+    Filter students with the query parameters:
+        ?alum=[true, false],
+        ?language=[0-4],
+        ?skills=:id:,
+        ?on_project=[true, false],
+        ?suggested_by_user=[true, false],
+        ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
+    example query: /api/students/?alum=true&language=0&skills=1&suggestion=yes&on_project=true
     """
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
@@ -130,8 +136,10 @@ class CoachViewSet(viewsets.GenericViewSet,
     API endpoint that allows coaches to be viewed, edited or searched.
     a coach cannot be created by this API endpoint
     a coach can only update and view its own data, except for admins
-    Search coaches with the query parameter '?search='
-    Filter coaches with the query parameters '?is_admin=' and '?is_active='
+    Search coaches with the query parameter ?search=
+    Filter coaches with the query parameters 
+        ?is_admin=[true, false],
+        ?is_active=[true, false]
     example query: /api/coaches/?is_admin=false&is_active=true
     """
     queryset = Coach.objects.all().order_by('id')
@@ -181,8 +189,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed, edited or searched.
     only admin users have permission for this endpoint, except for suggesting students or removing suggestions 
-    Search projects with the query parameter '?search='
-    Filter projects with the query parameters '?required_skills=', '?coaches=' and '?suggested_students='
+    Search projects with the query parameter ?search=
+    Filter projects with the query parameters 
+        ?required_skills=:id:, 
+        ?coaches=:id:,
+        ?suggested_students=:id:
     example query: /api/projects/?required_skills=1&coaches=2&suggested_students=1
     """
     queryset = Project.objects.all().order_by('id')
@@ -281,7 +292,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class SkillViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows skills to be viewed, edited or searched.
-    Search skills with the query parameter '?search='
+    Search skills with the query parameter ?search=
     """
     queryset = Skill.objects.all().order_by('id')
     serializer_class = SkillSerializer
@@ -293,8 +304,13 @@ class SkillViewSet(viewsets.ModelViewSet):
 class SentEmailViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows sent emails to be viewed, edited or searched.
-    Search emails with the query parameter '?search='
-    Filter emails with the query parameters '?sender=', '?receiver=', '?date=', '?before=' and '?after='
+    Search emails with the query parameter ?search=
+    Filter emails with the query parameters 
+        ?sender=:id:, 
+        ?receiver=:id:, 
+        ?date=yyyy-mm-dd, 
+        ?before=yyyy-mm-ddThh:mm:ss,
+        ?after=yyyy-mm-ddThh:mm:ss
     example query: /api/emails/?sender=1&after=2022-04-03
     """
     queryset = SentEmail.objects.all().order_by('id')
