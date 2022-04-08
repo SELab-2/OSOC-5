@@ -43,7 +43,6 @@ class TallyForm:
             value = None
             i = 0
             while value == None and i < len(matching):
-                # TODO: add skip values
                 value = self.getFieldValue(matching[i], question["type"])
                 skip.extend(self.__getAnswer(value, question.get("answers", [])).get("skip", []))
                 i += 1
@@ -116,7 +115,7 @@ class TallyForm:
         fields = getNested(form, None, "data", "fields")
         for i, question in self.questions.items():
             # only required questions need to be checked when validating
-            matching = self.findQuestions(question, fields)
+            matching = self.findFields(question, fields)
 
             value = None
             i = 0
@@ -126,8 +125,8 @@ class TallyForm:
 
             if value:
                 answer = self.__getAnswer(value, question.get("answers", []))
-                # TODO: list items and atoms and recursive value questions
-                transformed[question["field"]] = answer.get("value", answer["answer"])
+                transformed[question["field"]] = self.__processAnswer(answer, fields)
+
         return transformed
 
     def __getAnswer(self, value, answers):
@@ -136,3 +135,20 @@ class TallyForm:
             if self.__gor(answer, "answer") == value:
                 answerBody = answer
         return { 'answer': value } if answerBody == None else answerBody
+
+    def __processAnswer(self, answer, fields):
+        value = answer.get("value", None)
+        if value == None:
+            return answer["answer"]
+        else:
+            if value.get("question", None) != None:
+                matching = self.findFields(value, fields)
+                newValue = None
+                i = 0
+                while newValue == None and i < len(matching):
+                    newValue = self.getFieldValue(matching[i], value["type"])
+                    i += 1
+                assert value != None
+                return value
+            else:
+                return value

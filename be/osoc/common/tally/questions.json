@@ -297,7 +297,7 @@
     "question": [
       "How many years does your degree take?"
     ],
-    "field": "degree",
+    "field": "degree_number_of_years",
     "type": "INPUT_NUMBER",
     "required": true
   },
@@ -305,7 +305,7 @@
     "question": [
       "Which year of your degree are you in?"
     ],
-    "field": "degree",
+    "field": "degree_current_year",
     "type": "INPUT_TEXT",
     "required": true
   },
@@ -394,16 +394,16 @@
     "question": [
       "Would you like to be a student coach this year?"
     ],
-    "field": "skills",
+    "field": "student_coach",
     "type": "MULTIPLE_CHOICE",
     "answers": [
       {
         "answer": "Yes, I'd like to be a student coach",
-        "value": "Student Coach"
+        "value": true
       },
       {
         "answer": "No, I don't want to be a student coach",
-        "value": null
+        "value": false
       }
     ],
     "required": false
