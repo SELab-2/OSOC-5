@@ -32,76 +32,65 @@ class UtilityTestCases(TestCase):
         self.assertEqual(True, utils.getNested({'a': {'b': True }}, None, 'a', 'b'))
         self.assertEqual(True, utils.getNested({'a': {'b': { 'c': True }}}, None, 'a', 'b', 'c'))
 
-class TallyTestCases(TestCase):
-    def testTallyFormValidationErrors(self):
-        tally = TallyForm({})
-        # Formatting Errors
-        with self.assertRaisesMessage(TallyForm.TallyFormError, "Format error"):
-            tally.validate({}) # No fields
-        with self.assertRaisesMessage(TallyForm.TallyFormError, "Format error"):
-            # Event type and no fields
-            tally.validate({ "eventType": "FORM_RESPONSE" })
-        with self.assertRaisesMessage(TallyForm.TallyFormError, "Format error"):
-            # Fields no event type
-            tally.validate({ "data": { "fields": [] }})
-        # Question required error
-        tally = TallyForm({
-            3: {
-                "question": [
-                    "Birth name"
-                    ],
-                "field": "first_name",
-                "type": "INPUT_TEXT",
+class TallyFormTestCases(TestCase):
+    def setUp(self):
+       self.questions = {
+            1: {
+                "question": [ "What do/did you study?" ],
+                "field": "studies",
+                "type": "CHECKBOXES",
+                "answers": [
+                        { "answer": "Backend development" },
+                        { "answer": "Business management" },
+                        { "answer": "Other", "value": {
+                            "question": [ "What do/did you study?" ],
+                            "type": "INPUT_TEXT"
+                            } } ],
                 "required": True
-                }
-            })
-        with self.assertRaisesMessage(TallyForm.TallyFormError, "Question is required"):
-            tally.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
-                { "key": "question_mRoXgd", "label": "Birth name", "type": "INPUT_TEXT", "value": None }
-                ] } })
-        # Missing question
-        with self.assertRaisesMessage(TallyForm.TallyFormError, "Missing question in form"):
-            tally.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
-                { "key": "question_mRoXgd", "label": "Last name", "type": "INPUT_TEXT", "value": None }
-                ] } })
-
-    def testSkipValidation(self):
-        tally = TallyForm({
+            },
             2: {
-                "question": [
-                    "Are you a student?"
-                    ],
+                "question": [ "Are you a student?" ],
                 "field": "student",
                 "type": "MULTIPLE_CHOICE",
                 "answers": [
-                    {
-                        "answer": "Yes",
-                        "skip": [3]
-                        },
-                    ],
+                        { "answer": "Yes", "value": True, },
+                        { "answer": "No", "value": False } ],
                 "required": True
             },
             3: {
-                "question": [
-                    "Birth name"
-                    ],
+                "question": [ "Birth name" ],
                 "field": "first_name",
                 "type": "INPUT_TEXT",
                 "required": True
-                }
-            })
-        form = {
-                "eventType": "FORM_RESPONSE",
-                "data": {
-                    "fields": [
-                        {
-                            "key": "question_mRoXgd", "label": "Are you a student?", "type": "MULTIPLE_CHOICE", "value": "abc", "options": [ { "id": "abc", "text": "Yes" } ]
-                        }
-                    ]
-                }
-        }
-        self.assertEqual(tally.validate(form), form)
+            }
+       }
 
+    def testValidationFormatError(self):
+        tallyForm = TallyForm({})
+        with self.assertRaisesMessage(ValueError, "Format error: Event type should be 'FORM_RESPONSE'."):
+            tallyForm.validate({})
+        with self.assertRaisesMessage(ValueError, "Format error: No fields (root > data > fields)."):
+            tallyForm.validate({ "eventType": "FORM_RESPONSE" })
+
+    def testValidationQuestionError(self):
+        self.questions[1]["required"] = False
+        self.questions[2]["required"] = False
+        tallyForm = TallyForm(self.questions)
+        with self.assertRaisesMessage(ValueError, "Question is required"):
+            tallyForm.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
+                { "key": "question_mRoXgd", "label": "Birth name", "type": "INPUT_TEXT", "value": None }
+                ] } })
+        with self.assertRaisesMessage(ValueError, "Missing question in form"):
+            tallyForm.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [] } } )
+
+    # def testValidationSkipQuestions(self):
+    #     # Skip question 2 and 3 if answer for question 1 is "Backend development"
+    #     self.questions[1]["answers"][0]["skip"] = [2, 3]
+    #     tallyForm = TallyForm(self.questions)
+    #     form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
+    #         { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": "abc", "options": [ { "id": "abc", "text": "Backend development" } ] }
+    #         ] } }
+    #     self.assertEqual(tallyForm.validate(form), form)
 
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:

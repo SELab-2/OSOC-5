@@ -1,19 +1,13 @@
 """
 Tally form (https://tally.so); method for students to register.
 """
-from .utils import getNested
+from .utils import getNested, assertOrRaise
 import json
 
 class TallyForm:
     """
     Validate and manipulate student register form from Tally.
     """
-    class TallyFormError(Exception):
-        """
-        Raised when there is an error validating the Tally form.
-        """
-        pass
-
     def __init__(self, questions):
         self.questions = questions
 
@@ -27,54 +21,35 @@ class TallyForm:
         """
         Validate Tally form; make sure all student data is present.
         """
+        assertOrRaise(form.get("eventType", None) == "FORM_RESPONSE", "Format error: Event type should be 'FORM_RESPONSE'.")
+        # Get question fields from form
         fields = getNested(form, None, "data", "fields")
-        self.__raiseIfTrue(form.get("eventType", None) != "FORM_RESPONSE", "Format error", "Event type should be 'FORM_RESPONSE'")
-        self.__raiseIfTrue(fields == None, "Format error", "No fields (root > data > fields)!")
-        # Questions should be in the fields as formatted
-        skip = []
+        assertOrRaise(fields != None, "Format error: No fields (root > data > fields).")
+        # Validate (required) questions
+        skipQuestions = []
         for i, question in self.questions.items():
-            # just check required questions
-            if not self.__gor(question, "required") or i in skip:
+            if not question["required"] or i in skipQuestions:
                 continue
-            matching = self.findFields(question, fields)
-            # required questions should have matching fields in the form
-            self.__raiseIfTrue(not matching, "Missing question in form", ";".join(self.__gor(question, "question")))
-
-            value = None
-            i = 0
-            while value == None and i < len(matching):
-                value = self.getFieldValue(matching[i], question["type"])
-                skip.extend(self.__getAnswer(value, question.get("answers", [])).get("skip", []))
-                i += 1
-            # required questions should have a value
-            self.__raiseIfTrue(value == None, "Question is required", ";".join(self.__gor(question, "question")))
+            # Required questions should have matching fields in the form
+            filteredFields = self.findFields(question, fields)
+            assertOrRaise(filteredFields, f"Missing question in form {';'.join(question['question'])}")
+            # Required questions should have a value
+            fieldValue = self.searchFieldValue(filteredFields, question["type"])
+            assertOrRaise(fieldValue != None, f"Question is required {';'.join(question['question'])}")
+            # Add skip values if necessary
+            if fieldValue:
+                skipQuestions.extend(self.getAnswer(fieldValue, question.get("answers", [])).get("skip", []))
         return form
-
-    def __raiseIfTrue(self, check, mesg, extra):
-        """
-        Raise Tally error if check if true; with message and extra detailed info.
-        """
-        if check: # if check passed, raise error
-            raise self.TallyFormError(f'{mesg}: {extra}')
-
-    def __gor(self, d, k):
-        """
-        Get or raise field error; basically KeyError wrapped inside a TallyFormError.
-        """
-        try:
-            return d[k]
-        except KeyError:
-            raise self.TallyFormError(f'Field not present: {k}')
 
     def findFields(self, question, fields):
         """
-        Find fields (from a Tally form) that correspond with the given question.
+        Find fields that correspond with a given question.
         """
-        matching = []
+        foundFields = []
         for field in fields:
-            if self.__gor(field, "label") in self.__gor(question, "question") and self.__hasEqualType(self.__gor(question, "type"), self.__gor(field, "type")):
-                matching.append(field)
-        return matching
+            if field["label"] in question["question"] and self.__hasEqualType(question["type"], field["type"]):
+                foundFields.append(field)
+        return foundFields
 
     def __hasEqualType(self, questionType, fieldType):
         """
@@ -85,70 +60,81 @@ class TallyForm:
         else:
             return fieldType == questionType
 
-    def getFieldValue(self, field, fieldType):
+    def searchFieldValue(self, fields, type):
+        """
+        Search (filtered) fields for a value with a given type.
+        """
+        value = None
+        i = 0
+        while value == None and i < len(fields):
+            value = self.getFieldValue(fields[i], type)
+            i += 1
+        return value
+
+    def getFieldValue(self, field, type):
         """
         Get value from field with the given type.
         """
-        if fieldType == "MULTIPLE_CHOICE":
-            optionId = self.__gor(field, "value")
-            for option in self.__gor(field, "options"):
-                if self.__gor(option, "id") == optionId:
-                    return self.__gor(option, "text")
-        elif fieldType == "CHECKBOXES":
-            checked = self.__gor(field, "value")
+        if type == "MULTIPLE_CHOICE":
+            optionId = field["value"]
+            for option in field["options"]:
+                if option["id"] == optionId:
+                    return option["text"]
+        elif type == "CHECKBOXES":
+            checked = field["value"]
             values = []
-            for option in self.__gor(field, "options"):
-                if self.__gor(option, "id") in checked:
-                    values.append(self.__gor(option, "text"))
+            for option in field["options"]:
+                if option["id"] in checked:
+                    values.append(option["text"])
             return values
         else:
-            # assume text as value
-            return self.__gor(field, "value")
+            # Text as value
+            return field["value"]
 
     def transform(self, form):
         """
-        Transform validate Tally form to python dictionary with accessible fields;
-        this function does not validate fields, make sure to run validate before
-        running this function.
+        Transform validated Tally form to easier format; run validate before
+        calling this method.
         """
-        transformed = {}
+        newForm = {}
         fields = getNested(form, None, "data", "fields")
+        # Transform Tally form
+        skipQuestions = []
         for i, question in self.questions.items():
-            # only required questions need to be checked when validating
-            matching = self.findFields(question, fields)
+            if i in skipQuestions:
+                continue
+            fieldValue = self.searchFieldValue(self.findFields(question, fields), question["type"])
+            if fieldValue:
+                answer = self.getAnswer(fieldValue, question.get("answers", []))
+                # Add processed answer to new form
+                newForm[question["field"]] = self.processAnswer(answer, fields)
+                # Skip questions
+                skipQuestions.extend(answer.get("skip", []))
+        return newForm
 
-            value = None
-            i = 0
-            while value == None and i < len(matching):
-                value = self.getFieldValue(matching[i], question["type"])
-                i += 1
-
-            if value:
-                answer = self.__getAnswer(value, question.get("answers", []))
-                transformed[question["field"]] = self.__processAnswer(answer, fields)
-
-        return transformed
-
-    def __getAnswer(self, value, answers):
+    def getAnswer(self, fieldValue, answers):
+        """
+        Get question answer from its field value.
+        """
+        # TODO: fieldValue can be a list with CHECKBOXES; handle checkboxes
         answerBody = None
         for answer in answers:
-            if self.__gor(answer, "answer") == value:
+            if answer["answer"] == fieldValue:
                 answerBody = answer
-        return { 'answer': value } if answerBody == None else answerBody
+        return { 'answer': fieldValue } if answerBody == None else answerBody
 
-    def __processAnswer(self, answer, fields):
-        value = answer.get("value", None)
-        if value == None:
+    def processAnswer(self, answer, fields):
+        """
+        Process a question answer; map it to its corresponding qeustion value.
+        """
+        # TODO: adjust accordingly when getAnswer changes
+        questionValue = answer.get("value", None)
+        if questionValue == None:
             return answer["answer"]
         else:
-            if value.get("question", None) != None:
-                matching = self.findFields(value, fields)
-                newValue = None
-                i = 0
-                while newValue == None and i < len(matching):
-                    newValue = self.getFieldValue(matching[i], value["type"])
-                    i += 1
-                assert value != None
-                return value
+            # Question value is another question
+            if isinstance(questionValue, dict):
+                return self.searchFieldValue(self.findFields(questionValue, fields), questionValue["type"])
+            # Question value is just a value
             else:
-                return value
+                return questionValue

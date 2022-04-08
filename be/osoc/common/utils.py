@@ -2,6 +2,13 @@
 Utilities.
 """
 
+def assertOrRaise(check, mesg, error=ValueError):
+    """
+    If check fails, raise error with message.
+    """
+    if not check:
+        raise error(mesg)
+
 def getNested(dictionary, default, *keys):
     """
     Get a dictionary but nested; returning the default at the first missing key.
