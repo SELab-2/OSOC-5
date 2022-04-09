@@ -533,9 +533,6 @@ export default defineComponent({
         }
       },
 
-      change_color(id: number) {
-        console.log(id)
-      },
     }
   },
 })
