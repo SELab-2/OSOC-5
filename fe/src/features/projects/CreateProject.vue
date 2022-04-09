@@ -107,7 +107,6 @@
               row-key="url"
               selection="multiple"
               :filter="filter_coaches"/>
-            <div class="q-mt-md">selected_coaches: {{ JSON.stringify(selected_coaches) }}</div>
           </div>
 
           <div
