@@ -27,7 +27,6 @@ export class User implements UserInterface {
   isActive: Boolean
   url: string
   
-  
   constructor(data: UserInterface) {
     Object.assign(this, data)
   }

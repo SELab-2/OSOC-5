@@ -66,9 +66,8 @@
             <q-td
               key="name"
               :props="props"
-              @click="console.log(props)"
             >
-              {{ props.row.firstName }} {{ props.row.lastName }}
+              {{ props.row.fullName }}
             </q-td>
             <q-td
               key="role"
