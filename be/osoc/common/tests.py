@@ -82,6 +82,13 @@ class TallyFormTestCases(TestCase):
                 ] } })
         with self.assertRaisesMessage(ValueError, "Missing question in form"):
             tallyForm.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [] } } )
+        self.questions[2]["required"] = True
+        self.questions[3]["required"] = False
+        self.questions[2]["answers"] = []
+        with self.assertRaisesMessage(ValueError, "Question has no answer"):
+            tallyForm.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
+                { "key": "question_mRoXgd", "label": "Are you a student?", "type": "MULTIPLE_CHOICE", "value": "abc", "options": [ { "id": "abc", "text": "Yes" } ] }
+                ] } } )
 
     # def testValidationSkipQuestions(self):
     #     # Skip question 2 and 3 if answer for question 1 is "Backend development"

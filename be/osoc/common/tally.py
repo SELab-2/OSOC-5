@@ -32,13 +32,14 @@ class TallyForm:
                 continue
             # Required questions should have matching fields in the form
             filteredFields = self.findFields(question, fields)
-            assertOrRaise(filteredFields, f"Missing question in form {';'.join(question['question'])}")
+            assertOrRaise(filteredFields, f"Missing question in form {';'.join(question['question'])}.")
             # Required questions should have a value
             fieldValue = self.searchFieldValue(filteredFields, question["type"])
-            assertOrRaise(fieldValue != None, f"Question is required {';'.join(question['question'])}")
+            assertOrRaise(fieldValue != None, f"Question is required {';'.join(question['question'])}.")
             # Add skip values if necessary
-            if fieldValue:
-                skipQuestions.extend(self.getAnswer(fieldValue, question.get("answers", [])).get("skip", []))
+            answer = self.getQuestionAnswer(question, fieldValue, fields)
+            assertOrRaise(answer != None, f"Question has no answer {';'.join(question['question'])}.")
+            skipQuestions.extend(answer.get("skip", []))
         return form
 
     def findFields(self, question, fields):
@@ -47,18 +48,9 @@ class TallyForm:
         """
         foundFields = []
         for field in fields:
-            if field["label"] in question["question"] and self.__hasEqualType(question["type"], field["type"]):
+            if field["label"] in question["question"] and self.__equal(question["type"], field["type"]):
                 foundFields.append(field)
         return foundFields
-
-    def __hasEqualType(self, questionType, fieldType):
-        """
-        Verify equal question and field type.
-        """
-        if isinstance(questionType, list):
-            return fieldType in questionType
-        else:
-            return fieldType == questionType
 
     def searchFieldValue(self, fields, type):
         """
@@ -105,36 +97,48 @@ class TallyForm:
                 continue
             fieldValue = self.searchFieldValue(self.findFields(question, fields), question["type"])
             if fieldValue:
-                answer = self.getAnswer(fieldValue, question.get("answers", []))
+                answer = self.getQuestionAnswer(question, fieldValue, fields)
                 # Add processed answer to new form
-                newForm[question["field"]] = self.processAnswer(answer, fields)
+                newForm[question["field"]] = answer["value"]
                 # Skip questions
                 skipQuestions.extend(answer.get("skip", []))
         return newForm
 
-    def getAnswer(self, fieldValue, answers):
+    def getQuestionAnswer(self, question, fieldValue, fields):
         """
         Get question answer from its field value.
         """
-        # TODO: fieldValue can be a list with CHECKBOXES; handle checkboxes
-        answerBody = None
-        for answer in answers:
-            if answer["answer"] == fieldValue:
-                answerBody = answer
-        return { 'answer': fieldValue } if answerBody == None else answerBody
+        answer = None
+        if type == "MULTIPLE_CHOICE":
+            for ans in question["answers"]:
+                if answer["answer"] == fieldValue:
+                    answer = self.processAnswer(ans, fields)
+                    break # Multiple choice allows just 1 answer
+        elif type == "CHECKBOXES":
+            # TODO
+            pass
+        else:
+            # Text as value
+            answer = { "answer": fieldValue }
+        return answer
 
     def processAnswer(self, answer, fields):
         """
-        Process a question answer; map it to its corresponding qeustion value.
+        Process a question answer; map it to its corresponding question value (if needed).
         """
-        # TODO: adjust accordingly when getAnswer changes
         questionValue = answer.get("value", None)
         if questionValue == None:
-            return answer["answer"]
+            answer["value"] = answer["answer"]
+        elif isinstance(questionValue, dict):
+            answer["value"] = self.searchFieldValue(self.findFields(questionValue, fields), questionValue["type"])
+        return answer
+
+    def __equal(self, this, that):
+        """
+        Self-defined equal; if that is a list or dictionary, `this` should be in `that`.
+        Otherwise `this` should be equal to `that`.
+        """
+        if isinstance(that, list) or isinstance(that, dict):
+            return this in that
         else:
-            # Question value is another question
-            if isinstance(questionValue, dict):
-                return self.searchFieldValue(self.findFields(questionValue, fields), questionValue["type"])
-            # Question value is just a value
-            else:
-                return questionValue
+            return this == that
