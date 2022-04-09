@@ -212,7 +212,7 @@
                     </q-popup-edit>
                   </q-td>
                   <q-td style="width: 10px" key="remove">
-                    <q-btn
+                    <btn
                       flat
                       round
                       style="color: #f14a3b"
@@ -221,6 +221,7 @@
                         delete_role_prompt = true
                       "
                       icon="mdi-trash-can-outline"
+                      glow-color="red-2"
                     />
                   </q-td>
                 </q-tr>
@@ -278,8 +279,8 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat color="grey" label="Cancel" v-close-popup />
-        <q-btn flat color="red" label="Delete" @click="delete_role_confirm" />
+        <btn flat color="grey" label="Cancel" v-close-popup />
+        <btn flat color="red" label="Delete" @click="delete_role_confirm" glow-color="red-2"/>
       </q-card-actions>
     </q-card>
   </q-dialog>

@@ -124,12 +124,13 @@
               key="remove"
               style="width: 10px"
             >
-              <q-btn
+              <btn
                 flat
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 @click="coachStore.removeUser(props.row.id)"
+                glow-color="red-2"
               />
             </q-td>
           </q-tr>

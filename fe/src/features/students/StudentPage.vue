@@ -54,9 +54,9 @@
       <q-card>
         <q-card-section>
           <div class="text-h6">Suggest
-            <q-btn dense rounded class="text-h6" :class="this.suggestionColor">
+            <btn dense rounded class="text-h6" :class="this.suggestionColor">
               {{ this.suggestionName }}
-            </q-btn>
+            </btn>
             for {{ this.name }}</div>
         </q-card-section>
 
@@ -70,8 +70,8 @@
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn flat color="grey" label="Cancel" v-close-popup/>
-          <q-btn flat label="Suggest" @click="makeSuggestion" v-close-popup/>
+          <btn flat color="grey" label="Cancel" v-close-popup glow-color="grey-4"/>
+          <btn flat label="Suggest" @click="makeSuggestion" v-close-popup glow-color="teal-1"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
