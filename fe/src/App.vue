@@ -4,10 +4,10 @@
 </script>
 
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout style="height: 100vh" view="hHh lpR fFf">
 
-    <q-page-container>
-      <router-view/>
+    <q-page-container style="height: 100%">
+      <router-view />
     </q-page-container>
 
   </q-layout>

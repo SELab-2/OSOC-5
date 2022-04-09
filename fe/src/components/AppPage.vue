@@ -1,6 +1,6 @@
 <template>
   <TopToolbar/>
-  <router-view/>
+  <router-view style="height: 100%"/>
 </template>
 
 <script lang="ts">
