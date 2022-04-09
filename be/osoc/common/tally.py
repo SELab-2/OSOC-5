@@ -52,27 +52,27 @@ class TallyForm:
                 foundFields.append(field)
         return foundFields
 
-    def searchFieldValue(self, fields, type):
+    def searchFieldValue(self, fields, qtype):
         """
         Search (filtered) fields for a value with a given type.
         """
         value = None
         i = 0
         while value == None and i < len(fields):
-            value = self.getFieldValue(fields[i], type)
+            value = self.getFieldValue(fields[i], qtype)
             i += 1
         return value
 
-    def getFieldValue(self, field, type):
+    def getFieldValue(self, field, qtype):
         """
         Get value from field with the given type.
         """
-        if type == "MULTIPLE_CHOICE":
+        if qtype == "MULTIPLE_CHOICE":
             optionId = field["value"]
             for option in field["options"]:
                 if option["id"] == optionId:
                     return option["text"]
-        elif type == "CHECKBOXES":
+        elif qtype == "CHECKBOXES":
             checked = field["value"]
             values = []
             for option in field["options"]:
@@ -109,17 +109,23 @@ class TallyForm:
         Get question answer from its field value.
         """
         answer = None
-        if type == "MULTIPLE_CHOICE":
+        if question["type"] == "MULTIPLE_CHOICE":
             for ans in question["answers"]:
-                if answer["answer"] == fieldValue:
+                if ans["answer"] == fieldValue:
                     answer = self.processAnswer(ans, fields)
                     break # Multiple choice allows just 1 answer
-        elif type == "CHECKBOXES":
-            # TODO
-            pass
+        elif question["type"] == "CHECKBOXES":
+            answer = { "value": [], "skip": [] }
+            for ans in question["answers"]:
+                if ans["answer"] in fieldValue:
+                    nextAnswer = self.processAnswer(ans, fields)
+                    answer["value"].append(nextAnswer["value"])
+                    answer["skip"].extend(nextAnswer.get("skip", []))
+            if len(answer["value"]) == 0:
+                answer = None
         else:
             # Text as value
-            answer = { "answer": fieldValue }
+            answer = { "value": fieldValue }
         return answer
 
     def processAnswer(self, answer, fields):

@@ -62,7 +62,7 @@ class TallyFormTestCases(TestCase):
                 "field": "first_name",
                 "type": "INPUT_TEXT",
                 "required": True
-            }
+            },
        }
 
     def testValidationFormatError(self):
@@ -90,14 +90,45 @@ class TallyFormTestCases(TestCase):
                 { "key": "question_mRoXgd", "label": "Are you a student?", "type": "MULTIPLE_CHOICE", "value": "abc", "options": [ { "id": "abc", "text": "Yes" } ] }
                 ] } } )
 
-    # def testValidationSkipQuestions(self):
-    #     # Skip question 2 and 3 if answer for question 1 is "Backend development"
-    #     self.questions[1]["answers"][0]["skip"] = [2, 3]
-    #     tallyForm = TallyForm(self.questions)
-    #     form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
-    #         { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": "abc", "options": [ { "id": "abc", "text": "Backend development" } ] }
-    #         ] } }
-    #     self.assertEqual(tallyForm.validate(form), form)
+    def testValidationSkipQuestions(self):
+        # Skip question 2 and 3 if answer for question 1 is "Backend development"
+        self.questions[1]["answers"][0]["skip"] = [2, 3]
+        tallyForm = TallyForm(self.questions)
+        form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
+            { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": [ "abc" ], "options": [ { "id": "abc", "text": "Backend development" } ] }
+            ] } }
+        self.assertEqual(tallyForm.validate(form), form)
+
+    def testTransformOtherQuestion(self):
+        # Skip question 2 and 3 if answer for question 1 is "Other"
+        self.questions[1]["answers"][2]["skip"] = [2, 3]
+        tallyForm = TallyForm(self.questions)
+        form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
+            { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": [ "abc" ], "options": [ { "id": "abc", "text": "Other" } ] },
+            { "key": "question_mRfOpr", "label": "What do/did you study?", "type": "INPUT_TEXT", "value": "Bioinformatics" } ] } }
+        self.assertEqual(tallyForm.validate(form), form)
+        transformed = tallyForm.transform(form)
+        self.assertEqual(transformed.get("studies", []), ["Bioinformatics"])
+
+    def testValidateAndTransform(self):
+        tallyForm = TallyForm(self.questions)
+        form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
+            { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": [ "a", "b", "c" ], "options": [
+                { "id": "a", "text": "Backend development" },
+                { "id": "b", "text": "Business management" },
+                { "id": "c", "text": "Other" }
+                ] },
+            { "key": "question_mRfZds", "label": "What do/did you study?", "type": "INPUT_TEXT", "value": "Bioinformatics" },
+            { "key": "question_mRoXgd", "label": "Are you a student?", "type": "MULTIPLE_CHOICE", "value": "a", "options": [ { "id": "a", "text": "Yes" } ] },
+            { "key": "question_mRfLrs", "label": "Birth name", "type": "INPUT_TEXT", "value": "Henri" },
+            ] } }
+        self.assertEqual(tallyForm.validate(form), form)
+        transformed = tallyForm.transform(form)
+        self.assertEqual(transformed, {
+            "first_name": "Henri",
+            "student": True,
+            "studies": [ "Backend development", "Business management", "Bioinformatics" ]
+            })
 
 class ProjectTestsCoach(APITestCase):
     def setUp(self) -> None:
