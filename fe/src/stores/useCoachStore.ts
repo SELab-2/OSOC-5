@@ -4,7 +4,7 @@ import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 interface State {
-  users: Array<UserInterface>
+  users: Array<User>
   isLoadingUsers: boolean
 }
 
@@ -14,22 +14,21 @@ export const useCoachStore = defineStore('user/coach', {
     isLoadingUsers: false,
   }),
   actions: {
+    async getUser(url: string) {
+      return this.users.find(user => user.url == url) ?? await instance.get(url)
+    },
     async loadUsers() {
       this.isLoadingUsers = true
-      instance
-        .get('coaches/')
-        .then(({ data }) => {
-          this.isLoadingUsers = false
-          this.users = convertObjectKeysToCamelCase(data) as any as User[]
-          this.users.forEach((user) => {
-            user.role = user.isAdmin ? 'admin' : 'coach'
-          })
-        })
-        .catch(() => (this.isLoadingUsers = false))
+      let { data } = await instance.get<UserInterface[]>('coaches')
+      this.users = data.map(user => new User(user))
     },
-    async updateRole(user: { id: Number }, newRole: string) {
+    async updateRole(user: User) {
       return instance.put(
-        `coaches/${user.id}/${newRole === 'admin' ? 'make' : 'remove'}_admin/`
+        `coaches/${user.id}/update_status/`,
+        {
+          is_admin: user.isAdmin,
+          is_active: user.isActive
+        }
       )
     },
     async removeUser(userId: number) {

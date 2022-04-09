@@ -309,14 +309,13 @@ export default defineComponent({
     updateRole(user: User, oldRole: string) {
       // nextTick is used cause the user param contains the old role. We need to wait for the next tick to get the new role.
       this!.$nextTick(() => {
-        let newRole = this.coachStore.users.find(u => u.id === user.id)!.role
         this.coachStore
-        .updateRole(user, newRole)
+        .updateRole(user)
         .catch((error) => {
             this.$q.notify({
             icon: 'warning',
             color: 'warning',
-            message: `Error ${error.response.status} while updating role to ${user.role} for ${user.firstName} ${user.lastName}`,
+            message: error.detail,
             textColor: 'black'
           });
           this.coachStore.users.find((u: User) => u.id === user.id)!.role = oldRole

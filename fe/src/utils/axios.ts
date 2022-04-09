@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
+import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 export const instance: AxiosInstance = axios.create({
   baseURL:
@@ -22,7 +23,7 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (res) => {
-    return res
+    return convertObjectKeysToCamelCase(res as any)
   },
   async (err) => {
     const originalConfig = err.config
