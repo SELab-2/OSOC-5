@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { User } from '../models/User'
+import { User, UserInterface } from '../models/User'
 import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 interface State {
-  users: Array<User>
+  users: Array<UserInterface>
   isLoadingUsers: boolean
 }
 
@@ -20,24 +20,19 @@ export const useCoachStore = defineStore('user/coach', {
         .get('coaches/')
         .then(({ data }) => {
           this.isLoadingUsers = false
-          this.users = convertObjectKeysToCamelCase(data) as User[]
+          this.users = convertObjectKeysToCamelCase(data) as any as User[]
           this.users.forEach((user) => {
             user.role = user.isAdmin ? 'admin' : 'coach'
           })
         })
         .catch(() => (this.isLoadingUsers = false))
     },
-    async updateRole(
-      user: { firstName: string; lastName: string },
-      newRole: string,
-      callback: () => void
-    ) {
-      console.log(
-        `Will update role to ${newRole} for ${user.firstName} ${user.lastName}`
+    async updateRole(user: { id: Number }, newRole: string) {
+      return instance.put(
+        `coaches/${user.id}/${newRole === 'admin' ? 'make' : 'remove'}_admin/`
       )
-      callback()
     },
-    async removeUser(userId: string) {
+    async removeUser(userId: number) {
       await instance
         .delete(`coaches/${userId}/`)
         .then(() => {
