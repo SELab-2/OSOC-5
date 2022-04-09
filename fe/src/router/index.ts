@@ -10,8 +10,6 @@ import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
 
-import Temp from "../components/Temp.vue"
-
 const routes: Array<RouteRecordRaw> = [
   {
     path: '',
@@ -28,10 +26,6 @@ const routes: Array<RouteRecordRaw> = [
         component: LoginFormVue,
         name: 'Login',
       },
-      {
-        path: 'temp',
-        component: Temp
-      }
     ],
   },
   {
