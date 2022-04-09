@@ -18,7 +18,6 @@
           color="yellow"
           icon="download"
           label="csv"
-          @click="exportTable"
           glow-color="amber-2"
         />
       </div>
@@ -93,9 +92,9 @@
               >
                 <template #option="scope">
                   <q-item
+                    @click="() => updateRole(props.row, props.row.role)"
                     class="items-center"
                     v-bind="scope.itemProps"
-                    @click="() => updateRole(props.row, props.row.role)"
                   >
                     <q-icon
                       class="q-mr-md icon"
@@ -146,6 +145,7 @@ import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
+import { User } from '../../models/User'
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
@@ -169,7 +169,7 @@ const columns = [
     name: 'name',
     required: true,
     label: 'Name',
-    align: 'left',
+    align: 'left' as const,
     field: 'name',
     sortable: true,
   },
@@ -177,7 +177,7 @@ const columns = [
     name: 'role',
     required: true,
     label: 'Role',
-    align: 'left',
+    align: 'left' as const,
     field: 'role',
     sortable: true,
   },
@@ -185,20 +185,20 @@ const columns = [
     name: 'assignedto',
     required: false,
     label: 'Assigned To',
-    align: 'left',
+    align: 'left' as const,
     field: 'assignedto',
     sortable: true,
   },
   {
     name: 'email',
-    align: 'right',
+    align: 'right' as const,
     label: 'Email',
     field: 'email',
     sortable: true,
   },
   {
     name: 'action',
-    align: 'right',
+    align: 'right' as const,
     label: '',
     field: '',
     sortable: false,
@@ -230,24 +230,6 @@ export default defineComponent({
     
     onMounted(() => {
       coachStore.loadUsers();
-      coachStore.$subscribe((users, state) => {
-        console.log(users, state)
-        switch (users.events.key) {
-            case 'role':
-              coachStore
-              .updateRole(users.events.target, users.events.newValue)
-              .catch((error) => {
-                  $q.notify({
-                  icon: 'warning',
-                  color: 'warning',
-                  message: `Error ${error.response.status} while updating role to ${users.events.newValue} for ${users.events.target.firstName} ${users.events.target.lastName}`,
-                  textColor: 'black'
-                });
-                coachStore.users.find((user) => user.id === users.events.target.id).role = users.events.oldValue
-              }
-            )
-        }
-      })
     })
     
 
@@ -278,57 +260,57 @@ export default defineComponent({
         })
       )
     },
-    exportTable() {
-      // naive encoding to csv format
-      const current = new Date()
-      const cDate =
-        current.getFullYear() +
-        '' +
-        (current.getMonth() + 1) +
-        '' +
-        current.getDate()
-      const cTime =
-        current.getHours() + '' + current.getMinutes() + current.getSeconds()
-      const dateTime = cDate + '' + cTime
-      const content = [
-        columns.slice(0, -1).map((col) => wrapCsvValue(col.label)),
-      ]
-        .concat(
-          this.users.map((row: { [x: string]: any }) =>
-            columns
-              .slice(0, -1)
-              .map((col) =>
-                wrapCsvValue(
-                  typeof col.field === 'function'
-                    ? col.field(row)
-                    : row[col.field === void 0 ? col.name : col.field],
-                  col.format
-                )
-              )
-              .join(',')
-          )
-        )
-        .join('\r\n')
-
-      const status = exportFile(
-        'table-export-' + dateTime + '.csv',
-        content,
-        'text/csv'
-      )
-
-      if (status !== true) {
-        this.$q.notify({
-          message: 'Browser denied file download...',
-          color: 'negative',
-          icon: 'warning',
-        })
-      }
-    },
+//     exportTable() {
+//       // naive encoding to csv format
+//       const current = new Date()
+//       const cDate =
+//         current.getFullYear() +
+//         '' +
+//         (current.getMonth() + 1) +
+//         '' +
+//         current.getDate()
+//       const cTime =
+//         current.getHours() + '' + current.getMinutes() + current.getSeconds()
+//       const dateTime = cDate + '' + cTime
+//       const content = [
+//         columns.slice(0, -1).map((col) => wrapCsvValue(col.label)),
+//       ]
+//         .concat(
+//           this.coachStore.users.map((row: { [x: string]: any }) =>
+//             columns
+//               .slice(0, -1)
+//               .map((col) =>
+//                 wrapCsvValue(
+//                   typeof col.field === 'function'
+//                     ? col.field(row)
+//                     : row[col.field === void 0 ? col.name : col.field],
+//                   col.format
+//                 )
+//               )
+//               .join(',')
+//           )
+//         )
+//         .join('\r\n')
+// 
+//       const status = exportFile(
+//         'table-export-' + dateTime + '.csv',
+//         content,
+//         'text/csv'
+//       )
+// 
+//       if (status !== true) {
+//         this.$q.notify({
+//           message: 'Browser denied file download...',
+//           color: 'negative',
+//           icon: 'warning',
+//         })
+//       }
+//     },
     // Not so clean method for updating the role of an user. This is done this way because pinia events don't work in production mode andthe vue watcher doesn't work here.
-    updateRole(user, oldRole) {
+    updateRole(user: User, oldRole: string) {
       // nextTick is used cause the user param contains the old role. We need to wait for the next tick to get the new role.
-      this.$nextTick(() => {
-        let newRole = this.coachStore.users.find(u => u.id === user.id).role
+      this!.$nextTick(() => {
+        let newRole = this.coachStore.users.find(u => u.id === user.id)!.role
         this.coachStore
         .updateRole(user, newRole)
         .catch((error) => {
@@ -338,7 +320,7 @@ export default defineComponent({
             message: `Error ${error.response.status} while updating role to ${user.role} for ${user.firstName} ${user.lastName}`,
             textColor: 'black'
           });
-          this.coachStore.users.find((u) => u.id === user.id).role = oldRole
+          this.coachStore.users.find((u: User) => u.id === user.id)!.role = oldRole
         })
       })
       

@@ -1,40 +1,70 @@
 <template>
-  <q-header elevated class="bg-white text-white" height-hint="98">
+  <q-header
+    elevated
+    class="bg-white text-white"
+    height-hint="98"
+  >
     <q-toolbar class="text-blue bg-white">
-      <q-btn flat round>
+      <q-btn
+        flat
+        round
+      >
         <q-avatar size="42px">
-          <img src="../assets/logo.svg" />
+          <img src="../assets/logo.svg">
         </q-avatar>
       </q-btn>
 
       <q-space />
-      <q-tabs v-model="tab" shrink>
-        <osoc-tab name="students" label="Select Students" to="/students" exact glow-color="#B6FFD2"/>
-        <osoc-tab name="projects" label="Projects" to="/projects" exact glow-color="deep-orange-3"/>
-        <osoc-tab name="users" label="Manage Users" to="/users" exact glow-color="amber-2"/>
+      <q-tabs
+        v-model="tab"
+        class="absolute-center"
+        shrink
+      >
+        <q-route-tab
+          name="students"
+          label="Select Students"
+          to="/students"
+        />
+        <q-route-tab
+          name="projects"
+          label="Projects"
+          to="/projects"
+          exact
+        />
+        <q-route-tab
+          name="users"
+          label="Manage Users"
+          to="/users"
+          exact
+        />
       </q-tabs>
       <q-space />
-      <q-btn-dropdown flat rounded icon="mdi-account">
-        <!-- <div class="row items-center q-my-sm"> -->
-          <q-avatar class="q-ml-sm" size="40px">
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
-          </q-avatar>
-          <div class="text-subtitle1 q-mx-md">{{ user.name }}</div>
-        <!-- </div> -->
+      <q-btn-dropdown
+        flat
+        rounded
+        icon="mdi-account"
+        :label="fullName"
+      >
         <q-separator />
         <q-list separator>
           <q-item
             v-for="(item, index) in dropdownitems"
             :key="`${index}`"
-            clickable
             v-close-popup
+            clickable
             tabindex="0"
           >
             <q-item-section avatar>
-              <q-icon size="xs" :name="`${item.icon}`" color="primary" />
+              <q-icon
+                size="xs"
+                :name="`${item.icon}`"
+                color="primary"
+              />
             </q-item-section>
             <q-item-section>
-              <q-item-label :lines="1">{{ item.name }}</q-item-label>
+              <q-item-label :lines="1">
+                {{ item.name }}
+              </q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -47,7 +77,8 @@
 import { defineComponent, ref } from 'vue'
 
 import { useMeta } from 'quasar'
-import OsocTab from './OsocTab.vue'
+import { useAuthenticationStore } from '../stores/useAuthenticationStore'
+
 const metaData = {
   meta: {
     themecolor: { name: 'theme-color', content: '#24a3cb' },
@@ -55,12 +86,17 @@ const metaData = {
 }
 
 export default defineComponent({
-  components: { OsocTab },
+  setup() {
+    const authenticationStore = useAuthenticationStore()
+
+    return {
+      color: useMeta(metaData),
+      tab: ref('students'),
+      authenticationStore
+    }
+  },
   data() {
     return {
-      user: {
-        name: 'Miet Claeys',
-      },
       dropdownitems: [
         {
           name: 'Email Templates',
@@ -77,11 +113,10 @@ export default defineComponent({
       ],
     }
   },
-  setup() {
-    return {
-      color: useMeta(metaData),
-      tab: ref('students'),
+  computed: {
+    fullName(): string {
+      return this.authenticationStore.loggedInUser?.firstName + ' ' + this.authenticationStore.loggedInUser?.lastName
     }
-  },
+  }
 })
 </script>

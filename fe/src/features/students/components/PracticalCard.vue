@@ -13,9 +13,14 @@
   </q-card>
 </template>
 
-<script>
+<script lang="ts">
 export default {
-  props: ['title'],
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+  },
   setup() {
     const work = [
       {description: 'under a Belgian employment agreement', present: 'yes'},

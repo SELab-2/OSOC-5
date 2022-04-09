@@ -10,3 +10,4 @@ drf-yasg
 django-nose
 coverage
 django-cors-headers
+django-filter
