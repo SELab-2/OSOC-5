@@ -30,8 +30,8 @@ export const useStudentStore = defineStore('user/student', {
                 .get('students/')
                 .then(({data}) => {
                     for (const student of data) {
-                        if (student.final_decision) {
-                            student.final_decision.suggestion = parseInt(student.final_decision.suggestion)
+                        if (student.finalDecision) {
+                            student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
                         }
 
                         for (const suggestion of student.suggestions) {
@@ -39,7 +39,7 @@ export const useStudentStore = defineStore('user/student', {
                         }
                     }
 
-                    this.students = convertObjectKeysToCamelCase(data) as never as Student[]
+                    this.students = data as Student[]
                 })
 
             this.isLoading = false
@@ -54,8 +54,8 @@ export const useStudentStore = defineStore('user/student', {
                         suggestion.suggestion = parseInt(suggestion.suggestion)
                     }
 
-                    if (data.final_decision) {
-                        data.final_decision.suggestion = parseInt(data.final_decision.suggestion)
+                    if (data.finalDecision) {
+                        data.finalDecision.suggestion = parseInt(data.finalDecision.suggestion)
                     }
 
                     const skills = [] as Skill[]
@@ -69,7 +69,7 @@ export const useStudentStore = defineStore('user/student', {
                     }
 
                     data.skillList = skills
-                    this.currentStudent = convertObjectKeysToCamelCase(data) as never as Student
+                    this.currentStudent = data as Student
                 })
 
             this.isLoading = false
