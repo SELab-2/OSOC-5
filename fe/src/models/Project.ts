@@ -8,7 +8,7 @@ export interface ProjectInterface {
   id: number
   partnerName: string
   extraInfo: string
-  requiredSkills: Array<{amount: number, skill: Skill}>
+  requiredSkills: Array<{amount: number, comment: string, skill: Skill}>
   coaches: Array<User>
   suggestedStudents: Array<ProjectSuggestion>
 }
@@ -17,23 +17,26 @@ export class Project implements ProjectInterface {
   name: string
   partnerName: string
   extraInfo: string
-  requiredSkills: Skill[]
+  requiredSkills: {amount: number, comment: string, skill: Skill}[]
   coaches: User[]
-  suggested_students: Student[]
-
+  suggestedStudents: ProjectSuggestion[]
+  id: number
+  
   constructor(
     name: string,
     partnerName: string,
     extraInfo: string,
-    requiredSkills: Skill[],
+    requiredSkills: {amount: number, comment: string, skill: Skill}[],
     coaches: User[],
-    suggested_students: Student[]
+    suggested_students: ProjectSuggestion[],
+    id: number
   ) {
+    this.id = id
     this.name = name
     this.partnerName = partnerName
     this.extraInfo = extraInfo
     this.requiredSkills = requiredSkills
     this.coaches = coaches
-    this.suggested_students = suggested_students
+    this.suggestedStudents = suggested_students
   }
 }

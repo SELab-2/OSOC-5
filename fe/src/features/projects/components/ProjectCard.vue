@@ -90,10 +90,10 @@ export default {
   },
 
   data() {
-    console.log(this.project.requiredSkills.map(role => role.skill))
     return {
       expanded: ref(false),
       selectedRoles: reactive(
+        this.project.requiredSkills.length == 0 ? {} :
         Object.assign(
           ...this.project.requiredSkills.map((role) => ({ [role.skill.id]: false }))
         )

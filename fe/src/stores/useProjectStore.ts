@@ -15,7 +15,7 @@ interface State {
 interface TempStudent {
   student: string
   coach: string
-  role: string
+  skill: string
   reason: string
 }
 
@@ -28,6 +28,7 @@ interface TempProject {
   coaches: string[]
   requiredSkills: {
     amount: number
+    comment: string
     skill: string
   }[]
 }
@@ -44,7 +45,7 @@ export const useProjectStore = defineStore('project', {
         var newStudent: ProjectSuggestion = {
           student: await instance.get(student.student).then(res => res.data) as Student,
           coach: await instance.get(student.coach).then(res => res.data) as User,
-          skill: await instance.get(student.role).then(res => res.data) as Skill,
+          skill: await instance.get(student.skill).then(res => res.data) as Skill,
           reason: student.reason
         }
         newStudents.push(newStudent)
@@ -54,13 +55,13 @@ export const useProjectStore = defineStore('project', {
     async removeSuggestion(project: Project, suggestion: ProjectSuggestion) {
       return instance.post(`projects/${project.id}/remove_student/`, {
         student: suggestion.student.url,
-        role: suggestion.skill.url
+        skill: suggestion.skill.url
       })
     },
     async addSuggestion(projectId: number, studentUrl: URL, skillUrl: URL, reason: string) {
       return await instance.post(`projects/${projectId}/suggest_student/`, {
         student: studentUrl,
-        role: skillUrl,
+        skill: skillUrl,
         reason: reason
       })
     },
@@ -97,6 +98,7 @@ export const useProjectStore = defineStore('project', {
           requiredSkills: project.requiredSkills.map((skill, j) => {
             return {
               skill: convertObjectKeysToCamelCase(data2[j].data) as unknown as Skill,
+              comment: skill.comment,
               amount: skill.amount
             }
           })
@@ -105,7 +107,6 @@ export const useProjectStore = defineStore('project', {
         newProjects.push(fetchedProj)
       }
       this.projects = newProjects
-
     },
   },
 })
