@@ -32,7 +32,6 @@
               label="Search by name..."
               @keydown.enter="fetchStudents"
             >
-              >
               <template #append>
                 <q-icon name="search" />
               </template>
