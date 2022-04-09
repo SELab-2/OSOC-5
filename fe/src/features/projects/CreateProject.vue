@@ -104,10 +104,10 @@
               :rows="coachStore.users"
               :columns="columns_coaches"
               :loading="coachStore.isLoadingUsers"
-              row-key="displayName"
+              row-key="url"
               selection="multiple"
-              :filter="filter_coaches"
-            />
+              :filter="filter_coaches"/>
+            <div class="q-mt-md">selected_coaches: {{ JSON.stringify(selected_coaches) }}</div>
           </div>
 
           <div
@@ -313,6 +313,7 @@ import { ref } from 'vue'
 import { defineComponent, onMounted } from '@vue/runtime-core'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
+import { User } from '../../models/User'
 const columns_roles = [
   {
     name: 'role',
@@ -424,9 +425,11 @@ export default defineComponent({
        * Form Functions
        */
       onSubmit() {
-        console.log(selected_coaches.value)
 
-        let selected_coaches_urls: Array<string> = [] // TODO selection is broken
+        let selected_coaches_urls: Array<string> = []
+        for(let coach of selected_coaches.value as User[]){
+          selected_coaches_urls.push(coach.url)
+        }
 
         skillStore.submitProject(
           project_name.value,
@@ -435,7 +438,7 @@ export default defineComponent({
           selected_coaches_urls,
           (success: boolean) => {
             if (success) {
-              router.push('/projects/')
+              router.push('/projects')
 
               $q.notify({
                 icon: 'done',
