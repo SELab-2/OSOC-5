@@ -1,6 +1,13 @@
 import { Skill } from './Skill'
 import { Suggestion } from './Suggestion'
 
+export interface TempStudent {
+  student: string
+  coach: string
+  skill: string
+  reason: string
+}
+
 export interface StudentInterface {
   url: URL
   id: number

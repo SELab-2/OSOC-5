@@ -1,25 +1,28 @@
 export interface SkillInterface {
   name: string
   description: string
-  url: URL
+  url: string
 }
 
 export class Skill implements SkillInterface {
   name: string
   description: string
-
-  constructor(name: string, description: string) {
+  url: string
+  constructor(name: string, description: string, url: string) {
     this.name = name
     this.description = description
+    this.url = url
   }
 }
 
-export class Skill implements SkillInterface {
-  name: string
-  description: string
+export interface TempProjectSkill {
+  amount: number
+  comment: string
+  skill: string
+}
 
-  constructor(name: string, description: string) {
-    this.name = name
-    this.description = description
-  }
+export interface ProjectSkill {
+  amount: number
+  comment: string
+  skill: Skill
 }

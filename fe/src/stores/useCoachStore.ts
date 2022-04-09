@@ -14,8 +14,18 @@ export const useCoachStore = defineStore('user/coach', {
     isLoadingUsers: false,
   }),
   actions: {
-    async getUser(url: string) {
-      return this.users.find(user => user.url == url) ?? await instance.get(url)
+    async getUser(url: string): Promise<User> {
+      const user = this.users.find(user => user.url === url)
+      if (user) return user;
+      let { data } = await instance.get<UserInterface>(url)
+      
+      // Check again if not present, it could be added in the meantime.
+      const user2 = this.users.find(user => user.url === url)
+      if (user2) return user2
+      
+      let newUser = new User(data)
+      this.users.push(newUser)
+      return newUser
     },
     async loadUsers() {
       this.isLoadingUsers = true

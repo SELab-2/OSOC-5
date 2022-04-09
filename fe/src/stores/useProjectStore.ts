@@ -1,37 +1,19 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
-import { Student } from '../models/Student'
+import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
-import { Skill } from '../models/Skill'
+import { Skill, ProjectSkill, TempProjectSkill } from '../models/Skill'
 import { ProjectSuggestion } from '../models/ProjectSuggestion'
-import { Project } from '../models/Project'
+import { Project, TempProject } from '../models/Project'
+import { useCoachStore } from './useCoachStore'
+import { Either, left, right } from '../models/Either'
 
 interface State {
   projects: Array<Project>
   isLoadingProjects: boolean
 }
 
-interface TempStudent {
-  student: string
-  coach: string
-  skill: string
-  reason: string
-}
-
-interface TempProject {
-  id: number
-  name: string
-  suggestedStudents: TempStudent[]
-  partnerName: string,
-  extraInfo: string,
-  coaches: string[]
-  requiredSkills: {
-    amount: number
-    comment: string
-    skill: string
-  }[]
-}
 
 export const useProjectStore = defineStore('project', {
   state: (): State => ({
@@ -65,48 +47,54 @@ export const useProjectStore = defineStore('project', {
         reason: reason
       })
     },
+    async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
+      let { data } = await instance.get<Skill>(skill.skill)
+      return {
+        amount: skill.amount,
+        comment: skill.comment,
+        skill: data
+      }
+    },
+    async getProject(project: TempProject) {
+      let coaches: Array<User> = await Promise.all(
+        project.coaches.map(coach => useCoachStore().getUser(coach))
+      )
+      
+      let skills: Array<Skill|any> = await Promise.all(
+        project.requiredSkills.map(skill => this.getSkill(skill))
+      )
+      
+      let students: Array<ProjectSuggestion> = await this.fetchSuggestedStudents(project.suggestedStudents)
+      
+      // Is added to projects here because we do not want to await on each project.
+      this.projects = this.projects.concat([new Project(
+          project.name,
+          project.partnerName,
+          project.extraInfo,
+          skills,
+          coaches,
+          students,
+          project.id
+        )
+      ])
+      
+    },
     async loadProjects() {
       this.isLoadingProjects = true
-      let data = await instance
-        .get('projects/')
-        .catch(() => (this.isLoadingProjects = false))
+      try {
+        let { data } = await instance
+          .get<TempProject[]>('projects/')
         
-      this.isLoadingProjects = false
-      var projects = convertObjectKeysToCamelCase(data as any).data as TempProject[]
-      var newProjects: Project[] = []
-      for (const project of projects) {
-        
-        const data = await Promise.all(
-          project.coaches.map((coach) => {
-            return instance.get(coach)
-          })
-        )
-
-        const data2 = await Promise.all(
-          project.requiredSkills.map(skill => {
-            return instance.get(skill.skill)
-          })
-        )
-        
-        const fetchedProj: Project = {
-          id: project.id,
-          name: project.name,
-          partnerName: project.partnerName,
-          extraInfo: project.extraInfo,
-          coaches: (convertObjectKeysToCamelCase(data as any) as any).map((res: any): User => res.data) as any as User[],
-          suggestedStudents: convertObjectKeysToCamelCase(await this.fetchSuggestedStudents(project.suggestedStudents) as any) as unknown as ProjectSuggestion[],
-          requiredSkills: project.requiredSkills.map((skill, j) => {
-            return {
-              skill: convertObjectKeysToCamelCase(data2[j].data) as unknown as Skill,
-              comment: skill.comment,
-              amount: skill.amount
-            }
-          })
-          
-        }
-        newProjects.push(fetchedProj)
+        // for (let project of data) {
+        //   this.projects = this.projects.concat([await this.getProject(project)])
+        //   // this.projects.push(await this.getProject(project))
+        // }
+        // this.projects = this.projects.slice(1)
+        data.forEach(p => this.getProject(p))
+      } catch (error) {
+        console.log(error)
+        this.isLoadingProjects = false
       }
-      this.projects = newProjects
-    },
+    }
   },
 })
