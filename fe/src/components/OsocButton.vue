@@ -10,6 +10,7 @@
 <template>
   <q-btn
     unelevated
+    :flat="flat"
     ref="glowbutton"
     class="bttn"
     @mousemove="mousemove"
@@ -48,7 +49,9 @@ export default defineComponent({
       type: Number,
       default: 1
     },
-    'disableClick': Boolean
+    'disableClick': Boolean,
+    'unelevated': Boolean,
+    'flat': Boolean
   },
   mounted() {
     // This class produces a tint change on hover, but is unwanted for the glow button.
@@ -76,6 +79,13 @@ export default defineComponent({
       }
       return color
     },
+    shadow() {
+      if (this.unelevated || this.flat) return 'transparent'
+      var color: string = colors.getPaletteColor(`shadow-${this.color}`)
+      if (color !== "#000000") return color
+      color = colors.getPaletteColor(this.shadowColor)
+      return color === "#000000" ? this.shadowColor : color
+    },
     glowStyle() {
       return {
         '--x': `${this.x}px`,
@@ -83,7 +93,7 @@ export default defineComponent({
         '--size': this.glowSize,
         '--prop-scale': this.glowScale,
         '--color': this.glow,
-        '--shadow-color': this.shadowColor,
+        '--shadow-color': this.shadow,
         '--button-scale': this.disableClick ? 1 : 0.98,
         '--shadow-scale': this.disableClick ? 1 : 1.5,
         '--shadow-strength': this.shadowStrength

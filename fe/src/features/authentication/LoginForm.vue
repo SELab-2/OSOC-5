@@ -48,7 +48,6 @@
       size="md"
       class="q-mx-md cornered"
       glow-color="#00FFB5"
-      shadow-color="#57bf98"
     />
     <!--     <br/> -->
     <label class="text-bold">or</label>

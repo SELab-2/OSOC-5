@@ -98,7 +98,6 @@
          color="primary"
          class="q-mx-md cornered"
          glow-color="#00FFB5"
-         shadow-color="#57bf98"
       />
       <label class="text-bold">or</label>
       <GitHubSignInButton/>

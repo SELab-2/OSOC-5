@@ -15,7 +15,6 @@
                 class="q-mx-md cornered"
                 to="/projects"
                 glow-color="#00FFB5"
-                shadow-color="#57bf98"
                 shadow-strength="2"
               />
               <btn
@@ -26,7 +25,6 @@
                 size="md"
                 class="q-mx-md cornered"
                 glow-color="#00FFB5"
-                shadow-color="#57bf98"
                 shadow-strength="2"
               />
             </div>
@@ -128,7 +126,6 @@
                 label="Add role"
                 @click="new_role_prompt = true"
                 glow-color="#00FFB5"
-                shadow-color="#57bf98"
                 shadow-strength="2"
               />
               <q-space />
