@@ -109,7 +109,7 @@
                   :id="student.email"
                   :key="student.email"
                   :draggable="draggable"
-                  @dragstart="onDragStart($event, student.name)"
+                  @dragstart="onDragStart($event, student)"
                 >
                   <StudentCard
                     v-ripple
@@ -207,7 +207,7 @@ export default defineComponent({
     onDragStart(e: any, item: any) {
       const data = {
         targetId: e.target.id,
-        name: item
+        student: item
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'

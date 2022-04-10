@@ -3,6 +3,7 @@ import { Suggestion } from './Suggestion'
 
 export interface UserInterface {
   id: number
+  url: string
   firstName: string
   lastName: string
   email: string
@@ -15,6 +16,7 @@ export interface UserInterface {
 
 export class User implements UserInterface {
   id: number
+  url: string
   firstName: string
   lastName: string
   email: string
@@ -26,6 +28,7 @@ export class User implements UserInterface {
 
   constructor(
     id: number,
+    url: string,
     firstName: string,
     lastName: string,
     email: string,
@@ -36,6 +39,7 @@ export class User implements UserInterface {
     suggestions: Suggestion[]
   ) {
     this.id = id
+    this.url = url
     this.firstName = firstName
     this.lastName = lastName
     this.email = email
