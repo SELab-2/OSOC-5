@@ -3,7 +3,6 @@
     <q-form
       class="createProjectForm"
       @submit="onSubmit"
-      @reset="onReset"
     >
       <div>
         <div class="row justify-between items-center q-gutter-sm">
@@ -69,7 +68,7 @@
               label="Project URL"
               lazy-rules
               class="inputfield"
-              type="URL"
+              type="url"
               :rules="[
                 (val) =>
                   (val && val.length > 0) ||
@@ -192,7 +191,6 @@
                       label-set="Save"
                       label-cancel="Close"
                       :validate="amountRangeValidation"
-                      @hide="amountRangeValidation"
                     >
                       <q-input
                         v-model.number="scope.value"
@@ -260,10 +258,7 @@
                       round
                       style="color: #f14a3b"
                       icon="mdi-trash-can-outline"
-                      @click="
-                        ;(delete_role = props.row.id) &&
-                          (delete_role_prompt = true)
-                      "
+                      @click="delete_role = props.row"
                     />
                   </q-td>
                 </q-tr>
@@ -307,7 +302,7 @@
           outlined
           label="text color"
           class="inputfield"
-          type="URL"
+          type="url"
         />
         <!--  INFO if picker gives conversion issues use-->
         <!--  INFO https://quasar.dev/quasar-utils/color-utils#color-conversion-->
@@ -337,7 +332,8 @@
   </q-dialog>
 
   <q-dialog
-    v-model="delete_role_prompt"
+    :model-value="delete_role !== undefined"
+    @update:model-value="delete_role=undefined"
     persistent
   >
     <q-card style="min-width: 350px">
@@ -351,7 +347,7 @@
         </q-card-section>
         <q-card-section class="q-pt-xs">
           <div class="text-h6 q-mt-sm q-mb-xs">
-            Are you sure you want to delete "{{ delete_role.name }}"?
+            Are you sure you want to delete "{{ delete_role?.name }}"?
           </div>
           <div class="text text-grey">
             This skill will be deleted immediately from all projects. You can't
@@ -374,7 +370,7 @@
           flat
           color="red"
           label="Delete"
-          @click="delete_role_confirm"
+          @click="delete_role_confirm(delete_role!.id)"
         />
       </q-card-actions>
     </q-card>
@@ -384,43 +380,44 @@
 <script lang="ts">
 import router from '../../router'
 import { useQuasar } from 'quasar'
-import { ref } from 'vue'
+import { ref, Ref } from 'vue'
 import { defineComponent, onMounted } from '@vue/runtime-core'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { User } from '../../models/User'
+import { SkillInterface } from '../../models/Skill'
 const columns_roles = [
   {
     name: 'role',
-    align: 'left',
+    align: 'left' as const,
     label: 'Project Role',
     field: 'role',
     sortable: true,
   },
   {
     name: 'amount',
-    align: 'left',
+    align: 'left' as const,
     label: 'Amount',
     field: 'amount',
     sortable: true,
   },
   {
     name: 'comment',
-    align: 'left',
+    align: 'left' as const,
     label: 'Comment',
     field: 'comment',
     sortable: true,
   },
   {
     name: 'color',
-    align: 'center',
+    align: 'center' as const,
     label: 'Color',
     field: 'color',
     sortable: false,
   },
   {
     name: 'action',
-    align: 'right',
+    align: 'right' as const,
     label: '',
     field: '',
     sortable: false,
@@ -430,7 +427,7 @@ const columns_roles = [
 const columns_coaches = [
   {
     name: 'displayName',
-    align: 'left',
+    align: 'left' as const,
     label: 'Coach name',
     field: (row: { firstName: string; lastName: string }) =>
       row.firstName + ' ' + row.lastName,
@@ -469,8 +466,7 @@ export default defineComponent({
     const new_role_color = ref('')
 
     // variables for the delete role dialog popup
-    const delete_role_prompt = ref(false)
-    const delete_role = ref(-1)
+    const delete_role: Ref<SkillInterface|undefined> = ref()
 
     const selected_coaches = ref([])
 
@@ -539,14 +535,12 @@ export default defineComponent({
         errorMessageRoleAmount.value = ''
         return true
       },
-
-      delete_role_prompt,
       delete_role,
 
-      delete_role_confirm() {
-        skillStore.deleteSkill(delete_role.value)
-        delete_role_prompt.value = false
-        delete_role.value = -1
+      delete_role_confirm(id: number) {
+        skillStore.deleteSkill(id)
+        
+        delete_role.value = undefined
 
         $q.notify({
           icon: 'done',
