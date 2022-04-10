@@ -2,34 +2,46 @@
   <q-card class="my-card shadow-4 q-ma-sm" flat bordered>
     <q-card-section>
       <div class="row">
-        <div class="col">
-          <div class="text-h5 text-bold q-mt-sm q-mb-xs">
-            {{ project.name }}
-          </div>
-          <div class="text-overline">{{ project.partnerName }}</div>
-        </div>
+        <h5 class="text-bold q-mt-none q-mb-none">
+          {{ project.name }}
+        </h5>
+        <q-spinner 
+          v-show="!(project.requiredSkills && project.coaches && project.suggestedStudents)" size="20px"
+          color="primary"
+          class="q-ml-sm q-mt-xs"
+        />
+        <q-space/>
         <div>
           <q-btn flat round size="12px" color="primary" icon="mail" />
           <q-btn flat round size="12px" color="primary" icon="info" />
           <q-btn flat round size="12px" color="primary" icon="edit" />
         </div>
+        
       </div>
+        
+        <div class="text-overline">{{ project.partnerName }}</div>
+      <q-slide-transition>
+        <div v-show="(project.requiredSkills && project.coaches && project.suggestedStudents)">
       <div class="text-caption text-grey">Coaches:</div>
-      <q-chip v-for="coach in project.coaches" :key="coach.id" icon="person">
+      <q-chip v-for="coach in project.coaches ?? []" :key="coach.id" icon="person">
         {{ coach.firstName }} {{ coach.lastName.split(" ").map(res => res.charAt(0)).join("") }}.
       </q-chip>
-
+        
+      
+      
       <div
         class="row"
         style="display: flex; align-items: center"
-        @click="this.expanded = !this.expanded; toggleExpanded(this.expanded)"
+        
       >
         <div class="text-caption text-grey">Roles:</div>
-        <q-btn flat round size="sm" icon="mdi-eye" />
+        <q-btn flat round size="sm" icon="mdi-eye" @click="this.expanded = !this.expanded; toggleExpanded(this.expanded)"/>
       </div>
+      
       <project-role-chip
+        v-show="project.requiredSkills"
         v-model="this.selectedRoles[role.skill.id]"
-        v-for="(role, index) in project.requiredSkills"
+        v-for="(role, index) in project.requiredSkills ?? []"
         @dragleave="onDragLeave($event, role)"
         @dragover="this.amountLeft(role) > 0 ? onDragOver($event, role) : ''"
         @drop="onDrop($event, role)"
@@ -37,9 +49,11 @@
         :role="role.skill"
         :placesLeft="amountLeft(role)"
       />
+</div>
+      </q-slide-transition>
 
       <q-slide-transition
-        v-for="(role, index) in project.requiredSkills"
+        v-for="(role, index) in project.requiredSkills ?? []"
         :key="index"
         style="margin-top: 10px; margin-bottom: -10px"
       >
@@ -52,7 +66,7 @@
           </q-item-label>
           <q-item
             dense
-            v-for="suggestion in groupedStudents[role.skill.id]"
+            v-for="suggestion in groupedStudents[role.skill.id] ?? []"
             :key="suggestion.student.id"
           >
             <q-item-section lines="1" class="text-weight-medium">
@@ -89,15 +103,22 @@ export default {
     }
   },
 
+  
   data() {
     return {
       expanded: ref(false),
-      selectedRoles: reactive(
-        this.project.requiredSkills.length == 0 ? {} :
-        Object.assign(
-          ...this.project.requiredSkills.map((role) => ({ [role.skill.id]: false }))
-        )
-      ),
+      selectedRoles: reactive({}),
+    }
+  },
+  watch: {
+    // The skills are fetched later on, thus the list needs to be updated manually.
+    'project.requiredSkills': {
+      handler(newVal) {
+        this.selectedRoles = newVal.length == 0 ? {} :
+              Object.assign(
+                ...newVal.map((role) => ({ [role.skill.id]: false }))
+              )
+      }
     }
   },
 
@@ -185,10 +206,17 @@ export default {
     },
   },
   computed: {
+    test() {
+      return (this.project.requiredSkills ?? []).length == 0 ? {} :
+      Object.assign(
+        ...this.project.requiredSkills.map((role) => ({ [role.skill.id]: false }))
+      )
+    },
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }
     groupedStudents() {
       const result = {}
+      if (!this.project.suggestedStudents) return []
       this.project.suggestedStudents.forEach(student => {
         if (!result[student.skill.id]) {
           result[student.skill.id] = []

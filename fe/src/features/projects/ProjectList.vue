@@ -28,31 +28,28 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, onMounted } from 'vue'
+import { ref, defineComponent } from 'vue'
 import SideBar from '../../components/SideBar.vue'
 import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from "../../stores/useProjectStore"
 
 export default defineComponent({
     name: 'ProjectList',
-    components: {
-        SideBar, ProjectCard
-    },
+    components: { SideBar, ProjectCard },
     data() {
-        return {
-            showShadow: ref(false)
-        }
+      return {
+          showShadow: ref(false)
+      }
     },
     setup() {
-        const projectStore = useProjectStore()
-        
-        onMounted(() => {
-            projectStore.loadProjects()
-        })
-        return {
-          projectStore
-        }
+      return {
+        projectStore: useProjectStore()
+      }
     },
+    created() {
+      // Prevent a reload each time switched to the tab.
+      if (this.projectStore.projects.length === 0) this.projectStore.loadProjects()
+    }
 })
 </script>
 

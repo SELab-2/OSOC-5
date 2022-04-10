@@ -7,7 +7,6 @@ import { Skill, ProjectSkill, TempProjectSkill } from '../models/Skill'
 import { ProjectSuggestion } from '../models/ProjectSuggestion'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
-import { Either, left, right } from '../models/Either'
 
 interface State {
   projects: Array<Project>
@@ -71,26 +70,51 @@ export const useProjectStore = defineStore('project', {
           project.name,
           project.partnerName,
           project.extraInfo,
+          project.id,
           skills,
           coaches,
-          students,
-          project.id
+          students
         )
       ])
-      
     },
     async loadProjects() {
       this.isLoadingProjects = true
       try {
         let { data } = await instance
           .get<TempProject[]>('projects/')
-        
+        this.projects = data.map(p => {
+          return new Project(
+            p.name,
+            p.partnerName,
+            p.extraInfo,
+            p.id
+          )
+        })
+        data.forEach(async (project, i) => {
+          let coaches: Array<User> = await Promise.all(
+            project.coaches.map(coach => useCoachStore().getUser(coach))
+          )
+          
+          let skills: Array<Skill|any> = await Promise.all(
+            project.requiredSkills.map(skill => this.getSkill(skill))
+          )
+          
+          let students: Array<ProjectSuggestion> = await this.fetchSuggestedStudents(project.suggestedStudents)
+          // console.log(coaches)
+          this.projects[i].coaches = coaches
+          this.projects[i].requiredSkills = skills
+          this.projects[i].suggestedStudents = students
+        })
+        // for (let [i, project] of data.entries()) {
+        //   
+        //   // this.projects = [...this.projects]
+        // }
         // for (let project of data) {
         //   this.projects = this.projects.concat([await this.getProject(project)])
         //   // this.projects.push(await this.getProject(project))
         // }
         // this.projects = this.projects.slice(1)
-        data.forEach(p => this.getProject(p))
+        // data.forEach(p => this.getProject(p))
       } catch (error) {
         console.log(error)
         this.isLoadingProjects = false

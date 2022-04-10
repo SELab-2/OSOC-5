@@ -7,9 +7,9 @@ export interface ProjectInterface {
   id: number
   partnerName: string
   extraInfo: string
-  requiredSkills: Array<{amount: number, comment: string, skill: Skill}>
-  coaches: Array<User>
-  suggestedStudents: Array<ProjectSuggestion>
+  requiredSkills?: Array<{amount: number, comment: string, skill: Skill}>
+  coaches?: Array<User>
+  suggestedStudents?: Array<ProjectSuggestion>
 }
 
 export interface TempProject {
@@ -26,19 +26,19 @@ export class Project implements ProjectInterface {
   name: string
   partnerName: string
   extraInfo: string
-  requiredSkills: {amount: number, comment: string, skill: Skill}[]
-  coaches: Array<User>
-  suggestedStudents: ProjectSuggestion[]
+  requiredSkills?: {amount: number, comment: string, skill: Skill}[]
+  coaches?: Array<User>
+  suggestedStudents?: ProjectSuggestion[]
   id: number
   
   constructor(
     name: string,
     partnerName: string,
     extraInfo: string,
-    requiredSkills: {amount: number, comment: string, skill: Skill}[],
-    coaches: Array<User>,
-    suggested_students: ProjectSuggestion[],
-    id: number
+    id: number,
+    requiredSkills?: {amount: number, comment: string, skill: Skill}[],
+    coaches?: Array<User>,
+    suggested_students?: ProjectSuggestion[]
   ) {
     this.id = id
     this.name = name
