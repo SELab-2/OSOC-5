@@ -54,7 +54,10 @@ export const useStudentStore = defineStore('user/student', {
             if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
             if (this.byMe === true) filters.push("suggested_by_user")
             if (this.onProject === true) filters.push("on_project")
-            if (this.skills.length > 0) filters.push(`skills=${this.skills.map(obj => obj.id).join(",")}`)
+
+            for (const skill of this.skills) {
+                filters.push(`skills=${skill.id}`)
+            }
 
             console.log(filters)
             let url = ""
