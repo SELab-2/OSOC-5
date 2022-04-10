@@ -109,10 +109,8 @@
                 </template>
               </q-input>
             </div>
-
             <q-table
               v-model:selected="selected_coaches"
-              v-model:pagination="pagination_coaches"
               class="table shadow-4"
               :rows="coachStore.users"
               :columns="columns_coaches"
@@ -164,7 +162,6 @@
               </q-input>
             </div>
             <q-table
-              v-model:pagination="pagination_roles"
               class="table shadow-4"
               :rows="skillStore.skills"
               :columns="columns_roles"
@@ -480,13 +477,6 @@ export default defineComponent({
     return {
       skillStore,
       coachStore,
-
-      pagination_roles: {
-        rowsPerPage: 5, // current rows per page being displayed
-      },
-      pagination_coaches: {
-        rowsPerPage: 5, // current rows per page being displayed
-      },
 
       project_name,
       project_partner_name,
