@@ -2,7 +2,7 @@
   <SideBar :key="sideBarKey" :student="this.student" :selectStudent="selectStudent" :draggable="false"/>
 
   <div :key="studentKey"
-    class="justify-between row q-px-lg q-pt-lg studentcol full-height">
+    class="justify-between row q-px-lg q-pt-lg studentcol">
     <div class="row q-pa-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ name }}</h>
       <q-btn :href="this.student ? this.student.cv : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
