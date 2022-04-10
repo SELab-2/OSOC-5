@@ -76,7 +76,7 @@
               @update:model-value="fetchStudents"
             >
               <template #selected>
-                <div class="column">
+                <div class="full-width" style="max-height: 15vh; overflow-y: scroll">
                   <StudentSkillChip
                     v-for="skill of studentStore.skills"
                     :key="skill.id"
@@ -244,5 +244,17 @@ export default defineComponent({
   
 :deep(.q-item) {
   padding: 8px 8px !important;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  right: 0px;
+  background-color: darkgray;
+  border-radius: 7px;
+  width: 4px;
+  opacity: 0.75;
 }
 </style>
