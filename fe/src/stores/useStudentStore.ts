@@ -47,7 +47,6 @@ export const useStudentStore = defineStore('user/student', {
         },
         async loadStudents(): Promise<void> {
             this.isLoading = true
-            console.log(this.skills)
             const filters = []
 
             if (this.search) filters.push(`search=${this.search}`)
@@ -55,7 +54,9 @@ export const useStudentStore = defineStore('user/student', {
             if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
             if (this.byMe === true) filters.push("suggested_by_user")
             if (this.onProject === true) filters.push("on_project")
+            if (this.skills.length > 0) filters.push(`skills=${this.skills.map(obj => obj.id).join(",")}`)
 
+            console.log(filters)
             let url = ""
             if (filters) url = `?${filters.join('&')}`
 

@@ -67,7 +67,6 @@
               outlined
               dense
               multiple
-              virtual-scroll-slice-size="5"
               color="primary"
               bg-color="white"
               :options="skillStore.skills"
