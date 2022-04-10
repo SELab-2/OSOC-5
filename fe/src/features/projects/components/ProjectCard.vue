@@ -12,9 +12,9 @@
         />
         <q-space/>
         <div>
-          <q-btn flat round size="12px" color="primary" icon="mail" />
-          <q-btn flat round size="12px" color="primary" icon="info" />
-          <q-btn flat round size="12px" color="primary" icon="edit" />
+          <btn flat round size="12px" color="primary" icon="mail" />
+          <btn flat round size="12px" color="primary" icon="info" />
+          <btn flat round size="12px" color="primary" icon="edit" />
         </div>
         
       </div>
@@ -74,9 +74,9 @@
             </q-item-section>
 
             <div class="text-grey-8">
-              <q-btn class="gt-xs" size="sm" flat dense round icon="comment" />
-              <q-btn class="gt-xs" size="sm" flat dense round icon="info" />
-              <q-btn class="gt-xs" size="sm" flat dense round icon="delete" @click="removeSuggestion(suggestion)"/>
+              <btn class="gt-xs" size="sm" flat dense round icon="comment" />
+              <btn class="gt-xs" size="sm" flat dense round icon="info" />
+              <btn class="gt-xs" size="sm" flat dense round icon="delete" @click="removeSuggestion(suggestion)"/>
             </div>
           </q-item>
         </div>

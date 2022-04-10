@@ -9,11 +9,17 @@
                         <div>
                             <q-input dense outlined label="Outlined" />
                         </div>
-                        <q-btn padding='7px' icon='warning' color='red' label='Conflicts'
-                           to='/projects/conflicts' />
+                        <btn
+                          padding="7px"
+                          icon="warning"
+                          color="red"
+                          label="Conflicts"
+                          to="/projects/conflicts"
+                          shadow-color="red"
+                          shadow-strength="2.5"
+                        />
                     </q-toolbar>
         
-
                   <masonry-wall ref="scrol" @scroll="showShadow = $event.target.scrollTop > 5"  style="scroll-padding-top: 100px; overflow: auto; height: 92%;" :items="projectStore.projects" :ssr-columns="1" :column-width="320" :gap="0">
                     <template  #default="{ item, index }">
                       <project-card  :project="item"/>
@@ -22,7 +28,14 @@
                 </div>
 
             <q-page-sticky position='bottom-right' :offset='[18, 18]'>
-                <q-btn fab padding="10px" icon='add' color='yellow' to='/projects/create' />
+                <btn
+                  fab
+                  padding="10px"
+                  icon="add"
+                  color="yellow"
+                  to="/projects/create"
+                  shadow-color="orange"
+                />
             </q-page-sticky>
   </div>
 </template>
