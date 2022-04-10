@@ -21,7 +21,7 @@
                     </q-toolbar>
         
                   <masonry-wall ref="scrol" @scroll="showShadow = $event.target.scrollTop > 5"  style="scroll-padding-top: 100px; overflow: auto; height: 92%;" :items="projectStore.projects" :ssr-columns="1" :column-width="320" :gap="0">
-                    <template  #default="{ item, index }">
+                    <template  #default="{ item }">
                       <project-card  :project="item"/>
                     </template>
                   </masonry-wall>

@@ -85,16 +85,22 @@
   </q-card>
 </template>
 
-<script>
+<script lang="ts">
 import ProjectRoleChip from './ProjectRoleChip.vue'
 import { useProjectStore } from "../../../stores/useProjectStore"
-import { reactive, ref, nextTick } from 'vue'
+import { reactive, ref, Ref, nextTick, defineComponent } from 'vue'
 import { useQuasar } from 'quasar'
-
-
+import { ProjectSuggestion } from '../../../models/ProjectSuggestion' 
+import { ProjectSkill, Skill } from '../../../models/Skill'
+import { Project } from '../../../models/Project'
 var test = 0
-export default {
-  props: { project: {} },
+export default defineComponent({
+  props: { 
+    project: {
+      type: Project,
+      required: true
+    }
+  },
   components: { ProjectRoleChip },
   setup() {
     return {
@@ -105,85 +111,71 @@ export default {
 
   
   data() {
+    const selectedRoles: Record<number,boolean> = reactive({})
     return {
       expanded: ref(false),
-      selectedRoles: reactive({}),
+      selectedRoles
     }
   },
   watch: {
     // The skills are fetched later on, thus the list needs to be updated manually.
     'project.requiredSkills': {
-      handler(newVal) {
-        this.selectedRoles = newVal.length == 0 ? {} :
-              Object.assign(
-                ...newVal.map((role) => ({ [role.skill.id]: false }))
-              )
+      handler(newVal: ProjectSkill[]) {
+        this.selectedRoles = newVal.length === 0 ? {} : newVal.reduce((obj: any, skill) => (obj[skill.skill.id] = false, obj) ,{})
       }
     }
   },
 
   methods: {
     // Expand/Hide the whole student list.
-    toggleExpanded(state) {
-      Object.keys(this.selectedRoles).forEach(
-        (role) => (this.selectedRoles[role] = state)
-      )
-    },
-
-    groupBy(array, key) {
-      const result = {}
-      array.forEach((item) => {
-        if (!result[item[key]]) {
-          result[item[key]] = []
-        }
-        result[item[key]].push(item)
+    toggleExpanded(state: boolean) {
+      Object.keys(this.selectedRoles).forEach(key => {
+        this.selectedRoles[key as any as number] = state
       })
-      return result
     },
     
-    removeSuggestion(suggestion) {
-      const i = this.project.suggestedStudents.findIndex(s => s.student.id === suggestion.student.id && s.skill.id === suggestion.skill.id)
-      console.log(i)
-      this.project.suggestedStudents.splice(i,1)
+    removeSuggestion(suggestion: ProjectSuggestion) {
+      const i = this.project.suggestedStudents!.findIndex(s => s.student.id === suggestion.student.id && s.skill.id === suggestion.skill.id)
+      this.project.suggestedStudents!.splice(i,1)
       this.projectStore
         .removeSuggestion(this.project, suggestion)
         .catch(error => {
             this.$q.notify({
               icon: 'warning',
               color: 'warning',
-              message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.role.name}`,
+              message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.skill.name}`,
               textColor: 'black'
             });
-            this.project.suggestedStudents.splice(i, 0, suggestion)
+            this.project.suggestedStudents!.splice(i, 0, suggestion)
           }
         )
     },
 
     // Calculates how many places of a role are occupied.
-    amountLeft(role) {
-      const occupied = this.groupedStudents[role.skill.id]
-      return role.amount - (occupied ? occupied.length : 0)
+    amountLeft(skill: ProjectSkill) {
+      const occupied = this.groupedStudents[skill.skill.id]
+      return skill.amount - (occupied ? occupied.length : 0)
     },
 
     // Show the students assigned to a role when dragging over the chip of that role.
-    onDragOver(e, role) {
+    onDragOver(e: MouseEvent, skill: ProjectSkill) {
       e.preventDefault()
       e.stopPropagation()
-      this.selectedRoles[role.skill.id] = true
+      this.selectedRoles[skill.skill.id] = true
     },
 
     // Hide the students assigned to a role when dragging away from the chip of that role.
-    onDragLeave(e, role) {
-      e.target.classList.remove('drag-enter')
+    onDragLeave(e: MouseEvent, skill: ProjectSkill) {
+      (<HTMLDivElement>e.target).classList.remove('drag-enter')
       if (!this.expanded) {
-        this.selectedRoles[role.skill.id] = false
+        this.selectedRoles[skill.skill.id] = false
       }
     },
 
     // Assign a student to a role.
-    async onDrop(e, role) {
+    async onDrop(e: MouseEvent, skill: ProjectSkill) {
       e.preventDefault()
-
+      const target: HTMLDivElement = e.target
       // don't drop on other draggables
       if (e.target.draggable === true) {
         return
@@ -206,27 +198,18 @@ export default {
     },
   },
   computed: {
-    test() {
-      return (this.project.requiredSkills ?? []).length == 0 ? {} :
-      Object.assign(
-        ...this.project.requiredSkills.map((role) => ({ [role.skill.id]: false }))
-      )
-    },
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }
-    groupedStudents() {
-      const result = {}
-      if (!this.project.suggestedStudents) return []
-      this.project.suggestedStudents.forEach(student => {
-        if (!result[student.skill.id]) {
-          result[student.skill.id] = []
+    groupedStudents(): Record<string, ProjectSuggestion[]> {
+      if (!this.project.suggestedStudents) return {}
+      return this.project.suggestedStudents.reduce((obj: any, student) => {
+        if (!obj[student.skill.id]) {
+          obj[student.skill.id] = []
         }
-        result[student.skill.id].push(student)
-      })
-      return result
-      // console.log(this.groupBy(this.project.suggestedStudents, 'role.id'))
-      // return this.groupBy(this.project.suggestedStudents, 'role.id')
+        obj[student.skill.id].push(student)
+        return obj
+      } ,{})
     },
   },
-}
+})
 </script>

@@ -13,7 +13,6 @@ export interface UserInterface {
   hasProjects?: Array<Project>
   suggestions?: Array<Suggestion>
   isActive: Boolean
-  url: string
 }
 
 export class User implements UserInterface {
@@ -27,7 +26,6 @@ export class User implements UserInterface {
   hasProjects?: Project[]
   suggestions?: Suggestion[]
   isActive: Boolean
-  url: string
   
   constructor(data: UserInterface) {
     Object.assign(this, data)
