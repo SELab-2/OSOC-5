@@ -129,7 +129,7 @@
         class="absolute"
         style="top: 15px; right: -17px"
       >
-        <q-btn
+        <btn
           dense
           round
           unelevated
