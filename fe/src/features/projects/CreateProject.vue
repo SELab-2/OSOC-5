@@ -11,7 +11,7 @@
           </div>
           <div>
             <div class="q-gutter-sm">
-              <q-btn
+              <btn
                 elevated
                 color="primary"
                 label="Cancel"
@@ -19,14 +19,18 @@
                 size="md"
                 class="q-mx-md cornered"
                 to="/projects"
+                glow-color="#00FFB5"
+                shadow-strength="2"
               />
-              <q-btn
+              <btn
                 elevated
                 color="primary"
                 label="Submit"
                 type="submit"
                 size="md"
                 class="q-mx-md cornered"
+                glow-color="#00FFB5"
+                shadow-strength="2"
               />
             </div>
           </div>
@@ -127,12 +131,14 @@
               Project Roles
             </h4>
             <div class="row">
-              <q-btn
+              <btn
                 class="cornered"
                 color="primary"
                 icon="add"
                 label="Add role"
                 @click="new_role_prompt = true"
+                glow-color="#00FFB5"
+                shadow-strength="2"
               />
               <q-space />
               <q-input
@@ -253,11 +259,12 @@
                     key="remove"
                     style="width: 10px"
                   >
-                    <q-btn
+                    <btn
                       flat
                       round
                       style="color: #f14a3b"
                       icon="mdi-trash-can-outline"
+                      glow-color="red-2"
                       @click="delete_role = props.row"
                     />
                   </q-td>
@@ -317,15 +324,17 @@
         align="right"
         class="text-primary"
       >
-        <q-btn
+        <btn
           v-close-popup
           flat
           label="Cancel"
+          glow-color="#C0FFF4"
         />
-        <q-btn
+        <btn
           flat
           label="Add role"
           @click="new_role_confirm"
+          glow-color="#C0FFF4"
         />
       </q-card-actions>
     </q-card>
@@ -360,17 +369,18 @@
         align="right"
         class="text-primary"
       >
-        <q-btn
+        <btn
           v-close-popup
           flat
           color="grey"
           label="Cancel"
         />
-        <q-btn
+        <btn
           flat
           color="red"
           label="Delete"
           @click="delete_role_confirm(delete_role!.id)"
+          glow-color="red-2"
         />
       </q-card-actions>
     </q-card>
