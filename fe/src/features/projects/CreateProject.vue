@@ -205,7 +205,7 @@
                   </q-td>
                   <q-td key="color" :props="props" auto-width>
                     <div
-                      :style="`height: 50px; width:50px; background: ${props.row.color}`"
+                      :style="`height: 25px; width:25px; border-radius: 50%;background: ${props.row.color}`"
                     ></div>
                     <!-- TODO make this actually change in the database not locally-->
                     <q-popup-edit
@@ -264,6 +264,14 @@
         />
       </q-card-section>
       <q-card-section class="q-pt-none">
+<!--        TODO REMOVE -->
+        <q-input
+          v-model="new_role_color"
+          outlined
+          label="text color"
+          class="inputfield"
+          type="URL"
+        />
         <!--  INFO if picker gives conversion issues use-->
         <!--  INFO https://quasar.dev/quasar-utils/color-utils#color-conversion-->
         <q-color
