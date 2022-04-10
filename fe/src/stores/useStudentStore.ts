@@ -3,7 +3,6 @@ import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import { User } from '../models/User'
 import {Student} from "../models/Student";
-import {Suggestion} from "../models/Suggestion";
 import {Skill} from "../models/Skill";
 
 interface State {
@@ -12,6 +11,7 @@ interface State {
     decision: string
     byMe: boolean
     onProject: boolean
+    skills: Array<Skill>
     coaches: Map<string, User>
     students: Array<Student>
     isLoading: boolean
@@ -26,6 +26,7 @@ export const useStudentStore = defineStore('user/student', {
         decision: "none",
         byMe: false,
         onProject: false,
+        skills: [],
         coaches: new Map(),
         students: [],
         isLoading: false,
@@ -46,7 +47,7 @@ export const useStudentStore = defineStore('user/student', {
         },
         async loadStudents(): Promise<void> {
             this.isLoading = true
-
+            console.log(this.skills)
             const filters = []
 
             if (this.search) filters.push(`search=${this.search}`)

@@ -62,25 +62,35 @@
             />
 
             <q-select
-              v-model="roles"
+              v-model="studentStore.skills"
               rounded
               outlined
               dense
               multiple
+              virtual-scroll-slice-size="5"
               color="primary"
               bg-color="white"
-              :options="[
-                { name: 'fullStack', label: 'Full-stack developer'},
-                { name: 'data', label: 'Data person'},
-                { name: 'frontend', label: 'Front-end developer'}
-              ]"
+              :options="skillStore.skills"
+              :option-label="opt => opt.name"
+              :option-value="opt => opt.id"
               label="Roles"
               @update:model-value="fetchStudents"
-            />
+            >
+              <template #selected>
+                <div class="column">
+                  <StudentSkillChip
+                    v-for="skill of studentStore.skills"
+                    :key="skill.id"
+                    :color="skill.color"
+                    :name="skill.name"
+                  />
+                </div>
+              </template>
+            </q-select>
 
             <div class="row q-gutter-x-md">
               <q-checkbox
-                v-model="this.studentStore.byMe"
+                v-model="studentStore.byMe"
                 color="primary"
                 label="Suggested by you"
                 right-label
@@ -134,7 +144,7 @@
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState.value = !miniState"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -149,9 +159,12 @@ import {useStudentStore} from "../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
 import { Student } from '../models/Student';
+import {useSkillStore} from "../stores/useSkillStore";
+import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 
 export default defineComponent({
   components: {
+    StudentSkillChip,
     StudentCard,
     SegmentedControl,
   },
@@ -175,14 +188,17 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
+    const skillStore = useSkillStore()
     const $q = useQuasar()
 
     onMounted(() => {
       studentStore.loadStudents()
+      skillStore.loadSkills()
     })
 
     return {
       studentStore,
+      skillStore,
       $q,
       thumbStyle: {
         right: '0px',
@@ -213,7 +229,6 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
     },
     fetchStudents() {
-      console.log(this.roles)
       this.studentStore.loadStudents()
     },
     clickStudent(student: Student) {
