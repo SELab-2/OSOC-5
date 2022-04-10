@@ -73,6 +73,63 @@
       </q-btn-dropdown>
     </q-toolbar>
   </q-header>
+  <q-dialog v-model="display_popup" persistent>
+    <q-card style="min-width: 350px">
+      <q-card-section>
+        <div class="text-h6">Change Password</div>
+      </q-card-section>
+      <q-card-section class="q-pt-none">
+        <q-input
+          outlined
+          autofocus
+          v-model="old_password"
+          :type="isPwd1 ? 'password' : 'text'"
+          class="inputfield"
+          label="Old Password"
+        />
+        <q-icon
+          :name="isPwd1 ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="isPwd1 = !isPwd1"
+        />
+      </q-card-section>
+      <q-card-section class="q-pt-none">
+        <q-input
+          outlined
+          autofocus
+          v-model="password1"
+          :type="isPwd2 ? 'password' : 'text'"
+          class="inputfield"
+          label="New Password 1"
+        />
+        <q-icon
+          :name="isPwd2 ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="isPwd2 = !isPwd2"
+        />
+      </q-card-section>
+      <q-card-section class="q-pt-none">
+        <q-input
+          outlined
+          autofocus
+          v-model="password2"
+          :type="isPwd3 ? 'password' : 'text'"
+          class="inputfield"
+          label="New Password 2"
+        />
+        <q-icon
+          :name="isPwd3 ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="isPwd3 = !isPwd3"
+        />
+      </q-card-section>
+      <q-card-actions align="right" class="text-primary">
+        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn flat label="Add role" @click="change_password_confirm" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
 </template>
 
 <script lang="ts">
@@ -104,17 +161,34 @@ export default defineComponent({
   },
   setup() {
     const authenticationStore = useAuthenticationStore()
+    const password1 = ref('')
+    const password2 = ref('')
+    const old_password = ref('')
+    const display_popup = ref(false)
     return {
+      isPwd1: ref(true),
+      isPwd2: ref(true),
+      isPwd3: ref(true),
+      password1,
+      password2,
+      old_password,
+      display_popup,
       color: useMeta(metaData),
       tab: ref('students'),
       authenticationStore,
       on_dropdown_click(test: number) {
         if (test == 0) {
-          // implementation to change password
+          display_popup.value = true
         } else {
           authenticationStore.logout()
         }
-      }
+      },
+      change_password_confirm() {
+        display_popup.value = false
+        if (old_password.value == authenticationStore.loggedInUser?.password) {
+          authenticationStore.changePassword({p1:password1.value, p2:password2.value})
+        }
+      },
     }
   },
   computed: {

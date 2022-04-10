@@ -25,10 +25,17 @@ export const useAuthenticationStore: StoreDefinition<
       password: string
     }): Promise<void>
     logout(): void
+    changePassword({
+      p1,
+      p2,
+    }: {
+      p1: string
+      p2: string
+    }): Promise<void>
   }
 > = defineStore('user/authentication', {
   state: () => ({
-    loggedInUser: {},
+    loggedInUser: {first_name:"NO LOGIN", last_name:"NO LOGIN",email:"NO LOGIN",password:"NO LOGIN"},
   }),
   actions: {
     async login({ email, password }) {
@@ -50,6 +57,20 @@ export const useAuthenticationStore: StoreDefinition<
       localStorage.removeItem("accessToken")
       router.push('/')
       // this.$reset()
+    },
+    async changePassword({p1, p2}) {
+      const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
+      };
+      const bodyParameters = {
+        new_password1: p1,
+        new_password2: p2,
+      };
+      const {data} = axios.post('http://localhost:8000/api/auth/password/change/', bodyParameters, config)
+      if (data.response.status == 200) {
+        this.loggedInUser = { first_name: this.loggedInUser.first_name, last_name: this.loggedInUser.last_name, email: this.loggedInUser.email, password: p1 }
+      }
+
     },
   },
 })
