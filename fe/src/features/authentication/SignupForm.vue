@@ -91,7 +91,7 @@
     <br/>
 
     <div>
-      <btn unelevated
+      <btn
          label="Sign up"
          type="submit"
          size="md"

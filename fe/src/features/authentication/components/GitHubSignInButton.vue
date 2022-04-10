@@ -1,6 +1,5 @@
 <template>
   <btn
-    unelevated
     color="black"
     icon="mdi-github"
     label="Sign in via GitHub"
