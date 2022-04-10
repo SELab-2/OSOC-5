@@ -93,6 +93,9 @@ import { useQuasar } from 'quasar'
 import { ProjectSuggestion } from '../../../models/ProjectSuggestion' 
 import { ProjectSkill, Skill } from '../../../models/Skill'
 import { Project } from '../../../models/Project'
+import { Student } from '../../../models/Student'
+import { User } from '../../../models/User'
+import { useAuthenticationStore } from "../../../stores/useAuthenticationStore"
 var test = 0
 export default defineComponent({
   props: { 
@@ -104,6 +107,7 @@ export default defineComponent({
   components: { ProjectRoleChip },
   setup() {
     return {
+      authenticationStore: useAuthenticationStore(),
       $q: useQuasar(),
       projectStore: useProjectStore()
     }
@@ -173,27 +177,31 @@ export default defineComponent({
     },
 
     // Assign a student to a role.
-    async onDrop(e: MouseEvent, skill: ProjectSkill) {
+    async onDrop(e: DragEvent, skill: ProjectSkill) {
       e.preventDefault()
-      const target: HTMLDivElement = e.target
+      const target = <HTMLDivElement>e.target
       // don't drop on other draggables
-      if (e.target.draggable === true) {
+      if ((<HTMLDivElement>e.target).draggable === true) {
         return
       }
-      const data = JSON.parse(e.dataTransfer.getData('text'))
-      const draggedEl = document.getElementById(data.targetId)
-      console.log(data)
+      // TODO: additional checks that datatransfer is valid and not null
+      console.log(e.dataTransfer!.getData('text'))
+      const data: { targetId: string, student: Student } = JSON.parse(e.dataTransfer!.getData('text'))
+      
       // Add a student to the project and remove the student card from the sidebar.
-      e.target.classList.remove('drag-enter')
+      (<HTMLDivElement>e.target).classList.remove('drag-enter')
       const reason = "mimimi"
-      let result = await this.projectStore.addSuggestion(this.project.id, data.student.url, role.skill.url, reason)
-      console.log(result)
-      this.project.suggestedStudents.push({coach:undefined, reason: reason, skill: role.skill, student: data.student})
-      draggedEl.parentNode.removeChild(draggedEl)
+      let coach = this.authenticationStore.loggedInUser as User
+      if (!coach) {
+        console.log("User is not logged in")
+        return
+      }
+      let result = await this.projectStore.addSuggestion(this.project.id, data.student.url, skill.skill.url, reason)
+      this.project.suggestedStudents?.push({coach:coach, reason: reason, skill: skill.skill, student: data.student})
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
       if (!this.expanded) {
-        setTimeout(() => (this.selectedRoles[role.skill.id] = false), 1000)
+        setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
       }
     },
   },

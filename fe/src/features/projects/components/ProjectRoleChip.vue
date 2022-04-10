@@ -45,16 +45,31 @@
 
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
-
+import { Skill } from '../../../models/Skill'
 export default defineComponent({
-  props: ['role', 'placesLeft', 'modelValue'],
-  emits: ['update:modelValue'],
+  props: {
+    role: {
+      type: Skill,
+      required: true
+    },
+    placesLeft: {
+      type: Number,
+      required: true
+    },
+    modelValue: {
+      type: Boolean,
+      required: false
+    }
+  },
+  emits: {
+    'update:modelValue': Boolean
+  },
   computed: {
     enabled: {
       get() {
         return this.modelValue
       },
-      set(value) {
+      set(value: boolean) {
         this.$emit('update:modelValue', value)
       },
     },

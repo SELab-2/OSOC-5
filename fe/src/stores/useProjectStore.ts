@@ -39,7 +39,7 @@ export const useProjectStore = defineStore('project', {
         skill: suggestion.skill.url
       })
     },
-    async addSuggestion(projectId: number, studentUrl: URL, skillUrl: URL, reason: string) {
+    async addSuggestion(projectId: number, studentUrl: string, skillUrl: string, reason: string) {
       return await instance.post(`projects/${projectId}/suggest_student/`, {
         student: studentUrl,
         skill: skillUrl,
