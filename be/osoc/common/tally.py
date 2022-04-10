@@ -32,13 +32,13 @@ class TallyForm:
                 continue
             # Required questions should have matching fields in the form
             filteredFields = self.findFields(question, fields)
-            assertOrRaise(filteredFields, f"Missing question in form {';'.join(question['question'])}.")
+            assertOrRaise(filteredFields, f"Missing question in form: {', '.join(question['question'])}.")
             # Required questions should have a value
             fieldValue = self.searchFieldValue(filteredFields, question["type"])
-            assertOrRaise(fieldValue != None, f"Question is required {';'.join(question['question'])}.")
+            assertOrRaise(fieldValue != None, f"Question is required: {', '.join(question['question'])}.")
             # Add skip values if necessary
             answer = self.getQuestionAnswer(question, fieldValue, fields)
-            assertOrRaise(answer != None, f"Question has no answer {';'.join(question['question'])}.")
+            assertOrRaise(answer != None, f"Question has no answer: {', '.join(question['question'])}.")
             skipQuestions.extend(answer.get("skip", []))
         return form
 
@@ -48,7 +48,7 @@ class TallyForm:
         """
         foundFields = []
         for field in fields:
-            if field["label"] in question["question"] and self.__equal(question["type"], field["type"]):
+            if field["label"] in question["question"] and self.__equal(field["type"], question["type"]):
                 foundFields.append(field)
         return foundFields
 

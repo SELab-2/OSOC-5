@@ -38,13 +38,12 @@ class StudentViewSet(viewsets.ModelViewSet):
             # create Suggestion object if it doesnt exist yet, else update it
             _, created = Suggestion.objects.update_or_create(
                 student=self.get_object(), coach=request.user, defaults=serializer.data)
-            
+
             return Response(serializer.data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class CoachViewSet(viewsets.GenericViewSet, 
-                   mixins.ListModelMixin, 
+class CoachViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):
@@ -66,7 +65,7 @@ class CoachViewSet(viewsets.GenericViewSet,
         coach.is_admin = True
         coach.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
     @action(detail=True, methods=['put'])
     def remove_admin(self, request, pk=None):
         """
@@ -83,7 +82,7 @@ class CoachViewSet(viewsets.GenericViewSet,
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
-    only admin users have permission for this endpoint, except for suggesting students or removing suggestions 
+    only admin users have permission for this endpoint, except for suggesting students or removing suggestions
     """
     queryset = Project.objects.all().order_by('id')
     serializer_class = ProjectSerializer
@@ -97,7 +96,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         returns HTTP response:
             400 BAD REQUEST: there was required data missing or the data could not be serialized
             201 CREATED:     a new projectsuggestion was created
-            200 OK:          an existing projectsuggestion was found for this student and project from the current user, 
+            200 OK:          an existing projectsuggestion was found for this student and project from the current user,
                              the found projectsuggestion was updated
         """
         serializer = ProjectSuggestionSerializer(
