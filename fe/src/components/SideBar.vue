@@ -72,7 +72,7 @@
               :options="skillStore.skills"
               :option-label="opt => opt.name"
               :option-value="opt => opt.id"
-              label="Roles"
+              label="Skills"
               @update:model-value="fetchStudents"
             >
               <template #selected>
@@ -212,7 +212,6 @@ export default defineComponent({
     return {
       miniState: ref(false),
       drawer: ref(false),
-      roles: ref([]),
     }
   },
   methods: {
