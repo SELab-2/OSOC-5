@@ -120,7 +120,7 @@
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
-                  :draggable="draggable"
+                  :draggable="draggable ?? false"
                   @dragstart="onDragStart($event, student)"
                 >
                   <StudentCard
@@ -181,13 +181,12 @@ export default defineComponent({
     },
     draggable: {
       type: Boolean,
-      required: true
+      required: false
     },
   },
   setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
-    const $q = useQuasar()
 
     onMounted(() => {
       skillStore.loadSkills()
@@ -197,7 +196,6 @@ export default defineComponent({
     return {
       studentStore,
       skillStore,
-      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
