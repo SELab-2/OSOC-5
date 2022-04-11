@@ -187,7 +187,6 @@ export default defineComponent({
   setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
-    const $q = useQuasar()
 
     onMounted(() => {
       skillStore.loadSkills()
@@ -197,7 +196,6 @@ export default defineComponent({
     return {
       studentStore,
       skillStore,
-      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
