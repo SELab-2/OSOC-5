@@ -34,7 +34,7 @@
         </div>
         <q-tooltip
           v-if="skill.comment"
-          :class="`bg-${role.color}-2`"
+          :class="`bg-${skill.skill.color}-2`"
           class="text-black shadow-2"
           anchor="bottom middle"
           self="center middle"
