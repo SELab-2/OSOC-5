@@ -34,7 +34,11 @@
               name="mdi-close"
               color="red"
             />
+            <q-chip size="8px">
+              Alumni
+            </q-chip>
           </div>
+
           <label class="text-bold">{{ total }}</label>
         </div>
         <div
