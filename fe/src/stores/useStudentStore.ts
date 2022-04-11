@@ -59,7 +59,6 @@ export const useStudentStore = defineStore('user/student', {
                 filters.push(`skills=${skill.id}`)
             }
 
-            console.log(filters)
             let url = ""
             if (filters) url = `?${filters.join('&')}`
 
