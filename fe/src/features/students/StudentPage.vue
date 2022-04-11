@@ -33,7 +33,10 @@
         label="Portfolio"
       />
     </div>
-    <div v-if="this.authenticationStore.loggedInUser" class="row q-gutter-sm items-center">
+    <div
+      v-if="authenticationStore.loggedInUser"
+      class="row q-gutter-sm items-center"
+    >
       <q-select
         v-model="possibleFinalDecision"
         emit-value
@@ -50,12 +53,14 @@
         ]"
         label="Final decision"
       />
-      <q-btn @click="finalDecision"
-             icon-right="mail"
-             class="cornered"
-             label="Confirm"
-             outline
-             color='black'/>
+      <q-btn
+        icon-right="mail"
+        class="cornered"
+        label="Confirm"
+        outline
+        color="black"
+        @click="finalDecision"
+      />
     </div>
   </div>
 
@@ -78,11 +83,18 @@
     <q-dialog v-model="suggestionDialog">
       <q-card>
         <q-card-section>
-          <div class="text-h6">Suggest
-            <btn dense rounded class="text-h6" :class="this.suggestionColor">
-              {{ this.suggestionName }}
+          <div class="text-h6">
+            Suggest
+            <btn
+              dense
+              rounded
+              class="text-h6"
+              :class="suggestionColor"
+            >
+              {{ suggestionName }}
             </btn>
-            for {{ this.name }}</div>
+            for {{ name }}
+          </div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -94,9 +106,24 @@
           />
         </q-card-section>
 
-        <q-card-actions align="right" class="text-primary">
-          <btn flat color="grey" label="Cancel" v-close-popup glow-color="grey-4"/>
-          <btn flat label="Suggest" @click="makeSuggestion" v-close-popup glow-color="teal-1"/>
+        <q-card-actions
+          align="right"
+          class="text-primary"
+        >
+          <btn
+            v-close-popup
+            flat
+            color="grey"
+            label="Cancel"
+            glow-color="grey-4"
+          />
+          <btn
+            v-close-popup
+            flat
+            label="Suggest"
+            glow-color="teal-1"
+            @click="makeSuggestion"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -111,47 +138,56 @@
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <AcademiaCard :index="studentKey" title="Academia"/>
+        <AcademiaCard
+          :index="studentKey"
+          title="Academia"
+        />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SkillsCard :index="studentKey" title="Skills"/>
+        <SkillsCard
+          :index="studentKey"
+          title="Skills"
+        />
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-12">
-        <ExtraInfoCard :index="studentKey" title="Extra Info"/>
+        <ExtraInfoCard
+          :index="studentKey"
+          title="Extra Info"
+        />
       </div>
     </div>
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-12">-->
-<!--        <TitleTextCard title="Project you're most proud of" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">-->
-<!--        <PracticalCard title="Practical"/>-->
-<!--      </div>-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
-<!--        <DetailsCard title="Details" :content="[-->
-<!--            { description: 'First language', value: 'English'},-->
-<!--            { description: 'Level of English', value: '1/5'}-->
-<!--          ]"/>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-<!--        <TitleTextCard title="Why do you want to participate in osoc?" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-<!--        <TitleTextCard title="Why do you think you're a good fit?" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--    </div>-->
+    <!--    <div class="row">-->
+    <!--      <div class="studentcol col-12">-->
+    <!--        <TitleTextCard title="Project you're most proud of" content="-->
+    <!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+    <!--        />-->
+    <!--      </div>-->
+    <!--    </div>-->
+    <!--    <div class="row">-->
+    <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">-->
+    <!--        <PracticalCard title="Practical"/>-->
+    <!--      </div>-->
+    <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
+    <!--        <DetailsCard title="Details" :content="[-->
+    <!--            { description: 'First language', value: 'English'},-->
+    <!--            { description: 'Level of English', value: '1/5'}-->
+    <!--          ]"/>-->
+    <!--      </div>-->
+    <!--    </div>-->
+    <!--    <div class="row">-->
+    <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
+    <!--        <TitleTextCard title="Why do you want to participate in osoc?" content="-->
+    <!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+    <!--        />-->
+    <!--      </div>-->
+    <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
+    <!--        <TitleTextCard title="Why do you think you're a good fit?" content="-->
+    <!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+    <!--        />-->
+    <!--      </div>-->
+    <!--    </div>-->
   </div>
 </template>
 
@@ -279,8 +315,7 @@ export default defineComponent ({
   methods: {
     makeSuggestion: async function () {
       if (this.student) {
-        const loggedInUser = Object.assign({}, this.authenticationStore.loggedInUser);
-        await this.studentStore.updateSuggestion(this.student.id, loggedInUser.pk, this.possibleSuggestion, this.reason)
+        await this.studentStore.updateSuggestion(this.student.id, (this.authenticationStore?.loggedInUser?.id) || -1, this.possibleSuggestion, this.reason)
         this.reason = ""
       }
 
