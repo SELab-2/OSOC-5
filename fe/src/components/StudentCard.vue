@@ -1,17 +1,44 @@
 <template>
   <div class="full-width relative-position cursor-pointer">
-    <span class="dot"
-          :class="mySuggestionColor"
-          style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);" />
-    <q-card class="full-width position" :class="active? 'bg-teal-1' : ''">
+    <span
+      class="dot"
+      :class="mySuggestionColor"
+      style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);"
+    />
+    <q-card
+      class="full-width position"
+      :class="active? 'bg-teal-1' : ''"
+    >
       <q-card-section rounded>
         <div class="row justify-between">
           <div>
             <label class="text-bold q-pr-xs">{{ name }}</label>
-              <q-icon class="final-decision-icon" v-if="official === 0" size="xs" name="mdi-check" color="green" />
-              <q-icon class="final-decision-icon" v-else-if="official === 1" size="xs" name="mdi-help" color="yellow" />
-              <q-icon class="final-decision-icon" v-else-if="official === 2" size="xs" name="mdi-close" color="red" />
+            <q-icon
+              v-if="official === YES"
+              class="final-decision-icon"
+              size="xs"
+              name="mdi-check"
+              color="green"
+            />
+            <q-icon
+              v-else-if="official === MAYBE"
+              class="final-decision-icon"
+              size="xs"
+              name="mdi-help"
+              color="yellow"
+            />
+            <q-icon
+              v-else-if="official === NO"
+              class="final-decision-icon"
+              size="xs"
+              name="mdi-close"
+              color="red"
+            />
+            <q-chip size="8px">
+              Alumni
+            </q-chip>
           </div>
+
           <label class="text-bold">{{ total }}</label>
         </div>
         <div
@@ -69,20 +96,27 @@ export default defineComponent({
       authenticationStore
     }
   },
+  data: function() {
+    return {
+      YES : 0,
+      NO : 1,
+      MAYBE : 2,
+    };
+  },
   computed: {
     total(): number {
       return this.student.suggestions.length
     },
     yesStyle(): { width: string } {
-      const widthYes = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === 0).length / this.total
+      const widthYes = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === this.YES).length / this.total
       return { width: (widthYes + '%')}
     },
     maybeStyle(): { width: string } {
-      const widthMaybe = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === 1).length / this.total
+      const widthMaybe = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === this.MAYBE).length / this.total
       return { width: (widthMaybe + '%')}
     },
     noStyle(): { width: string } {
-      const widthNo = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === 2).length / this.total
+      const widthNo = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === this.NO).length / this.total
       return { width: (widthNo + '%')}
     },
     name(): string {
@@ -110,7 +144,7 @@ export default defineComponent({
     },
     mySuggestionColor: function () {
       let mySuggestion = this.mySuggestion
-      return mySuggestion === 0 ? "bg-green" : (mySuggestion === 1 ? "bg-yellow" : (mySuggestion === 2 ? "bg-red" : "bg-grey"))
+      return mySuggestion === this.YES ? "bg-green" : (mySuggestion === this.MAYBE ? "bg-yellow" : (mySuggestion === this.NO ? "bg-red" : "bg-grey"))
     },
   }
 })

@@ -5,10 +5,10 @@
     class="justify-between row q-px-lg q-pt-lg studentcol">
     <div class="row q-pa-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ name }}</h>
-      <q-btn :href="student ? student.cv.href : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="student ? student.portfolio.href : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
+      <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
+      <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
-    <div v-if="authenticationStore.loggedInUser" class="row q-gutter-sm items-center">
+    <div v-if="authenticationStore.loggedInUser?.isAdmin ?? false" class="row q-gutter-sm items-center">
       <q-select
         v-model="possibleFinalDecision"
         emit-value
@@ -19,8 +19,8 @@
         style="width: 200px"
         :options="[
           { value: '0', label: 'Yes' },
-          { value: '1', label: 'Maybe' },
-          { value: '2', label: 'No' },
+          { value: '2', label: 'Maybe' },
+          { value: '1', label: 'No' },
           { value: '-1', label: 'Not decided' },
         ]"
         label="Final decision"
@@ -44,8 +44,8 @@
       v-model="mySuggestion"
       :options="[
         { name: '0', label: 'Yes' },
-        { name: '1', label: 'Maybe' },
-        { name: '2', label: 'No' },
+        { name: '2', label: 'Maybe' },
+        { name: '1', label: 'No' },
         { name: '-1', label: 'Not decided' },
       ]"
     />
@@ -200,14 +200,12 @@ export default defineComponent ({
     mySuggestionColor(): string {
       let mySuggestion = this.mySuggestion
       switch (mySuggestion) {
-        case null:
-          return "grey"
         case "0":
           return "green"
         case "1":
-          return "yellow"
-        case "2":
           return "red"
+        case "2":
+          return "yellow"
         default:
           return "grey"
       }
@@ -217,9 +215,9 @@ export default defineComponent ({
         case "0":
           return "yes"
         case "1":
-          return "maybe"
-        case "2":
           return "no"
+        case "2":
+          return "maybe"
         default:
           return "not decided"
       }
@@ -229,9 +227,9 @@ export default defineComponent ({
         case "0":
           return "bg-green"
         case "1":
-          return "bg-yellow"
-        case "2":
           return "bg-red"
+        case "2":
+          return "bg-yellow"
         default:
           return "bg-grey"
       }

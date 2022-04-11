@@ -14,8 +14,8 @@
         <div v-for="(suggestion, key) in studentStore.currentStudent?.suggestions" :key="key">
           <div class="row">
             <q-icon v-if="suggestion.suggestion === 0" size="xs" name="mdi-check" color="green" />
-            <q-icon v-else-if="suggestion.suggestion === 1" size="xs" name="mdi-help" color="yellow" />
-            <q-icon v-else size="xs" name="mdi-close" color="red" />
+            <q-icon v-else-if="suggestion.suggestion === 1" size="xs" name="mdi-close" color="red" />
+            <q-icon v-else size="xs" name="mdi-help" color="yellow" />
             <label class="q-pl-xs">
               {{ suggestion.coachName }}
             </label>
