@@ -18,6 +18,7 @@ export interface StudentInterface {
   degree: string
   studies: string
   skills: Array<Skill>
+  finalDecision: Suggestion | null
   suggestions: Array<Suggestion>
 }
 
@@ -46,6 +47,7 @@ export class Student implements StudentInterface {
   degree: string
   studies: string
   skills: Skill[]
+  finalDecision: Suggestion | null
   suggestions: Suggestion[]
 
   constructor(
@@ -65,6 +67,7 @@ export class Student implements StudentInterface {
     degree: string,
     studies: string,
     skills: Skill[],
+    finalDecision: Suggestion | null,
     suggestions: Suggestion[]
   ) {
     this.url = url
@@ -83,6 +86,7 @@ export class Student implements StudentInterface {
     this.degree = degree
     this.studies = studies
     this.skills = skills
+    this.finalDecision = finalDecision
     this.suggestions = suggestions
   }
 }

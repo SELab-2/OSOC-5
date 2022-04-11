@@ -33,22 +33,29 @@
         label="Portfolio"
       />
     </div>
-    <div class="row q-gutter-sm items-center">
+    <div v-if="this.authenticationStore.loggedInUser" class="row q-gutter-sm items-center">
       <q-select
+        v-model="possibleFinalDecision"
+        emit-value
+        map-options
         rounded
         outlined
         dense
         style="width: 200px"
-        :options="['Not decided', 'Yes', 'Maybe', 'No']"
+        :options="[
+          { value: 0, label: 'Yes' },
+          { value: 1, label: 'Maybe' },
+          { value: 2, label: 'No' },
+          { value: -1, label: 'Not decided' },
+        ]"
         label="Final decision"
       />
-      <q-btn
-        icon-right="mail"
-        class="cornered"
-        label="Confirm"
-        outline
-        color="black"
-      />
+      <q-btn @click="finalDecision"
+             icon-right="mail"
+             class="cornered"
+             label="Confirm"
+             outline
+             color='black'/>
     </div>
   </div>
 
@@ -71,18 +78,11 @@
     <q-dialog v-model="suggestionDialog">
       <q-card>
         <q-card-section>
-          <div class="text-h6">
-            Suggest
-            <q-btn
-              dense
-              rounded
-              class="text-h6"
-              :class="suggestionColor"
-            >
-              {{ suggestionName }}
-            </q-btn>
-            for {{ name }}
-          </div>
+          <div class="text-h6">Suggest
+            <btn dense rounded class="text-h6" :class="this.suggestionColor">
+              {{ this.suggestionName }}
+            </btn>
+            for {{ this.name }}</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -94,22 +94,9 @@
           />
         </q-card-section>
 
-        <q-card-actions
-          align="right"
-          class="text-primary"
-        >
-          <q-btn
-            v-close-popup
-            flat
-            color="grey"
-            label="Cancel"
-          />
-          <q-btn
-            v-close-popup
-            flat
-            label="Suggest"
-            @click="makeSuggestion"
-          />
+        <q-card-actions align="right" class="text-primary">
+          <btn flat color="grey" label="Cancel" v-close-popup glow-color="grey-4"/>
+          <btn flat label="Suggest" @click="makeSuggestion" v-close-popup glow-color="teal-1"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -123,57 +110,48 @@
           title="Suggestions"
         />
       </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <AcademiaCard
-          title="Academia"
-          :content="student ? [
-            'Enrolled at: ' + student.schoolName,
-            'Studies: ' + student.studies,
-            'Degree: ' + student.degree
-          // 'Years into degree: 5'
-          ] : []"
-        />
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <AcademiaCard :index="studentKey" title="Academia"/>
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <SkillsCard :index="studentKey" title="Skills"/>
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-12">
-        <TitleTextCard
-          title="Project you're most proud of"
-          content="
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        />
+        <ExtraInfoCard :index="studentKey" title="Extra Info"/>
       </div>
     </div>
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">
-        <PracticalCard title="Practical" />
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <DetailsCard
-          title="Details"
-          :content="[
-            { description: 'First language', value: 'English'},
-            { description: 'Level of English', value: '1/5'}
-          ]"
-        />
-      </div>
-    </div>
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <TitleTextCard
-          title="Why do you want to participate in osoc?"
-          content="
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        />
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <TitleTextCard
-          title="Why do you think you're a good fit?"
-          content="
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        />
-      </div>
-    </div>
+<!--    <div class="row">-->
+<!--      <div class="studentcol col-12">-->
+<!--        <TitleTextCard title="Project you're most proud of" content="-->
+<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+<!--        />-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="row">-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">-->
+<!--        <PracticalCard title="Practical"/>-->
+<!--      </div>-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
+<!--        <DetailsCard title="Details" :content="[-->
+<!--            { description: 'First language', value: 'English'},-->
+<!--            { description: 'Level of English', value: '1/5'}-->
+<!--          ]"/>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="row">-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
+<!--        <TitleTextCard title="Why do you want to participate in osoc?" content="-->
+<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+<!--        />-->
+<!--      </div>-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
+<!--        <TitleTextCard title="Why do you think you're a good fit?" content="-->
+<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
+<!--        />-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -183,21 +161,19 @@ import {useStudentStore} from "../../stores/useStudentStore";
 import {ref} from "vue";
 import SideBar from "../../components/SideBar.vue"
 import AcademiaCard from "./components/AcademiaCard.vue";
-import DetailsCard from "./components/DetailsCard.vue";
-import PracticalCard from "./components/PracticalCard.vue";
+import SkillsCard from "./components/SkillsCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
-import TitleTextCard from "./components/TitleTextCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
 import {defineComponent} from "@vue/runtime-core";
+import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 
 export default defineComponent ({
   components: {
+    ExtraInfoCard,
     AcademiaCard,
-    DetailsCard,
-    PracticalCard,
     SuggestionsCard,
-    TitleTextCard,
+    SkillsCard,
     SegmentedControl,
     SideBar,
   },
@@ -214,17 +190,16 @@ export default defineComponent ({
     return {
       authenticationStore,
       studentStore,
+      possibleFinalDecision: ref(-1),
     }
   },
   data() {
-    const possibleSuggestion = ref(-1)
     const suggestionDialog = ref(false)
-    const reason = ref(null)
+    const reason = ref("")
 
     return {
       sideBarKey: 0,
       studentKey: 0,
-      possibleSuggestion,
       suggestionDialog,
       reason
     }
@@ -233,25 +208,35 @@ export default defineComponent ({
     student(): Student | null {
       return this.studentStore.currentStudent
     },
+    possibleSuggestion(): number {
+      return this.studentStore.possibleSuggestion
+    },
     name(): string {
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     mySuggestion(): number | null {
-      if (this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.email === this.authenticationStore.loggedInUser?.email)
+      if (! this.studentStore.isLoading && this.student) {
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.pk)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
-        return null
+        return this.possibleSuggestion
       }
 
     },
     mySuggestionColor(): string {
       let mySuggestion = this.mySuggestion
-      if (mySuggestion !== null) {
-        return mySuggestion === 0 ? "green" : (mySuggestion === 1 ? "yellow" : (mySuggestion === 2 ? "red" : "grey"))
-      } else {
-        return ""
+      switch (mySuggestion) {
+        case null:
+          return "grey"
+        case 0:
+          return "green"
+        case 1:
+          return "yellow"
+        case 2:
+          return "red"
+        default:
+          return "grey"
       }
     },
     suggestionName(): string {
@@ -279,19 +264,25 @@ export default defineComponent ({
       }
     }
   },
-  created() {
-    this.studentStore.loadStudent(this.id)
-  },
   mounted() {
     // Reload when new student is selected
-    this.$watch('id', (id: number) => {
-      this.studentStore.loadStudent(id)
+    this.$watch('id', async (id: number) => {
+      await this.studentStore.loadStudent(id)
+
+      if (this.student?.finalDecision) {
+        this.possibleFinalDecision = this.student.finalDecision.suggestion
+      } else {
+        this.possibleFinalDecision = -1
+      }
     }, {immediate: true})
   },
   methods: {
     makeSuggestion: async function () {
-      const loggedInUser = Object.assign({}, this.authenticationStore.loggedInUser);
-      await this.studentStore.updateSuggestion(this.student.id, loggedInUser.pk, this.possibleSuggestion, this.reason)
+      if (this.student) {
+        const loggedInUser = Object.assign({}, this.authenticationStore.loggedInUser);
+        await this.studentStore.updateSuggestion(this.student.id, loggedInUser.pk, this.possibleSuggestion, this.reason)
+        this.reason = ""
+      }
 
       // Make components update
       this.sideBarKey += 1
@@ -301,8 +292,17 @@ export default defineComponent ({
       this.$router.push(`/students/${selected_student.id}`)
     },
     showDialog: function (value: number) {
-      this.possibleSuggestion = value
+      this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
+    },
+    finalDecision: async function () {
+      if (this.student) {
+        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
+      }
+
+      // Make components update
+      this.sideBarKey += 1
+      this.studentKey += 1
     }
   },
 })

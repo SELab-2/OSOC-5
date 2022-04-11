@@ -6,16 +6,14 @@
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <div v-if="this.studentStore.isLoading">
+      <div v-if="studentStore.isLoading">
         <LoadingSpinner />
       </div>
 
       <div v-else>
-        <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
-          <li>{{ 'Enrolled at: ' + studentStore.currentStudent.schoolName }}</li>
-          <li>{{ 'Studies: ' + studentStore.currentStudent.studies }}</li>
-          <li>{{ 'Degree: ' + studentStore.currentStudent.degree }}</li>
-        </ul>
+        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
+          {{ studentStore.currentStudent.extraInfo }}
+        </div>
       </div>
     </q-card-section>
   </q-card>

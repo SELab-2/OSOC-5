@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative-position container flex flex-center"
+    class="relative-position container flex justify-center"
     style="width: 100vw"
   >
     <div
@@ -12,12 +12,13 @@
           Users
         </div>
         <q-space />
-        <q-btn
+        <btn
           stack
           flat
           color="yellow"
           icon="download"
           label="csv"
+          glow-color="amber-2"
         />
       </div>
       <div class="row q-mb-md vertical-middle">
@@ -123,12 +124,13 @@
               key="remove"
               style="width: 10px"
             >
-              <q-btn
+              <btn
                 flat
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 @click="coachStore.removeUser(props.row.id)"
+                glow-color="red-2"
               />
             </q-td>
           </q-tr>
