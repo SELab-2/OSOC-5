@@ -30,7 +30,7 @@
               color="green"
               bg-color="white"
               label="Search by name..."
-              @keydown.enter="fetchStudents"
+              @update:modelValue="studentStore.loadStudents"
             >
               <template #append>
                 <q-icon name="search" />
@@ -45,7 +45,7 @@
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
               ]"
-              @click="fetchStudents"
+              @click="studentStore.loadStudents"
             />
 
             <label>Suggestion:</label>
@@ -58,7 +58,7 @@
                 { name: 'no', label: 'No' },
                 { name: 'none', label: 'None' },
               ]"
-              @click="fetchStudents"
+              @click="studentStore.loadStudents"
             />
 
             <q-select
@@ -73,7 +73,7 @@
               :option-label="opt => opt.name"
               :option-value="opt => opt.id"
               label="Skills"
-              @update:model-value="fetchStudents"
+              @update:model-value="studentStore.loadStudents"
             >
               <template #selected>
                 <div
@@ -96,14 +96,14 @@
                 color="primary"
                 label="Suggested by you"
                 right-label
-                @click="fetchStudents"
+                @click="studentStore.loadStudents"
               />
               <q-checkbox
                 v-model="studentStore.onProject"
                 color="primary"
                 label="On project"
                 right-label
-                @click="fetchStudents"
+                @click="studentStore.loadStudents"
               />
             </div>
 
@@ -223,9 +223,6 @@ export default defineComponent({
       }
       e.dataTransfer.setData('text', JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
-    },
-    fetchStudents() {
-      this.studentStore.loadStudents()
     },
     clickStudent(student: Student) {
       this.selectStudent(student)
