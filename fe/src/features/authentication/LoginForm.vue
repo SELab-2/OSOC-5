@@ -46,7 +46,7 @@
       type="submit"
       size="md"
       class="q-mx-md cornered"
-      glow-color="#00FFB5"
+      glow-color="#00F1AF"
     />
     <!--     <br/> -->
     <label class="text-bold">or</label>

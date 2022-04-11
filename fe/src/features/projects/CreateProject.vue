@@ -19,7 +19,7 @@
                 size="md"
                 class="q-mx-md cornered"
                 to="/projects"
-                glow-color="#00FFB5"
+                glow-color="#00F1AF"
                 shadow-strength=2
               />
               <btn
@@ -29,7 +29,7 @@
                 type="submit"
                 size="md"
                 class="q-mx-md cornered"
-                glow-color="#00FFB5"
+                glow-color="#00F1AF"
                 shadow-strength=2
               />
             </div>
@@ -137,7 +137,7 @@
                 icon="add"
                 label="Add role"
                 @click="new_role_prompt = true"
-                glow-color="#00FFB5"
+                glow-color="#00F1AF"
                 shadow-strength=2
               />
               <q-space />

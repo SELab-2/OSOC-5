@@ -97,7 +97,7 @@
          size="md"
          color="primary"
          class="q-mx-md cornered"
-         glow-color="#00FFB5"
+         glow-color="#00ECAA"
       />
       <label class="text-bold">or</label>
       <GitHubSignInButton/>
