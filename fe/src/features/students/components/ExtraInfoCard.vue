@@ -22,8 +22,9 @@
 <script lang="ts">
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import {defineComponent} from "@vue/runtime-core";
 
-export default {
+export default defineComponent( {
   components: {LoadingSpinner},
   props: {
     title: {
@@ -38,5 +39,5 @@ export default {
       studentStore,
     }
   },
-}
+})
 </script>
