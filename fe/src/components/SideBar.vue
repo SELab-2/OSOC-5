@@ -78,7 +78,7 @@
               <template #selected>
                 <div
                   class="full-width"
-                  style="max-height: 15vh; overflow-y: scroll"
+                  style="max-height: 15vh; overflow-y: auto"
                 >
                   <StudentSkillChip
                     v-for="skill of studentStore.skills"
