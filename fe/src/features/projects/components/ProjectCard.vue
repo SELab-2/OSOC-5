@@ -145,7 +145,7 @@ export default defineComponent({
   setup() {
     return {
       authenticationStore: useAuthenticationStore(),
-      $q: useQuasar(),
+      q: useQuasar(),
       projectStore: useProjectStore(),
     }
   },
@@ -190,7 +190,7 @@ export default defineComponent({
       this.projectStore
         .removeSuggestion(this.project, suggestion)
         .catch((error) => {
-          this.$q.notify({
+          this.q.notify({
             icon: 'warning',
             color: 'warning',
             message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.skill.name}`,
