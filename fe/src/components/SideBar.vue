@@ -184,14 +184,14 @@ export default defineComponent({
       required: true
     },
   },
-  setup(props) {
+  setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
     const $q = useQuasar()
 
     onMounted(() => {
       skillStore.loadSkills()
-      studentStore.loadStudents().then(() => props.selectStudent(studentStore.students[0]))
+      studentStore.loadStudents()
     })
 
     return {
