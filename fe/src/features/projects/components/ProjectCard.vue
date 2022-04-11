@@ -66,15 +66,15 @@
           <div v-if="project.requiredSkills !== undefined">
             <project-role-chip
               v-show="project.requiredSkills"
-              v-model="selectedRoles[role.skill.id]"
-              v-for="(role, index) in project.requiredSkills"
-              @dragleave="onDragLeave($event, role)"
-              @dragover="amountLeft(role) > 0 ? onDragOver($event, role) : ''"
-              @drop="onDrop($event, role)"
+              v-model="selectedRoles[skill.skill.id]"
+              v-for="(skill, index) in project.requiredSkills"
+              @dragleave="onDragLeave($event, skill)"
+              @dragover="amountLeft(skill) > 0 ? onDragOver($event, skill) : ''"
+              @drop="onDrop($event, skill)"
               :key="index"
-              :role="role.skill"
-              :placesLeft="amountLeft(role)"
-              :comment="role.comment"
+              :skill="skill"
+              :occupied="this.groupedStudents[skill.skill.id]?.length"
+              
             />
           </div>
         </div>
@@ -128,7 +128,7 @@ import { useProjectStore } from '../../../stores/useProjectStore'
 import { reactive, ref, Ref, nextTick, defineComponent } from 'vue'
 import { useQuasar } from 'quasar'
 import { ProjectSuggestion } from '../../../models/ProjectSuggestion'
-import { ProjectSkill, Skill } from '../../../models/Skill'
+import { ProjectSkillInterface, Skill } from '../../../models/Skill'
 import { Project } from '../../../models/Project'
 import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
@@ -160,7 +160,7 @@ export default defineComponent({
   watch: {
     // The skills are fetched later on, thus the list needs to be updated manually.
     'project.requiredSkills': {
-      handler(newVal: ProjectSkill[]) {
+      handler(newVal: ProjectSkillInterface[]) {
         this.selectedRoles =
           newVal.length === 0
             ? {}
@@ -201,20 +201,20 @@ export default defineComponent({
     },
 
     // Calculates how many places of a role are occupied.
-    amountLeft(skill: ProjectSkill) {
+    amountLeft(skill: ProjectSkillInterface) {
       const occupied = this.groupedStudents[skill.skill.id]
       return skill.amount - (occupied ? occupied.length : 0)
     },
 
     // Show the students assigned to a role when dragging over the chip of that role.
-    onDragOver(e: MouseEvent, skill: ProjectSkill) {
+    onDragOver(e: MouseEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
       e.stopPropagation()
       this.selectedRoles[skill.skill.id] = true
     },
 
     // Hide the students assigned to a role when dragging away from the chip of that role.
-    onDragLeave(e: MouseEvent, skill: ProjectSkill) {
+    onDragLeave(e: MouseEvent, skill: ProjectSkillInterface) {
       ;(<HTMLDivElement>e.target).classList.remove('drag-enter')
       if (!this.expanded) {
         this.selectedRoles[skill.skill.id] = false
@@ -222,7 +222,7 @@ export default defineComponent({
     },
 
     // Assign a student to a role.
-    async onDrop(e: DragEvent, skill: ProjectSkill) {
+    async onDrop(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
       const target = <HTMLDivElement>e.target
       // don't drop on other draggables

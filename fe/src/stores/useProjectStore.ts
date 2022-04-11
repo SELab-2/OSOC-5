@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
-import { Skill, ProjectSkill, TempProjectSkill } from '../models/Skill'
+import { Skill, ProjectSkillInterface, ProjectSkill, TempProjectSkill } from '../models/Skill'
 import { ProjectSuggestion } from '../models/ProjectSuggestion'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
@@ -53,20 +53,14 @@ export const useProjectStore = defineStore('project', {
     },
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
-      return {
-        amount: skill.amount,
-        comment: skill.comment,
-        skill: new Skill(data),
-        // A new skill must be created, otherwise it's just on object casted to Skill, but not a Skill object.
-        // That would produce warnings in Vue.
-      }
+      return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
 
-      const skills: Array<ProjectSkill> = await Promise.all(
+      const skills: Array<ProjectSkillInterface> = await Promise.all(
         project.requiredSkills.map((skill) => this.getSkill(skill))
       )
 
@@ -98,7 +92,7 @@ export const useProjectStore = defineStore('project', {
             project.coaches.map((coach) => useCoachStore().getUser(coach))
           )
 
-          const skills: Array<ProjectSkill> = await Promise.all(
+          const skills: Array<ProjectSkillInterface> = await Promise.all(
             project.requiredSkills.map((skill) => this.getSkill(skill))
           )
 
