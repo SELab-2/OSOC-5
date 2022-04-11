@@ -37,30 +37,6 @@ export interface ProjectSkill {
   comment: string
   skill: Skill
 }
-export class ProjectTableSkill implements SkillInterface {
-  name: string
-  id: number
-  color: string
-  url: string
-  amount: number
-  comment: string
-
-  constructor(
-    name: string,
-    id: number,
-    color: string,
-    url: string,
-    amount: number,
-    comment: string
-  ) {
-    this.name = name
-    this.id = id
-    this.color = color
-    this.url = url
-    this.amount = amount
-    this.comment = comment
-  }
-}
 
 export class ProjectTableSkill implements SkillInterface {
   name: string
@@ -82,18 +58,6 @@ export class ProjectTableSkill implements SkillInterface {
     this.id = id
     this.color = color
     this.url = url
-    this.amount = amount
-    this.comment = comment
-  }
-}
-
-export class ProjectSkill {
-  skill: string
-  amount: number
-  comment: string
-
-  constructor(skill: string, amount: number, comment: string) {
-    this.skill = skill
     this.amount = amount
     this.comment = comment
   }
