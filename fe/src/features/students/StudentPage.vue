@@ -8,7 +8,7 @@
       <q-btn :href="student ? student.cv.href : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
       <q-btn :href="student ? student.portfolio.href : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
-    <div v-if="authenticationStore.loggedInUser" class="row q-gutter-sm items-center">
+    <div v-if="authenticationStore.loggedInUser.isAdmin" class="row q-gutter-sm items-center">
       <q-select
         v-model="possibleFinalDecision"
         emit-value
