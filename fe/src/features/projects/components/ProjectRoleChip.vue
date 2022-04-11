@@ -7,7 +7,9 @@
     outline
     :color="`${role.color}-${enabled ? 8 : 4}`"
     :class="`bg-${role.color}-${enabled ? 4 : 1}`"
-    :style="`border-width: 1.5px; padding-right: 8px; padding-left: ${comment ? 2 : 8}px`"
+    :style="`border-width: 1.5px; padding-right: 8px; padding-left: ${
+      comment ? 2 : 8
+    }px`"
   >
     <template v-slot:default>
       <div class="row" style="display: flex; align-items: center">
@@ -19,7 +21,9 @@
         />
         <div
           class="text-weight-medium"
-          :style="`color: ${enabled ? 'white' : 'black'}; padding-left: ${comment ? 3 : 0}px`"
+          :style="`color: ${enabled ? 'white' : 'black'}; padding-left: ${
+            comment ? 3 : 0
+          }px`"
         >
           {{ role.name }}
         </div>
@@ -50,23 +54,23 @@ export default defineComponent({
   props: {
     role: {
       type: Skill,
-      required: true
+      required: true,
     },
     placesLeft: {
       type: Number,
-      required: true
+      required: true,
     },
     comment: {
       type: String,
-      required: false
+      required: false,
     },
     modelValue: {
       type: Boolean,
-      required: false
-    }
+      required: false,
+    },
   },
   emits: {
-    'update:modelValue': Boolean
+    'update:modelValue': Boolean,
   },
   computed: {
     enabled: {

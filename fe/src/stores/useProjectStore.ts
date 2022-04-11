@@ -57,7 +57,7 @@ export const useProjectStore = defineStore('project', {
         amount: skill.amount,
         comment: skill.comment,
         skill: new Skill(data),
-        // A new skill must be created, otherwise it's just on object casted to Skill, but not a Skill object. 
+        // A new skill must be created, otherwise it's just on object casted to Skill, but not a Skill object.
         // That would produce warnings in Vue.
       }
     },
