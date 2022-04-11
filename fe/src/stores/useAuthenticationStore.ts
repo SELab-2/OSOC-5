@@ -9,7 +9,7 @@ const baseURL =
     : 'https://sel2-5.ugent.be/api/'
 
 interface State {
-  loggedInUser: User | null
+  loggedInUser: UserInterface | null
 }
 
 export const useAuthenticationStore = defineStore('user/authentication', {
@@ -29,6 +29,8 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         email,
         password,
       })
+      localStorage.setItem('refreshToken', data.refresh_token)
+      localStorage.setItem('accessToken', data.access_token)
 
       this.loggedInUser = convertObjectKeysToCamelCase(data).user as User
 

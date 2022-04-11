@@ -26,9 +26,6 @@
       <q-chip v-for="coach in project.coaches ?? []" :key="coach.id" icon="person">
         {{ coach.firstName }} {{ coach.lastName.split(" ").map(res => res.charAt(0)).join("") }}.
       </q-chip>
-        
-      
-      
       <div
         class="row"
         style="display: flex; align-items: center"
@@ -154,6 +151,24 @@ export default defineComponent({
               textColor: 'black'
             });
             this.project.suggestedStudents!.splice(i, 0, suggestion)
+          }
+        )
+    },
+    
+    removeSuggestion(suggestion) {
+      const i = this.project.suggestedStudents.findIndex(s => s.student.id === suggestion.student.id && s.skill.id === suggestion.skill.id)
+      console.log(i)
+      this.project.suggestedStudents.splice(i,1)
+      this.projectStore
+        .removeSuggestion(this.project, suggestion)
+        .catch(error => {
+            this.$q.notify({
+              icon: 'warning',
+              color: 'warning',
+              message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.role.name}`,
+              textColor: 'black'
+            });
+            this.project.suggestedStudents.splice(i, 0, suggestion)
           }
         )
     },
