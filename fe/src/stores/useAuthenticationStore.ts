@@ -1,9 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import { StoreDefinition } from 'pinia'
-import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
-import router from "../router";
-import {User} from "../models/User";
+import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
+import { User } from '../models/User'
 
 const baseURL =
   process.env.NODE_ENV == 'development'
@@ -19,7 +17,13 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     loggedInUser: null,
   }),
   actions: {
-    async login({ email, password }: {email: string, password: string}): Promise<void> {
+    async login({
+      email,
+      password,
+    }: {
+      email: string
+      password: string
+    }): Promise<void> {
       const { data } = await axios.post(baseURL + 'auth/login/', {
         username: email,
         email,
@@ -28,10 +32,8 @@ export const useAuthenticationStore = defineStore('user/authentication', {
 
       this.loggedInUser = convertObjectKeysToCamelCase(data).user as User
 
-      localStorage.setItem("refreshToken", data.refresh_token)
-      localStorage.setItem("accessToken", data.access_token)
-
-      await router.push('/students')
+      localStorage.setItem('refreshToken', data.refresh_token)
+      localStorage.setItem('accessToken', data.access_token)
     },
     logout(): void {
       this.$reset()

@@ -1,3 +1,5 @@
+import { Url } from 'url'
+
 export interface SkillInterface {
   name: string
   id: number
@@ -28,7 +30,7 @@ export interface TempProjectSkill {
 export interface ProjectSkill {
   amount: number
   comment: string
-  skill: Skill
+  skill: Skill | string
 }
 export class ProjectTableSkill implements SkillInterface {
   name: string
