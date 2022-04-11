@@ -3,10 +3,15 @@ import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import { User } from '../models/User'
 import {Student} from "../models/Student";
-import {Suggestion} from "../models/Suggestion";
 import {Skill} from "../models/Skill";
 
 interface State {
+    search: string
+    alumni: string
+    decision: string
+    byMe: boolean
+    onProject: boolean
+    skills: Array<Skill>
     coaches: Map<string, User>
     students: Array<Student>
     isLoading: boolean
@@ -16,6 +21,12 @@ interface State {
 
 export const useStudentStore = defineStore('user/student', {
     state: (): State => ({
+        search: "",
+        alumni: "all",
+        decision: "none",
+        byMe: false,
+        onProject: false,
+        skills: [],
         coaches: new Map(),
         students: [],
         isLoading: false,
@@ -23,23 +34,41 @@ export const useStudentStore = defineStore('user/student', {
         currentStudent: null,
     }),
     actions: {
-        async loadStudents(): Promise<void> {
+        transformStudents(data: any): void {
+            for (const student of data) {
+                if (student.final_decision) {
+                    student.final_decision.suggestion = parseInt(student.final_decision.suggestion)
+                }
+
+                for (const suggestion of student.suggestions) {
+                    suggestion.suggestion = parseInt(suggestion.suggestion)
+                }
+            }
+        },
+        async loadStudents() {
             this.isLoading = true
+            const filters = []
+
+            if (this.search) filters.push(`search=${this.search}`)
+            if (this.alumni === "alumni") filters.push("alumni=true")
+            if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
+            if (this.byMe === true) filters.push("suggested_by_user")
+            if (this.onProject === true) filters.push("on_project")
+
+            for (const skill of this.skills) {
+                filters.push(`skills=${skill.id}`)
+            }
+
+            console.log(filters)
+            let url = ""
+            if (filters) url = `?${filters.join('&')}`
 
             await instance
-                .get('students/')
+                .get(`students/${url}`)
                 .then(({data}) => {
-                    for (const student of data) {
-                        if (student.final_decision) {
-                            student.final_decision.suggestion = parseInt(student.final_decision.suggestion)
-                        }
+                    this.transformStudents(data)
 
-                        for (const suggestion of student.suggestions) {
-                            suggestion.suggestion = parseInt(suggestion.suggestion)
-                        }
-                    }
-
-                    this.students = convertObjectKeysToCamelCase(data) as never as Student[]
+                    this.students = (convertObjectKeysToCamelCase(data) as unknown as Student[]).map((student) => new Student(student))
                 })
 
             this.isLoading = false
@@ -68,8 +97,8 @@ export const useStudentStore = defineStore('user/student', {
                             })
                     }
 
-                    data.skillList = skills
-                    this.currentStudent = convertObjectKeysToCamelCase(data) as never as Student
+                    data.skills = skills
+                    this.currentStudent = new Student(convertObjectKeysToCamelCase(data) as unknown as Student)
                 })
 
             this.isLoading = false
@@ -89,15 +118,15 @@ export const useStudentStore = defineStore('user/student', {
 
             await this.loadStudent(studentId)
         },
-        async updateFinalDecision(studentId: number, possibleFinalDecision: number) {
+        async updateFinalDecision(studentId: number, possibleFinalDecision: string) {
             let reason = ""
 
-            if (this.currentStudent?.finalDecision?.suggestion == possibleFinalDecision) {
+            if (this.currentStudent?.finalDecision?.suggestion.toString() == possibleFinalDecision) {
                 reason = this.currentStudent.finalDecision.reason
             }
 
             // check if -1 is selected to delete decision
-            if (possibleFinalDecision == -1) {
+            if (possibleFinalDecision == "-1") {
                 await instance
                     .delete(`students/${studentId}/remove_final_decision/`)
             } else {
