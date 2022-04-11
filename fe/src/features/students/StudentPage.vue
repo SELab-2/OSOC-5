@@ -200,8 +200,6 @@ export default defineComponent ({
     mySuggestionColor(): string {
       let mySuggestion = this.mySuggestion
       switch (mySuggestion) {
-        case null:
-          return "grey"
         case "0":
           return "green"
         case "1":
