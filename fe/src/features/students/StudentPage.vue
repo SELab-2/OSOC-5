@@ -1,14 +1,14 @@
 <template>
-  <SideBar :key="sideBarKey" :student="this.student" :selectStudent="selectStudent" :draggable="false"/>
+  <SideBar :key="sideBarKey" color="bg-grey-3" :selectStudent="selectStudent" :draggable="false"/>
 
   <div :key="studentKey"
     class="justify-between row q-px-lg q-pt-lg studentcol">
     <div class="row q-pa-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ name }}</h>
-      <q-btn :href="this.student ? this.student.cv : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="this.student ? this.student.portfolio : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
+      <q-btn :href="student ? student.cv.href : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
+      <q-btn :href="student ? student.portfolio.href : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
-    <div v-if="this.authenticationStore.loggedInUser" class="row q-gutter-sm items-center">
+    <div v-if="authenticationStore.loggedInUser" class="row q-gutter-sm items-center">
       <q-select
         v-model="possibleFinalDecision"
         emit-value
@@ -18,10 +18,10 @@
         dense
         style="width: 200px"
         :options="[
-          { value: 0, label: 'Yes' },
-          { value: 1, label: 'Maybe' },
-          { value: 2, label: 'No' },
-          { value: -1, label: 'Not decided' },
+          { value: '0', label: 'Yes' },
+          { value: '1', label: 'Maybe' },
+          { value: '2', label: 'No' },
+          { value: '-1', label: 'Not decided' },
         ]"
         label="Final decision"
       />
@@ -43,21 +43,22 @@
       @update:modelValue="showDialog"
       v-model="mySuggestion"
       :options="[
-        { name: 0, label: 'Yes' },
-        { name: 1, label: 'Maybe' },
-        { name: 2, label: 'No' },
-        { name: -1, label: 'Not decided' },
+        { name: '0', label: 'Yes' },
+        { name: '1', label: 'Maybe' },
+        { name: '2', label: 'No' },
+        { name: '-1', label: 'Not decided' },
       ]"
     />
 
-    <q-dialog v-model="this.suggestionDialog" >
+    <q-dialog v-model="suggestionDialog" >
       <q-card>
         <q-card-section>
+          {{suggestionName}}
+          {{suggestionColor}}
           <div class="text-h6">Suggest
-            <q-btn dense rounded class="text-h6" :class="this.suggestionColor">
-              {{ this.suggestionName }}
-            </q-btn>
-            for {{ this.name }}</div>
+            <btn :label="suggestionName" dense rounded class="text-h6" :class="suggestionColor" />
+            for {{ name }}
+          </div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -70,8 +71,8 @@
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn flat color="grey" label="Cancel" v-close-popup/>
-          <q-btn flat label="Suggest" @click="makeSuggestion" v-close-popup/>
+          <btn flat color="grey" label="Cancel" v-close-popup glow-color="grey-4"/>
+          <btn flat label="Suggest" @click="makeSuggestion" v-close-popup glow-color="teal-1"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -151,7 +152,7 @@ export default defineComponent ({
   },
   props: {
     id: {
-      type: Number,
+      type: String,
       required: true
     },
   },
@@ -162,7 +163,7 @@ export default defineComponent ({
     return {
       authenticationStore,
       studentStore,
-      possibleFinalDecision: ref(-1),
+      possibleFinalDecision: ref("-1"),
     }
   },
   data() {
@@ -180,19 +181,19 @@ export default defineComponent ({
     student(): Student | null {
       return this.studentStore.currentStudent
     },
-    possibleSuggestion(): number {
-      return this.studentStore.possibleSuggestion
+    possibleSuggestion(): string {
+      return this.studentStore.possibleSuggestion.toString()
     },
     name(): string {
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
-    mySuggestion(): number | null {
+    mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.pk)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.id)
 
-        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
+        return mySuggestions.length > 0 ? mySuggestions[0].suggestion.toString() : (-1).toString()
       } else {
-        return this.possibleSuggestion
+        return this.possibleSuggestion.toString()
       }
 
     },
@@ -201,11 +202,11 @@ export default defineComponent ({
       switch (mySuggestion) {
         case null:
           return "grey"
-        case 0:
+        case "0":
           return "green"
-        case 1:
+        case "1":
           return "yellow"
-        case 2:
+        case "2":
           return "red"
         default:
           return "grey"
@@ -213,11 +214,11 @@ export default defineComponent ({
     },
     suggestionName(): string {
       switch (this.possibleSuggestion) {
-        case 0:
+        case "0":
           return "yes"
-        case 1:
+        case "1":
           return "maybe"
-        case 2:
+        case "2":
           return "no"
         default:
           return "not decided"
@@ -225,11 +226,11 @@ export default defineComponent ({
     },
     suggestionColor(): string {
       switch (this.possibleSuggestion) {
-        case 0:
+        case "0":
           return "bg-green"
-        case 1:
+        case "1":
           return "bg-yellow"
-        case 2:
+        case "2":
           return "bg-red"
         default:
           return "bg-grey"
@@ -242,9 +243,9 @@ export default defineComponent ({
       await this.studentStore.loadStudent(id)
 
       if (this.student?.finalDecision) {
-        this.possibleFinalDecision = this.student.finalDecision.suggestion
+        this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
       } else {
-        this.possibleFinalDecision = -1
+        this.possibleFinalDecision = (-1).toString()
       }
     }, {immediate: true})
   },

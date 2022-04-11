@@ -1,8 +1,8 @@
 <template>
   <q-chip
     outline
-    :color="`${this.color}-4`"
-    :class="`bg-${this.color}-1`"
+    :color="`${color}-4`"
+    :class="`bg-${color}-1`"
     style="border-width: 1.5px; padding-right: 8px; padding-left: 8px"
   >
     <template v-slot:default>
@@ -11,7 +11,7 @@
           class="text-weight-medium"
           style="color: black; padding-left: 0px"
         >
-          {{ this.name }}
+          {{ name }}
         </div>
       </div>
     </template>
@@ -19,7 +19,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import {defineComponent} from "@vue/runtime-core";
+
+export default defineComponent( {
   props: {
     color: {
       type: String,
@@ -30,5 +32,5 @@ export default {
       required: true
     }
   },
-}
+})
 </script>

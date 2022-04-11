@@ -10,7 +10,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import {defineComponent} from "@vue/runtime-core";
+
+export default defineComponent( {
   props: {
     title: {
       type: String,
@@ -21,5 +23,5 @@ export default {
       required: true
     }
   }
-}
+})
 </script>

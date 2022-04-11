@@ -126,7 +126,7 @@
                   <StudentCard
                     v-ripple
                     :student="student"
-                    :active="student ? student.email === student.email : false"
+                    :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
                     @click="clickStudent(student)"
                   />
                 </q-item>
@@ -140,7 +140,7 @@
         class="absolute"
         style="top: 15px; right: -17px"
       >
-        <q-btn
+        <btn
           dense
           round
           unelevated
@@ -183,10 +183,6 @@ export default defineComponent({
       type: Boolean,
       required: true
     },
-    student: {
-      type: Student,
-      required: true
-    }
   },
   setup(props) {
     const studentStore = useStudentStore()
@@ -207,7 +203,6 @@ export default defineComponent({
         borderRadius: '7px',
         backgroundColor: 'black',
         width: '4px',
-        opacity: 0.75
       },
     }
   },
