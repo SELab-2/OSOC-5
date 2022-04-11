@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
-import { User } from '../models/User'
+import { User, UserInterface } from '../models/User'
 
 const baseURL =
   process.env.NODE_ENV == 'development'

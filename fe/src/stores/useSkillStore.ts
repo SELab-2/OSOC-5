@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
-import { ProjectSkill, ProjectTableSkill, Skill } from '../models/Skill'
+import { TempProjectSkill, ProjectTableSkill, Skill } from '../models/Skill'
 
 interface State {
   skills: Array<ProjectTableSkill>
@@ -107,7 +107,7 @@ export const useSkillStore = defineStore('skills', {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: any
     ) {
-      const skillsList: Array<ProjectSkill> = []
+      const skillsList: Array<TempProjectSkill> = []
 
       // filter out the used skills
       for (const skill of this.skills) {
