@@ -115,8 +115,8 @@
                   <StudentCard
                     v-ripple
                     :student="student"
-                    :active="this.student ? student.email === this.student.email : false"
-                    @click="this.clickStudent(student)"
+                    :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
+                    @click="clickStudent(student)"
                   />
                 </q-item>
               </q-list>
@@ -135,7 +135,7 @@
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState.value = !miniState"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -169,10 +169,6 @@ export default defineComponent({
       type: Boolean,
       required: true
     },
-    student: {
-      type: Student,
-      required: true
-    }
   },
   setup() {
     const studentStore = useStudentStore()
@@ -190,7 +186,6 @@ export default defineComponent({
         borderRadius: '7px',
         backgroundColor: 'black',
         width: '4px',
-        opacity: 0.75
       },
     }
   },

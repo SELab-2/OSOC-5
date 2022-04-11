@@ -3,7 +3,6 @@ import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import { User } from '../models/User'
 import {Student} from "../models/Student";
-import {Suggestion} from "../models/Suggestion";
 import {Skill} from "../models/Skill";
 
 interface State {
@@ -68,7 +67,7 @@ export const useStudentStore = defineStore('user/student', {
                             })
                     }
 
-                    data.skillList = skills
+                    data.skills = skills
                     this.currentStudent = convertObjectKeysToCamelCase(data) as never as Student
                 })
 
@@ -89,15 +88,15 @@ export const useStudentStore = defineStore('user/student', {
 
             await this.loadStudent(studentId)
         },
-        async updateFinalDecision(studentId: number, possibleFinalDecision: number) {
+        async updateFinalDecision(studentId: number, possibleFinalDecision: string) {
             let reason = ""
 
-            if (this.currentStudent?.finalDecision?.suggestion == possibleFinalDecision) {
+            if (this.currentStudent?.finalDecision?.suggestion.toString() == possibleFinalDecision) {
                 reason = this.currentStudent.finalDecision.reason
             }
 
             // check if -1 is selected to delete decision
-            if (possibleFinalDecision == -1) {
+            if (possibleFinalDecision == "-1") {
                 await instance
                     .delete(`students/${studentId}/remove_final_decision/`)
             } else {

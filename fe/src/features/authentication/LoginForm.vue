@@ -109,8 +109,7 @@ export default defineComponent({
     }
   },
   methods: {
-    
-    mousemove(e) {
+    mousemove(e: any) {
       const test = e.target.getBoundingClientRect()
       const x = e.clientX - test.left
       const y = e.clientY - test.top
