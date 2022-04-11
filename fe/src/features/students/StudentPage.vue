@@ -53,11 +53,12 @@
     <q-dialog v-model="suggestionDialog" >
       <q-card>
         <q-card-section>
+          {{suggestionName}}
+          {{suggestionColor}}
           <div class="text-h6">Suggest
-            <btn dense rounded class="text-h6" :class="suggestionColor">
-              {{ suggestionName }}
-            </btn>
-            for {{ name }}</div>
+            <btn :label="suggestionName" dense rounded class="text-h6" :class="suggestionColor" />
+            for {{ name }}
+          </div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
