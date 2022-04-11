@@ -55,7 +55,7 @@
     <q-separator class="sep middle-sep q-my-md" />
     <router-link
       :to="{ name: 'Signup' }"
-      :class="$q.dark.isActive ? 'text-white' : 'text-black'"
+      :class="q.dark.isActive ? 'text-white' : 'text-black'"
     >
       Sign Up
     </router-link>
@@ -76,7 +76,7 @@ export default defineComponent({
   components: { GitHubSignInButton },
   setup() {
     const authenticationStore = useAuthenticationStore()
-    const $q = useQuasar()
+    const q = useQuasar()
     const email = ref('')
     const password = ref('')
     useMeta(metaData)
@@ -89,13 +89,13 @@ export default defineComponent({
           .then(() => {
             router.push('/students') 
             
-            $q.notify({
+            q.notify({
               icon: 'done',
               color: 'positive',
               message: 'Submitted',
             })
           }).catch(() => {
-            $q.notify({
+            q.notify({
               icon: 'close',
               color: 'negative',
               message: 'Could not log in',

@@ -455,7 +455,7 @@ export default defineComponent({
       coachStore.loadUsers()
     })
 
-    const $q = useQuasar()
+    const q = useQuasar()
 
     // input fields
     const project_name = ref('')
@@ -514,13 +514,13 @@ export default defineComponent({
             if (success) {
               router.push('/projects')
 
-              $q.notify({
+              q.notify({
                 icon: 'done',
                 color: 'positive',
                 message: 'Project created successfully!',
               })
             } else {
-              $q.notify({
+              q.notify({
                 icon: 'close',
                 color: 'negative',
                 message: 'Project creation failed',
@@ -552,7 +552,7 @@ export default defineComponent({
         
         delete_role.value = undefined
 
-        $q.notify({
+        q.notify({
           icon: 'done',
           color: 'positive',
           message: 'Successfully deleted!',
@@ -579,7 +579,7 @@ export default defineComponent({
             // callback
             (success: boolean) => {
               if (success) {
-                $q.notify({
+                q.notify({
                   icon: 'done',
                   color: 'positive',
                   message: `Added new project role: ${new_role.value}.`,
@@ -589,7 +589,7 @@ export default defineComponent({
                 new_role.value = ''
                 new_role_color.value = ''
               } else {
-                $q.notify({
+                q.notify({
                   icon: 'close',
                   color: 'negative',
                   message: 'Failed to add role!',
@@ -598,7 +598,7 @@ export default defineComponent({
             }
           )
         } else {
-          $q.notify({
+          q.notify({
             icon: 'close',
             color: 'negative',
             message: 'Invalid name/color!',

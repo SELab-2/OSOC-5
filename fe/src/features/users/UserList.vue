@@ -226,7 +226,7 @@ export default defineComponent({
   components: { SegmentedControl },
   setup() {
     const coachStore = useCoachStore()
-    const $q = useQuasar()
+    const q = useQuasar()
     
     onMounted(() => {
       coachStore.loadUsers();
@@ -240,7 +240,7 @@ export default defineComponent({
       columns,
       roles,
       coachStore,
-      $q
+      q
     }
   },
   methods: {
@@ -299,7 +299,7 @@ export default defineComponent({
 //       )
 // 
 //       if (status !== true) {
-//         this.$q.notify({
+//         this.q.notify({
 //           message: 'Browser denied file download...',
 //           color: 'negative',
 //           icon: 'warning',
@@ -313,7 +313,7 @@ export default defineComponent({
         this.coachStore
         .updateRole(user)
         .catch((error) => {
-            this.$q.notify({
+            this.q.notify({
             icon: 'warning',
             color: 'warning',
             message: error.detail,
