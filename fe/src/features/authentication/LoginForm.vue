@@ -108,18 +108,6 @@ export default defineComponent({
       },
     }
   },
-  methods: {
-    
-    mousemove(e) {
-      const test = e.target.getBoundingClientRect()
-      const x = e.clientX - test.left
-      const y = e.clientY - test.top
-  
-      e.target.style.setProperty('--x', `${x}px`)
-      e.target.style.setProperty('--y', `${y}px`)
-      e.target.style.setProperty('--color', `#00FFB5`)
-    },
-  },
 })
 </script>
 
