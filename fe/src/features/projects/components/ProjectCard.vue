@@ -234,12 +234,17 @@ export default defineComponent({
         e.dataTransfer!.getData('text')
       )
 
-      // Add a student to the project and remove the student card from the sidebar.
+      // Add a student to the project.
       ;(<HTMLDivElement>e.target).classList.remove('drag-enter')
       const reason = 'mimimi'
       let coach = this.authenticationStore.loggedInUser as User
       if (!coach) {
-        console.log('User is not logged in')
+        this.q.notify({
+          icon: 'warning',
+          color: 'warning',
+          message: 'You are not logged in.',
+          textColor: 'black'
+        })
         return
       }
       let result = await this.projectStore.addSuggestion(
