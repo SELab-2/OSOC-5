@@ -109,7 +109,7 @@
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
-                  :draggable="draggable"
+                  :draggable="draggable ?? false"
                   @dragstart="onDragStart($event, student)"
                 >
                   <StudentCard
@@ -167,7 +167,7 @@ export default defineComponent({
     },
     draggable: {
       type: Boolean,
-      required: true
+      required: false
     },
     student: {
       type: Student,

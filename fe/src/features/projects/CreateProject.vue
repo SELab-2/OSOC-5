@@ -20,7 +20,7 @@
                 class="q-mx-md cornered"
                 to="/projects"
                 glow-color="#00FFB5"
-                shadow-strength="2"
+                shadow-strength=2
               />
               <btn
                 elevated
@@ -30,7 +30,7 @@
                 size="md"
                 class="q-mx-md cornered"
                 glow-color="#00FFB5"
-                shadow-strength="2"
+                shadow-strength=2
               />
             </div>
           </div>
@@ -138,7 +138,7 @@
                 label="Add role"
                 @click="new_role_prompt = true"
                 glow-color="#00FFB5"
-                shadow-strength="2"
+                shadow-strength=2
               />
               <q-space />
               <q-input

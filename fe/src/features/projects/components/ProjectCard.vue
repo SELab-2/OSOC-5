@@ -35,20 +35,23 @@
         
       >
         <div class="text-caption text-grey">Roles:</div>
-        <q-btn flat round size="sm" icon="mdi-eye" @click="this.expanded = !this.expanded; toggleExpanded(this.expanded)"/>
+        <q-btn flat round size="sm" icon="mdi-eye" @click="expanded = !expanded; toggleExpanded(expanded)"/>
       </div>
       
+      <div v-if="project.requiredSkills !== undefined">
       <project-role-chip
         v-show="project.requiredSkills"
-        v-model="this.selectedRoles[role.skill.id]"
-        v-for="(role, index) in project.requiredSkills ?? []"
+        v-model="selectedRoles[role.skill.id]"
+        v-for="(role, index) in (project.requiredSkills)"
         @dragleave="onDragLeave($event, role)"
-        @dragover="this.amountLeft(role) > 0 ? onDragOver($event, role) : ''"
+        @dragover="amountLeft(role) > 0 ? onDragOver($event, role) : ''"
         @drop="onDrop($event, role)"
         :key="index"
         :role="role.skill"
         :placesLeft="amountLeft(role)"
+        :comment="role.comment"
       />
+    </div>
 </div>
       </q-slide-transition>
 
@@ -57,7 +60,7 @@
         :key="index"
         style="margin-top: 10px; margin-bottom: -10px"
       >
-        <div v-show="this.selectedRoles[role.skill.id]">
+        <div v-show="selectedRoles[role.skill.id]">
           <q-item-label
             class="text-subtitle1 text-bold"
             :class="'text-' + role.skill.color + '-8'"
@@ -185,8 +188,7 @@ export default defineComponent({
         return
       }
       // TODO: additional checks that datatransfer is valid and not null
-      console.log(e.dataTransfer!.getData('text'))
-      const data: { targetId: string, student: Student } = JSON.parse(e.dataTransfer!.getData('text'))
+      const data: { targetId: string, student: Student } = JSON.parse(e.dataTransfer!.getData('text'));
       
       // Add a student to the project and remove the student card from the sidebar.
       (<HTMLDivElement>e.target).classList.remove('drag-enter')

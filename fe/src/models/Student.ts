@@ -9,7 +9,7 @@ export interface TempStudent {
 }
 
 export interface StudentInterface {
-  url: URL
+  url: string
   id: number
   firstName: string
   lastName: string
@@ -38,7 +38,7 @@ enum Language {
 }
 
 export class Student implements StudentInterface {
-  url: URL
+  url: string
   id: number
   firstName: string
   lastName: string
@@ -58,7 +58,7 @@ export class Student implements StudentInterface {
   suggestions: Suggestion[]
 
   constructor(
-    url: URL,
+    url: string,
     id: number,
     firstName: string,
     lastName: string,

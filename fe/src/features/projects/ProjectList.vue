@@ -1,13 +1,13 @@
 <template>
     <div style=' height: 100%;' >
-        <SideBar color="bg-grey-3" :draggable="true"/>
+        <SideBar color="bg-grey-3" draggable/>
             <!-- <div > -->
                 <div style="height: 100%;" class="fit">
                     <q-toolbar style="height: 8%; overflow: visible; z-index:1" :class="`text-blue bg-white ${showShadow ? 'shadow-2' : ''}`">
                         <div class="text-bold text-h4 q-ml-md" >Projects</div>
                         <q-space/>
                         <div>
-                            <q-input dense outlined label="Outlined" />
+                            <q-input dense v-model="filter" outlined label="Outlined" />
                         </div>
                         <btn
                           padding="7px"
@@ -16,7 +16,7 @@
                           label="Conflicts"
                           to="/projects/conflicts"
                           shadow-color="red"
-                          shadow-strength="2.5"
+                          shadow-strength=2.5
                         />
                     </q-toolbar>
         
@@ -51,6 +51,7 @@ export default defineComponent({
     components: { SideBar, ProjectCard },
     data() {
       return {
+          filter: ref(''),
           showShadow: ref(false)
       }
     },

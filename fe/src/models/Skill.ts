@@ -1,5 +1,3 @@
-import { Url } from 'url'
-
 export interface SkillInterface {
   name: string
   id: number
@@ -12,13 +10,20 @@ export class Skill implements SkillInterface {
   id: number
   color: string
   url: string
-
-  constructor(name: string, id: number, color: string, url: string) {
-    this.name = name
-    this.id = id
-    this.color = color
-    this.url = url
+  
+  constructor(obj: SkillInterface);
+  constructor(name: string, id: number, color: string, url: string);
+  constructor(...args: any[]) {
+    if (args.length == 1) {
+      Object.assign(this, args[0])
+    } else {
+      this.name = args[0]
+      this.id = args[1]
+      this.color = args[2]
+      this.url = args[3]
+    } 
   }
+  
 }
 
 export interface TempProjectSkill {
@@ -30,7 +35,7 @@ export interface TempProjectSkill {
 export interface ProjectSkill {
   amount: number
   comment: string
-  skill: Skill | string
+  skill: Skill
 }
 export class ProjectTableSkill implements SkillInterface {
   name: string
