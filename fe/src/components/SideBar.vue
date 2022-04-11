@@ -22,7 +22,7 @@
             </div>
 
             <q-input
-              v-model="this.studentStore.search"
+              v-model="studentStore.search"
               outlined
               dense
               rounded
@@ -38,7 +38,7 @@
             </q-input>
 
             <SegmentedControl
-              v-model="this.studentStore.alumni"
+              v-model="studentStore.alumni"
               color="primary"
               text-color="white"
               :options="[
@@ -50,7 +50,7 @@
 
             <label>Suggestion:</label>
             <SegmentedControl
-              v-model="this.studentStore.decision"
+              v-model="studentStore.decision"
               color="primary"
               :options="[
                 { name: 'yes', label: 'Yes' },
@@ -76,7 +76,10 @@
               @update:model-value="fetchStudents"
             >
               <template #selected>
-                <div class="full-width" style="max-height: 15vh; overflow-y: scroll">
+                <div
+                  class="full-width"
+                  style="max-height: 15vh; overflow-y: scroll"
+                >
                   <StudentSkillChip
                     v-for="skill of studentStore.skills"
                     :key="skill.id"
@@ -96,7 +99,7 @@
                 @click="fetchStudents"
               />
               <q-checkbox
-                v-model="this.studentStore.onProject"
+                v-model="studentStore.onProject"
                 color="primary"
                 label="On project"
                 right-label
@@ -123,8 +126,8 @@
                   <StudentCard
                     v-ripple
                     :student="student"
-                    :active="this.student ? student.email === this.student.email : false"
-                    @click="this.clickStudent(student)"
+                    :active="student ? student.email === student.email : false"
+                    @click="clickStudent(student)"
                   />
                 </q-item>
               </q-list>
@@ -185,14 +188,14 @@ export default defineComponent({
       required: true
     }
   },
-  setup() {
+  setup(props) {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
     const $q = useQuasar()
 
     onMounted(() => {
-      studentStore.loadStudents()
       skillStore.loadSkills()
+      studentStore.loadStudents().then(() => props.selectStudent(studentStore.students[0]))
     })
 
     return {
