@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SideBar :selectStudent="selectStudent" :draggable="false"/>
+    <SideBar :selectStudent="selectStudent" color="bg-grey-3" :draggable="false"/>
     <div class="q-pa-lg full-height flex-center">
       <label>Select a student from the sidebar to get started</label>
     </div>
