@@ -45,7 +45,7 @@ export const useStudentStore = defineStore('user/student', {
                 }
             }
         },
-        async loadStudents(): Promise<void> {
+        async loadStudents() {
             this.isLoading = true
             const filters = []
 
@@ -68,7 +68,7 @@ export const useStudentStore = defineStore('user/student', {
                 .then(({data}) => {
                     this.transformStudents(data)
 
-                    this.students = convertObjectKeysToCamelCase(data) as never as Student[]
+                    this.students = (convertObjectKeysToCamelCase(data) as unknown as Student[]).map((student) => new Student(student))
                 })
 
             this.isLoading = false
@@ -98,7 +98,7 @@ export const useStudentStore = defineStore('user/student', {
                     }
 
                     data.skills = skills
-                    this.currentStudent = convertObjectKeysToCamelCase(data) as never as Student
+                    this.currentStudent = new Student(convertObjectKeysToCamelCase(data) as unknown as Student)
                 })
 
             this.isLoading = false
