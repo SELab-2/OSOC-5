@@ -55,7 +55,7 @@
     <q-separator class="sep middle-sep q-my-md" />
     <router-link
       :to="{ name: 'Signup' }"
-      :class="q.dark.isActive ? 'text-white' : 'text-black'"
+      :class="$q.dark.isActive ? 'text-white' : 'text-black'"
     >
       Sign Up
     </router-link>
