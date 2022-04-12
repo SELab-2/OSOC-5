@@ -13,6 +13,7 @@ interface State {
 }
 
 export const useAuthenticationStore = defineStore('user/authentication', {
+  persist: true,
   state: (): State => ({
     loggedInUser: null,
   }),
