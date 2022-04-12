@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
 from datetime import datetime
 
@@ -148,13 +148,21 @@ class Student(models.Model):
     """
     Student; Person who would like to participate in an OSOC project.
     """
-    class Language(models.TextChoices):
-        DUTCH = '0', _('Dutch')
-        ENGLISH = '1', _('English')
-        FRENCH = '2', _('French')
-        GERMAN = '3', _('German')
-        OTHER = '4', _('Other')
+    class Gender(models.TextChoices):
+        FEMALE = '0', _('FEMALE')
+        MALE = '1', _('MALE')
+        TRANSGENDER = '2', _('TRANSGENDER')
+        UNKNOWN = '3', _('UNKNOWN')
 
+    employment_agreement = models.CharField(
+        _('employment agreement'),
+        max_length=255,
+    )
+    hinder_work = models.TextField(
+        _('hinder work'),
+        null=True,
+        blank=True
+    )
     first_name = models.CharField(
         _('name'),
         max_length=255,
@@ -166,8 +174,20 @@ class Student(models.Model):
     call_name = models.CharField(
         _('call name'),
         max_length=255,
-        blank=True,
-        default=""
+        null=True,
+        blank=True
+    )
+    gender = models.CharField(
+        _('gender'),
+        max_length=1,
+        choices=Gender.choices,
+        default=Gender.UNKNOWN
+    )
+    pronouns = models.CharField(
+        _('pronouns'),
+        max_length=255,
+        null=True,
+        blank=True
     )
     email = models.EmailField(
         _('email address'),
@@ -179,26 +199,29 @@ class Student(models.Model):
         validators=[phone_regex],
         max_length=17,
         blank=True,
-        default=""
+        null=True
     )
     language = models.CharField(
         _('language'),
-        max_length=1,
-        choices=Language.choices,
-        default=Language.DUTCH,
+        max_length=255
     )
-    extra_info = models.TextField(
-        _('extra info'),
-        blank=True,
-        default=""
+    english_rating = models.PositiveSmallIntegerField(
+        _("english rating"),
+        validators=[MaxValueValidator(5), MinValueValidator(1)],
+    )
+    motivation = models.TextField(
+        _('motivation')
     )
     cv = models.URLField(
         _('cv'),
-        max_length=200
+        max_length=255
     )
     portfolio = models.URLField(
         _('portfolio'),
-        max_length=200
+        max_length=255
+    )
+    fun_fact = models.TextField(
+        _('fun fact'),
     )
     school_name = models.CharField(
         _("school name"),
@@ -208,6 +231,14 @@ class Student(models.Model):
         _("degree"),
         max_length=255
     )
+    degree_duration = models.PositiveSmallIntegerField(
+        _("degree duration"),
+        validators=[MinValueValidator(1)],
+    )
+    degree_current_year = models.PositiveSmallIntegerField(
+        _("degree current year"),
+        validators=[MinValueValidator(1)],
+    )
     studies = models.CharField(
         _("studies"),
         max_length=255
@@ -216,8 +247,16 @@ class Student(models.Model):
         _("alum"),
         default=False
     )
+    student_coach = models.BooleanField(
+        _("wants to be student coach"),
+        default=False
+    )
     skills = models.ManyToManyField(
         Skill,
+    )
+    best_skill = models.CharField(
+        _("best skill"),
+        max_length=255
     )
     suggestions = models.ManyToManyField(
         Coach,
