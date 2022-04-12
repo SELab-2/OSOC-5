@@ -71,9 +71,9 @@
         >
           <StudentSkillChip
             v-for="skill of student.skills"
-            :key="skill.id"
-            :color="skill.color"
-            :name="skill.name"
+            :key="typeof(skill) !== 'string' ? skill.id : ''"
+            :color="typeof(skill) !== 'string' ? skill.color : ''"
+            :name="typeof(skill) !== 'string' ? skill.name : ''"
           />
         </div>
       </q-tooltip>
