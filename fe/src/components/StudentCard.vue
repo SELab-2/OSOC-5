@@ -65,17 +65,13 @@
           />
         </div>
       </q-card-section>
-      <q-tooltip v-if="mustHover" max-width="300px" anchor="top middle" :delay="500" :offset="[0, 10]">
-        <div
-          style="overflow-y: auto"
-        >
-          <StudentSkillChip
-            v-for="skill of student.skills"
-            :key="typeof(skill) !== 'string' ? skill.id : ''"
-            :color="typeof(skill) !== 'string' ? skill.color : ''"
-            :name="typeof(skill) !== 'string' ? skill.name : ''"
-          />
-        </div>
+      <q-tooltip class="bg-grey-1 shadow-5 cornered" v-if="mustHover" max-width="300px" anchor="top middle" self="bottom middle" :offset="[0, 5]" :delay="500">
+        <StudentSkillChip
+          v-for="skill of student.skills"
+          :key="typeof(skill) !== 'string' ? skill.id : ''"
+          :color="typeof(skill) !== 'string' ? skill.color : ''"
+          :name="typeof(skill) !== 'string' ? skill.name : ''"
+        />
       </q-tooltip>
     </q-card>
   </div>
