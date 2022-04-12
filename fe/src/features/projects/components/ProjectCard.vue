@@ -55,10 +55,11 @@
               round
               size="sm"
               icon="mdi-eye"
-              @click="() => {
-                expanded = !expanded
-                toggleExpanded(expanded)
-              }
+              @click="
+                () => {
+                  expanded = !expanded
+                  toggleExpanded(expanded)
+                }
               "
             />
           </div>
@@ -74,7 +75,6 @@
               :key="index"
               :skill="skill"
               :occupied="groupedStudents[skill.skill.id]?.length"
-              
             />
           </div>
         </div>
@@ -83,7 +83,6 @@
       <q-slide-transition
         v-for="(role, index) in project.requiredSkills ?? []"
         :key="index"
-        style="margin-top: 10px; margin-bottom: -10px"
       >
         <div v-show="selectedRoles[role.skill.id]">
           <q-item-label
@@ -92,30 +91,62 @@
           >
             {{ role.skill.name }}
           </q-item-label>
-          <q-item
-            dense
+          <q-slide-transition
+            :appear="!suggestion.coach"
             v-for="suggestion in groupedStudents[role.skill.id] ?? []"
             :key="suggestion.student.id"
           >
-            <q-item-section lines="1" class="text-weight-medium">
-              {{ suggestion.student.firstName }}
-              {{ suggestion.student.lastName }}
-            </q-item-section>
-
-            <div class="text-grey-8">
-              <btn class="gt-xs" size="sm" flat dense round icon="comment" />
-              <btn class="gt-xs" size="sm" flat dense round icon="info" />
-              <btn
-                class="gt-xs"
-                size="sm"
-                flat
-                dense
-                round
-                icon="delete"
-                @click="removeSuggestion(suggestion)"
-              />
+            <div v-if="suggestion.student.email" style="margin-left: 10px">
+              <div class="column full-width">
+                <div class="row">
+                  <q-item-section :lines="1" class="text-weight-medium">
+                    {{ suggestion.student.firstName }}
+                    {{ suggestion.student.lastName }}
+                  </q-item-section>
+                  <btn
+                    class="gt-xs"
+                    size="sm"
+                    flat
+                    dense
+                    round
+                    icon="comment"
+                  />
+                  <btn class="gt-xs" size="sm" flat dense round icon="info" />
+                  <btn
+                    class="gt-xs"
+                    size="sm"
+                    flat
+                    dense
+                    round
+                    icon="delete"
+                    @click="removeSuggestion(suggestion)"
+                  />
+                </div>
+                <q-slide-transition>
+                  <q-input
+                    :color="role.skill.color"
+                    v-if="suggestion.coach === undefined"
+                    v-model="suggestion.reason"
+                    dense
+                    outlined
+                    autogrow
+                    label="Comment"
+                  >
+                    <template v-slot:after>
+                      <q-btn
+                        :color="role.skill.color"
+                        round
+                        dense
+                        flat
+                        @click="confirmSuggestion(suggestion)"
+                        :icon="loading ? 'check' : 'send'"
+                      />
+                    </template>
+                  </q-input>
+                </q-slide-transition>
+              </div>
             </div>
-          </q-item>
+          </q-slide-transition>
         </div>
       </q-slide-transition>
     </q-card-section>
@@ -155,6 +186,7 @@ export default defineComponent({
     return {
       expanded: ref(false),
       selectedRoles,
+      loading: ref(false),
     }
   },
   watch: {
@@ -180,24 +212,29 @@ export default defineComponent({
       })
     },
 
-    removeSuggestion(suggestion: ProjectSuggestion) {
-      const i = this.project.suggestedStudents!.findIndex(
-        (s) =>
-          s.student.id === suggestion.student.id &&
-          s.skill.id === suggestion.skill.id
-      )
-      this.project.suggestedStudents!.splice(i, 1)
-      this.projectStore
-        .removeSuggestion(this.project, suggestion)
-        .catch((error) => {
+    async removeSuggestion(suggestion: ProjectSuggestion) {
+      const suggest = { ...suggestion }
+      suggestion.student.email = undefined
+      
+      await setTimeout(async () => {
+        try {
+          await this.projectStore.removeSuggestion(this.project, suggest)
+          const index = this.project.suggestedStudents!.findIndex(
+            (s) =>
+              s.student.id === suggestion.student.id &&
+              s.skill.id === suggestion.skill.id
+          )
+          this.project.suggestedStudents!.splice(index, 1)
+        } catch (error) {
           this.q.notify({
             icon: 'warning',
             color: 'warning',
-            message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.skill.name}`,
+            message: `Error ${error.response.status} while removing ${suggest.student.firstName} ${suggest.student.lastName} as ${suggest.skill.name}`,
             textColor: 'black',
           })
-          this.project.suggestedStudents!.splice(i, 0, suggestion)
-        })
+          suggestion.student = suggest.student
+        }
+      }, 2000)
     },
 
     // Calculates how many places of a role are occupied.
@@ -205,12 +242,17 @@ export default defineComponent({
       const occupied = this.groupedStudents[skill.skill.id]
       return skill.amount - (occupied ? occupied.length : 0)
     },
-    
+
     checkDrag(e: MouseEvent, skill: ProjectSkillInterface) {
       const data: { targetId: string; student: Student } = JSON.parse(
         e.dataTransfer!.getData('text')
       )
-      if (this.groupedStudents?.[skill.skill.id]?.some(suggestion => suggestion.student.id === data.student.id)) return ''
+      if (
+        this.groupedStudents?.[skill.skill.id]?.some(
+          (suggestion) => suggestion.student.id === data.student.id
+        )
+      )
+        return ''
       return this.amountLeft(skill) > 0 ? this.onDragOver(e, skill) : ''
     },
 
@@ -249,30 +291,41 @@ export default defineComponent({
           icon: 'warning',
           color: 'warning',
           message: 'You are not logged in.',
-          textColor: 'black'
+          textColor: 'black',
         })
         return
       }
-      let result = await this.projectStore.addSuggestion(
-        this.project.id,
-        data.student.url,
-        skill.skill.url,
-        reason
-      )
+
       this.project.suggestedStudents?.push({
-        coach: coach,
-        reason: reason,
+        coach: undefined,
+        reason: '',
         skill: skill.skill,
         student: data.student,
       })
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
       if (!this.expanded) {
-        setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
+        // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
       }
+    },
+    async confirmSuggestion(suggestion) {
+      this.loading = true
+      await this.projectStore.addSuggestion(
+        this.project.id,
+        suggestion.student.url,
+        suggestion.skill.url,
+        suggestion.reason
+      )
+      setTimeout(() => {
+        suggestion.coach = this.me
+        this.loading = false
+      }, 800)
     },
   },
   computed: {
+    me() {
+      return this.authenticationStore.loggedInUser as User
+    },
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }
     groupedStudents(): Record<string, ProjectSuggestion[]> {
