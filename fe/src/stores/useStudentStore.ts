@@ -86,24 +86,10 @@ export const useStudentStore = defineStore('user/student', {
 
                         student.skills = skills
                     }
-                    console.log(data)
-
                     this.transformStudents(data)
 
                     this.students = data.map((student) => new Student(student))
                 })
-
-
-
-            // for (let i = 0; i < data.skills.length; i++) {
-            //     await instance
-            //         .get(data.skills[i])
-            //         .then(({data}) => {
-            //             skills.push(data)
-            //         })
-            // }
-            //
-            // data.skills = skills
 
             this.isLoading = false
         },
@@ -113,7 +99,6 @@ export const useStudentStore = defineStore('user/student', {
             await instance
                 .get(`students/${studentId}/`)
                 .then(async ({data}) => {
-                    console.log(data)
                     for (const suggestion of data.suggestions) {
                         suggestion.suggestion = parseInt(suggestion.suggestion)
                     }
