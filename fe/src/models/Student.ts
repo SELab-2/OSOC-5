@@ -1,8 +1,15 @@
 import { Skill } from './Skill'
 import { Suggestion } from './Suggestion'
 
+export interface TempStudent {
+  student: string
+  coach: string
+  skill: string
+  reason: string
+}
+
 export interface StudentInterface {
-  url: URL
+  url: string
   id: number
   firstName: string
   lastName: string
@@ -31,7 +38,7 @@ enum Language {
 }
 
 export class Student implements StudentInterface {
-  url: URL
+  url: string
   id: number
   firstName: string
   lastName: string
@@ -50,8 +57,9 @@ export class Student implements StudentInterface {
   finalDecision: Suggestion | null
   suggestions: Suggestion[]
 
+  constructor(obj: StudentInterface);
   constructor(
-    url: URL,
+    url: string,
     id: number,
     firstName: string,
     lastName: string,
@@ -69,24 +77,30 @@ export class Student implements StudentInterface {
     skills: Skill[],
     finalDecision: Suggestion | null,
     suggestions: Suggestion[]
-  ) {
-    this.url = url
-    this.id = id
-    this.firstName = firstName
-    this.lastName = lastName
-    this.callName = callName
-    this.email = email
-    this.phoneNumber = phoneNumber
-    this.language = language
-    this.extraInfo = extraInfo
-    this.cv = cv
-    this.portfolio = portfolio
-    this.lastEmailSent = lastEmailSent
-    this.schoolName = schoolName
-    this.degree = degree
-    this.studies = studies
-    this.skills = skills
-    this.finalDecision = finalDecision
-    this.suggestions = suggestions
+  );
+
+  constructor (...args: any[]) {
+    if (args.length == 1) {
+      Object.assign(this, args[0])
+    } else {
+      this.url = args[0]
+      this.id = args[1]
+      this.firstName = args[2]
+      this.lastName = args[3]
+      this.callName = args[4]
+      this.email = args[5]
+      this.phoneNumber = args[6]
+      this.language = args[7]
+      this.extraInfo = args[8]
+      this.cv = args[9]
+      this.portfolio = args[10]
+      this.lastEmailSent = args[11]
+      this.schoolName = args[12]
+      this.degree = args[13]
+      this.studies = args[14]
+      this.skills = args[15]
+      this.finalDecision = args[16]
+      this.suggestions = args[17]
+    }
   }
 }

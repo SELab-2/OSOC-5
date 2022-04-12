@@ -46,7 +46,7 @@
       type="submit"
       size="md"
       class="q-mx-md cornered"
-      glow-color="#00FFB5"
+      glow-color="#00F1AF"
     />
     <!--     <br/> -->
     <label class="text-bold">or</label>
@@ -76,7 +76,7 @@ export default defineComponent({
   components: { GitHubSignInButton },
   setup() {
     const authenticationStore = useAuthenticationStore()
-    const $q = useQuasar()
+    const q = useQuasar()
     const email = ref('')
     const password = ref('')
     useMeta(metaData)
@@ -89,13 +89,13 @@ export default defineComponent({
           .then(() => {
             router.push('/students') 
             
-            $q.notify({
+            q.notify({
               icon: 'done',
               color: 'positive',
               message: 'Submitted',
             })
           }).catch(() => {
-            $q.notify({
+            q.notify({
               icon: 'close',
               color: 'negative',
               message: 'Could not log in',

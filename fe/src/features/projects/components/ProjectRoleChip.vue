@@ -7,19 +7,23 @@
     outline
     :color="`${role.color}-${enabled ? 8 : 4}`"
     :class="`bg-${role.color}-${enabled ? 4 : 1}`"
-    :style="`border-width: 1.5px; padding-right: 8px; padding-left: ${role.description ? 2 : 8}px`"
+    :style="`border-width: 1.5px; padding-right: 8px; padding-left: ${
+      comment ? 2 : 8
+    }px`"
   >
     <template v-slot:default>
       <div class="row" style="display: flex; align-items: center">
         <q-icon
-          v-if="role.description"
+          v-if="comment"
           name="info"
           size="sm"
           :color="`${role.color}-${enabled ? 2 : 6}`"
         />
         <div
           class="text-weight-medium"
-          :style="`color: ${enabled ? 'white' : 'black'}; padding-left: ${role.description ? 3 : 0}px`"
+          :style="`color: ${enabled ? 'white' : 'black'}; padding-left: ${
+            comment ? 3 : 0
+          }px`"
         >
           {{ role.name }}
         </div>
@@ -31,33 +35,52 @@
           {{ placesLeft }}
         </div>
         <q-tooltip
-          v-if="role.description"
+          v-if="comment"
           :class="`bg-${role.color}-2`"
           class="text-black shadow-2"
           anchor="bottom middle"
           self="center middle"
-          >{{ role.description }}</q-tooltip
+          >{{ comment }}</q-tooltip
         >
       </div>
     </template>
   </q-chip>
 </template>
 
-<script>
-import { ref } from 'vue'
-
-export default {
-  props: ['role', 'placesLeft', 'modelValue'],
-  emits: ['update:modelValue'],
+<script lang="ts">
+import { ref, defineComponent } from 'vue'
+import { Skill } from '../../../models/Skill'
+export default defineComponent({
+  props: {
+    role: {
+      type: Skill,
+      required: true,
+    },
+    placesLeft: {
+      type: Number,
+      required: true,
+    },
+    comment: {
+      type: String,
+      required: false,
+    },
+    modelValue: {
+      type: Boolean,
+      required: false,
+    },
+  },
+  emits: {
+    'update:modelValue': Boolean,
+  },
   computed: {
     enabled: {
       get() {
         return this.modelValue
       },
-      set(value) {
+      set(value: boolean) {
         this.$emit('update:modelValue', value)
       },
     },
   },
-}
+})
 </script>

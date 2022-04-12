@@ -9,9 +9,10 @@ export interface UserInterface {
   email: string
   isAdmin: boolean
   role: string
-  lastEmailSent: Date
-  hasProjects: Array<Project>
-  suggestions: Array<Suggestion>
+  lastEmailSent?: Date
+  hasProjects?: Array<Project>
+  suggestions?: Array<Suggestion>
+  isActive: Boolean
 }
 
 export class User implements UserInterface {
@@ -21,32 +22,25 @@ export class User implements UserInterface {
   lastName: string
   email: string
   isAdmin: boolean
-  role: string
-  lastEmailSent: Date
-  hasProjects: Project[]
-  suggestions: Suggestion[]
-
-  constructor(
-    id: number,
-    url: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    isAdmin: boolean,
-    role: string,
-    lastEmailSent: Date,
-    hasProjects: Project[],
-    suggestions: Suggestion[]
-  ) {
-    this.id = id
-    this.url = url
-    this.firstName = firstName
-    this.lastName = lastName
-    this.email = email
-    this.isAdmin = isAdmin
-    this.role = role
-    this.lastEmailSent = lastEmailSent
-    this.hasProjects = hasProjects
-    this.suggestions = suggestions
+  lastEmailSent?: Date
+  hasProjects?: Project[]
+  suggestions?: Suggestion[]
+  isActive: Boolean
+  
+  constructor(data: UserInterface) {
+    Object.assign(this, data)
+  }
+  
+  get fullName(): string {
+      return this.firstName + " " + this.lastName;
+  }
+  
+  get role(): string {
+    return this.isActive ? (this.isAdmin ? 'admin' : 'coach') : 'inactive'
+  }
+  
+  set role(newRole: string) {
+    this.isAdmin = newRole === 'admin'
+    this.isActive = newRole !== "inactive"
   }
 }

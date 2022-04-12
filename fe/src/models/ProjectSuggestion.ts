@@ -8,3 +8,10 @@ export interface ProjectSuggestion {
   skill: Skill
   reason: string
 }
+
+export interface TempProjectSuggestion {
+  student: string
+  coach: string
+  skill: string
+  reason: string
+}

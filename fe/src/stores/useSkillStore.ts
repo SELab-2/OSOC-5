@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
-import { ProjectSkill, ProjectTableSkill, Skill } from '../models/Skill'
+import { TempProjectSkill, ProjectTableSkill, Skill } from '../models/Skill'
 
 interface State {
   skills: Array<ProjectTableSkill>
@@ -45,6 +45,7 @@ export const useSkillStore = defineStore('skills', {
         })
     },
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async addSkill(newSkillName: string, color: string, callback: any) {
       // start the loading animation
       this.isLoadingSkills = true
@@ -52,11 +53,10 @@ export const useSkillStore = defineStore('skills', {
       // Process the new skill
       console.log(`Adding new skill: ${newSkillName}.`)
 
-
       instance
         .post('skills/', {
-          'name': newSkillName,
-          'color': color,
+          name: newSkillName,
+          color: color,
         })
         .then((response) => {
           console.log(response['data'])
@@ -104,9 +104,10 @@ export const useSkillStore = defineStore('skills', {
       projectURL: string,
       partnerName: string,
       coaches: Array<string>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: any
     ) {
-      const skillsList: Array<ProjectSkill> = []
+      const skillsList: Array<TempProjectSkill> = []
 
       // filter out the used skills
       for (const skill of this.skills) {

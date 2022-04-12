@@ -37,7 +37,7 @@ export default defineComponent({
       default: "500px"
     },
     'glowScale': {
-      type: Number,
+      type: [Number,String],
       default: 1
     },
     'color': String,
@@ -46,7 +46,7 @@ export default defineComponent({
       default: 'transparent'
     },
     'shadowStrength': {
-      type: Number,
+      type: [Number,String],
       default: 1
     },
     'disableClick': Boolean,

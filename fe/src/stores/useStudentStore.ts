@@ -1,12 +1,17 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
-import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { User } from '../models/User'
 import { Student } from '../models/Student'
 import { Skill } from '../models/Skill'
 import { useCoachStore } from './useCoachStore'
 
 interface State {
+  search: string
+  alumni: string
+  decision: string
+  byMe: boolean
+  onProject: boolean
+  skills: Array<Skill>
   coaches: Map<string, User>
   students: Array<Student>
   isLoading: boolean
@@ -24,6 +29,12 @@ const socket = new WebSocket(
 
 export const useStudentStore = defineStore('user/student', {
   state: (): State => ({
+    search: '',
+    alumni: 'all',
+    decision: 'none',
+    byMe: false,
+    onProject: false,
+    skills: [],
     coaches: new Map(),
     students: [],
     isLoading: false,
@@ -31,23 +42,42 @@ export const useStudentStore = defineStore('user/student', {
     currentStudent: null,
   }),
   actions: {
-    async loadStudents(): Promise<void> {
-      this.isLoading = true
-
-      await instance.get('students/').then(({ data }) => {
-        for (const student of data) {
-          if (student.final_decision) {
-            student.final_decision.suggestion = parseInt(
-              student.final_decision.suggestion
-            )
-          }
-
-          for (const suggestion of student.suggestions) {
-            suggestion.suggestion = parseInt(suggestion.suggestion)
-          }
+    transformStudents(data: Student[]): void {
+      for (const student of data) {
+        if (student.finalDecision) {
+          student.finalDecision.suggestion = parseInt(
+            student.finalDecision.suggestion as unknown as string
+          )
         }
 
-        this.students = convertObjectKeysToCamelCase(data) as never as Student[]
+        for (const suggestion of student.suggestions) {
+          suggestion.suggestion = parseInt(
+            suggestion.suggestion as unknown as string
+          )
+        }
+      }
+    },
+    async loadStudents() {
+      this.isLoading = true
+      const filters = []
+
+      if (this.search) filters.push(`search=${this.search}`)
+      if (this.alumni === 'alumni') filters.push('alumni=true')
+      if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
+      if (this.byMe === true) filters.push('suggested_by_user')
+      if (this.onProject === true) filters.push('on_project')
+
+      for (const skill of this.skills) {
+        filters.push(`skills=${skill.id}`)
+      }
+
+      let url = ''
+      if (filters) url = `?${filters.join('&')}`
+
+      await instance.get<Student[]>(`students/${url}`).then(({ data }) => {
+        this.transformStudents(data)
+
+        this.students = data.map((student) => new Student(student))
       })
 
       this.isLoading = false
@@ -60,9 +90,9 @@ export const useStudentStore = defineStore('user/student', {
           suggestion.suggestion = parseInt(suggestion.suggestion)
         }
 
-        if (data.final_decision) {
-          data.final_decision.suggestion = parseInt(
-            data.final_decision.suggestion
+        if (data.finalDecision) {
+          data.finalDecision.suggestion = parseInt(
+            data.finalDecision.suggestion
           )
         }
 
@@ -74,18 +104,16 @@ export const useStudentStore = defineStore('user/student', {
           })
         }
 
-        data.skillList = skills
-        this.currentStudent = convertObjectKeysToCamelCase(
-          data
-        ) as never as Student
+        data.skills = skills
+        this.currentStudent = new Student(data as Student)
       })
 
       this.isLoading = false
     },
     async updateSuggestion(
       studentId: number,
-      coachId: number,
-      suggestion: number,
+      coachId: string,
+      suggestion: string,
       reason: string
     ) {
       // check if -1 is selected to delete suggestion
@@ -111,18 +139,19 @@ export const useStudentStore = defineStore('user/student', {
     },
     async updateFinalDecision(
       studentId: number,
-      possibleFinalDecision: number
+      possibleFinalDecision: string
     ) {
       let reason = ''
 
       if (
-        this.currentStudent?.finalDecision?.suggestion == possibleFinalDecision
+        this.currentStudent?.finalDecision?.suggestion.toString() ==
+        possibleFinalDecision
       ) {
         reason = this.currentStudent.finalDecision.reason
       }
 
       // check if -1 is selected to delete decision
-      if (possibleFinalDecision == -1) {
+      if (possibleFinalDecision == '-1') {
         await instance.delete(`students/${studentId}/remove_final_decision/`)
       } else {
         await instance.post(`students/${studentId}/make_final_decision/`, {

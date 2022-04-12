@@ -6,7 +6,7 @@
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <div v-if="this.studentStore.isLoading">
+      <div v-if="studentStore.isLoading">
         <LoadingSpinner />
       </div>
 
@@ -24,8 +24,9 @@
 <script lang="ts">
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import {defineComponent} from "@vue/runtime-core";
 
-export default {
+export default defineComponent( {
   components: {LoadingSpinner},
   props: {
     title: {
@@ -40,5 +41,5 @@ export default {
       studentStore,
     }
   },
-}
+})
 </script>
