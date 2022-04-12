@@ -71,7 +71,7 @@ export const useStudentStore = defineStore('user/student', {
                         const skills = [] as Skill[]
 
                         for (let i = 0; i < student.skills.length; i++) {
-                            if (this.skillsStudents.get(student.skills[i].toString()) !== undefined) {
+                            if (this.skillsStudents.get(student.skills[i].toString())) {
                                 const skill = this.skillsStudents.get(student.skills[i].toString()) as Skill
                                 skills.push(skill)
                             } else {
