@@ -8,20 +8,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@babel/types": "^7.17.0",
     "@quasar/extras": "^1.13.5",
+    "@quasar/vite-plugin": "^1.0.5",
+    "@types/node": "^17.0.23",
+    "@vitejs/plugin-vue": "^2.2.0",
     "@yeger/vue-masonry-wall": "^3.0.26",
     "axios": "^0.26.1",
     "pinia": "^2.0.13",
     "pinia-plugin-persistedstate": "^1.5.1",
     "quasar": "^2.6.5",
+    "vite": "^2.8.6",
     "vue": "^3.2.25",
     "vue-meta": "^2.4.0",
     "vue-router": "^4.0.14",
-    "@babel/types": "^7.17.0",
-    "@types/node": "^17.0.23",
-    "@vitejs/plugin-vue": "^2.2.0",
-    "@quasar/vite-plugin": "^1.0.5",
-    "vite": "^2.8.6",
     "vue-tsc": "^0.33.9"
   },
   "devDependencies": {

@@ -65,10 +65,9 @@
           />
         </div>
       </q-card-section>
-      <q-tooltip anchor="top middle" :delay="500" :offset="[0, 10]">
+      <q-tooltip v-if="mustHover" max-width="300px" anchor="top middle" :delay="500" :offset="[0, 10]">
         <div
-          class="full-width"
-          style="max-height: 15vh; overflow-y: auto"
+          style="overflow-y: auto"
         >
           <StudentSkillChip
             v-for="skill of student.skills"
@@ -89,7 +88,6 @@ import {useAuthenticationStore} from "../stores/useAuthenticationStore";
 import { Suggestion } from "../models/Suggestion";
 import {Student} from "../models/Student";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
-import SegmentedControl from "./SegmentedControl.vue";
 
 export default defineComponent({
   components: {
@@ -104,6 +102,10 @@ export default defineComponent({
       type: Boolean,
       required: true
     },
+    mustHover: {
+      type: Boolean,
+      required: true
+    }
   },
   setup() {
     const authenticationStore = useAuthenticationStore()

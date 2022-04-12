@@ -202,7 +202,7 @@
       "email": "jan.pieter@example.com",
       "phone_number": "",
       "language": "0",
-      "motivation": "",
+      "motivation": "Test.",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
       "school_name": "UGent",
