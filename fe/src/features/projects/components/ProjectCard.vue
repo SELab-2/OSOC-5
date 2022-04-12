@@ -69,7 +69,7 @@
               v-model="selectedRoles[skill.skill.id]"
               v-for="(skill, index) in project.requiredSkills"
               @dragleave="onDragLeave($event, skill)"
-              @dragover="amountLeft(skill) > 0 ? onDragOver($event, skill) : ''"
+              @dragover="checkDrag($event, skill)"
               @drop="onDrop($event, skill)"
               :key="index"
               :skill="skill"
@@ -205,6 +205,14 @@ export default defineComponent({
       const occupied = this.groupedStudents[skill.skill.id]
       return skill.amount - (occupied ? occupied.length : 0)
     },
+    
+    checkDrag(e: MouseEvent, skill: ProjectSkillInterface) {
+      const data: { targetId: string; student: Student } = JSON.parse(
+        e.dataTransfer!.getData('text')
+      )
+      if (this.groupedStudents?.[skill.skill.id]?.some(suggestion => suggestion.student.id === data.student.id)) return ''
+      return this.amountLeft(skill) > 0 ? this.onDragOver(e, skill) : ''
+    },
 
     // Show the students assigned to a role when dragging over the chip of that role.
     onDragOver(e: MouseEvent, skill: ProjectSkillInterface) {
@@ -215,7 +223,6 @@ export default defineComponent({
 
     // Hide the students assigned to a role when dragging away from the chip of that role.
     onDragLeave(e: MouseEvent, skill: ProjectSkillInterface) {
-      ;(<HTMLDivElement>e.target).classList.remove('drag-enter')
       if (!this.expanded) {
         this.selectedRoles[skill.skill.id] = false
       }
@@ -235,7 +242,6 @@ export default defineComponent({
       )
 
       // Add a student to the project.
-      ;(<HTMLDivElement>e.target).classList.remove('drag-enter')
       const reason = 'mimimi'
       let coach = this.authenticationStore.loggedInUser as User
       if (!coach) {
