@@ -65,6 +65,19 @@
           />
         </div>
       </q-card-section>
+      <q-tooltip anchor="top middle" :delay="500" :offset="[0, 10]">
+        <div
+          class="full-width"
+          style="max-height: 15vh; overflow-y: auto"
+        >
+          <StudentSkillChip
+            v-for="skill of student.skills"
+            :key="skill.id"
+            :color="skill.color"
+            :name="skill.name"
+          />
+        </div>
+      </q-tooltip>
     </q-card>
   </div>
 </template>
@@ -75,8 +88,13 @@ import {useStudentStore} from "../stores/useStudentStore";
 import {useAuthenticationStore} from "../stores/useAuthenticationStore";
 import { Suggestion } from "../models/Suggestion";
 import {Student} from "../models/Student";
+import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
+import SegmentedControl from "./SegmentedControl.vue";
 
 export default defineComponent({
+  components: {
+    StudentSkillChip,
+  },
   props: {
     student: {
       type: Student,
@@ -85,7 +103,7 @@ export default defineComponent({
     active: {
       type: Boolean,
       required: true
-    }
+    },
   },
   setup() {
     const authenticationStore = useAuthenticationStore()

@@ -24,7 +24,7 @@ export interface StudentInterface {
   schoolName: string
   degree: string
   studies: string
-  skills: Array<Skill>
+  skills: Array<Skill> | Array<string>
   finalDecision: Suggestion | null
   suggestions: Array<Suggestion>
   alum: boolean
@@ -54,7 +54,7 @@ export class Student implements StudentInterface {
   schoolName: string
   degree: string
   studies: string
-  skills: Skill[]
+  skills: Skill[] | string[]
   finalDecision: Suggestion | null
   suggestions: Suggestion[]
   alum: boolean

@@ -2,6 +2,7 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { User, UserInterface } from '../models/User'
+import {instance} from "../utils/axios";
 
 const baseURL =
   process.env.NODE_ENV == 'development'
@@ -35,10 +36,8 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       localStorage.setItem('refreshToken', data.refresh_token)
       localStorage.setItem('accessToken', data.access_token)
 
-      this.loggedInUser = convertObjectKeysToCamelCase(data).user as User
-
-      localStorage.setItem('refreshToken', data.refresh_token)
-      localStorage.setItem('accessToken', data.access_token)
+      const result = await instance.get<User>('coaches/' + data.user.pk)
+      this.loggedInUser = result.data
     },
     logout(): void {
       this.$reset()
