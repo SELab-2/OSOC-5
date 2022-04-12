@@ -11,7 +11,6 @@
     "@quasar/extras": "^1.13.5",
     "@yeger/vue-masonry-wall": "^3.0.26",
     "axios": "^0.26.1",
-    "esbuild-darwin-arm64": "^0.14.34",
     "pinia": "^2.0.13",
     "pinia-plugin-persistedstate": "^1.5.1",
     "quasar": "^2.6.5",
