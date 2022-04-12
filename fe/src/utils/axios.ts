@@ -33,9 +33,9 @@ instance.interceptors.response.use(
         originalConfig._retry = true
         try {
           const rs = await refreshToken(instance)
-          const { accessToken } = rs.data
-          localStorage.setItem('accessToken', accessToken)
-          instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+          const { access } = rs.data
+          localStorage.setItem('accessToken', access)
+          instance.defaults.headers.common.Authorization = `Bearer ${access}`
           return instance(originalConfig)
         } catch (_error: any) {
           if (_error.response && _error.response.data) {
@@ -54,6 +54,6 @@ instance.interceptors.response.use(
 
 function refreshToken(instance: AxiosInstance) {
   return instance.post('/auth/token/refresh/', {
-    refreshToken: localStorage.getItem('refreshToken'),
+    refresh: localStorage.getItem('refreshToken'),
   })
 }
