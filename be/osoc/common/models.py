@@ -148,13 +148,6 @@ class Student(models.Model):
     """
     Student; Person who would like to participate in an OSOC project.
     """
-    class Language(models.TextChoices):
-        DUTCH = '0', _('Dutch')
-        ENGLISH = '1', _('English')
-        FRENCH = '2', _('French')
-        GERMAN = '3', _('German')
-        OTHER = '4', _('Other')
-
     class Gender(models.TextChoices):
         FEMALE = '0', _('FEMALE')
         MALE = '1', _('MALE')
@@ -164,7 +157,6 @@ class Student(models.Model):
     employment_agreement = models.CharField(
         _('employment agreement'),
         max_length=255,
-        default=""
     )
     hinder_work = models.TextField(
         _('hinder work'),
@@ -211,36 +203,25 @@ class Student(models.Model):
     )
     language = models.CharField(
         _('language'),
-        max_length=1,
-        choices=Language.choices,
-        default=Language.DUTCH,
+        max_length=255
     )
     english_rating = models.PositiveSmallIntegerField(
         _("english rating"),
         validators=[MaxValueValidator(5), MinValueValidator(1)],
-        default=1
     )
-    extra_info = models.TextField(
-        _('extra info'),
-        blank=True,
-        null=True
+    motivation = models.TextField(
+        _('motivation')
     )
     cv = models.URLField(
         _('cv'),
-        max_length=200
+        max_length=255
     )
     portfolio = models.URLField(
         _('portfolio'),
-        max_length=200
+        max_length=255
     )
     fun_fact = models.TextField(
         _('fun fact'),
-        default=""
-    )
-    last_email_sent = models.DateTimeField(
-        _('last email sent'),
-        null=True,
-        blank=True
     )
     school_name = models.CharField(
         _("school name"),
@@ -253,35 +234,29 @@ class Student(models.Model):
     degree_duration = models.PositiveSmallIntegerField(
         _("degree duration"),
         validators=[MinValueValidator(1)],
-        default=1
     )
     degree_current_year = models.PositiveSmallIntegerField(
         _("degree current year"),
         validators=[MinValueValidator(1)],
-        default=1
     )
     studies = models.CharField(
         _("studies"),
         max_length=255
-    )
-    skills = models.ManyToManyField(
-        Skill,
-    )
-    suggestions = models.ManyToManyField(
-        Coach,
-        through='Suggestion',
-        blank=True
     )
     alum = models.BooleanField(
         _("alum"),
         default=False
     )
     student_coach = models.BooleanField(
-        _("alum"),
+        _("wants to be student coach"),
         default=False
     )
     skills = models.ManyToManyField(
         Skill,
+    )
+    best_skill = models.CharField(
+        _("best skill"),
+        max_length=255
     )
     suggestions = models.ManyToManyField(
         Coach,
