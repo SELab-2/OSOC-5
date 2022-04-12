@@ -36,8 +36,8 @@ export const useStudentStore = defineStore('user/student', {
     actions: {
         transformStudents(data: any): void {
             for (const student of data) {
-                if (student.final_decision) {
-                    student.final_decision.suggestion = parseInt(student.final_decision.suggestion)
+                if (student.finalDecision) {
+                    student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
                 }
 
                 for (const suggestion of student.suggestions) {
@@ -59,16 +59,15 @@ export const useStudentStore = defineStore('user/student', {
                 filters.push(`skills=${skill.id}`)
             }
 
-            console.log(filters)
             let url = ""
             if (filters) url = `?${filters.join('&')}`
 
             await instance
-                .get(`students/${url}`)
+                .get<Student[]>(`students/${url}`)
                 .then(({data}) => {
                     this.transformStudents(data)
 
-                    this.students = (convertObjectKeysToCamelCase(data) as unknown as Student[]).map((student) => new Student(student))
+                    this.students = data.map((student) => new Student(student))
                 })
 
             this.isLoading = false
@@ -83,8 +82,8 @@ export const useStudentStore = defineStore('user/student', {
                         suggestion.suggestion = parseInt(suggestion.suggestion)
                     }
 
-                    if (data.final_decision) {
-                        data.final_decision.suggestion = parseInt(data.final_decision.suggestion)
+                    if (data.finalDecision) {
+                        data.finalDecision.suggestion = parseInt(data.finalDecision.suggestion)
                     }
 
                     const skills = [] as Skill[]
@@ -98,7 +97,7 @@ export const useStudentStore = defineStore('user/student', {
                     }
 
                     data.skills = skills
-                    this.currentStudent = new Student(convertObjectKeysToCamelCase(data) as unknown as Student)
+                    this.currentStudent = new Student(data as Student)
                 })
 
             this.isLoading = false

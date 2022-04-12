@@ -1,8 +1,15 @@
 import { Skill } from './Skill'
 import { Suggestion } from './Suggestion'
 
+export interface TempStudent {
+  student: string
+  coach: string
+  skill: string
+  reason: string
+}
+
 export interface StudentInterface {
-  url: URL
+  url: string
   id: number
   firstName: string
   lastName: string
@@ -31,7 +38,7 @@ enum Language {
 }
 
 export class Student implements StudentInterface {
-  url: URL
+  url: string
   id: number
   firstName: string
   lastName: string
@@ -52,7 +59,7 @@ export class Student implements StudentInterface {
 
   constructor(obj: StudentInterface);
   constructor(
-    url: URL,
+    url: string,
     id: number,
     firstName: string,
     lastName: string,
