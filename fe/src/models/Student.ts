@@ -27,6 +27,7 @@ export interface StudentInterface {
   skills: Array<Skill>
   finalDecision: Suggestion | null
   suggestions: Array<Suggestion>
+  alum: boolean
 }
 
 enum Language {
@@ -56,6 +57,7 @@ export class Student implements StudentInterface {
   skills: Skill[]
   finalDecision: Suggestion | null
   suggestions: Suggestion[]
+  alum: boolean
 
   constructor(obj: StudentInterface);
   constructor(
@@ -76,7 +78,8 @@ export class Student implements StudentInterface {
     studies: string,
     skills: Skill[],
     finalDecision: Suggestion | null,
-    suggestions: Suggestion[]
+    suggestions: Suggestion[],
+    alum: boolean
   );
 
   constructor (...args: any[]) {
@@ -101,6 +104,7 @@ export class Student implements StudentInterface {
       this.skills = args[15]
       this.finalDecision = args[16]
       this.suggestions = args[17]
+      this.alum = args[18]
     }
   }
 }

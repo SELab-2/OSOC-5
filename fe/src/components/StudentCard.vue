@@ -34,7 +34,7 @@
               name="mdi-close"
               color="red"
             />
-            <q-chip size="8px">
+            <q-chip v-if="student.alum" size="8px">
               Alumni
             </q-chip>
           </div>

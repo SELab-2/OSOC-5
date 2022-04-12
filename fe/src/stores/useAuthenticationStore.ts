@@ -30,6 +30,8 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         email,
         password,
       })
+      console.log(data)
+
       localStorage.setItem('refreshToken', data.refresh_token)
       localStorage.setItem('accessToken', data.access_token)
 

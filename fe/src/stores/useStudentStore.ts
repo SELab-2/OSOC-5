@@ -78,6 +78,7 @@ export const useStudentStore = defineStore('user/student', {
             await instance
                 .get(`students/${studentId}/`)
                 .then(async ({data}) => {
+                    console.log(data)
                     for (const suggestion of data.suggestions) {
                         suggestion.suggestion = parseInt(suggestion.suggestion)
                     }
