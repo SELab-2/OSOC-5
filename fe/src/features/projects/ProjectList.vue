@@ -75,7 +75,7 @@ export default defineComponent({
     // Prevent a reload each time switched to the tab.
     if (this.projectStore.projects.length === 0)
       this.projectStore.loadProjects()
-  },
+  }
 })
 </script>
 

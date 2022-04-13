@@ -204,12 +204,10 @@ export default defineComponent({
     },
 
     checkDrag(e: MouseEvent, skill: ProjectSkillInterface) {
-      const data: { targetId: string; student: Student } = JSON.parse(
-        e.dataTransfer!.getData('text')
-      )
+      const id: number = parseInt(e.dataTransfer!.types[0])
       if (
         this.groupedStudents?.[skill.skill.id]?.some(
-          (suggestion) => suggestion.student.id === data.student.id
+          (suggestion) => suggestion.student.id === id
         )
       )
         return ''
@@ -240,7 +238,7 @@ export default defineComponent({
       }
       // TODO: additional checks that datatransfer is valid and not null
       const data: { targetId: string; student: Student } = JSON.parse(
-        e.dataTransfer!.getData('text')
+        e.dataTransfer!.getData(e.dataTransfer!.types[0])
       )
 
       // Add a student to the project.
@@ -277,7 +275,8 @@ export default defineComponent({
         suggestion.skill.url,
         suggestion.reason
       )
-    },
+    }
+    
   },
   computed: {
     me() {
