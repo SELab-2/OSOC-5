@@ -7,7 +7,7 @@
         style="height: 8%; overflow: visible; z-index: 1"
         :class="`text-blue bg-white ${showShadow ? 'shadow-2' : ''}`"
       >
-        <div class="text-bold text-h4 q-ml-md">Projects</div>
+        <div class="text-bold text-h4 q-ml-md text-black">Projects</div>
         <q-space />
         <div>
           <q-input dense v-model="filter" outlined label="Outlined" />

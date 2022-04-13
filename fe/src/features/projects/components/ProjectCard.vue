@@ -91,62 +91,20 @@
           >
             {{ role.skill.name }}
           </q-item-label>
-          <q-slide-transition
+          <project-card-suggestion
+            :confirmSuggestion="confirmSuggestion"
+            :removeSuggestion="removeSuggestion"
+            :suggestion="suggestion"
+            v-for="suggestion in groupedStudents[role.skill.id] ?? []"
+            :key="suggestion.student.id"
+          />
+          <!-- <q-slide-transition
             :appear="!suggestion.coach"
             v-for="suggestion in groupedStudents[role.skill.id] ?? []"
             :key="suggestion.student.id"
           >
-            <div v-if="suggestion.student.email" style="margin-left: 10px">
-              <div class="column full-width">
-                <div class="row">
-                  <q-item-section :lines="1" class="text-weight-medium">
-                    {{ suggestion.student.firstName }}
-                    {{ suggestion.student.lastName }}
-                  </q-item-section>
-                  <btn
-                    class="gt-xs"
-                    size="sm"
-                    flat
-                    dense
-                    round
-                    icon="comment"
-                  />
-                  <btn class="gt-xs" size="sm" flat dense round icon="info" />
-                  <btn
-                    class="gt-xs"
-                    size="sm"
-                    flat
-                    dense
-                    round
-                    icon="delete"
-                    @click="removeSuggestion(suggestion)"
-                  />
-                </div>
-                <q-slide-transition>
-                  <q-input
-                    :color="role.skill.color"
-                    v-if="suggestion.coach === undefined"
-                    v-model="suggestion.reason"
-                    dense
-                    outlined
-                    autogrow
-                    label="Comment"
-                  >
-                    <template v-slot:after>
-                      <q-btn
-                        :color="role.skill.color"
-                        round
-                        dense
-                        flat
-                        @click="confirmSuggestion(suggestion)"
-                        :icon="loading ? 'check' : 'send'"
-                      />
-                    </template>
-                  </q-input>
-                </q-slide-transition>
-              </div>
-            </div>
-          </q-slide-transition>
+            
+          </q-slide-transition> -->
         </div>
       </q-slide-transition>
     </q-card-section>
@@ -158,12 +116,17 @@ import ProjectRoleChip from './ProjectRoleChip.vue'
 import { useProjectStore } from '../../../stores/useProjectStore'
 import { reactive, ref, Ref, nextTick, defineComponent } from 'vue'
 import { useQuasar } from 'quasar'
-import { ProjectSuggestion } from '../../../models/ProjectSuggestion'
+import {
+  ProjectSuggestionInterface,
+  ProjectSuggestion,
+} from '../../../models/ProjectSuggestion'
 import { ProjectSkillInterface, Skill } from '../../../models/Skill'
 import { Project } from '../../../models/Project'
 import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
+import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
+import { Suggestion } from '../../../models/Suggestion'
 var test = 0
 export default defineComponent({
   props: {
@@ -172,7 +135,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { ProjectRoleChip },
+  components: { ProjectRoleChip, ProjectCardSuggestion },
   setup() {
     return {
       authenticationStore: useAuthenticationStore(),
@@ -212,29 +175,26 @@ export default defineComponent({
       })
     },
 
-    async removeSuggestion(suggestion: ProjectSuggestion) {
-      const suggest = { ...suggestion }
-      suggestion.student.email = undefined
-      
-      await setTimeout(async () => {
-        try {
-          await this.projectStore.removeSuggestion(this.project, suggest)
-          const index = this.project.suggestedStudents!.findIndex(
-            (s) =>
-              s.student.id === suggestion.student.id &&
-              s.skill.id === suggestion.skill.id
-          )
-          this.project.suggestedStudents!.splice(index, 1)
-        } catch (error) {
-          this.q.notify({
-            icon: 'warning',
-            color: 'warning',
-            message: `Error ${error.response.status} while removing ${suggest.student.firstName} ${suggest.student.lastName} as ${suggest.skill.name}`,
-            textColor: 'black',
-          })
-          suggestion.student = suggest.student
+    async removeSuggestion(suggestion: ProjectSuggestionInterface) {
+      try {
+        // If the suggestion has not yet been posted to the server, don't make the POST call.
+        if (suggestion.reason !== undefined) {
+          await this.projectStore.removeSuggestion(this.project, suggestion)
         }
-      }, 2000)
+        const index = this.project.suggestedStudents!.findIndex(
+          (s) =>
+            s.student.id === suggestion.student.id &&
+            s.skill.id === suggestion.skill.id
+        )
+        this.project.suggestedStudents!.splice(index, 1)
+      } catch (error) {
+        this.q.notify({
+          icon: 'warning',
+          color: 'warning',
+          message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.skill.name}`,
+          textColor: 'black',
+        })
+      }
     },
 
     // Calculates how many places of a role are occupied.
@@ -295,20 +255,21 @@ export default defineComponent({
         })
         return
       }
-
-      this.project.suggestedStudents?.push({
-        coach: undefined,
-        reason: '',
-        skill: skill.skill,
-        student: data.student,
-      })
+      this.project.suggestedStudents?.push(
+        new ProjectSuggestion({
+          coach: this.me,
+          reason: undefined,
+          skill: skill.skill,
+          student: data.student,
+        })
+      )
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
       if (!this.expanded) {
         // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
       }
     },
-    async confirmSuggestion(suggestion) {
+    async confirmSuggestion(suggestion: ProjectSuggestion) {
       this.loading = true
       await this.projectStore.addSuggestion(
         this.project.id,
@@ -316,10 +277,6 @@ export default defineComponent({
         suggestion.skill.url,
         suggestion.reason
       )
-      setTimeout(() => {
-        suggestion.coach = this.me
-        this.loading = false
-      }, 800)
     },
   },
   computed: {
@@ -328,7 +285,7 @@ export default defineComponent({
     },
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }
-    groupedStudents(): Record<string, ProjectSuggestion[]> {
+    groupedStudents(): Record<string, ProjectSuggestionInterface[]> {
       if (!this.project.suggestedStudents) return {}
       return this.project.suggestedStudents.reduce((obj: any, student) => {
         if (!obj[student.skill.id]) {

@@ -3,7 +3,7 @@ import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
 import { Skill, ProjectSkillInterface, ProjectSkill, TempProjectSkill } from '../models/Skill'
-import { ProjectSuggestion } from '../models/ProjectSuggestion'
+import { ProjectSuggestionInterface } from '../models/ProjectSuggestionInterface'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 
@@ -20,10 +20,10 @@ export const useProjectStore = defineStore('project', {
   actions: {
     async fetchSuggestedStudents(
       students: TempStudent[]
-    ): Promise<ProjectSuggestion[]> {
-      const newStudents: ProjectSuggestion[] = []
+    ): Promise<ProjectSuggestionInterface[]> {
+      const newStudents: ProjectSuggestionInterface[] = []
       for (const student of students) {
-        const newStudent: ProjectSuggestion = {
+        const newStudent: ProjectSuggestionInterface = {
           student: (await instance.get(student.student)).data as Student,
           coach: (await instance.get(student.coach)).data as User,
           skill: (await instance.get(student.skill)).data as Skill,
@@ -33,7 +33,7 @@ export const useProjectStore = defineStore('project', {
       }
       return newStudents
     },
-    async removeSuggestion(project: Project, suggestion: ProjectSuggestion) {
+    async removeSuggestion(project: Project, suggestion: ProjectSuggestionInterface) {
       return instance.post(`projects/${project.id}/remove_student/`, {
         student: suggestion.student.url,
         skill: suggestion.skill.url,
@@ -64,7 +64,7 @@ export const useProjectStore = defineStore('project', {
         project.requiredSkills.map((skill) => this.getSkill(skill))
       )
 
-      const students: Array<ProjectSuggestion> =
+      const students: Array<ProjectSuggestionInterface> =
         await this.fetchSuggestedStudents(project.suggestedStudents)
 
       // Is added to projects here because we do not want to await on each project.
@@ -96,7 +96,7 @@ export const useProjectStore = defineStore('project', {
             project.requiredSkills.map((skill) => this.getSkill(skill))
           )
 
-          const students: Array<ProjectSuggestion> =
+          const students: Array<ProjectSuggestionInterface> =
             await this.fetchSuggestedStudents(project.suggestedStudents)
 
           this.projects[i].coaches = coaches

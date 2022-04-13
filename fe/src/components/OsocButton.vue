@@ -53,17 +53,20 @@ export default defineComponent({
     'unelevated': Boolean,
     'flat': Boolean
   },
-  mounted() {
-    // This class produces a tint change on hover, but is unwanted for the glow button.
-    const button = this.$refs.glowbutton as any
-    button.$el.classList.remove('q-hoverable')
-    button.$el.removeChild(button.$el.children[0])
-  },
+  
   data() {
     return {
       x: ref(0),
       y: ref(0)
     }
+  },
+  mounted() {
+    // This class produces a tint change on hover, but is unwanted for the glow button.
+    const button = this.$refs.glowbutton as any
+    button.$el.classList.remove('q-hoverable')
+    button.$el.removeChild(button.$el.children[0])
+    this.x = button.$el.clientWidth / 2
+    this.y = button.$el.clientHeight / 2
   },
   computed: {
     glow() {
@@ -144,6 +147,12 @@ export default defineComponent({
   }
 
   &:hover::before {
+    --scale: 1;
+    --opacity: 1;
+    transition-property: transform, opacity;
+  }
+  
+  &:focus::before {
     --scale: 1;
     --opacity: 1;
     transition-property: transform, opacity;

@@ -1,6 +1,6 @@
 import { Skill } from './Skill'
 import { User } from './User'
-import { ProjectSuggestion, TempProjectSuggestion } from './ProjectSuggestion'
+import { ProjectSuggestionInterface, TempProjectSuggestion } from './ProjectSuggestionInterface'
 
 export interface ProjectInterface {
   name: string
@@ -9,7 +9,7 @@ export interface ProjectInterface {
   extraInfo: string
   requiredSkills?: Array<{amount: number, comment: string, skill: Skill}>
   coaches?: Array<User>
-  suggestedStudents?: Array<ProjectSuggestion>
+  suggestedStudents?: Array<ProjectSuggestionInterface>
 }
 
 export interface TempProject {
@@ -28,7 +28,7 @@ export class Project implements ProjectInterface {
   extraInfo: string
   requiredSkills?: {amount: number, comment: string, skill: Skill}[]
   coaches?: Array<User>
-  suggestedStudents?: ProjectSuggestion[]
+  suggestedStudents?: ProjectSuggestionInterface[]
   id: number
   
   constructor(
@@ -38,7 +38,7 @@ export class Project implements ProjectInterface {
     id: number,
     requiredSkills?: {amount: number, comment: string, skill: Skill}[],
     coaches?: Array<User>,
-    suggested_students?: ProjectSuggestion[]
+    suggested_students?: ProjectSuggestionInterface[]
   ) {
     this.id = id
     this.name = name
