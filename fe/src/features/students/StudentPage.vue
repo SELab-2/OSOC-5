@@ -8,6 +8,11 @@
       <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
       <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
+    <div class="row q-pa-sm q-gutter-sm items-center">
+      <InfoChip v-if="student?.employmentAgreement" :color="bestSkillColor" :info="'Employment agreement: ' + student.employmentAgreement" />
+      <InfoChip v-if="student?.gender" :color="bestSkillColor" :info="'Gender: ' + gender" />
+      <InfoChip v-if="student?.pronouns" :color="bestSkillColor" :info="'Pronouns: ' + student.pronouns" />
+    </div>
     <div v-if="authenticationStore.loggedInUser?.isAdmin ?? false" class="row q-gutter-sm items-center">
       <q-select
         v-model="possibleFinalDecision"
@@ -26,11 +31,9 @@
         label="Final decision"
       />
       <q-btn @click="finalDecision"
-             icon-right="mail"
              class="cornered"
              label="Confirm"
-             outline
-             color='black'/>
+             color='green'/>
     </div>
   </div>
 
@@ -140,9 +143,12 @@ import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
 import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
+import InfoChip from "./components/InfoChip.vue";
+import { Skill } from "../../models/Skill";
 
 export default defineComponent ({
   components: {
+    InfoChip,
     ExtraInfoCard,
     AcademiaCard,
     SuggestionsCard,
@@ -186,6 +192,32 @@ export default defineComponent ({
     },
     name(): string {
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
+    },
+    gender(): string {
+      switch (this.student?.gender) {
+        case 0:
+          return 'female'
+        case 1:
+          return 'male'
+        case 2:
+          return 'transgender'
+        default:
+          return 'unknown'
+      }
+    },
+    bestSkillColor(): string | null {
+      if (this.student) {
+        for (const skill of this.student.skills) {
+          if (typeof(skill) === 'string') {
+            return null
+          } else {
+            if (skill.name === this.student?.bestSkill) {
+              return skill.color
+            }
+          }
+        }
+      }
+      return null
     },
     mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {

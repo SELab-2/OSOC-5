@@ -45,6 +45,8 @@ export const useStudentStore = defineStore('user/student', {
                 for (const suggestion of student.suggestions) {
                     suggestion.suggestion = parseInt(suggestion.suggestion)
                 }
+
+                student.gender = parseInt(student.gender)
             }
         },
         async loadStudents() {
@@ -106,6 +108,7 @@ export const useStudentStore = defineStore('user/student', {
                     if (data.finalDecision) {
                         data.finalDecision.suggestion = parseInt(data.finalDecision.suggestion)
                     }
+                    data.gender = parseInt(data.gender)
 
                     const skills = [] as Skill[]
 
