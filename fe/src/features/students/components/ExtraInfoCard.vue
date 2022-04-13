@@ -12,7 +12,7 @@
 
       <div v-else>
         <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
-          {{ studentStore.currentStudent.extraInfo }}
+          {{ studentStore.currentStudent.motivation }}
         </div>
       </div>
     </q-card-section>

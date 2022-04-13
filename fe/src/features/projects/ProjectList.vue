@@ -1,6 +1,11 @@
 <template>
   <div style="height: 100%">
-    <SideBar :select-student="() => {}" color="bg-grey-3" draggable />
+    <SideBar
+      :select-student="() => {}"
+      :must-hover="true"
+      color="bg-grey-3"
+      draggable
+    />
     <!-- <div > -->
     <div style="height: 100%" class="fit">
       <q-toolbar

@@ -22,9 +22,18 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Student
-        fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 
-                  'phone_number', 'alum', 'language', 'extra_info', 'cv', 'portfolio', 
-                  'school_name', 'degree', 'studies', 'skills', 'suggestions', 'final_decision']
+        fields = '__all__'
+        extra_fields = ['id']
+
+    def get_field_names(self, declared_fields, info):
+        # Include all fields and id
+        # https://stackoverflow.com/questions/38245414/django-rest-framework-how-to-include-all-fields-and-a-related-field-in-mo
+        expanded_fields = super(StudentSerializer, self).get_field_names(declared_fields, info)
+
+        if getattr(self.Meta, 'extra_fields', None):
+            return self.Meta.extra_fields + expanded_fields
+        else:
+            return expanded_fields
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
