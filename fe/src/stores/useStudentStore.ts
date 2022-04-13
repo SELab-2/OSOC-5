@@ -36,20 +36,36 @@ export const useStudentStore = defineStore('user/student', {
         currentStudent: null,
     }),
     actions: {
-        transformStudents(data: any): void {
-            for (const student of data) {
-                if (student.finalDecision) {
-                    student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
-                }
+        async transformStudent(student: any): Promise<void> {
+            const skills = [] as Skill[]
 
-                for (const suggestion of student.suggestions) {
-                    suggestion.suggestion = parseInt(suggestion.suggestion)
+            for (let i = 0; i < student.skills.length; i++) {
+                if (this.skillsStudents.get(student.skills[i])) {
+                    const skill = this.skillsStudents.get(student.skills[i].toString()) as Skill
+                    skills.push(skill)
+                } else {
+                    await instance
+                        .get(student.skills[i])
+                        .then(({data}) => {
+                            this.skillsStudents.set(student.skills[i].toString(), data)
+                            skills.push(data)
+                        })
                 }
-
-                student.gender = parseInt(student.gender)
-                student.language = parseInt(student.language)
-                student.englishRating = parseInt(student.englishRating)
             }
+
+            student.skills = skills
+
+            if (student.finalDecision) {
+                student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
+            }
+
+            for (const suggestion of student.suggestions) {
+                suggestion.suggestion = parseInt(suggestion.suggestion)
+            }
+
+            student.gender = parseInt(student.gender)
+            student.language = parseInt(student.language)
+            student.englishRating = parseInt(student.englishRating)
         },
         async loadStudents() {
             this.isLoading = true
@@ -72,25 +88,8 @@ export const useStudentStore = defineStore('user/student', {
                 .get<Student[]>(`students/${url}`)
                 .then(async ({data}) => {
                     for (const student of data) {
-                        const skills = [] as Skill[]
-
-                        for (let i = 0; i < student.skills.length; i++) {
-                            if (this.skillsStudents.get(student.skills[i].toString())) {
-                                const skill = this.skillsStudents.get(student.skills[i].toString()) as Skill
-                                skills.push(skill)
-                            } else {
-                                await instance
-                                    .get(student.skills[i].toString())
-                                    .then(({data}) => {
-                                        this.skillsStudents.set(student.skills[i].toString(), data)
-                                        skills.push(data)
-                                    })
-                            }
-                        }
-
-                        student.skills = skills
+                        await this.transformStudent(student)
                     }
-                    this.transformStudents(data)
 
                     this.students = data.map((student) => new Student(student))
                 })
@@ -103,28 +102,8 @@ export const useStudentStore = defineStore('user/student', {
             await instance
                 .get(`students/${studentId}/`)
                 .then(async ({data}) => {
-                    for (const suggestion of data.suggestions) {
-                        suggestion.suggestion = parseInt(suggestion.suggestion)
-                    }
+                    await this.transformStudent(data)
 
-                    if (data.finalDecision) {
-                        data.finalDecision.suggestion = parseInt(data.finalDecision.suggestion)
-                    }
-                    data.gender = parseInt(data.gender)
-                    data.language = parseInt(data.language)
-                    data.englishRating = parseInt(data.englishRating)
-
-                    const skills = [] as Skill[]
-
-                    for (let i = 0; i < data.skills.length; i++) {
-                        await instance
-                            .get(data.skills[i])
-                            .then(({data}) => {
-                                skills.push(data)
-                            })
-                    }
-
-                    data.skills = skills
                     this.currentStudent = new Student(data as Student)
                 })
 
