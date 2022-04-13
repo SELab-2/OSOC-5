@@ -85,6 +85,7 @@
                     :key="skill.id"
                     :color="skill.color"
                     :name="skill.name"
+                    best-skill=""
                   />
                 </div>
               </template>

@@ -28,7 +28,7 @@ export interface StudentInterface {
   finalDecision: Suggestion | null
   suggestions: Array<Suggestion>
   alum: boolean
-  bestSkill: Skill | string
+  bestSkill: string
   degreeCurrentYear: number
   degreeDuration: number
   employmentAgreement: string
@@ -68,7 +68,7 @@ export class Student implements StudentInterface {
   finalDecision: Suggestion | null
   suggestions: Suggestion[]
   alum: boolean
-  bestSkill: Skill | string
+  bestSkill: string
   degreeCurrentYear: number
   degreeDuration: number
   employmentAgreement: string
@@ -100,7 +100,7 @@ export class Student implements StudentInterface {
     finalDecision: Suggestion | null,
     suggestions: Suggestion[],
     alum: boolean,
-    bestSkill: Skill | string,
+    bestSkill: string,
     degreeCurrentYear: number,
     degreeDuration: number,
     employmentAgreement: string,
