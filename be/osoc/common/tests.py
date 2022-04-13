@@ -34,14 +34,29 @@ class ProjectTestsCoach(APITestCase):
             extra_info="Exra info"
         )
         Student.objects.create(
+            employment_agreement="volunteer",
+            hinder_work="",
             first_name="First name",
             last_name="Last name",
+            call_name="call name",
+            gender=0,
+            pronouns="",
             email="example@example.com",
+            phone_number="+14255550123",
+            language="Dutch",
+            english_rating=3,
+            motivation="extra info",
             cv="https://example.com",
             portfolio="https://example.com",
+            fun_fact="I swim",
             school_name="Example",
             degree="Example",
-            studies="Example"
+            degree_duration=3,
+            degree_current_year=1,
+            studies="Example",
+            best_skill="Example",
+            alum=False,
+            student_coach=True
         )
         Skill.objects.create(
             name="skill",
@@ -273,14 +288,29 @@ class SkillTests(APITestCase):
 class StudentTests(APITestCase):
     def setUp(self) -> None:
         Student.objects.create(
+            employment_agreement="volunteer",
+            hinder_work="",
             first_name="First name",
             last_name="Last name",
+            call_name="call name",
+            gender=0,
+            pronouns="",
             email="example@example.com",
+            phone_number="+14255550123",
+            language="Dutch",
+            english_rating=3,
+            motivation="extra info",
             cv="https://example.com",
             portfolio="https://example.com",
+            fun_fact="I swim",
             school_name="Example",
             degree="Example",
-            studies="Example"
+            degree_duration=3,
+            degree_current_year=1,
+            studies="Example",
+            best_skill="Example",
+            alum=False,
+            student_coach=True
         )
         Skill.objects.create(
             name="skill",
@@ -332,15 +362,23 @@ class StudentTests(APITestCase):
     def test_create_student(self):
         skill = Skill.objects.first()
         data = {
+            "employment_agreement": "student",
             "first_name": "John",
             "last_name": "Doe",
+            "gender": 1,
             "email": "john.doe@example.com",
+            "motivation": "I like work",
             "cv": "https://example.com",
             "portfolio": "https://example.com",
+            "language": "Dutch",
+            "fun_fact": "I cycle",
             "school_name": "Example",
             "degree": "Example",
+            "degree_duration": 5,
+            "degree_current_year": 2,
             "studies": "Example",
-            "skills": [reverse("skill-detail", args=(skill.id,))]
+            "skills": [reverse("skill-detail", args=(skill.id,))],
+            "best_skill": "frontend"
         }
         url = reverse("student-list")
         before_count = Student.objects.count()
