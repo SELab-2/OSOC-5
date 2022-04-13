@@ -125,6 +125,7 @@
                 >
                   <StudentCard
                     v-ripple
+                    :must-hover="mustHover"
                     :student="student"
                     :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
                     @click="clickStudent(student)"
@@ -183,6 +184,10 @@ export default defineComponent({
       type: Boolean,
       required: false
     },
+    mustHover: {
+      type: Boolean,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()

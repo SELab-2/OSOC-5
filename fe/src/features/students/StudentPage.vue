@@ -1,5 +1,5 @@
 <template>
-  <SideBar :key="sideBarKey" color="bg-grey-3" :selectStudent="selectStudent" :draggable="false"/>
+  <SideBar :must-hover="false" :key="sideBarKey" color="bg-grey-3" :selectStudent="selectStudent" :draggable="false"/>
 
   <div :key="studentKey"
     class="justify-between row q-px-lg q-pt-lg studentcol">
