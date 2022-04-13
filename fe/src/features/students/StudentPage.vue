@@ -9,6 +9,8 @@
       <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
     <div class="row q-pa-sm q-gutter-sm items-center">
+      <InfoChip v-if="student?.alum" :color="bestSkillColor" info="Alumni" />
+      <InfoChip v-if="student?.studentCoach" :color="bestSkillColor" info="Student coach" />
       <InfoChip v-if="student?.employmentAgreement" :color="bestSkillColor" :info="'Employment agreement: ' + student.employmentAgreement" />
       <InfoChip v-if="student?.gender" :color="bestSkillColor" :info="'Gender: ' + gender" />
       <InfoChip v-if="student?.pronouns" :color="bestSkillColor" :info="'Pronouns: ' + student.pronouns" />
@@ -32,8 +34,8 @@
       />
       <q-btn @click="finalDecision"
              class="cornered"
-             label="Confirm"
-             color='green'/>
+             outline
+             label="Confirm"/>
     </div>
   </div>
 
@@ -93,20 +95,20 @@
         <SkillsCard :index="studentKey" title="Skills"/>
       </div>
     </div>
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
-<!--        <SuggestionsCard :index="studentKey" title="Suggestions"/>-->
-<!--      </div>-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
-<!--        <AcademiaCard :index="studentKey" title="Academia"/>-->
-<!--      </div>-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
-<!--        <SkillsCard :index="studentKey" title="Skills"/>-->
-<!--      </div>-->
-<!--    </div>-->
+    <div class="row">
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <LanguageCard :index="studentKey" title="Language"/>
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <ExtraInfoCard :index="studentKey" title="Hinder for work" :content="studentStore.currentStudent?.hinderWork ?? ''"/>
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <ExtraInfoCard :index="studentKey" title="Fun fact" :content="studentStore.currentStudent?.funFact ?? ''"/>
+      </div>
+    </div>
     <div class="row">
       <div class="studentcol col-12">
-        <ExtraInfoCard :index="studentKey" title="Motivation"/>
+        <ExtraInfoCard :index="studentKey" title="Motivation" :content="studentStore.currentStudent?.motivation ?? ''"/>
       </div>
     </div>
   </div>
@@ -126,9 +128,11 @@ import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import InfoChip from "./components/InfoChip.vue";
 import { Skill } from "../../models/Skill";
+import LanguageCard from "./components/LanguageCard.vue";
 
 export default defineComponent ({
   components: {
+    LanguageCard,
     InfoChip,
     ExtraInfoCard,
     AcademiaCard,

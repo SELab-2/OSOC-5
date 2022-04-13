@@ -10,9 +10,18 @@
         <LoadingSpinner />
       </div>
 
-      <div v-else>
-        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 0px;">
-          {{ content }}
+      <div class="column" v-else>
+        <div>
+          Language: {{ language }}
+        </div>
+        <div>
+          English rating:
+          <q-icon
+            v-for="index in (studentStore.currentStudent?.englishRating ?? 0)"
+            :key="index"
+            color="yellow"
+            name="star"
+          />
         </div>
       </div>
     </q-card-section>
@@ -31,10 +40,6 @@ export default defineComponent( {
       type: String,
       required: true
     },
-    content: {
-      type: String,
-      required: true
-    }
   },
   setup() {
     const studentStore = useStudentStore()
@@ -43,5 +48,25 @@ export default defineComponent( {
       studentStore,
     }
   },
+  computed: {
+    language(): string {
+      switch (this.studentStore.currentStudent?.language ?? null) {
+        case 0:
+          return "Dutch"
+        case 1:
+          return "English"
+        case 2:
+          return "French"
+        case 3:
+          return "German"
+        default:
+          return ''
+      }
+    }
+  }
 })
 </script>
+
+<style scoped>
+
+</style>

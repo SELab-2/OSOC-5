@@ -47,6 +47,8 @@ export const useStudentStore = defineStore('user/student', {
                 }
 
                 student.gender = parseInt(student.gender)
+                student.language = parseInt(student.language)
+                student.englishRating = parseInt(student.englishRating)
             }
         },
         async loadStudents() {
@@ -109,6 +111,8 @@ export const useStudentStore = defineStore('user/student', {
                         data.finalDecision.suggestion = parseInt(data.finalDecision.suggestion)
                     }
                     data.gender = parseInt(data.gender)
+                    data.language = parseInt(data.language)
+                    data.englishRating = parseInt(data.englishRating)
 
                     const skills = [] as Skill[]
 

@@ -16,7 +16,7 @@ export interface StudentInterface {
   callName: string
   email: string
   phoneNumber: string
-  language: Language
+  language: number
   motivation: string
   cv: URL
   portfolio: URL
@@ -40,14 +40,6 @@ export interface StudentInterface {
   studentCoach: boolean
 }
 
-enum Language {
-  Dutch = 0,
-  English = 1,
-  French = 2,
-  German = 3,
-  Other = 4,
-}
-
 export class Student implements StudentInterface {
   url: string
   id: number
@@ -56,7 +48,7 @@ export class Student implements StudentInterface {
   callName: string
   email: string
   phoneNumber: string
-  language: Language
+  language: number
   motivation: string
   cv: URL
   portfolio: URL
@@ -88,7 +80,7 @@ export class Student implements StudentInterface {
     callName: string,
     email: string,
     phoneNumber: string,
-    language: Language,
+    language: number,
     motivation: string,
     cv: URL,
     portfolio: URL,
