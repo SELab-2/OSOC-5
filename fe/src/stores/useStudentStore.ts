@@ -12,6 +12,7 @@ interface State {
     byMe: boolean
     onProject: boolean
     skills: Array<Skill>
+    skillsStudents: Map<string, Skill>
     coaches: Map<string, User>
     students: Array<Student>
     isLoading: boolean
@@ -27,6 +28,7 @@ export const useStudentStore = defineStore('user/student', {
         byMe: false,
         onProject: false,
         skills: [],
+        skillsStudents: new Map(),
         coaches: new Map(),
         students: [],
         isLoading: false,
@@ -64,7 +66,26 @@ export const useStudentStore = defineStore('user/student', {
 
             await instance
                 .get<Student[]>(`students/${url}`)
-                .then(({data}) => {
+                .then(async ({data}) => {
+                    for (const student of data) {
+                        const skills = [] as Skill[]
+
+                        for (let i = 0; i < student.skills.length; i++) {
+                            if (this.skillsStudents.get(student.skills[i].toString())) {
+                                const skill = this.skillsStudents.get(student.skills[i].toString()) as Skill
+                                skills.push(skill)
+                            } else {
+                                await instance
+                                    .get(student.skills[i].toString())
+                                    .then(({data}) => {
+                                        this.skillsStudents.set(student.skills[i].toString(), data)
+                                        skills.push(data)
+                                    })
+                            }
+                        }
+
+                        student.skills = skills
+                    }
                     this.transformStudents(data)
 
                     this.students = data.map((student) => new Student(student))
