@@ -82,10 +82,10 @@
         <q-input
           outlined
           autofocus
-          v-model="old_password"
+          v-model="password1"
           :type="isPwd1 ? 'password' : 'text'"
           class="inputfield"
-          label="Old Password"
+          label="New Password 1"
         />
         <q-icon
           :name="isPwd1 ? 'visibility_off' : 'visibility'"
@@ -97,10 +97,10 @@
         <q-input
           outlined
           autofocus
-          v-model="password1"
+          v-model="password2"
           :type="isPwd2 ? 'password' : 'text'"
           class="inputfield"
-          label="New Password 1"
+          label="New Password 2"
         />
         <q-icon
           :name="isPwd2 ? 'visibility_off' : 'visibility'"
@@ -108,24 +108,9 @@
           @click="isPwd2 = !isPwd2"
         />
       </q-card-section>
-      <q-card-section class="q-pt-none">
-        <q-input
-          outlined
-          autofocus
-          v-model="password2"
-          :type="isPwd3 ? 'password' : 'text'"
-          class="inputfield"
-          label="New Password 2"
-        />
-        <q-icon
-          :name="isPwd3 ? 'visibility_off' : 'visibility'"
-          class="cursor-pointer"
-          @click="isPwd3 = !isPwd3"
-        />
-      </q-card-section>
       <q-card-actions align="right" class="text-primary">
         <q-btn flat label="Cancel" v-close-popup />
-        <q-btn flat label="Add role" @click="change_password_confirm" />
+        <q-btn flat label="Submit Password Change" @click="change_password_confirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -163,15 +148,12 @@ export default defineComponent({
     const authenticationStore = useAuthenticationStore()
     const password1 = ref('')
     const password2 = ref('')
-    const old_password = ref('')
     const display_popup = ref(false)
     return {
       isPwd1: ref(true),
       isPwd2: ref(true),
-      isPwd3: ref(true),
       password1,
       password2,
-      old_password,
       display_popup,
       color: useMeta(metaData),
       tab: ref('students'),
@@ -185,9 +167,7 @@ export default defineComponent({
       },
       change_password_confirm() {
         display_popup.value = false
-        if (old_password.value == authenticationStore.loggedInUser?.password) {
-          authenticationStore.changePassword({p1:password1.value, p2:password2.value})
-        }
+        authenticationStore.changePassword({p1:password1.value, p2:password2.value})
       },
     }
   },

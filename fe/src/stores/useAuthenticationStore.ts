@@ -66,11 +66,10 @@ export const useAuthenticationStore: StoreDefinition<
         new_password1: p1,
         new_password2: p2,
       };
-      const {data} = axios.post('http://localhost:8000/api/auth/password/change/', bodyParameters, config)
+      const {data} = await axios.post('http://localhost:8000/api/auth/password/change/', bodyParameters, config)
       if (data.response.status == 200) {
         this.loggedInUser = { first_name: this.loggedInUser.first_name, last_name: this.loggedInUser.last_name, email: this.loggedInUser.email, password: p1 }
       }
-
     },
   },
 })
