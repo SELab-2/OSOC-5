@@ -5,7 +5,7 @@
     :class="color ? 'bg-' + color + '-1' : 'bg-grey-6'"
     style="border-width: 1.5px; padding-right: 8px; padding-left: 8px"
   >
-    {{ info }} {{ color }}
+    {{ info }}
   </q-chip>
 </template>
 

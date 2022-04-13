@@ -93,41 +93,22 @@
         <SkillsCard :index="studentKey" title="Skills"/>
       </div>
     </div>
-    <div class="row">
-      <div class="studentcol col-12">
-        <ExtraInfoCard :index="studentKey" title="Extra Info"/>
-      </div>
-    </div>
 <!--    <div class="row">-->
-<!--      <div class="studentcol col-12">-->
-<!--        <TitleTextCard title="Project you're most proud of" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">-->
-<!--        <PracticalCard title="Practical"/>-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
+<!--        <SuggestionsCard :index="studentKey" title="Suggestions"/>-->
 <!--      </div>-->
 <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
-<!--        <DetailsCard title="Details" :content="[-->
-<!--            { description: 'First language', value: 'English'},-->
-<!--            { description: 'Level of English', value: '1/5'}-->
-<!--          ]"/>-->
+<!--        <AcademiaCard :index="studentKey" title="Academia"/>-->
+<!--      </div>-->
+<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
+<!--        <SkillsCard :index="studentKey" title="Skills"/>-->
 <!--      </div>-->
 <!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-<!--        <TitleTextCard title="Why do you want to participate in osoc?" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-<!--        <TitleTextCard title="Why do you think you're a good fit?" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--    </div>-->
+    <div class="row">
+      <div class="studentcol col-12">
+        <ExtraInfoCard :index="studentKey" title="Motivation"/>
+      </div>
+    </div>
   </div>
 </template>
 

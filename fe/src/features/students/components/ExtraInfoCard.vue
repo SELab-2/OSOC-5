@@ -11,7 +11,7 @@
       </div>
 
       <div v-else>
-        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
+        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 0px;">
           {{ studentStore.currentStudent.motivation }}
         </div>
       </div>

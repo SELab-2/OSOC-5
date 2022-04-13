@@ -15,6 +15,8 @@
           <li>{{ 'Enrolled at: ' + studentStore.currentStudent.schoolName }}</li>
           <li>{{ 'Studies: ' + studentStore.currentStudent.studies }}</li>
           <li>{{ 'Degree: ' + studentStore.currentStudent.degree }}</li>
+          <li>{{ 'Duration of degree: ' + studentStore.currentStudent.degreeDuration }}</li>
+          <li>{{ 'Current year of degree: ' + studentStore.currentStudent.degreeCurrentYear }}</li>
         </ul>
       </div>
     </q-card-section>
