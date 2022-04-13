@@ -17,16 +17,27 @@ export interface StudentInterface {
   email: string
   phoneNumber: string
   language: Language
-  extraInfo: string
+  motivation: string
   cv: URL
   portfolio: URL
   lastEmailSent: Date
   schoolName: string
   degree: string
   studies: string
-  skills: Array<Skill>
+  skills: Array<Skill> | Array<string>
   finalDecision: Suggestion | null
   suggestions: Array<Suggestion>
+  alum: boolean
+  bestSkill: Skill | string
+  degreeCurrentYear: number
+  degreeDuration: number
+  employmentAgreement: string
+  englishRating: number
+  funFact: string
+  gender: number
+  hinderWork: string
+  pronouns: string
+  studentCoach: boolean
 }
 
 enum Language {
@@ -46,16 +57,27 @@ export class Student implements StudentInterface {
   email: string
   phoneNumber: string
   language: Language
-  extraInfo: string
+  motivation: string
   cv: URL
   portfolio: URL
   lastEmailSent: Date
   schoolName: string
   degree: string
   studies: string
-  skills: Skill[]
+  skills: Skill[] | string[]
   finalDecision: Suggestion | null
   suggestions: Suggestion[]
+  alum: boolean
+  bestSkill: Skill | string
+  degreeCurrentYear: number
+  degreeDuration: number
+  employmentAgreement: string
+  englishRating: number
+  funFact: string
+  gender: number
+  hinderWork: string
+  pronouns: string
+  studentCoach: boolean
 
   constructor(obj: StudentInterface);
   constructor(
@@ -67,7 +89,7 @@ export class Student implements StudentInterface {
     email: string,
     phoneNumber: string,
     language: Language,
-    extraInfo: string,
+    motivation: string,
     cv: URL,
     portfolio: URL,
     lastEmailSent: Date,
@@ -76,7 +98,18 @@ export class Student implements StudentInterface {
     studies: string,
     skills: Skill[],
     finalDecision: Suggestion | null,
-    suggestions: Suggestion[]
+    suggestions: Suggestion[],
+    alum: boolean,
+    bestSkill: Skill | string,
+    degreeCurrentYear: number,
+    degreeDuration: number,
+    employmentAgreement: string,
+    englishRating: number,
+    funFact: string,
+    gender: number,
+    hinderWork: string,
+    pronouns: string,
+    studentCoach: boolean
   );
 
   constructor (...args: any[]) {
@@ -91,7 +124,7 @@ export class Student implements StudentInterface {
       this.email = args[5]
       this.phoneNumber = args[6]
       this.language = args[7]
-      this.extraInfo = args[8]
+      this.motivation = args[8]
       this.cv = args[9]
       this.portfolio = args[10]
       this.lastEmailSent = args[11]
@@ -101,6 +134,17 @@ export class Student implements StudentInterface {
       this.skills = args[15]
       this.finalDecision = args[16]
       this.suggestions = args[17]
+      this.alum = args[18]
+      this.bestSkill = args[19]
+      this.degreeCurrentYear = args[20]
+      this.degreeDuration = args[21]
+      this.employmentAgreement = args[22]
+      this.englishRating = args[23]
+      this.funFact = args[24]
+      this.gender = args[25]
+      this.hinderWork = args[26]
+      this.pronouns = args[27]
+      this.studentCoach = args[28]
     }
   }
 }
