@@ -27,12 +27,12 @@ export default defineComponent({
   props: {
     title: {
       type: String,
-      required: false,
-      default: ""
+      required: true,
     },
     content: {
       type: String,
-      required: true
+      required: true,
+      default: ""
     },
     color: {
       type: String,
