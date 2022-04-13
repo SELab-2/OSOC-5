@@ -8,13 +8,6 @@
       <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
       <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
-    <div class="row q-pa-sm q-gutter-sm items-center">
-      <InfoChip v-if="student?.alum" :color="bestSkillColor" info="Alumni" />
-      <InfoChip v-if="student?.studentCoach" :color="bestSkillColor" info="Student coach" />
-      <InfoChip v-if="student?.employmentAgreement" :color="bestSkillColor" :info="'Employment agreement: ' + student.employmentAgreement" />
-      <InfoChip v-if="student?.gender" :color="bestSkillColor" :info="'Gender: ' + gender" />
-      <InfoChip v-if="student?.pronouns" :color="bestSkillColor" :info="'Pronouns: ' + student.pronouns" />
-    </div>
     <div v-if="authenticationStore.loggedInUser?.isAdmin ?? false" class="row q-gutter-sm items-center">
       <q-select
         v-model="possibleFinalDecision"
@@ -37,6 +30,35 @@
              outline
              label="Confirm"/>
     </div>
+  </div>
+
+  <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+    <InfoDiv
+      v-if="student?.alum"
+      use-icon="mdi-account-school"
+      color="blue"
+      title="Alumni"
+    />
+    <InfoDiv
+      v-if="student?.studentCoach"
+      use-icon="mdi-account-group"
+      color="yellow"
+      title="Student coach"
+    />
+    <InfoDiv
+      v-if="student?.employmentAgreement"
+      use-icon="mdi-file-document-edit"
+      color="red"
+      content="Employment"
+      :title="employment"
+    />
+    <InfoDiv
+      v-if="student?.gender"
+      :use-icon="genderIcon"
+      color="green"
+      content="Gender"
+      :title="gender"
+    />
   </div>
 
   <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
@@ -126,14 +148,13 @@ import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
 import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
-import InfoChip from "./components/InfoChip.vue";
-import { Skill } from "../../models/Skill";
 import LanguageCard from "./components/LanguageCard.vue";
+import InfoDiv from "./components/InfoDiv.vue";
 
 export default defineComponent ({
   components: {
+    InfoDiv,
     LanguageCard,
-    InfoChip,
     ExtraInfoCard,
     AcademiaCard,
     SuggestionsCard,
@@ -179,15 +200,37 @@ export default defineComponent ({
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     gender(): string {
+      let gender = ''
       switch (this.student?.gender) {
         case 0:
-          return 'female'
+          gender += 'Female'
+          break
         case 1:
-          return 'male'
+          gender += 'Male'
+          break
         case 2:
-          return 'transgender'
+          gender += 'Transgender'
+          break
         default:
-          return 'unknown'
+          gender += 'Unknown'
+          break
+      }
+      return this.student?.pronouns ? gender + `: ${this.student.pronouns}` : gender
+    },
+    employment(): string {
+      const string = this.student?.employmentAgreement
+      return string ? string.charAt(0).toUpperCase() + string.slice(1) : '';
+    },
+    genderIcon(): string {
+      switch (this.student?.gender) {
+        case 0:
+          return 'mdi-gender-female'
+        case 1:
+          return 'mdi-gender-male'
+        case 2:
+          return 'mdi-gender-transgender'
+        default:
+          return 'person'
       }
     },
     bestSkillColor(): string | null {
