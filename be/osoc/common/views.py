@@ -126,7 +126,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         Endpoint to which Tally's webhook can connect to register students.
         returns HTTP response:
-            404 NOT FOUND:  The request data was malformatted or a student tried to register twice
+            400 BAD REQUEST:  The request data was malformatted or a student tried to register twice
             201 CREATED:    The student registration resulted in a new student being created
         """
         tally = TallyForm.fromFile()
