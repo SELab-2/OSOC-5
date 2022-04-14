@@ -4,7 +4,6 @@
     "pk": 1,
     "fields": {
       "name": "Front-end developer",
-      "description": "Develops the front-end",
       "color": "yellow"
     }
   },
@@ -13,7 +12,6 @@
     "pk": 2,
     "fields": {
       "name": "Back-end developer",
-      "description": "Back-ends the developer",
       "color": "blue"
     }
   },
@@ -22,16 +20,47 @@
     "pk": 3,
     "fields": {
       "name": "Sysadmin",
-      "description": "System administrator",
       "color": "red"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 4,
+    "fields": {
+      "name": "Full-stack developer",
+      "color": "magenta"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 5,
+    "fields": {
+      "name": "Student coach",
+      "color": "cyan"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 6,
+    "fields": {
+      "name": "Communication Expert",
+      "color": "white"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 7,
+    "fields": {
+      "name": "Tester",
+      "color": "black"
     }
   },
   {
     "model": "common.coach",
     "pk": 1,
     "fields": {
-      "password": "pbkdf2_sha256$320000$5rgqbJ6R9kNXbeQbRgsQ9w$rcwylWX8M8F2dBSQJ3mId5uxXRARO0hIVJGSGaS62T0=",
-      "last_login": "2022-03-19T13:31:16Z",
+      "password": "pbkdf2_sha256$260000$KSkTj3rghH0hT1VHV6iiHl$asJxNBNnkwZeceqjETcr74rAcocEdX2ITGCnVbcERck=",
+      "last_login": "2022-04-06T13:16:36.880Z",
       "is_superuser": true,
       "is_staff": true,
       "is_active": true,
@@ -40,7 +69,6 @@
       "last_name": "admin",
       "email": "admin@example.com",
       "is_admin": true,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -59,7 +87,6 @@
       "last_name": "Vandenberghe",
       "email": "friedrich.vandenberghe@ugent.be",
       "is_admin": false,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -78,7 +105,6 @@
       "last_name": "Saerens",
       "email": "lander.saerens@ugent.be",
       "is_admin": true,
-      "last_email_sent": null,
       "groups": [],
       "user_permissions": []
     }
@@ -97,7 +123,60 @@
       "last_name": "Cattoire",
       "email": "henri.cattoire@ugent.be",
       "is_admin": false,
-      "last_email_sent": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 6,
+    "fields": {
+      "password": "test",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": false,
+      "date_joined": "2022-04-02T20:15:28Z",
+      "first_name": "test",
+      "last_name": "test",
+      "email": "test@example.com",
+      "is_admin": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 7,
+    "fields": {
+      "password": "abcdef",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-04-06T13:18:32Z",
+      "first_name": "Lisa",
+      "last_name": "De Jonghe",
+      "email": "lisa.dejonghe@ugent.be",
+      "is_admin": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "common.coach",
+    "pk": 8,
+    "fields": {
+      "password": "abcdef",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-04-06T13:19:03Z",
+      "first_name": "Wouter",
+      "last_name": "Hennen",
+      "email": "wouter.hennen@ugent.be",
+      "is_admin": true,
       "groups": [],
       "user_permissions": []
     }
@@ -106,16 +185,26 @@
     "model": "common.student",
     "pk": 1,
     "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "",
+      "english_rating": 5,
+      "gender": "1",
+      "pronouns": "",
+      "fun_fact": "I skateboard",
+      "degree_duration": 3,
+      "degree_current_year": 3,
+      "alum": false,
+      "student_coach": false,
+      "best_skill": "Back-end Dev",
       "first_name": "Jan",
       "last_name": "Pieter",
-      "call_name": null,
+      "call_name": "",
       "email": "jan.pieter@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "0",
-      "extra_info": "",
+      "motivation": "Making money",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "UGent",
       "degree": "MaNaMa",
       "studies": "Computer Science",
@@ -128,16 +217,26 @@
     "model": "common.student",
     "pk": 2,
     "fields": {
+      "employment_agreement": "volunteer",
+      "hinder_work": "I smoke",
+      "english_rating": 3,
+      "gender": "1",
+      "pronouns": "he/him",
+      "fun_fact": "I like to drink coffee",
+      "degree_duration": 500,
+      "degree_current_year": 100,
+      "alum": true,
+      "student_coach": false,
+      "best_skill": "Front-end Dev",
       "first_name": "Wouter",
       "last_name": "Siemens",
-      "call_name": null,
+      "call_name": "",
       "email": "wouter.siemens@example.com",
-      "phone_number": null,
+      "phone_number": "",
       "language": "3",
-      "extra_info": "",
+      "motivation": "Fun experience",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "VUB",
       "degree": "500 Masters",
       "studies": "Zeverologie",
@@ -151,21 +250,304 @@
     "model": "common.student",
     "pk": 3,
     "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "",
+      "english_rating": 4,
+      "gender": "0",
+      "pronouns": "she/her",
+      "fun_fact": "I like to read books",
+      "degree_duration": 3,
+      "degree_current_year": 1,
+      "alum": true,
+      "student_coach": true,
+      "best_skill": "Sysadmin",
       "first_name": "Florence",
       "last_name": "Nightingale",
       "call_name": "Flo",
       "email": "flo.floflo@flo.flo",
       "phone_number": "+32444444444",
       "language": "4",
-      "extra_info": "",
+      "motivation": "Fun experience",
       "cv": "http://example.com",
       "portfolio": "http://example.com",
-      "last_email_sent": null,
       "school_name": "KUL",
       "degree": "Bachelor",
       "studies": "Taal- en letterkunde",
       "skills": [
         3
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 4,
+    "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "",
+      "english_rating": 4,
+      "gender": "0",
+      "pronouns": "she/her",
+      "fun_fact": "I like to swim",
+      "degree_duration": 2,
+      "degree_current_year": 1,
+      "alum": true,
+      "student_coach": false,
+      "best_skill": "sysadmin",
+      "first_name": "Sarah",
+      "last_name": "Kerrigan",
+      "call_name": "Kerrigan",
+      "email": "sarah.kerrigan@example.com",
+      "phone_number": "",
+      "language": "1",
+      "motivation": "No real motivation",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "school_name": "MIT",
+      "degree": "Masters",
+      "studies": "Computer Science",
+      "skills": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 5,
+    "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "",
+      "english_rating": 5,
+      "gender": "3",
+      "pronouns": "",
+      "fun_fact": "I like to act",
+      "degree_duration": 2,
+      "degree_current_year": 1,
+      "alum": false,
+      "student_coach": false,
+      "best_skill": "Communication",
+      "first_name": "Jim",
+      "last_name": "Carrey",
+      "call_name": "",
+      "email": "jim.carrey@example.com",
+      "phone_number": "",
+      "language": "1",
+      "motivation": "Checkout my github",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "school_name": "UCL",
+      "degree": "Masters",
+      "studies": "Communication",
+      "skills": [
+        5,
+        6
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 6,
+    "fields": {
+      "employment_agreement": "volunteer",
+      "hinder_work": "I eat donuts, a lot",
+      "english_rating": 5,
+      "gender": "0",
+      "pronouns": "simp/son",
+      "fun_fact": "I like to spend time with my brother Bart",
+      "degree_duration": 6,
+      "degree_current_year": 5,
+      "alum": false,
+      "student_coach": false,
+      "best_skill": "Communication",
+      "first_name": "Lisa",
+      "last_name": "Simpsons",
+      "call_name": "",
+      "email": "lisa@simpsons.com",
+      "phone_number": "",
+      "language": "1",
+      "motivation": "My parents forced me",
+      "cv": "http://example.com",
+      "portfolio": "http://example.com",
+      "school_name": "Springfield Elementary",
+      "degree": "Lower School",
+      "studies": "Not applicable",
+      "skills": [
+        6
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 7,
+    "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "",
+      "english_rating": 5,
+      "gender": "1",
+      "pronouns": "ze/hir/hir",
+      "fun_fact": "I like maps",
+      "degree_duration": 5,
+      "degree_current_year": 5,
+      "alum": false,
+      "student_coach": false,
+      "best_skill": "Front-end dev",
+      "first_name": "Edsger",
+      "last_name": "Dijkstra",
+      "call_name": "Dijkstra",
+      "email": "edsger@dijkstra.nl",
+      "phone_number": "",
+      "language": "0",
+      "motivation": "Greater good",
+      "cv": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
+      "portfolio": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
+      "school_name": "Leiden",
+      "degree": "BS & MS",
+      "studies": "Mathematics",
+      "skills": [
+        1,
+        3,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 8,
+    "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "I get lost in discussions",
+      "english_rating": 2,
+      "gender": "0",
+      "pronouns": "by firstname",
+      "fun_fact": "I like france",
+      "degree_duration": 2,
+      "degree_current_year": 2,
+      "alum": false,
+      "student_coach": false,
+      "best_skill": "Tester",
+      "first_name": "Bertrand",
+      "last_name": "Meyer",
+      "call_name": "",
+      "email": "bertrand.meyer@france.fr",
+      "phone_number": "",
+      "language": "2",
+      "motivation": "Meeting new people",
+      "cv": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
+      "portfolio": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
+      "school_name": "École Polytechnique",
+      "degree": "Masters",
+      "studies": "Engineering",
+      "skills": [
+        2,
+        6,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 9,
+    "fields": {
+      "employment_agreement": "volunteer",
+      "hinder_work": "",
+      "english_rating": 5,
+      "gender": "0",
+      "pronouns": "",
+      "fun_fact": "I like to supervise",
+      "degree_duration": 2,
+      "degree_current_year": 2,
+      "alum": true,
+      "student_coach": true,
+      "best_skill": "Comm",
+      "first_name": "Jean-Raymond",
+      "last_name": "Abrial",
+      "call_name": "",
+      "email": "jean@ariel.fr",
+      "phone_number": "",
+      "language": "2",
+      "motivation": "I like working",
+      "cv": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
+      "portfolio": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
+      "school_name": "ETH Zurich",
+      "degree": "Professor",
+      "studies": "Engineering",
+      "skills": [
+        3,
+        6
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 10,
+    "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "",
+      "english_rating": 5,
+      "gender": "0",
+      "pronouns": "",
+      "fun_fact": "I like to to talk about the Brexit",
+      "degree_duration": 2,
+      "degree_current_year": 2,
+      "alum": false,
+      "student_coach": false,
+      "best_skill": "Full stack",
+      "first_name": "Jonathan",
+      "last_name": "Bowen",
+      "call_name": "",
+      "email": "bowen@bouwer.co.uk",
+      "phone_number": "",
+      "language": "1",
+      "motivation": "I need money",
+      "cv": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
+      "portfolio": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
+      "school_name": "University College, Oxford",
+      "degree": "MA",
+      "studies": "Engineering Science",
+      "skills": [
+        2,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.student",
+    "pk": 11,
+    "fields": {
+      "employment_agreement": "student",
+      "hinder_work": "",
+      "english_rating": 3,
+      "gender": "0",
+      "pronouns": "",
+      "fun_fact": "I like to play tennis",
+      "degree_duration": 2,
+      "degree_current_year": 2,
+      "alum": false,
+      "student_coach": false,
+      "best_skill": "Full stack",
+      "first_name": "Egon",
+      "last_name": "Börger",
+      "call_name": "",
+      "email": "egon@bergerman.de",
+      "phone_number": "",
+      "language": "3",
+      "motivation": "I have to much sparetime",
+      "cv": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
+      "portfolio": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
+      "school_name": "University of Münster",
+      "degree": "Masters",
+      "studies": "Computer Science",
+      "skills": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
       ]
     }
   },
@@ -232,6 +614,88 @@
     }
   },
   {
+    "model": "common.project",
+    "pk": 6,
+    "fields": {
+      "name": "Project F",
+      "partner_name": "Inex",
+      "extra_info": "Iets",
+      "coaches": [
+        8,
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 7,
+    "fields": {
+      "name": "Project K",
+      "partner_name": "OptiDisc",
+      "extra_info": "DiscOptie",
+      "coaches": [
+        8,
+        1,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 8,
+    "fields": {
+      "name": "Project ABC",
+      "partner_name": "R.E.M.",
+      "extra_info": "Automatic For The People",
+      "coaches": [
+        8,
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 9,
+    "fields": {
+      "name": "Combo Touch",
+      "partner_name": "Logitech",
+      "extra_info": "Touch die combo!",
+      "coaches": [
+        2,
+        4,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 10,
+    "fields": {
+      "name": "Borderlands King",
+      "partner_name": "Stephen Eragon",
+      "extra_info": "Plop",
+      "coaches": [
+        8,
+        6,
+        7
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 11,
+    "fields": {
+      "name": "Beiard",
+      "partner_name": "Massa",
+      "extra_info": "Snoopy",
+      "coaches": [
+        2
+      ]
+    }
+  },
+  {
     "model": "common.requiredskills",
     "pk": 1,
     "fields": {
@@ -282,6 +746,42 @@
     "fields": {
       "project": 4,
       "skill": 1,
+      "amount": 1
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 7,
+    "fields": {
+      "project": 4,
+      "skill": 5,
+      "amount": 5
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 8,
+    "fields": {
+      "project": 6,
+      "skill": 4,
+      "amount": 5
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 9,
+    "fields": {
+      "project": 5,
+      "skill": 4,
+      "amount": 2
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 10,
+    "fields": {
+      "project": 4,
+      "skill": 4,
       "amount": 1
     }
   },
@@ -343,6 +843,216 @@
       "coach": 4,
       "suggestion": "2",
       "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 7,
+    "fields": {
+      "student": 9,
+      "coach": 8,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 8,
+    "fields": {
+      "student": 3,
+      "coach": 8,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 9,
+    "fields": {
+      "student": 10,
+      "coach": 7,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 10,
+    "fields": {
+      "student": 11,
+      "coach": 3,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 11,
+    "fields": {
+      "student": 6,
+      "coach": 4,
+      "suggestion": "0",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 12,
+    "fields": {
+      "student": 5,
+      "coach": 1,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 13,
+    "fields": {
+      "student": 8,
+      "coach": 3,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 14,
+    "fields": {
+      "student": 10,
+      "coach": 8,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 15,
+    "fields": {
+      "student": 4,
+      "coach": 4,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 16,
+    "fields": {
+      "student": 8,
+      "coach": 4,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 1,
+    "fields": {
+      "reason": "",
+      "project": 1,
+      "student": 3,
+      "coach": 3,
+      "skill_id": 3
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 2,
+    "fields": {
+      "reason": "",
+      "project": 5,
+      "student": 7,
+      "coach": 4,
+      "skill_id": 7
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 3,
+    "fields": {
+      "reason": "",
+      "project": 11,
+      "student": 5,
+      "coach": 7,
+      "skill_id": 2
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 4,
+    "fields": {
+      "reason": "",
+      "project": 8,
+      "student": 5,
+      "coach": 4,
+      "skill_id": 5
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 5,
+    "fields": {
+      "reason": "",
+      "project": 10,
+      "student": 6,
+      "coach": 7,
+      "skill_id": 3
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 6,
+    "fields": {
+      "reason": "",
+      "project": 9,
+      "student": 2,
+      "coach": 8,
+      "skill_id": 2
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 7,
+    "fields": {
+      "reason": "",
+      "project": 6,
+      "student": 2,
+      "coach": 1,
+      "skill_id": 2
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 8,
+    "fields": {
+      "reason": "",
+      "project": 5,
+      "student": 4,
+      "coach": 2,
+      "skill_id": 4
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 9,
+    "fields": {
+      "reason": "",
+      "project": 3,
+      "student": 8,
+      "coach": 3,
+      "skill_id": 4
+    }
+  },
+  {
+    "model": "common.projectsuggestion",
+    "pk": 10,
+    "fields": {
+      "reason": "",
+      "project": 7,
+      "student": 4,
+      "coach": 1,
+      "skill_id": 3
     }
   }
 ]

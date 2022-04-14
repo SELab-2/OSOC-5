@@ -1,4 +1,8 @@
 $primary   : #5dd3a7
+
+.text-shadow-primary
+  color: #57bf98 !important
+
 $secondary : #24a3cb
 $accent    : #ffdd45
 
@@ -12,13 +16,18 @@ $info      : #31CCEC
 $warning   : #F2C037
 
 $yellow : #FCB70F
-$yellow-1       : rgba($yellow, .1)
-$yellow-4       : rgba($yellow, .5)
-$yellow-7 : rgba($yellow, .7)
+$yellow-1       : lighten($yellow, 35%)
+$yellow-4       : lighten($yellow, 10%)
+$yellow-7 : lighten($yellow, 5%)
 $green : #44DBA4
-$green-1: rgba($green, .1)
+$green-1: lighten($green, 35%)
 
 $blue : #0A0839
 
-$red: #F14A3B
-$red-2: rgba($red, .2)
+// Example for new colors
+$newcolor: #57bf98
+.bg-newcolor
+  background: #57bf98 !important
+
+.text-newcolor
+  color: #57bf98 !important

@@ -13,9 +13,16 @@
   </q-card>
 </template>
 
-<script>
-export default {
-  props: ['title'],
+<script lang="ts">
+import {defineComponent} from "@vue/runtime-core";
+
+export default defineComponent( {
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+  },
   setup() {
     const work = [
       {description: 'under a Belgian employment agreement', present: 'yes'},
@@ -34,5 +41,5 @@ export default {
       details
     }
   }
-}
+})
 </script>

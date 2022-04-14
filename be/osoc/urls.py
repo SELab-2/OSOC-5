@@ -22,12 +22,16 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
 router = routers.DefaultRouter()
-router.register(r'groups', views.GroupViewSet)
 router.register(r'coaches', views.CoachViewSet)
 router.register(r'students', views.StudentViewSet)
 router.register(r'projects', views.ProjectViewSet)
 router.register(r'skills', views.SkillViewSet)
+router.register(r'emails', views.SentEmailViewSet)
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -47,8 +51,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/admin/', admin.site.urls),
-    path('api/login/', views.LoginView.as_view()),
-    path('api/logout/', views.LogoutView.as_view()),
+    path('api/auth/', include('dj_rest_auth.urls')),
     path('api/register/', views.RegisterView.as_view()),
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',

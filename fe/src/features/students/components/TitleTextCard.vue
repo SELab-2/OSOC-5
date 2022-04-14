@@ -9,8 +9,19 @@
   </q-card>
 </template>
 
-<script>
-export default {
-  props: ['title', 'content'],
-}
+<script lang="ts">
+import {defineComponent} from "@vue/runtime-core";
+
+export default defineComponent( {
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    content: {
+      type: String,
+      required: true
+    }
+  }
+})
 </script>

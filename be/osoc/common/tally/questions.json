@@ -3,16 +3,16 @@
     "question": [
       "Are you able to work 128 hours with a student employment agreement, or as a volunteer?*"
     ],
-    "field": "available",
+    "field": "employment_agreement",
     "type": "MULTIPLE_CHOICE",
     "answers": [
       {
         "answer": "Yes, I can work with a student employment agreement in Belgium",
-        "value": "Can work with a student employment agreement in Belgium"
+        "value": "student"
       },
       {
         "answer": "Yes, I can work as a volunteer in Belgium",
-        "value": "Can work as a volunteer in Belgium"
+        "value": "volunteer"
       }
     ],
     "required": true
@@ -21,9 +21,9 @@
     "question": [
       "Are there any responsibilities you might have which could hinder you during the day?"
     ],
-    "field": "hinder",
+    "field": "hinder_work",
     "type": "TEXTAREA",
-    "required": true
+    "required": false
   },
   "2": {
     "question": [
@@ -57,16 +57,20 @@
     "type": "MULTIPLE_CHOICE",
     "answers": [
       {
-        "answer": "Female"
+        "answer": "Female",
+        "value": 0
       },
       {
-        "answer": "Male"
+        "answer": "Male",
+        "value": 1
       },
       {
-        "answer": "Transgender"
+        "answer": "Transgender",
+        "value": 2
       },
       {
-        "answer": "Rather not say"
+        "answer": "Rather not say",
+        "value": 3
       }
     ],
     "required": true
@@ -201,7 +205,7 @@
     "question": [
       "Upload your motivation – size limit 10MB", "Or link to your motivation", "Or write about your motivation"
     ],
-    "field": "extra_info",
+    "field": "motivation",
     "type": [ "FILE_UPLOAD", "INPUT_LINK", "TEXTAREA" ],
     "required": true
   },
@@ -297,7 +301,7 @@
     "question": [
       "How many years does your degree take?"
     ],
-    "field": "degree_number_of_years",
+    "field": "degree_duration",
     "type": "INPUT_NUMBER",
     "required": true
   },
