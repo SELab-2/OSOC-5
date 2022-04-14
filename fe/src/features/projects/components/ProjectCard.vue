@@ -149,7 +149,7 @@ export default defineComponent({
     return {
       expanded: ref(false),
       selectedRoles,
-      loading: ref(false),
+      loading: ref(false)
     }
   },
   watch: {

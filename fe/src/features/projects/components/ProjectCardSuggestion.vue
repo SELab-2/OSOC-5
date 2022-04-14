@@ -1,8 +1,8 @@
 <template>
   <q-slide-transition :appear="!suggestion.reason">
     <div v-if="show" style="margin-left: 10px">
-      <div class="column full-width">
-        <div tabindex="-1" class="row">
+      <div class="column full-width" style="justify-content: center">
+        <div tabindex="-1" class="row" style="height: 30px">
           <q-item-section
             :lines="1"
             class="text-weight-medium"
@@ -27,7 +27,7 @@
               }"
             />
           </div>
-          <btn v-else label="undo" @click="removed = false" />
+          <btn v-else label="undo" @click="stop" dense style="justify-content: center; height: 30px"/>
         </div>
         <q-slide-transition v-if="progress >= 0">
           <q-input
@@ -99,13 +99,26 @@ export default defineComponent({
       progress: ref(0),
       reason: ref(''),
       removed: ref(false),
+      timeout: undefined
+    }
+  },
+  beforeUnmount() {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+      this.remove()
     }
   },
   methods: {
+    stop() {
+      this.removed = false
+      if (!this.timeout) return
+      clearTimeout(this.timeout)
+      this.timeout = undefined
+    },
     prepareRemove() {
-      setTimeout(() => {
-        if (!this.removed) return
+      this.timeout = setTimeout(() => {
         this.remove()
+        this.timeout = undefined
       }, 2000)
     },
     remove() {

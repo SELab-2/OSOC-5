@@ -1,6 +1,6 @@
 import { Skill } from './Skill'
 import { User } from './User'
-import { ProjectSuggestionInterface, TempProjectSuggestion } from './ProjectSuggestionInterface'
+import { ProjectSuggestionInterface, TempProjectSuggestion } from './ProjectSuggestion'
 
 export interface ProjectInterface {
   name: string

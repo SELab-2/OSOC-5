@@ -221,6 +221,7 @@ export default defineComponent({
       }
       e.dataTransfer.setData(data.student.id, JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
+      e.dataTransfer.effectAllowed = 'copy'
     },
     clickStudent(student: Student) {
       this.selectStudent(student)
