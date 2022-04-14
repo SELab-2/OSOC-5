@@ -4,6 +4,7 @@
     color="bg-grey-3"
     :select-student="selectStudent"
     :draggable="false"
+    @update="update"
   />
 
   <div
@@ -80,135 +81,83 @@
       @update:modelValue="showDialog"
     />
 
-    <<<<<<< HEAD
     <q-dialog v-model="suggestionDialog">
       <q-card>
         <q-card-section>
           <div class="text-h6">
             Suggest
             <btn
+              :label="suggestionName"
               dense
               rounded
               class="text-h6"
               :class="suggestionColor"
-            >
-              {{ suggestionName }}
-            </btn>
-            =======
-            <q-dialog v-model="suggestionDialog">
-              <q-card>
-                <q-card-section>
-                  {{ suggestionName }}
-                  {{ suggestionColor }}
-                  <div class="text-h6">
-                    Suggest
-                    <btn
-                      :label="suggestionName"
-                      dense
-                      rounded
-                      class="text-h6"
-                      :class="suggestionColor"
-                    />
-                    >>>>>>> main
-                    for {{ name }}
-                  </div>
-                </q-card-section>
-
-                <q-card-section class="q-pt-none">
-                  Why are you making this decision? (optional)
-                  <q-input
-                    v-model="reason"
-                    filled
-                    type="textarea"
-                  />
-                </q-card-section>
-
-                <q-card-actions
-                  align="right"
-                  class="text-primary"
-                >
-                  <btn
-                    v-close-popup
-                    flat
-                    color="grey"
-                    label="Cancel"
-                    glow-color="grey-4"
-                  />
-                  <btn
-                    v-close-popup
-                    flat
-                    label="Suggest"
-                    glow-color="teal-1"
-                    @click="makeSuggestion"
-                  />
-                </q-card-actions>
-              </q-card>
-            </q-dialog>
-          </div>
-
-          <div class="q-gutter-sm q-pa-lg">
-            <div class="row">
-              <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <SuggestionsCard
-                  :index="studentKey"
-                  title="Suggestions"
-                />
-              </div>
-              <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <AcademiaCard
-                  :index="studentKey"
-                  title="Academia"
-                />
-              </div>
-              <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <SkillsCard
-                  :index="studentKey"
-                  title="Skills"
-                />
-              </div>
-            </div>
-            <div class="row">
-              <div class="studentcol col-12">
-                <ExtraInfoCard
-                  :index="studentKey"
-                  title="Extra Info"
-                />
-              </div>
-            </div>
-            <!--    <div class="row">-->
-            <!--      <div class="studentcol col-12">-->
-            <!--        <TitleTextCard title="Project you're most proud of" content="-->
-            <!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-            <!--        />-->
-            <!--      </div>-->
-            <!--    </div>-->
-            <!--    <div class="row">-->
-            <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">-->
-            <!--        <PracticalCard title="Practical"/>-->
-            <!--      </div>-->
-            <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
-            <!--        <DetailsCard title="Details" :content="[-->
-            <!--            { description: 'First language', value: 'English'},-->
-            <!--            { description: 'Level of English', value: '1/5'}-->
-            <!--          ]"/>-->
-            <!--      </div>-->
-            <!--    </div>-->
-            <!--    <div class="row">-->
-            <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-            <!--        <TitleTextCard title="Why do you want to participate in osoc?" content="-->
-            <!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-            <!--        />-->
-            <!--      </div>-->
-            <!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-            <!--        <TitleTextCard title="Why do you think you're a good fit?" content="-->
-            <!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-            <!--        />-->
-            <!--      </div>-->
-            <!--    </div>-->
+            />
+            for {{ name }}
           </div>
         </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          Why are you making this decision? (optional)
+          <q-input
+            v-model="reason"
+            filled
+            type="textarea"
+          />
+        </q-card-section>
+
+        <q-card-actions
+          align="right"
+          class="text-primary"
+        >
+          <btn
+            v-close-popup
+            flat
+            color="grey"
+            label="Cancel"
+            glow-color="grey-4"
+          />
+          <btn
+            v-close-popup
+            flat
+            label="Suggest"
+            glow-color="teal-1"
+            @click="makeSuggestion"
+          />
+        </q-card-actions>
       </q-card>
     </q-dialog>
+  </div>
+
+  <div class="q-gutter-sm q-pa-lg">
+    <div class="row">
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <SuggestionsCard
+          :index="studentKey"
+          title="Suggestions"
+        />
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <AcademiaCard
+          :index="studentKey"
+          title="Academia"
+        />
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <SkillsCard
+          :index="studentKey"
+          title="Skills"
+        />
+      </div>
+    </div>
+    <div class="row">
+      <div class="studentcol col-12">
+        <ExtraInfoCard
+          :index="studentKey"
+          title="Extra Info"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -273,7 +222,7 @@ export default defineComponent ({
     },
     mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.id)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.pk)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion.toString() : (-1).toString()
       } else {
@@ -333,14 +282,12 @@ export default defineComponent ({
   },
   methods: {
     makeSuggestion: async function () {
-      if (this.student) {
-        await this.studentStore.updateSuggestion(this.student.id, (this.authenticationStore?.loggedInUser?.id) || -1, this.possibleSuggestion, this.reason)
+      if (this.student && this.authenticationStore?.loggedInUser?.pk) {
+        await this.studentStore.updateSuggestion(this.student.id, this.authenticationStore?.loggedInUser?.pk, this.possibleSuggestion, this.reason)
         this.reason = ""
       }
 
-      // Make components update
-      this.sideBarKey += 1
-      this.studentKey += 1
+      this.update()
     },
     selectStudent: function (selected_student: Student) {
       this.$router.push(`/students/${selected_student.id}`)
@@ -354,6 +301,9 @@ export default defineComponent ({
         await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
       }
 
+      this.update()
+    },
+    update() {
       // Make components update
       this.sideBarKey += 1
       this.studentKey += 1

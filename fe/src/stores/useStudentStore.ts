@@ -112,7 +112,7 @@ export const useStudentStore = defineStore('user/student', {
     },
     async updateSuggestion(
       studentId: number,
-      coachId: string,
+      coachId: number,
       suggestion: string,
       reason: string
     ) {
@@ -125,7 +125,7 @@ export const useStudentStore = defineStore('user/student', {
           reason: reason,
         })
       }
-
+      console.log('Coachid: ' + coachId)
       socket.send(
         JSON.stringify({
           studentId,
@@ -179,6 +179,7 @@ export const useStudentStore = defineStore('user/student', {
       while (ctr <= this.students.length && this.students[ctr].id !== studentId)
         ctr++
 
+      // We found the corresponding student
       if (this.students[ctr].id === studentId) {
         const student = this.students[ctr]
         ctr = 0
@@ -191,10 +192,16 @@ export const useStudentStore = defineStore('user/student', {
         )
           ctr++
 
+        console.log(student.suggestions)
         if (ctr < student.suggestions.length) {
+          // Update suggestion
           student.suggestions[ctr].suggestion = suggestion
           student.suggestions[ctr].reason = reason
+
+          console.log('UPDATE')
         } else {
+          console.log('NEW')
+          // New suggestion
           const coaches = useCoachStore()
           const coach = coaches.users.filter(({ id }) => id === coachId)[0]
           student.suggestions.push({

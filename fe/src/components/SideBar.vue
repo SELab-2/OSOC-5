@@ -184,6 +184,7 @@ export default defineComponent({
       required: false
     },
   },
+emits: ['update'],
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
@@ -218,8 +219,9 @@ export default defineComponent({
   mounted() {
         this.socket.onmessage = (event: { data: string }) => {
             const data = JSON.parse(event.data)
-            console.log(data)
             this.studentStore.receiveSuggestion(data)
+
+            this.$emit("update")
         }
    },   
   methods: {
