@@ -7,7 +7,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from .utils import strip_and_lower_email
-from datetime import datetime
+from django.utils import timezone
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -403,7 +403,7 @@ class SentEmail(models.Model):
     )
     time = models.DateTimeField(
         _("send date and time"),
-        default=datetime.now, 
+        default=timezone.now, 
         blank=True
     )
     info = models.CharField(
