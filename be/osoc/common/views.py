@@ -18,6 +18,8 @@ from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -30,9 +32,12 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter, StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
-    search_fields = ['first_name', 'last_name', 'call_name', 'email', 'alum', 'language', 'degree', 'studies', 'extra_info']
-    filterset_fields = ['alum', 'language', 'skills'] # TODO practical info, student coach
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend,
+                       StudentOnProjectFilter, StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
+    search_fields = ['first_name', 'last_name', 'call_name',
+                     'email', 'alum', 'language', 'degree', 'studies', 'extra_info']
+    # TODO practical info, student coach
+    filterset_fields = ['alum', 'language', 'skills']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -46,6 +51,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         serializer = SuggestionSerializer(
             data=request.data, context={'request': request})
+
         if serializer.is_valid():
 
             # create Suggestion object if it doesnt exist yet, else update it
@@ -55,11 +61,22 @@ class StudentViewSet(viewsets.ModelViewSet):
             response_data = serializer.data
             response_data['coach_name'] = request.user.get_full_name()
             response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
-            
+            response_data['coach'] = request.build_absolute_uri(
+                reverse("coach-detail", args=(request.user.id,)))
+            response_data['student_id'] = pk
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'suggestion',
+                    'data': response_data
+                }
+            )
+
             return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer)
     def remove_suggestion(self, request, pk=None):
         """
@@ -73,8 +90,20 @@ class StudentViewSet(viewsets.ModelViewSet):
         deleted, _ = Suggestion.objects.filter(
             student=self.get_object(), coach=request.user).delete()
 
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'remove_suggestion',
+                'data': {
+                    'student': pk,
+                    'coach': request.user.id
+                }
+            }
+        )
+
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
-    
+
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def make_final_decision(self, request, pk=None):
         """
@@ -92,7 +121,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             # create Suggestion object if it doesnt exist yet, else update it
             suggestion, created = Suggestion.objects.update_or_create(
                 student=self.get_object(), coach=request.user, defaults=serializer.data)
-            
+
             student = self.get_object()
             student.final_decision = suggestion
             student.save()
@@ -100,11 +129,12 @@ class StudentViewSet(viewsets.ModelViewSet):
             response_data = serializer.data
             response_data['coach_name'] = request.user.get_full_name()
             response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
-            
+            response_data['coach'] = request.build_absolute_uri(
+                reverse("coach-detail", args=(request.user.id,)))
+
             return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def remove_final_decision(self, request, pk=None):
         """
@@ -136,7 +166,8 @@ class CoachViewSet(viewsets.GenericViewSet,
     """
     queryset = Coach.objects.all().order_by('id')
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    permission_classes = [
+        permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
@@ -146,7 +177,7 @@ class CoachViewSet(viewsets.GenericViewSet,
         coach = self.get_object()
         if coach != request.user:
             # check if number of admins would not be zero after the delete
-            if not coach.is_admin or Coach.objects.filter(is_admin=True).count() > 1: 
+            if not coach.is_admin or Coach.objects.filter(is_admin=True).count() > 1:
                 self.perform_destroy(coach)
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response({"detail": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
@@ -171,7 +202,7 @@ class CoachViewSet(viewsets.GenericViewSet,
                 coach.is_admin = serializer.data['is_admin']
                 coach.is_active = serializer.data['is_active']
                 coach.save()
-            
+
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response({"detail": "you can not update your own admin status"}, status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -212,15 +243,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # get student object from url
             student_url = data.pop('student')
-            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
+            student = Student.objects.get(
+                **resolve(urlparse(student_url).path).kwargs)
 
             # get skill object from url
             skill_url = data.pop('skill')
-            skill = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
+            skill = Skill.objects.get(
+                **resolve(urlparse(skill_url).path).kwargs)
 
             # check if skill is one of the required skills of the project
             if skill in project.required_skills.all():
-                
+
                 # replace skill url with skill object
                 data['skill'] = skill
 
@@ -229,7 +262,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     project=project, student=student, coach=request.user, defaults=data)
 
                 response_data = serializer.data
-                response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
+                response_data['coach'] = request.build_absolute_uri(
+                    reverse("coach-detail", args=(request.user.id,)))
                 response_data['coach_name'] = request.user.get_full_name()
                 response_data['coach_id'] = request.user.id
 
@@ -271,8 +305,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         for student in students:
             projects = ProjectSuggestion.objects.filter(student=student)
             if projects.count() > 1:
-                student_url = request.build_absolute_uri(reverse("student-detail", args=(student.id,)))
-                project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,))) 
+                student_url = request.build_absolute_uri(
+                    reverse("student-detail", args=(student.id,)))
+                project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,)))
                                 for project_sug in projects]
                 conflicts.append({student_url: project_urls})
         return Response({"conflicts": conflicts}, status=status.HTTP_200_OK)
@@ -300,7 +335,8 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     queryset = SentEmail.objects.all().order_by('id')
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, EmailDateTimeFilter]
+    filter_backends = [filters.SearchFilter,
+                       DjangoFilterBackend, EmailDateTimeFilter]
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 

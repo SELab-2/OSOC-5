@@ -12,20 +12,13 @@ interface State {
   byMe: boolean
   onProject: boolean
   skills: Array<Skill>
+  skillsStudents: Map<string, Skill>
   coaches: Map<string, User>
   students: Array<Student>
   isLoading: boolean
   possibleSuggestion: number
   currentStudent: Student | null
 }
-
-const socket = new WebSocket(
-  `ws://${
-    process.env.NODE_ENV == 'development'
-      ? '127.0.0.1:8000/'
-      : 'sel2-5.ugent.be/'
-  }ws/socket_server/`
-)
 
 export const useStudentStore = defineStore('user/student', {
   state: (): State => ({
@@ -35,6 +28,7 @@ export const useStudentStore = defineStore('user/student', {
     byMe: false,
     onProject: false,
     skills: [],
+    skillsStudents: new Map(),
     coaches: new Map(),
     students: [],
     isLoading: false,
@@ -42,20 +36,38 @@ export const useStudentStore = defineStore('user/student', {
     currentStudent: null,
   }),
   actions: {
-    transformStudents(data: Student[]): void {
-      for (const student of data) {
-        if (student.finalDecision) {
-          student.finalDecision.suggestion = parseInt(
-            student.finalDecision.suggestion as unknown as string
-          )
-        }
+    async transformStudent(student: any): Promise<void> {
+      const skills = [] as Skill[]
 
-        for (const suggestion of student.suggestions) {
-          suggestion.suggestion = parseInt(
-            suggestion.suggestion as unknown as string
-          )
+      for (let i = 0; i < student.skills.length; i++) {
+        if (this.skillsStudents.get(student.skills[i])) {
+          const skill = this.skillsStudents.get(
+            student.skills[i].toString()
+          ) as Skill
+          skills.push(skill)
+        } else {
+          await instance.get(student.skills[i]).then(({ data }) => {
+            this.skillsStudents.set(student.skills[i].toString(), data)
+            skills.push(data)
+          })
         }
       }
+
+      student.skills = skills
+
+      if (student.finalDecision) {
+        student.finalDecision.suggestion = parseInt(
+          student.finalDecision.suggestion
+        )
+      }
+
+      for (const suggestion of student.suggestions) {
+        suggestion.suggestion = parseInt(suggestion.suggestion)
+      }
+
+      student.gender = parseInt(student.gender)
+      student.language = parseInt(student.language)
+      student.englishRating = parseInt(student.englishRating)
     },
     async loadStudents() {
       this.isLoading = true
@@ -74,11 +86,15 @@ export const useStudentStore = defineStore('user/student', {
       let url = ''
       if (filters) url = `?${filters.join('&')}`
 
-      await instance.get<Student[]>(`students/${url}`).then(({ data }) => {
-        this.transformStudents(data)
+      await instance
+        .get<Student[]>(`students/${url}`)
+        .then(async ({ data }) => {
+          for (const student of data) {
+            await this.transformStudent(student)
+          }
 
-        this.students = data.map((student) => new Student(student))
-      })
+          this.students = data.map((student) => new Student(student))
+        })
 
       this.isLoading = false
     },
@@ -86,36 +102,14 @@ export const useStudentStore = defineStore('user/student', {
       this.isLoading = true
 
       await instance.get(`students/${studentId}/`).then(async ({ data }) => {
-        for (const suggestion of data.suggestions) {
-          suggestion.suggestion = parseInt(suggestion.suggestion)
-        }
+        await this.transformStudent(data)
 
-        if (data.finalDecision) {
-          data.finalDecision.suggestion = parseInt(
-            data.finalDecision.suggestion
-          )
-        }
-
-        const skills = [] as Skill[]
-
-        for (let i = 0; i < data.skills.length; i++) {
-          await instance.get(data.skills[i]).then(({ data }) => {
-            skills.push(data)
-          })
-        }
-
-        data.skills = skills
         this.currentStudent = new Student(data as Student)
       })
 
       this.isLoading = false
     },
-    async updateSuggestion(
-      studentId: number,
-      coachId: number,
-      suggestion: string,
-      reason: string
-    ) {
+    async updateSuggestion(studentId: number, reason: string) {
       // check if -1 is selected to delete suggestion
       if (this.possibleSuggestion == -1) {
         await instance.delete(`students/${studentId}/remove_suggestion/`)
@@ -125,15 +119,6 @@ export const useStudentStore = defineStore('user/student', {
           reason: reason,
         })
       }
-      console.log('Coachid: ' + coachId)
-      socket.send(
-        JSON.stringify({
-          studentId,
-          coachId,
-          suggestion,
-          reason,
-        })
-      )
 
       await this.loadStudent(studentId)
     },
@@ -162,7 +147,89 @@ export const useStudentStore = defineStore('user/student', {
 
       await this.loadStudent(studentId)
     },
-    receiveSuggestion({
+    async receiveSuggestion({
+      student_id,
+      coach_id,
+      suggestion,
+      reason,
+    }: {
+      student_id: number
+      coach_id: number
+      suggestion: number
+      reason: string
+    }) {
+      const studentId = Number(student_id)
+      const coachId = Number(coach_id)
+
+      let ctr = 0
+
+      while (
+        ctr < this.students.length &&
+        Number(this.students[ctr].id) !== studentId
+      )
+        ctr++
+
+      // We found the corresponding student
+      if (ctr < this.students.length) {
+        const student = this.students[ctr]
+        ctr = 0
+        while (
+          ctr < student.suggestions.length &&
+          student.suggestions[ctr].coachId !== coachId
+        )
+          ctr++
+
+        if (ctr < student.suggestions.length) {
+          // Update suggestion
+          student.suggestions[ctr].suggestion = suggestion
+          student.suggestions[ctr].reason = reason
+        } else {
+          // New suggestion
+          const coaches = useCoachStore()
+          const coach = await coaches.getUser(`/coaches/${coachId.toString()}`)
+
+          student.suggestions.push({
+            student: studentId,
+            coachId: coachId,
+            suggestion,
+            reason,
+            coach: coach.url,
+            coachName: coach.firstName,
+          })
+        }
+      }
+    },
+    removeSuggestion({ student, coach }: { student: string; coach: number }) {
+      const studentId = Number.parseInt(student)
+      const coachId = Number(coach)
+
+      let ctr = 0
+
+      while (
+        ctr < this.students.length &&
+        Number(this.students[ctr].id) !== studentId
+      ) {
+        console.log('A')
+        console.log(Number(this.students[ctr].id))
+        console.log(studentId)
+        ctr++
+      }
+
+      // We found the corresponding student
+      if (ctr < this.students.length) {
+        const student = this.students[ctr]
+        ctr = 0
+        while (
+          ctr < student.suggestions.length &&
+          student.suggestions[ctr].coachId !== coachId
+        )
+          ctr++
+
+        // Corresponding suggestion is found
+        if (ctr < student.suggestions.length) student.suggestions.splice(ctr, 1)
+      }
+    },
+    receiveFinalDecision({
       studentId,
       coachId,
       suggestion,
@@ -192,15 +259,11 @@ export const useStudentStore = defineStore('user/student', {
         )
           ctr++
 
-        console.log(student.suggestions)
         if (ctr < student.suggestions.length) {
           // Update suggestion
           student.suggestions[ctr].suggestion = suggestion
           student.suggestions[ctr].reason = reason
-
-          console.log('UPDATE')
         } else {
-          console.log('NEW')
           // New suggestion
           const coaches = useCoachStore()
           const coach = coaches.users.filter(({ id }) => id === coachId)[0]

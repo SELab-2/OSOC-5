@@ -85,6 +85,7 @@
                     :key="skill.id"
                     :color="skill.color"
                     :name="skill.name"
+                    best-skill=""
                   />
                 </div>
               </template>
@@ -125,6 +126,7 @@
                 >
                   <StudentCard
                     v-ripple
+                    :must-hover="mustHover"
                     :student="student"
                     :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
                     @click="clickStudent(student)"
@@ -183,6 +185,10 @@ export default defineComponent({
       type: Boolean,
       required: false
     },
+    mustHover: {
+      type: Boolean,
+      required: true
+    }
   },
 emits: ['update'],
   setup() {
@@ -217,10 +223,16 @@ emits: ['update'],
     }
   },
   mounted() {
-        this.socket.onmessage = (event: { data: string }) => {
+        this.socket.onmessage = async (event: { data: string }) => {
             const data = JSON.parse(event.data)
-            this.studentStore.receiveSuggestion(data)
-
+            console.log(data)
+            if(data.hasOwnProperty('suggestion'))
+              await this.studentStore.receiveSuggestion(data.suggestion)
+            else if(data.hasOwnProperty('remove_suggestion'))
+              this.studentStore.removeSuggestion(data.remove_suggestion)
+            else if(data.hasOwnProperty('final_decision'))
+              this.studentStore.receiveFinalDecision(data.final_decision)
+            
             this.$emit("update")
         }
    },   

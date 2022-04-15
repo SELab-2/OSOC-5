@@ -34,7 +34,7 @@
               name="mdi-close"
               color="red"
             />
-            <q-chip size="8px">
+            <q-chip v-if="student.alum" size="8px">
               Alumni
             </q-chip>
           </div>
@@ -65,6 +65,15 @@
           />
         </div>
       </q-card-section>
+      <q-tooltip class="bg-grey-1 shadow-5 cornered" v-if="mustHover" max-width="300px" anchor="top middle" self="bottom middle" :offset="[0, 5]" :delay="500">
+        <StudentSkillChip
+          v-for="skill of student.skills"
+          :key="typeof(skill) !== 'string' ? skill.id : ''"
+          :color="typeof(skill) !== 'string' ? skill.color : ''"
+          :name="typeof(skill) !== 'string' ? skill.name : ''"
+          :best-skill="student.bestSkill"
+        />
+      </q-tooltip>
     </q-card>
   </div>
 </template>
@@ -75,14 +84,22 @@ import {useStudentStore} from "../stores/useStudentStore";
 import {useAuthenticationStore} from "../stores/useAuthenticationStore";
 import { Suggestion } from "../models/Suggestion";
 import {Student} from "../models/Student";
+import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 
 export default defineComponent({
+  components: {
+    StudentSkillChip,
+  },
   props: {
     student: {
       type: Student,
       required: true
     },
     active: {
+      type: Boolean,
+      required: true
+    },
+    mustHover: {
       type: Boolean,
       required: true
     }
@@ -133,7 +150,7 @@ export default defineComponent({
       if (this.student) {
         const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
           if (this.authenticationStore.loggedInUser != null) {
-            return suggestion.coachId === this.authenticationStore.loggedInUser.id
+            return suggestion.coachId === this.authenticationStore.loggedInUser.pk
           }
         })
 

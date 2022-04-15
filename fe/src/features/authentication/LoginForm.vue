@@ -76,6 +76,9 @@ export default defineComponent({
   components: { GitHubSignInButton },
   setup() {
     const authenticationStore = useAuthenticationStore()
+
+    authenticationStore.checkLogin()
+
     const q = useQuasar()
     const email = ref('')
     const password = ref('')

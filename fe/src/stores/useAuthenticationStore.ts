@@ -2,6 +2,9 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { User, UserInterface } from '../models/User'
+import {instance} from "../utils/axios";
+import {useStudentStore} from "./useStudentStore";
+import router from "../router";
 
 const baseURL =
   process.env.NODE_ENV == 'development'
@@ -18,6 +21,11 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     loggedInUser: null,
   }),
   actions: {
+    checkLogin(): void {
+      if (localStorage.getItem('refreshToken') && localStorage.getItem('accessToken')) {
+        router.push({name: 'Projects'}).then()
+      }
+    },
     async login({
       email,
       password,
@@ -33,13 +41,24 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       localStorage.setItem('refreshToken', data.refresh_token)
       localStorage.setItem('accessToken', data.access_token)
 
-      this.loggedInUser = convertObjectKeysToCamelCase(data).user as User
-
-      localStorage.setItem('refreshToken', data.refresh_token)
-      localStorage.setItem('accessToken', data.access_token)
+      const result = await instance.get<User>('coaches/' + data.user.pk)
+      this.loggedInUser = result.data
     },
     logout(): void {
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('accessToken')
+
+      const studentStore = useStudentStore()
+      studentStore.$reset()
+      const skillStore = useStudentStore()
+      skillStore.$reset()
+      const coachStore = useStudentStore()
+      coachStore.$reset()
+      const projectStore = useStudentStore()
+      projectStore.$reset()
+
       this.$reset()
+      router.push({name: 'Login'}).then()
     },
   },
 })

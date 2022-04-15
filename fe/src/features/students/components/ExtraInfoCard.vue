@@ -11,8 +11,8 @@
       </div>
 
       <div v-else>
-        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
-          {{ studentStore.currentStudent.extraInfo }}
+        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 0px;">
+          {{ content }}
         </div>
       </div>
     </q-card-section>
@@ -31,6 +31,10 @@ export default defineComponent( {
       type: String,
       required: true
     },
+    content: {
+      type: String,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()

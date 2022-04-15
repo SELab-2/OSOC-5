@@ -10,6 +10,8 @@ import os
 # General
 DEBUG = False
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = ['sel2-5.ugent.be']
