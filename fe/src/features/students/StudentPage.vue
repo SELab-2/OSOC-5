@@ -26,12 +26,39 @@
         label="Final decision"
       />
       <q-btn @click="finalDecision"
-             icon-right="mail"
              class="cornered"
-             label="Confirm"
              outline
-             color='black'/>
+             label="Confirm"/>
     </div>
+  </div>
+
+  <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+    <InfoDiv
+      v-if="student?.alum"
+      use-icon="mdi-account-school"
+      color="blue"
+      title="Alumni"
+    />
+    <InfoDiv
+      v-if="student?.studentCoach"
+      use-icon="mdi-account-group"
+      color="yellow"
+      title="Student coach"
+    />
+    <InfoDiv
+      v-if="student?.employmentAgreement"
+      use-icon="mdi-file-document-edit"
+      color="red"
+      content="Employment"
+      :title="employment"
+    />
+    <InfoDiv
+      v-if="student?.gender"
+      :use-icon="genderIcon"
+      color="green"
+      content="Gender"
+      :title="gender"
+    />
   </div>
 
   <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
@@ -91,40 +118,21 @@
       </div>
     </div>
     <div class="row">
-      <div class="studentcol col-12">
-        <ExtraInfoCard :index="studentKey" title="Extra Info"/>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <LanguageCard :index="studentKey" title="Language"/>
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <ExtraInfoCard :index="studentKey" title="Hinder for work" :content="studentStore.currentStudent?.hinderWork ?? ''"/>
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <ExtraInfoCard :index="studentKey" title="Fun fact" :content="studentStore.currentStudent?.funFact ?? ''"/>
       </div>
     </div>
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-12">-->
-<!--        <TitleTextCard title="Project you're most proud of" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-8 col-lg-8">-->
-<!--        <PracticalCard title="Practical"/>-->
-<!--      </div>-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">-->
-<!--        <DetailsCard title="Details" :content="[-->
-<!--            { description: 'First language', value: 'English'},-->
-<!--            { description: 'Level of English', value: '1/5'}-->
-<!--          ]"/>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-<!--        <TitleTextCard title="Why do you want to participate in osoc?" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--      <div class="studentcol col-xs-12 col-sm-12 col-md-6 col-lg-6">-->
-<!--        <TitleTextCard title="Why do you think you're a good fit?" content="-->
-<!--            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."-->
-<!--        />-->
-<!--      </div>-->
-<!--    </div>-->
+    <div class="row">
+      <div class="studentcol col-12">
+        <ExtraInfoCard :index="studentKey" title="Motivation" :content="studentStore.currentStudent?.motivation ?? ''"/>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -140,9 +148,13 @@ import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
 import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
+import LanguageCard from "./components/LanguageCard.vue";
+import InfoDiv from "./components/InfoDiv.vue";
 
 export default defineComponent ({
   components: {
+    InfoDiv,
+    LanguageCard,
     ExtraInfoCard,
     AcademiaCard,
     SuggestionsCard,
@@ -186,6 +198,54 @@ export default defineComponent ({
     },
     name(): string {
       return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
+    },
+    gender(): string {
+      let gender = ''
+      switch (this.student?.gender) {
+        case 0:
+          gender += 'Female'
+          break
+        case 1:
+          gender += 'Male'
+          break
+        case 2:
+          gender += 'Transgender'
+          break
+        default:
+          gender += 'Unknown'
+          break
+      }
+      return this.student?.pronouns ? gender + `: ${this.student.pronouns}` : gender
+    },
+    employment(): string {
+      const string = this.student?.employmentAgreement
+      return string ? string.charAt(0).toUpperCase() + string.slice(1) : '';
+    },
+    genderIcon(): string {
+      switch (this.student?.gender) {
+        case 0:
+          return 'mdi-gender-female'
+        case 1:
+          return 'mdi-gender-male'
+        case 2:
+          return 'mdi-gender-transgender'
+        default:
+          return 'person'
+      }
+    },
+    bestSkillColor(): string | null {
+      if (this.student) {
+        for (const skill of this.student.skills) {
+          if (typeof(skill) === 'string') {
+            return null
+          } else {
+            if (skill.name === this.student?.bestSkill) {
+              return skill.color
+            }
+          }
+        }
+      }
+      return null
     },
     mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {

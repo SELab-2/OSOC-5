@@ -10,14 +10,19 @@
         <LoadingSpinner />
       </div>
 
-      <div v-else>
-        <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
-          <li>{{ 'Enrolled at: ' + studentStore.currentStudent.schoolName }}</li>
-          <li>{{ 'Studies: ' + studentStore.currentStudent.studies }}</li>
-          <li>{{ 'Degree: ' + studentStore.currentStudent.degree }}</li>
-          <li>{{ 'Duration of degree: ' + studentStore.currentStudent.degreeDuration }}</li>
-          <li>{{ 'Current year of degree: ' + studentStore.currentStudent.degreeCurrentYear }}</li>
-        </ul>
+      <div class="column" v-else>
+        <div>
+          Language: {{ language }}
+        </div>
+        <div>
+          English rating:
+          <q-icon
+            v-for="index in (studentStore.currentStudent?.englishRating ?? 0)"
+            :key="index"
+            color="yellow"
+            name="star"
+          />
+        </div>
       </div>
     </q-card-section>
   </q-card>
@@ -43,5 +48,25 @@ export default defineComponent( {
       studentStore,
     }
   },
+  computed: {
+    language(): string {
+      switch (this.studentStore.currentStudent?.language ?? null) {
+        case 0:
+          return "Dutch"
+        case 1:
+          return "English"
+        case 2:
+          return "French"
+        case 3:
+          return "German"
+        default:
+          return ''
+      }
+    }
+  }
 })
 </script>
+
+<style scoped>
+
+</style>

@@ -15,6 +15,7 @@
           <StudentSkillChip
             v-for="(skill, index) in studentStore.currentStudent.skills"
             :key="index"
+            :best-skill="studentStore.currentStudent.bestSkill ?? ''"
             :color="typeof(skill) !== 'string' ? skill.color : ''"
             :name="typeof(skill) !== 'string' ? skill.name : ''"
           />

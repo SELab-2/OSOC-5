@@ -71,6 +71,7 @@
           :key="typeof(skill) !== 'string' ? skill.id : ''"
           :color="typeof(skill) !== 'string' ? skill.color : ''"
           :name="typeof(skill) !== 'string' ? skill.name : ''"
+          :best-skill="student.bestSkill"
         />
       </q-tooltip>
     </q-card>
