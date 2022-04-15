@@ -1,13 +1,19 @@
-import {test, expect, describe, beforeEach} from 'vitest'
+import {test, expect, describe, beforeEach, fn, vi} from 'vitest'
 import {mount} from '@vue/test-utils'
 import {Quasar} from 'quasar'
 import Component from '../../src/components/LoadingSpinner.vue'
 import {createPinia, setActivePinia} from "pinia";
+import {createTestingPinia} from '@pinia/testing'
 
 // This makes sure Quasar is loaded
 const wrapperFactory = () => mount(Component, {
     global: {
-        plugins: [Quasar]
+        plugins: [
+            createTestingPinia({
+                createSpy: vi.fn,
+            }),
+            Quasar
+        ]
     },
 })
 
