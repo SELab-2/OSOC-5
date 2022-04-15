@@ -21,6 +21,11 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     loggedInUser: null,
   }),
   actions: {
+    checkLogin(): void {
+      if (localStorage.getItem('refreshToken') && localStorage.getItem('accessToken')) {
+        router.push({name: 'Projects'}).then()
+      }
+    },
     async login({
       email,
       password,
