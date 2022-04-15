@@ -36,14 +36,20 @@ class StudentTestsCoach(APITestCase):
             call_name="call name",
             email="example@example.com",
             phone_number="+14255550123",
-            language="0",
-            extra_info="extra info",
+            language="dutch",
             cv="https://example.com",
             portfolio="https://example.com",
             school_name="Example",
             degree="Example",
             studies="Example",
-            alum=False
+            alum=False,
+            employment_agreement="test value",
+            english_rating=2,
+            motivation="test value",
+            fun_fact="test value",
+            degree_duration=2,
+            degree_current_year=1,
+            best_skill="test value"
         )
         skill = Skill.objects.create(
             name="skill",
@@ -64,7 +70,7 @@ class StudentTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], Student.objects.count())
+        self.assertEqual(len(response.data), Student.objects.count())
 
     def test_get_student_instance(self):
         student = Student.objects.first()
@@ -110,6 +116,14 @@ class StudentTestsCoach(APITestCase):
             "school_name": "Example",
             "degree": "Example",
             "studies": "Example",
+            "employment_agreement": "test_value",
+            "language": "dutch",
+            "english_rating": 2,
+            "motivation": "test_value",
+            "fun_fact": "test_value",
+            "degree_duration": 5,
+            "degree_current_year": 2,
+            "best_skill": "test_value",
             "skills": [reverse("skill-detail", args=(skill.id,))]
         }
         url = reverse("student-list")
@@ -214,14 +228,20 @@ class StudentTestsAdmin(APITestCase):
             call_name="call name",
             email="example@example.com",
             phone_number="+14255550123",
-            language="0",
-            extra_info="extra info",
+            language="dutch",
             cv="https://example.com",
             portfolio="https://example.com",
             school_name="Example",
             degree="Example",
             studies="Example",
-            alum=False
+            alum=False,
+            employment_agreement="test value",
+            english_rating=2,
+            motivation="test value",
+            fun_fact="test value",
+            degree_duration=2,
+            degree_current_year=1,
+            best_skill="test value"
         )
 
         admin = Coach.objects.create_user(
@@ -373,7 +393,7 @@ class CoachTestsAdmin(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], Coach.objects.count())
+        self.assertEqual(len(response.data), Coach.objects.count())
 
     def test_get_coach_instance(self):
         coach = Coach.objects.exclude(id=self.admin.id).first()
@@ -448,12 +468,23 @@ class ProjectTestsCoach(APITestCase):
         Student.objects.create(
             first_name="First name",
             last_name="Last name",
+            call_name="call name",
             email="example@example.com",
+            phone_number="+14255550123",
+            language="dutch",
             cv="https://example.com",
             portfolio="https://example.com",
             school_name="Example",
             degree="Example",
-            studies="Example"
+            studies="Example",
+            alum=False,
+            employment_agreement="test value",
+            english_rating=2,
+            motivation="test value",
+            fun_fact="test value",
+            degree_duration=2,
+            degree_current_year=1,
+            best_skill="test value"
         )
 
         user = Coach.objects.create_user(
@@ -468,7 +499,7 @@ class ProjectTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], Project.objects.count())
+        self.assertEqual(len(response.data), Project.objects.count())
 
     def test_get_project_instance(self):
         project = Project.objects.first()
@@ -702,7 +733,7 @@ class SkillTests(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], Skill.objects.count())
+        self.assertEqual(len(response.data), Skill.objects.count())
 
     def test_get_skill_instance(self):
         skill = Skill.objects.first()
@@ -773,12 +804,23 @@ class SentEmailTests(APITestCase):
         student = Student.objects.create(
             first_name="First name",
             last_name="Last name",
+            call_name="call name",
             email="example@example.com",
+            phone_number="+14255550123",
+            language="dutch",
             cv="https://example.com",
             portfolio="https://example.com",
             school_name="Example",
             degree="Example",
-            studies="Example"
+            studies="Example",
+            alum=False,
+            employment_agreement="test value",
+            english_rating=2,
+            motivation="test value",
+            fun_fact="test value",
+            degree_duration=2,
+            degree_current_year=1,
+            best_skill="test value"
         )
         user = Coach.objects.create_user(
             first_name="username", 
@@ -798,7 +840,7 @@ class SentEmailTests(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], SentEmail.objects.count())
+        self.assertEqual(len(response.data), SentEmail.objects.count())
 
     def test_get_email_instance(self):
         email = SentEmail.objects.first()
