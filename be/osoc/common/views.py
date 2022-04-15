@@ -1,8 +1,7 @@
 """
 Views that create a connection between the database and the application.
 """
-from django.contrib.auth import login, logout
-from rest_framework import viewsets, mixins, permissions, views, status, generics
+from rest_framework import viewsets, mixins, permissions, status, generics
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import *
@@ -15,6 +14,10 @@ from urllib.parse import urlparse
 from rest_framework.reverse import reverse
 from .models import *
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
+from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
@@ -117,8 +120,8 @@ class StudentViewSet(viewsets.ModelViewSet):
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
 
-class CoachViewSet(viewsets.GenericViewSet, 
-                   mixins.ListModelMixin, 
+class CoachViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):   # no create, this is handled in RegisterView
@@ -301,41 +304,6 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     filterset_fields = ['sender', 'receiver']
 
 
-class LoginView(views.APIView):
-    """
-    API view that handles logging in users; Accessible to anyone.
-    """
-    # This view should be accessible also for unauthenticated users.
-    permission_classes = (permissions.AllowAny,)
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def post(self, request, format=None):
-        serializer = LoginSerializer(data=self.request.data,
-                                                 context={'request': self.request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        login(request, user)
-        return Response(None, status=status.HTTP_202_ACCEPTED)
-
-
-class LogoutView(views.APIView):
-    """
-    API view that handles logging out users; Accessible to anyone.
-    """
-    permission_classes = (permissions.AllowAny,)
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def get(self, request):
-        logout(request)
-        return Response()
-
-
 class RegisterView(generics.GenericAPIView):
     """
     API view that handles registering users; Only admins can
@@ -355,3 +323,9 @@ class RegisterView(generics.GenericAPIView):
         return Response({
             "user": CoachSerializer(user, context=self.get_serializer_context()).data
         })
+
+
+class GithubLogin(SocialLoginView):
+    adapter_class = GitHubOAuth2Adapter
+    callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"
+    client_class = OAuth2Client

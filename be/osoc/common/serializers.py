@@ -4,6 +4,8 @@ Serializers definitions of the Django models defined in ./models.py.
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import *
+from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.serializers import LoginSerializer
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
@@ -20,9 +22,18 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Student
-        fields = ['url', 'id', 'first_name', 'last_name', 'call_name', 'email', 
-                  'phone_number', 'alum', 'language', 'extra_info', 'cv', 'portfolio', 
-                  'school_name', 'degree', 'studies', 'skills', 'suggestions', 'final_decision']
+        fields = '__all__'
+        extra_fields = ['id']
+
+    def get_field_names(self, declared_fields, info):
+        # Include all fields and id
+        # https://stackoverflow.com/questions/38245414/django-rest-framework-how-to-include-all-fields-and-a-related-field-in-mo
+        expanded_fields = super(StudentSerializer, self).get_field_names(declared_fields, info)
+
+        if getattr(self.Meta, 'extra_fields', None):
+            return self.Meta.extra_fields + expanded_fields
+        else:
+            return expanded_fields
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
@@ -43,11 +54,13 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
         model = RequiredSkills
         fields = ['amount', 'skill', 'comment']
 
+
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'coach_name', 'coach_id', 'skill', 'reason']
         read_only_fields = ['coach']
+
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     required_skills = RequiredSkillsSerializer(
@@ -69,6 +82,26 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
+    
+
+    # overwrite update method to be able to create/update/delete RequiredSkills objects
+    def update(self, instance, validated_data):
+        
+        # first update required skills
+        skills_data = validated_data.pop('requiredskills_set')
+        # update or create skills from request
+        for skill_data in skills_data:
+            RequiredSkills.objects.update_or_create(project=instance, **skill_data)
+        # delete skills not in request
+        skills = [skill_data['skill'] for skill_data in skills_data]
+        RequiredSkills.objects.filter(project=instance).exclude(skill__in=skills).delete()
+        return super().update(instance, validated_data)
+
+
+class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = SentEmail
+        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
 
     # overwrite update method to be able to create/update/delete RequiredSkills objects
     def update(self, instance, validated_data):
@@ -102,14 +135,9 @@ class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['is_admin', 'is_active']
 
 
-class LoginSerializer(serializers.Serializer):
-    """
-    This serializer defines two fields for authentication:
-      * username
-      * password.
-    It will try to authenticate the user with when validated.
-    """
-    username = serializers.CharField(
+class CustomLoginSerializer(LoginSerializer):
+    username = None
+    email = serializers.CharField(
         label="Username",
         write_only=True
     )
@@ -123,13 +151,13 @@ class LoginSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         # Take username and password from request
-        username = attrs.get('username')
+        email = attrs.get('email')
         password = attrs.get('password')
 
-        if username and password:
+        if email and password:
             # Try to authenticate the user using Django auth framework.
             user = authenticate(request=self.context.get('request'),
-                                username=username, password=password)
+                                username=email, password=password)
             if not user:
                 # If we don't have a regular user, raise a ValidationError
                 msg = 'Access denied: wrong username or password.'
@@ -143,14 +171,17 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Coach
-        fields = ('id', 'first_name', 'last_name', 'email', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
+class CustomRegisterSerializer(RegisterSerializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    username = None
 
-    def create(self, validated_data):
-        user = Coach.objects.create_user(
-            validated_data['email'], validated_data['password'], first_name=validated_data['first_name'], last_name=validated_data['last_name'])
-
-        return user
+    def get_cleaned_data(self):
+        super(CustomRegisterSerializer, self).get_cleaned_data()
+        return {
+            'password1': self.validated_data.get('password1', ''),
+            'password2': self.validated_data.get('password2', ''),
+            'email': self.validated_data.get('email', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', '')
+        }

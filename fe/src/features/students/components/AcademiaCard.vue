@@ -1,0 +1,47 @@
+<template>
+  <q-card class="full-height cornered">
+    <q-card-section>
+      <div class="text-h6">
+        {{ title }}
+      </div>
+    </q-card-section>
+    <q-card-section class="q-pt-none">
+      <div v-if="studentStore.isLoading">
+        <LoadingSpinner />
+      </div>
+
+      <div v-else>
+        <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
+          <li>{{ 'Enrolled at: ' + studentStore.currentStudent.schoolName }}</li>
+          <li>{{ 'Studies: ' + studentStore.currentStudent.studies }}</li>
+          <li>{{ 'Degree: ' + studentStore.currentStudent.degree }}</li>
+          <li>{{ 'Duration of degree: ' + studentStore.currentStudent.degreeDuration }}</li>
+          <li>{{ 'Current year of degree: ' + studentStore.currentStudent.degreeCurrentYear }}</li>
+        </ul>
+      </div>
+    </q-card-section>
+  </q-card>
+</template>
+
+<script lang="ts">
+import {useStudentStore} from "../../../stores/useStudentStore";
+import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import {defineComponent} from "@vue/runtime-core";
+
+export default defineComponent( {
+  components: {LoadingSpinner},
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+  },
+  setup() {
+    const studentStore = useStudentStore()
+
+    return {
+      studentStore,
+    }
+  },
+})
+</script>
