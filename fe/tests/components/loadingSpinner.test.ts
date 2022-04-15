@@ -21,6 +21,6 @@ describe('example test typescript', () => {
         expect(Component).toBeTruthy();
         const wrapper = wrapperFactory();
 
-        console.log(wrapper.html());
+        // console.log(wrapper.html());
     })
 })
