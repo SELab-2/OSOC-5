@@ -1,5 +1,5 @@
 <template>
-  <q-slide-transition :appear="suggestion.reason === undefined">
+  <q-slide-transition :appear="isNew && !suggestion.reason">
     <div v-if="show" style="margin-left: 10px">
       <div class="column full-width" style="justify-content: center">
         <div tabindex="-1" class="row" style="height: 30px;">
@@ -12,7 +12,7 @@
             {{ suggestion.student.firstName }}
             {{ suggestion.student.lastName }}
           
-          <q-badge v-if="suggestion.reason === undefined" rounded :color="suggestion.skill.color" label="Draft" class="q-ml-xs" style="height: 15px; margin-top: 3px" />
+          <q-badge v-if="isNew" rounded :color="suggestion.skill.color" label="Draft" class="q-ml-xs" style="height: 15px; margin-top: 3px" />
           </div>
           <q-space/>
           <div v-if="!removed">
@@ -31,7 +31,7 @@
               icon="delete"
               @click="() => {
                 removed = true
-                suggestion.reason === undefined ? remove() : prepareRemove()
+                isNew ? remove() : prepareRemove()
               }"
             />
           </div>
@@ -41,8 +41,8 @@
           <q-input
             :autofocus="progress !== 3"
             :color="suggestion.skill.color"
-            v-if="undefined === suggestion.reason || progress !== 0"
-            v-model="currentReason"
+            v-if="isNew || progress !== 0"
+            v-model="suggestion.reason"
             dense
             outlined
             autogrow
@@ -84,7 +84,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { ProjectSuggestion } from '../../../models/ProjectSuggestion'
+import { ProjectSuggestion, NewProjectSuggestion } from '../../../models/ProjectSuggestion'
 import { useProjectStore } from '../../../stores/useProjectStore'
 
 export default defineComponent({
@@ -108,7 +108,6 @@ export default defineComponent({
       projectStore: useProjectStore(),
       show: ref(true),
       progress: ref(0),
-      reason: ref(''),
       removed: ref(false),
       timeout
     }
@@ -141,7 +140,6 @@ export default defineComponent({
     },
     async confirm() {
       this.progress = 1
-      this.suggestion.reason = this.reason
       try {
         await this.confirmSuggestion(this.suggestion)
         this.progress = 2
@@ -152,13 +150,8 @@ export default defineComponent({
     },
   },
   computed: {
-    currentReason: {
-      get() {
-        return this.progress === 3 ? this.suggestion.reason : this.reason
-      },
-      set(newValue: string) {
-        this.progress === 3 ? (this.suggestion.reason = newValue) : (this.reason = newValue)
-      }
+    isNew() {
+      return this.suggestion instanceof NewProjectSuggestion
     }
   }
 })

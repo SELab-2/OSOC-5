@@ -16,7 +16,9 @@
     @mousemove="mousemove"
     :color="color"
     :style="glowStyle"
-  />
+  >
+  <slot/>
+  </q-btn>
 </template>
 
 <style scoped>

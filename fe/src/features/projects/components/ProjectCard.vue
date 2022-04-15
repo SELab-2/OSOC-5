@@ -19,6 +19,22 @@
         />
         <q-space />
         <div>
+          <btn 
+            v-if="anyNew.length > 0" 
+            icon="r_warning" 
+            color="yellow"
+            flat
+            round
+            size="12px"
+            glow-color="amber-3"
+            @click="expand(anyNew)"
+            >
+            <q-tooltip class="shadow-4 bg-amber-7">
+            <div class="text-subtitle2">
+              There are still draft suggestions open.
+            </div>
+          </q-tooltip>
+          </btn>
           <btn flat round size="12px" color="primary" icon="mail" />
           <btn flat round size="12px" color="primary" icon="info" />
           <btn flat round size="12px" color="primary" icon="edit" />
@@ -55,19 +71,14 @@
               round
               size="sm"
               icon="mdi-eye"
-              @click="
-                () => {
-                  expanded = !expanded
-                  toggleExpanded(expanded)
-                }
-              "
+              @click="expanded = !expanded"
             />
           </div>
-
           <div v-if="project.requiredSkills !== undefined">
             <project-role-chip
               v-show="project.requiredSkills"
-              v-model="selectedRoles[skill.skill.id]"
+              :modelValue="selectedRoles[skill.skill.id] || hovered === skill.skill.id"
+              @update:modelValue="selectedRoles[skill.skill.id] = $event"
               v-for="(skill, index) in project.requiredSkills"
               @dragleave="onDragLeave($event, skill)"
               @dragover="checkDrag($event, skill)"
@@ -84,7 +95,7 @@
         v-for="(role, index) in project.requiredSkills ?? []"
         :key="index"
       >
-        <div v-show="selectedRoles[role.skill.id]">
+        <div v-show="selectedRoles[role.skill.id] || hovered === role.skill.id">
           <q-item-label
             class="text-subtitle1 text-bold"
             :class="'text-' + role.skill.color + '-8'"
@@ -112,6 +123,7 @@ import { useQuasar } from 'quasar'
 import {
   ProjectSuggestionInterface,
   ProjectSuggestion,
+  NewProjectSuggestion
 } from '../../../models/ProjectSuggestion'
 import { ProjectSkillInterface, Skill } from '../../../models/Skill'
 import { Project } from '../../../models/Project'
@@ -136,13 +148,12 @@ export default defineComponent({
       projectStore: useProjectStore(),
     }
   },
-
   data() {
     return {
-      expanded: ref(false),
-      loading: ref(false)
+      hovered: ref(-1)
     }
   },
+
   watch: {
     // The skills are fetched later on, thus the list needs to be updated manually.
     'project.requiredSkills': {
@@ -159,17 +170,11 @@ export default defineComponent({
   },
 
   methods: {
-    // Expand/Hide the whole student list.
-    toggleExpanded(state: boolean) {
-      Object.keys(this.selectedRoles).forEach((key) => {
-        this.selectedRoles[key as any as number] = state
-      })
-    },
 
-    async removeSuggestion(suggestion: ProjectSuggestionInterface) {
+    async removeSuggestion(suggestion: ProjectSuggestion) {
       try {
         // If the suggestion has not yet been posted to the server, don't make the POST call.
-        if (suggestion.reason !== undefined) {
+        if (!(suggestion instanceof NewProjectSuggestion)) {
           await this.projectStore.removeSuggestion(this.project, suggestion)
         }
         const index = this.project.suggestedStudents!.findIndex(
@@ -185,6 +190,12 @@ export default defineComponent({
           message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.skill.name}`,
           textColor: 'black',
         })
+      }
+    },
+    expand(skills) {
+      const indexes = skills.map(s => s.skill.id);
+      for (let i in this.selectedRoles) {
+        this.selectedRoles[i] = indexes.includes(parseInt(i))
       }
     },
 
@@ -204,24 +215,26 @@ export default defineComponent({
         return ''
       return this.amountLeft(skill) > 0 ? this.onDragOver(e, skill) : ''
     },
-
+   
     // Show the students assigned to a role when dragging over the chip of that role.
     onDragOver(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
       e.stopPropagation()
-      this.selectedRoles[skill.skill.id] = true
+      this.hovered = skill.skill.id
+      // this.selectedRoles[skill.skill.id] = true
     },
 
     // Hide the students assigned to a role when dragging away from the chip of that role.
     onDragLeave(e: DragEvent, skill: ProjectSkillInterface) {
-      if (!this.expanded) {
-        this.selectedRoles[skill.skill.id] = false
-      }
+      this.hovered = -1
+
     },
 
     // Assign a student to a role.
     async onDrop(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
+      this.hovered = -1
+      this.selectedRoles[skill.skill.id] = true
       const target = <HTMLDivElement>e.target
       // don't drop on other draggables
       if ((<HTMLDivElement>e.target).draggable === true) {
@@ -245,9 +258,9 @@ export default defineComponent({
         return
       }
       this.project.suggestedStudents?.push(
-        new ProjectSuggestion({
+        new NewProjectSuggestion({
           coach: this.me,
-          reason: undefined,
+          reason: '',
           skill: skill.skill,
           student: data.student,
         })
@@ -258,20 +271,39 @@ export default defineComponent({
         // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
       }
     },
-    async confirmSuggestion(suggestion: ProjectSuggestion) {
-      this.loading = true
+    async confirmSuggestion(suggestion: NewProjectSuggestion) {
+      // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
+      const i = this.project.suggestedStudents.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
+      this.project.suggestedStudents[i] = new ProjectSuggestion(suggestion)
+
       await this.projectStore.addSuggestion(
         this.project.id,
         suggestion.student.url,
         suggestion.skill.url,
-        suggestion?.reason ?? ''
+        suggestion.reason
       )
     }
     
   },
   computed: {
+    anyNew() {
+      return (this.project.requiredSkills ?? []).filter(s => {
+        return !this.selectedRoles[s.skill.id] && this.project.suggestedStudents.filter(student => student.skill.id === s.skill.id).some(student => student instanceof NewProjectSuggestion)
+      })
+      // return this.project.suggestedStudents?.some(s => s instanceof NewProjectSuggestion )
+    },
     me() {
       return this.authenticationStore.loggedInUser as User
+    },
+    expanded: {
+      get() {
+        return Object.values(this.selectedRoles).every(r => r)
+      },
+      set(newValue) {
+        for (let i in this.selectedRoles) {
+          this.selectedRoles[i] = newValue
+        }
+      }
     },
     // Selectedroles is stored in the project itself instead of in the component state.
     // This is due to a bug with state in masonry-wall.

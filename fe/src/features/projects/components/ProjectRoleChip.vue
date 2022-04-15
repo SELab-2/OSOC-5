@@ -26,6 +26,7 @@
           {{ skill.skill.name }}
         </div>
         <div
+          v-if="occupied"
           class="text-bold"
           style="padding-left: 3px"
           :class="`text-${enabled ? 'white' : `${skill.skill.color}-8`}`"
