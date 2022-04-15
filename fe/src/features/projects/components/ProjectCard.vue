@@ -98,13 +98,6 @@
             v-for="suggestion in groupedStudents[role.skill.id] ?? []"
             :key="suggestion.student.id"
           />
-          <!-- <q-slide-transition
-            :appear="!suggestion.coach"
-            v-for="suggestion in groupedStudents[role.skill.id] ?? []"
-            :key="suggestion.student.id"
-          >
-            
-          </q-slide-transition> -->
         </div>
       </q-slide-transition>
     </q-card-section>
@@ -145,10 +138,8 @@ export default defineComponent({
   },
 
   data() {
-    const selectedRoles: Record<number, boolean> = reactive({})
     return {
       expanded: ref(false),
-      selectedRoles,
       loading: ref(false)
     }
   },
@@ -187,7 +178,7 @@ export default defineComponent({
             s.skill.id === suggestion.skill.id
         )
         this.project.suggestedStudents!.splice(index, 1)
-      } catch (error) {
+      } catch (error: any) {
         this.q.notify({
           icon: 'warning',
           color: 'warning',
@@ -203,7 +194,7 @@ export default defineComponent({
       return skill.amount - (occupied ? occupied.length : 0)
     },
 
-    checkDrag(e: MouseEvent, skill: ProjectSkillInterface) {
+    checkDrag(e: DragEvent, skill: ProjectSkillInterface) {
       const id: number = parseInt(e.dataTransfer!.types[0])
       if (
         this.groupedStudents?.[skill.skill.id]?.some(
@@ -215,14 +206,14 @@ export default defineComponent({
     },
 
     // Show the students assigned to a role when dragging over the chip of that role.
-    onDragOver(e: MouseEvent, skill: ProjectSkillInterface) {
+    onDragOver(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
       e.stopPropagation()
       this.selectedRoles[skill.skill.id] = true
     },
 
     // Hide the students assigned to a role when dragging away from the chip of that role.
-    onDragLeave(e: MouseEvent, skill: ProjectSkillInterface) {
+    onDragLeave(e: DragEvent, skill: ProjectSkillInterface) {
       if (!this.expanded) {
         this.selectedRoles[skill.skill.id] = false
       }
@@ -273,7 +264,7 @@ export default defineComponent({
         this.project.id,
         suggestion.student.url,
         suggestion.skill.url,
-        suggestion.reason
+        suggestion?.reason ?? ''
       )
     }
     
@@ -281,6 +272,16 @@ export default defineComponent({
   computed: {
     me() {
       return this.authenticationStore.loggedInUser as User
+    },
+    // Selectedroles is stored in the project itself instead of in the component state.
+    // This is due to a bug with state in masonry-wall.
+    selectedRoles: {
+      get() {
+        return (this.project as any).selectedRoles ?? {}
+      },
+      set(newValue: Record<number,boolean>) {
+        (this.project as any).selectedRoles = newValue
+      }
     },
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }

@@ -1,18 +1,26 @@
 <template>
-  <q-slide-transition :appear="!suggestion.reason">
+  <q-slide-transition :appear="suggestion.reason === undefined">
     <div v-if="show" style="margin-left: 10px">
       <div class="column full-width" style="justify-content: center">
-        <div tabindex="-1" class="row" style="height: 30px">
-          <q-item-section
+        <div tabindex="-1" class="row" style="height: 30px;">
+          <div
             :lines="1"
-            class="text-weight-medium"
+            class="text-weight-medium row"
             :class="removed ? 'text-strike' : ''"
           >
+          
             {{ suggestion.student.firstName }}
             {{ suggestion.student.lastName }}
-          </q-item-section>
+          
+          <q-badge v-if="suggestion.reason === undefined" rounded :color="suggestion.skill.color" label="Draft" class="q-ml-xs" style="height: 15px; margin-top: 3px" />
+          </div>
+          <q-space/>
           <div v-if="!removed">
-            <btn tabindex="-1" class="gt-xs" size="sm" flat dense round icon="comment" />
+            <btn tabindex="-1" class="gt-xs" size="sm" @mouseover="() => {
+              if (progress === 0) progress = 3
+            }" @mouseleave="() => {
+              if (progress === 3) progress = 0
+            }" flat dense round icon="r_comment" />
             <btn tabindex="-1" class="gt-xs" size="sm" flat dense round icon="info" />
             <btn tabindex="-1"
               class="gt-xs"
@@ -31,24 +39,26 @@
         </div>
         <q-slide-transition v-if="progress >= 0">
           <q-input
-            autofocus
+            :autofocus="progress !== 3"
             :color="suggestion.skill.color"
             v-if="undefined === suggestion.reason || progress !== 0"
-            v-model="reason"
+            v-model="currentReason"
             dense
             outlined
             autogrow
-            label="Comment"
+            label="Comment (Optional)"
+            :disabled="progress === 3"
           >
-            <template v-slot:after>
+            <template v-slot:after v-if="progress !== 3">
               <btn
-                :color="progress === 2 ? 'green' : suggestion.skill.color"
+                :color="progress === 2 ? 'positive' : suggestion.skill.color"
                 dense
                 flat
+                padding="sm"
                 :loading="progress === 1"
                 @click="confirm"
-                :icon="progress === 0 ? 'send' : 'check'"
-                :glow-color="`${suggestion.skill.color}-2`"
+                :icon="progress === 0 ? 'r_send' : 'r_check'"
+                :glow-color="progress === 2 ? 'green-2' : `${suggestion.skill.color}-2`"
               />
             </template>
           </q-input>
@@ -93,13 +103,14 @@ export default defineComponent({
     },
   },
   data() {
+    let timeout: any | null = null
     return {
       projectStore: useProjectStore(),
       show: ref(true),
       progress: ref(0),
       reason: ref(''),
       removed: ref(false),
-      timeout: undefined
+      timeout
     }
   },
   beforeUnmount() {
@@ -113,12 +124,12 @@ export default defineComponent({
       this.removed = false
       if (!this.timeout) return
       clearTimeout(this.timeout)
-      this.timeout = undefined
+      this.timeout = null
     },
     prepareRemove() {
       this.timeout = setTimeout(() => {
         this.remove()
-        this.timeout = undefined
+        this.timeout = null
       }, 2000)
     },
     remove() {
@@ -140,5 +151,15 @@ export default defineComponent({
       }
     },
   },
+  computed: {
+    currentReason: {
+      get() {
+        return this.progress === 3 ? this.suggestion.reason : this.reason
+      },
+      set(newValue: string) {
+        this.progress === 3 ? (this.suggestion.reason = newValue) : (this.reason = newValue)
+      }
+    }
+  }
 })
 </script>

@@ -6,9 +6,9 @@ export interface ProjectSuggestionInterface {
   student: Student
   coach: User
   skill: Skill
-  reason: string
-  coachId: number
-  coachName: string
+  reason?: string
+  coachId?: number
+  coachName?: string
 }
 
 export interface TempProjectSuggestion {
@@ -24,9 +24,9 @@ export class ProjectSuggestion implements ProjectSuggestionInterface {
   student: Student
   coach: User
   skill: Skill
-  reason: string
-  coachId: number
-  coachName: string
+  reason?: string
+  coachId?: number
+  coachName?: string
   
   constructor(data: ProjectSuggestionInterface) {
     Object.assign(this, data)

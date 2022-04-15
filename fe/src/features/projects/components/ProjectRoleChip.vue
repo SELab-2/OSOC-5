@@ -65,9 +65,6 @@ export default defineComponent({
       required: false,
     },
   },
-  setup(props, { emit }) {
-    emit('update:modelValue')
-  },
   computed: {
     enabled: {
       get() {

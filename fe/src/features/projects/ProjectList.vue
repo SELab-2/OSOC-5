@@ -14,7 +14,7 @@
         </div>
         <btn
           padding="7px"
-          icon="warning"
+          icon="r_warning"
           color="red"
           label="Conflicts"
           to="/projects/conflicts"

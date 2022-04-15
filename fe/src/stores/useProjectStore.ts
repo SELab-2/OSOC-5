@@ -3,7 +3,7 @@ import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
 import { Skill, ProjectSkillInterface, ProjectSkill, TempProjectSkill } from '../models/Skill'
-import { ProjectSuggestionInterface } from '../models/ProjectSuggestionInterface'
+import { ProjectSuggestionInterface, ProjectSuggestion } from '../models/ProjectSuggestion'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 
@@ -23,12 +23,12 @@ export const useProjectStore = defineStore('project', {
     ): Promise<ProjectSuggestionInterface[]> {
       const newStudents: ProjectSuggestionInterface[] = []
       for (const student of students) {
-        const newStudent: ProjectSuggestionInterface = {
+        const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
           coach: (await instance.get(student.coach)).data as User,
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
-        }
+        })
         newStudents.push(newStudent)
       }
       return newStudents
