@@ -76,8 +76,9 @@ export default defineComponent({
     }
   },
   setup() {
+    const projectStore = useProjectStore()
     return {
-      projectStore: useProjectStore(),
+      projectStore,
     }
   },
   created() {
@@ -89,10 +90,10 @@ export default defineComponent({
     expanded: {
       get() {
         if (this.projectStore.projects.length === 0) return false
-        return this.projectStore.projects.every(p => Object.values(p.selectedRoles ?? {k:false}).every(r => r))
+        return (this as any).projectStore.projects.every((p: any) => Object.values(p.selectedRoles ?? {k:false}).every(r => r))
       },
       set(newValue) {
-        this.projectStore.projects.forEach(p => {
+        this.projectStore.projects.forEach((p: any) => {
           for (let r in p.selectedRoles) {
             p.selectedRoles[r] = newValue
           }

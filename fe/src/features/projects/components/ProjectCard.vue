@@ -202,7 +202,7 @@ export default defineComponent({
         })
       }
     },
-    expand(skills) {
+    expand(skills: ProjectSkillInterface[]) {
       const indexes = skills.map(s => s.skill.id);
       for (let i in this.selectedRoles) {
         this.selectedRoles[i] = indexes.includes(parseInt(i))
@@ -283,8 +283,8 @@ export default defineComponent({
     },
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
       // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
-      const i = this.project.suggestedStudents.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
-      this.project.suggestedStudents[i] = new ProjectSuggestion(suggestion)
+      const i = this.project.suggestedStudents!.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
+      this.project.suggestedStudents![i] = new ProjectSuggestion(suggestion)
 
       await this.projectStore.addSuggestion(
         this.project.id,
@@ -298,7 +298,7 @@ export default defineComponent({
   computed: {
     anyNew() {
       return (this.project.requiredSkills ?? []).filter(s => {
-        return !this.selectedRoles[s.skill.id] && this.project.suggestedStudents.filter(student => student.skill.id === s.skill.id).some(student => student instanceof NewProjectSuggestion)
+        return !this.selectedRoles[s.skill.id] && (this.project.suggestedStudents ?? []).filter(student => student.skill.id === s.skill.id).some(student => student instanceof NewProjectSuggestion)
       })
       // return this.project.suggestedStudents?.some(s => s instanceof NewProjectSuggestion )
     },
@@ -309,7 +309,7 @@ export default defineComponent({
       get() {
         return Object.values(this.selectedRoles).every(r => r)
       },
-      set(newValue) {
+      set(newValue: boolean) {
         for (let i in this.selectedRoles) {
           this.selectedRoles[i] = newValue
         }
