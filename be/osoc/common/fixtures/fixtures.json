@@ -19,7 +19,7 @@
     "model": "common.skill",
     "pk": 3,
     "fields": {
-      "name": "Sysadmin",
+      "name": "UX / UI designer",
       "color": "red"
     }
   },
@@ -27,7 +27,7 @@
     "model": "common.skill",
     "pk": 4,
     "fields": {
-      "name": "Full-stack developer",
+      "name": "Graphic designer",
       "color": "magenta"
     }
   },
@@ -35,7 +35,7 @@
     "model": "common.skill",
     "pk": 5,
     "fields": {
-      "name": "Student coach",
+      "name": "Business Modeller",
       "color": "cyan"
     }
   },
@@ -43,7 +43,7 @@
     "model": "common.skill",
     "pk": 6,
     "fields": {
-      "name": "Communication Expert",
+      "name": "Storyteller",
       "color": "white"
     }
   },
@@ -51,8 +51,32 @@
     "model": "common.skill",
     "pk": 7,
     "fields": {
-      "name": "Tester",
+      "name": "Marketer",
       "color": "black"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 8,
+    "fields": {
+      "name": "Copywriter",
+      "color": "pink"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 9,
+    "fields": {
+      "name": "Video editor",
+      "color": "orange"
+    }
+  },
+  {
+    "model": "common.skill",
+    "pk": 10,
+    "fields": {
+      "name": "Photographer",
+      "color": "green"
     }
   },
   {
