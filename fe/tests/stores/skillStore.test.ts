@@ -1,4 +1,4 @@
-import {test, expect, describe, beforeEach} from 'vitest'
+import {it, expect, describe, beforeEach} from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import {useSkillStore} from "../../src/stores/useSkillStore";
 
@@ -11,7 +11,7 @@ describe('Skill Store', () => {
         setActivePinia(createPinia())
     })
 
-    test('load skills', () => {
+    it('load skills', () => {
 
         // create a new skillstore
         const skillStore = useSkillStore()

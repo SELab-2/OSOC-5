@@ -1,4 +1,4 @@
-import {test, expect, describe, beforeEach, fn, vi} from 'vitest'
+import {test, expect, describe, beforeEach, vi, it} from 'vitest'
 import {mount} from '@vue/test-utils'
 import {Quasar} from 'quasar'
 import Component from '../../src/components/LoadingSpinner.vue'
@@ -23,7 +23,7 @@ describe('example test typescript', () => {
         setActivePinia(createPinia())
     })
     // example test
-    test('mount component', () => {
+    it('mount component', () => {
         expect(Component).toBeTruthy();
         const wrapper = wrapperFactory();
 
