@@ -66,13 +66,23 @@
           </q-chip>
           <div class="row" style="display: flex; align-items: center">
             <div class="text-caption text-grey">Roles:</div>
-            <q-btn
+            <btn
               flat
               round
               size="sm"
-              icon="mdi-eye"
+              
+              
+              
               @click="expanded = !expanded"
-            />
+            >
+            <q-icon 
+              size="2em"
+              name="expand_more" 
+              :class="expanded ? 'rotate180' : ''" 
+              style="transition: transform ease 500ms !important; align-self: center; justify-self: center;"
+              
+              />
+            </btn>
           </div>
           <div v-if="project.requiredSkills !== undefined">
             <project-role-chip
@@ -330,3 +340,10 @@ export default defineComponent({
   },
 })
 </script>
+
+<style>
+
+.rotate180 {
+  transform: rotate( 180deg ) !important;
+}
+</style>

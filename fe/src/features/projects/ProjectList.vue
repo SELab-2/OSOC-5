@@ -10,8 +10,17 @@
         <div class="text-bold text-h4 q-ml-md text-black">Projects</div>
         <q-space />
         <div>
-          <q-input dense v-model="filter" outlined label="Outlined" />
+          <q-input dense v-model="filter" outlined label="Outlined" style="margin-right: 10px" />
         </div>
+        <btn
+          padding="7px"
+          :icon="expanded ? 'unfold_less' : 'unfold_more'"
+          color="blue"
+          @click="expanded = !expanded"
+          shadow-color="blue"
+          shadow-strength="1.8"
+        />
+        
         <btn
           padding="7px"
           icon="r_warning"
@@ -75,9 +84,30 @@ export default defineComponent({
     // Prevent a reload each time switched to the tab.
     if (this.projectStore.projects.length === 0)
       this.projectStore.loadProjects()
+  },
+  computed: {
+    expanded: {
+      get() {
+        if (this.projectStore.projects.length === 0) return false
+        return this.projectStore.projects.every(p => Object.values(p.selectedRoles ?? {k:false}).every(r => r))
+      },
+      set(newValue) {
+        this.projectStore.projects.forEach(p => {
+          for (let r in p.selectedRoles) {
+            p.selectedRoles[r] = newValue
+          }
+        })
+      }
+    }
   }
 })
 </script>
+
+<style>
+.rotate180 {
+  transform: rotate(180deg);
+}
+</style>
 
 <style lang="sass" scoped>
 .my-card
@@ -88,4 +118,5 @@ export default defineComponent({
 
 .q-btn
     margin: 5px
+    
 </style>

@@ -13,6 +13,7 @@
     :flat="flat"
     ref="glowbutton"
     class="bttn"
+    :class="focusable ? 'focusable' : ''"
     @mousemove="mousemove"
     :color="color"
     :style="glowStyle"
@@ -53,7 +54,8 @@ export default defineComponent({
     },
     'disableClick': Boolean,
     'unelevated': Boolean,
-    'flat': Boolean
+    'flat': Boolean,
+    'focusable': Boolean
   },
   
   data() {
@@ -154,12 +156,7 @@ export default defineComponent({
     transition-property: transform, opacity;
   }
   
-  &:focus::before {
-    --scale: 1;
-    --opacity: 1;
-    transition-property: transform, opacity;
-  }
-    
+  
   &:active::before {
     --scale: calc(3 * var(--prop-scale));
     --opacity: 1;
@@ -177,6 +174,12 @@ export default defineComponent({
     --press: var(--button-scale);
     --spread: calc(var(--shadow-strength) * var(--shadow-scale));
   }
+}
+
+.focusable:focus::before {
+  --scale: 1;
+  --opacity: 1;
+  transition-property: transform, opacity;
 }
 
 

@@ -54,6 +54,7 @@
                 :color="progress === 2 ? 'positive' : suggestion.skill.color"
                 dense
                 flat
+                focusable
                 padding="sm"
                 :loading="progress === 1"
                 @click="confirm"
