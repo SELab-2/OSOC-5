@@ -36,12 +36,21 @@
           </q-tooltip>
           </btn>
           <btn flat round size="12px" color="primary" icon="mail" />
-          <btn flat round size="12px" color="primary" icon="info" />
+          <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
           <btn flat round size="12px" color="primary" icon="edit" />
         </div>
       </div>
 
       <div class="text-overline">{{ project.partnerName }}</div>
+      <q-slide-transition>
+        <div v-if="showInfo">
+        <div class="text-h6">Info</div>
+        <div class="text-body2" >
+        {{ project.extraInfo }}
+        </div>
+        <q-separator inset spaced="10px"/>
+        </div>
+      </q-slide-transition>
       <q-slide-transition>
         <div
           v-show="
@@ -65,24 +74,25 @@
             }}.
           </q-chip>
           <div class="row" style="display: flex; align-items: center">
-            <div class="text-caption text-grey">Roles:</div>
-            <btn
-              flat
-              round
-              size="sm"
-              
-              
-              
-              @click="expanded = !expanded"
-            >
-            <q-icon 
-              size="2em"
-              name="expand_more" 
-              :class="expanded ? 'rotate180' : ''" 
-              style="transition: transform ease 500ms !important; align-self: center; justify-self: center;"
-              
-              />
-            </btn>
+            <div v-if="(project.requiredSkills ?? []).length > 0" class="row flex-center">
+              <div class="text-caption text-grey">Skills:</div>
+              <btn
+                
+                flat
+                round
+                size="sm"
+                @click="expanded = !expanded"
+              >
+              <q-icon 
+                size="2em"
+                name="expand_more" 
+                :class="expanded ? 'rotate180' : ''" 
+                style="transition: transform ease 500ms !important; align-self: center; justify-self: center;"
+                />
+              </btn>
+            </div>
+            <div v-else>There are no skills assigned to this project.</div>
+            
           </div>
           <div v-if="project.requiredSkills !== undefined">
             <project-role-chip
@@ -160,7 +170,8 @@ export default defineComponent({
   },
   data() {
     return {
-      hovered: ref(-1)
+      hovered: ref(-1),
+      showInfo: ref(false)
     }
   },
 
@@ -307,7 +318,8 @@ export default defineComponent({
     },
     expanded: {
       get() {
-        return Object.values(this.selectedRoles).every(r => r)
+        const v = Object.values(this.selectedRoles)
+        return v.every(r => r) && v.length > 0
       },
       set(newValue: boolean) {
         for (let i in this.selectedRoles) {

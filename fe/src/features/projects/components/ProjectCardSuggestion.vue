@@ -1,18 +1,16 @@
 <template>
   <q-slide-transition :appear="isNew && !suggestion.reason">
     <div v-if="show" style="margin-left: 10px">
-      <div class="column full-width" style="justify-content: center">
-        <div :lines="1" tabindex="-1" class="row" style="height: 30px; flex-wrap: nowrap;">
+      <div class="column full-width">
+        <div :lines="1" tabindex="-1" class="row flex-center no-wrap" style="height: 30px">
           <div
-            class="text-weight-medium row"
+            class="text-weight-medium row wrap text-no-wrap"
             :class="removed ? 'text-strike' : ''"
-            style="white-space: nowrap;overflow: hidden;display: block;text-overflow: ellipsis; margin-top: 3px;"
           >
-          
             {{ suggestion.student.firstName }}
             {{ suggestion.student.lastName }}
           </div>
-          <q-badge v-if="isNew" rounded :color="suggestion.skill.color" label="Draft" class="q-ml-xs" style="height: 15px; margin-top: 6px" />
+          <q-badge v-if="isNew" rounded :color="suggestion.skill.color" label="Draft" class="q-ml-xs" />
           
           <q-space/>
           <div v-if="!removed" style="flex-wrap: nowrap; display: block; min-width: 72px">
