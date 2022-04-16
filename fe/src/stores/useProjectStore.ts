@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
-import { Skill, ProjectSkill, TempProjectSkill } from '../models/Skill'
-import { ProjectSuggestion } from '../models/ProjectSuggestion'
+import { Skill, ProjectSkillInterface, ProjectSkill, TempProjectSkill } from '../models/Skill'
+import { ProjectSuggestionInterface, ProjectSuggestion } from '../models/ProjectSuggestion'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 
@@ -20,20 +20,20 @@ export const useProjectStore = defineStore('project', {
   actions: {
     async fetchSuggestedStudents(
       students: TempStudent[]
-    ): Promise<ProjectSuggestion[]> {
-      const newStudents: ProjectSuggestion[] = []
+    ): Promise<ProjectSuggestionInterface[]> {
+      const newStudents: ProjectSuggestionInterface[] = []
       for (const student of students) {
-        const newStudent: ProjectSuggestion = {
+        const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
           coach: (await instance.get(student.coach)).data as User,
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
-        }
+        })
         newStudents.push(newStudent)
       }
       return newStudents
     },
-    async removeSuggestion(project: Project, suggestion: ProjectSuggestion) {
+    async removeSuggestion(project: Project, suggestion: ProjectSuggestionInterface) {
       return instance.post(`projects/${project.id}/remove_student/`, {
         student: suggestion.student.url,
         skill: suggestion.skill.url,
@@ -53,24 +53,18 @@ export const useProjectStore = defineStore('project', {
     },
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
-      return {
-        amount: skill.amount,
-        comment: skill.comment,
-        skill: new Skill(data),
-        // A new skill must be created, otherwise it's just on object casted to Skill, but not a Skill object.
-        // That would produce warnings in Vue.
-      }
+      return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
 
-      const skills: Array<ProjectSkill> = await Promise.all(
+      const skills: Array<ProjectSkillInterface> = await Promise.all(
         project.requiredSkills.map((skill) => this.getSkill(skill))
       )
 
-      const students: Array<ProjectSuggestion> =
+      const students: Array<ProjectSuggestionInterface> =
         await this.fetchSuggestedStudents(project.suggestedStudents)
 
       // Is added to projects here because we do not want to await on each project.
@@ -98,11 +92,11 @@ export const useProjectStore = defineStore('project', {
             project.coaches.map((coach) => useCoachStore().getUser(coach))
           )
 
-          const skills: Array<ProjectSkill> = await Promise.all(
+          const skills: Array<ProjectSkillInterface> = await Promise.all(
             project.requiredSkills.map((skill) => this.getSkill(skill))
           )
 
-          const students: Array<ProjectSuggestion> =
+          const students: Array<ProjectSuggestionInterface> =
             await this.fetchSuggestedStudents(project.suggestedStudents)
 
           this.projects[i].coaches = coaches
