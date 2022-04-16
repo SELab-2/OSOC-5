@@ -13,10 +13,11 @@
       <div v-else>
         <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 0px;">
           <StudentSkillChip
-            v-for="(skill, index) in studentStore.currentStudent.skillList"
+            v-for="(skill, index) in studentStore.currentStudent.skills"
             :key="index"
-            :color="skill.color"
-            :name="skill.name"
+            :best-skill="studentStore.currentStudent.bestSkill ?? ''"
+            :color="typeof(skill) !== 'string' ? skill.color : ''"
+            :name="typeof(skill) !== 'string' ? skill.name : ''"
           />
         </ul>
       </div>
@@ -28,8 +29,10 @@
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import StudentSkillChip from "./StudentSkillChip.vue";
+import {defineComponent} from "@vue/runtime-core";
+import {Skill} from "../../../models/Skill";
 
-export default {
+export default defineComponent( {
   components: {StudentSkillChip, LoadingSpinner},
   props: {
     title: {
@@ -44,5 +47,5 @@ export default {
       studentStore,
     }
   },
-}
+})
 </script>

@@ -11,8 +11,8 @@
       </div>
 
       <div v-else>
-        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
-          {{ studentStore.currentStudent.extraInfo }}
+        <div v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 0px;">
+          {{ content }}
         </div>
       </div>
     </q-card-section>
@@ -22,14 +22,19 @@
 <script lang="ts">
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import {defineComponent} from "@vue/runtime-core";
 
-export default {
+export default defineComponent( {
   components: {LoadingSpinner},
   props: {
     title: {
       type: String,
       required: true
     },
+    content: {
+      type: String,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()
@@ -38,5 +43,5 @@ export default {
       studentStore,
     }
   },
-}
+})
 </script>

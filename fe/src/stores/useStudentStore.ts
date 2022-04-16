@@ -3,10 +3,16 @@ import {instance} from "../utils/axios";
 import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import { User } from '../models/User'
 import {Student} from "../models/Student";
-import {Suggestion} from "../models/Suggestion";
 import {Skill} from "../models/Skill";
 
 interface State {
+    search: string
+    alumni: string
+    decision: string
+    byMe: boolean
+    onProject: boolean
+    skills: Array<Skill>
+    skillsStudents: Map<string, Skill>
     coaches: Map<string, User>
     students: Array<Student>
     isLoading: boolean
@@ -16,6 +22,13 @@ interface State {
 
 export const useStudentStore = defineStore('user/student', {
     state: (): State => ({
+        search: "",
+        alumni: "all",
+        decision: "none",
+        byMe: false,
+        onProject: false,
+        skills: [],
+        skillsStudents: new Map(),
         coaches: new Map(),
         students: [],
         isLoading: false,
@@ -23,23 +36,62 @@ export const useStudentStore = defineStore('user/student', {
         currentStudent: null,
     }),
     actions: {
-        async loadStudents(): Promise<void> {
+        async transformStudent(student: any): Promise<void> {
+            const skills = [] as Skill[]
+
+            for (let i = 0; i < student.skills.length; i++) {
+                if (this.skillsStudents.get(student.skills[i])) {
+                    const skill = this.skillsStudents.get(student.skills[i].toString()) as Skill
+                    skills.push(skill)
+                } else {
+                    await instance
+                        .get(student.skills[i])
+                        .then(({data}) => {
+                            this.skillsStudents.set(student.skills[i].toString(), data)
+                            skills.push(data)
+                        })
+                }
+            }
+
+            student.skills = skills
+
+            if (student.finalDecision) {
+                student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
+            }
+
+            for (const suggestion of student.suggestions) {
+                suggestion.suggestion = parseInt(suggestion.suggestion)
+            }
+
+            student.gender = parseInt(student.gender)
+            student.language = parseInt(student.language)
+            student.englishRating = parseInt(student.englishRating)
+        },
+        async loadStudents() {
             this.isLoading = true
+            const filters = []
+
+            if (this.search) filters.push(`search=${this.search}`)
+            if (this.alumni === "alumni") filters.push("alumni=true")
+            if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
+            if (this.byMe === true) filters.push("suggested_by_user")
+            if (this.onProject === true) filters.push("on_project")
+
+            for (const skill of this.skills) {
+                filters.push(`skills=${skill.id}`)
+            }
+
+            let url = ""
+            if (filters) url = `?${filters.join('&')}`
 
             await instance
-                .get('students/')
-                .then(({data}) => {
+                .get<Student[]>(`students/${url}`)
+                .then(async ({data}) => {
                     for (const student of data) {
-                        if (student.final_decision) {
-                            student.final_decision.suggestion = parseInt(student.final_decision.suggestion)
-                        }
-
-                        for (const suggestion of student.suggestions) {
-                            suggestion.suggestion = parseInt(suggestion.suggestion)
-                        }
+                        await this.transformStudent(student)
                     }
 
-                    this.students = convertObjectKeysToCamelCase(data) as never as Student[]
+                    this.students = data.map((student) => new Student(student))
                 })
 
             this.isLoading = false
@@ -50,26 +102,9 @@ export const useStudentStore = defineStore('user/student', {
             await instance
                 .get(`students/${studentId}/`)
                 .then(async ({data}) => {
-                    for (const suggestion of data.suggestions) {
-                        suggestion.suggestion = parseInt(suggestion.suggestion)
-                    }
+                    await this.transformStudent(data)
 
-                    if (data.final_decision) {
-                        data.final_decision.suggestion = parseInt(data.final_decision.suggestion)
-                    }
-
-                    const skills = [] as Skill[]
-
-                    for (let i = 0; i < data.skills.length; i++) {
-                        await instance
-                            .get(data.skills[i])
-                            .then(({data}) => {
-                                skills.push(data)
-                            })
-                    }
-
-                    data.skillList = skills
-                    this.currentStudent = convertObjectKeysToCamelCase(data) as never as Student
+                    this.currentStudent = new Student(data as Student)
                 })
 
             this.isLoading = false
@@ -89,15 +124,15 @@ export const useStudentStore = defineStore('user/student', {
 
             await this.loadStudent(studentId)
         },
-        async updateFinalDecision(studentId: number, possibleFinalDecision: number) {
+        async updateFinalDecision(studentId: number, possibleFinalDecision: string) {
             let reason = ""
 
-            if (this.currentStudent?.finalDecision?.suggestion == possibleFinalDecision) {
+            if (this.currentStudent?.finalDecision?.suggestion.toString() == possibleFinalDecision) {
                 reason = this.currentStudent.finalDecision.reason
             }
 
             // check if -1 is selected to delete decision
-            if (possibleFinalDecision == -1) {
+            if (possibleFinalDecision == "-1") {
                 await instance
                     .delete(`students/${studentId}/remove_final_decision/`)
             } else {

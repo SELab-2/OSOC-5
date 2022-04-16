@@ -91,12 +91,13 @@
     <br/>
 
     <div>
-      <q-btn unelevated
-             label="Sign up"
-             type="submit"
-             size="md"
-             color="primary"
-             class="q-mx-md cornered primarybuttonshadow"
+      <btn
+         label="Sign up"
+         type="submit"
+         size="md"
+         color="primary"
+         class="q-mx-md cornered"
+         glow-color="#00ECAA"
       />
       <label class="text-bold">or</label>
       <GitHubSignInButton/>
@@ -118,7 +119,7 @@ const metaData = {
 export default defineComponent({
   components: { GitHubSignInButton },
   setup() {
-    const $q = useQuasar()
+    const q = useQuasar()
     const email = ref(null)
     const firstName = ref(null)
     const lastName = ref(null)
@@ -139,18 +140,18 @@ export default defineComponent({
       isConfPwd: ref(true),
       onSubmit () {
         if (password.value !== confirmPassword.value) {
-          $q.notify({
+          q.notify({
             color: 'negative',
             message: 'Passwords do not match'
           })
         } else if (accept.value !== true) {
-          $q.notify({
+          q.notify({
             color: 'negative',
             message: 'You need to accept the license and terms first'
           })
         }
         else {
-          $q.notify({
+          q.notify({
             icon: 'done',
             color: 'positive',
             message: 'Submitted'

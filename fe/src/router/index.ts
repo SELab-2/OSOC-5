@@ -9,6 +9,7 @@ import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
+import {useStudentStore} from "../stores/useStudentStore";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -87,6 +88,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const studentStore = useStudentStore()
+  studentStore.currentStudent = null
+
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.

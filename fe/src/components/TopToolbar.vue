@@ -1,14 +1,7 @@
 <template>
-  <q-header
-    elevated
-    class="bg-white text-white"
-    height-hint="98"
-  >
-    <q-toolbar class="text-blue bg-white">
-      <q-btn
-        flat
-        round
-      >
+  <q-header class="bg-white text-white" height-hint="98">
+    <q-toolbar class="text-blue bg-white shadow-2">
+      <q-btn flat round>
         <q-avatar size="42px">
           <img src="../assets/logo.svg">
         </q-avatar>
@@ -52,6 +45,7 @@
             :key="`${index}`"
             v-close-popup
             clickable
+            @click="item.click"
             tabindex="0"
           >
             <q-item-section avatar>
@@ -101,14 +95,17 @@ export default defineComponent({
         {
           name: 'Email Templates',
           icon: 'email',
+          click: () => console.log("test"),
         },
         {
           name: 'Change Password',
           icon: 'key',
+          click: () => console.log("test"),
         },
         {
           name: 'Sign Out',
           icon: 'logout',
+          click: this.authenticationStore.logout,
         },
       ],
     }
@@ -116,6 +113,11 @@ export default defineComponent({
   computed: {
     fullName(): string {
       return this.authenticationStore.loggedInUser?.firstName + ' ' + this.authenticationStore.loggedInUser?.lastName
+    }
+  },
+  method: {
+    logout(): void {
+      this.authenticationStore.logout()
     }
   }
 })

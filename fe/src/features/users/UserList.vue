@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative-position container flex flex-center"
+    class="relative-position container flex justify-center"
     style="width: 100vw"
   >
     <div
@@ -12,12 +12,13 @@
           Users
         </div>
         <q-space />
-        <q-btn
+        <btn
           stack
           flat
           color="yellow"
           icon="download"
           label="csv"
+          glow-color="amber-2"
         />
       </div>
       <div class="row q-mb-md vertical-middle">
@@ -66,9 +67,8 @@
             <q-td
               key="name"
               :props="props"
-              @click="console.log(props)"
             >
-              {{ props.row.firstName }} {{ props.row.lastName }}
+              {{ props.row.fullName }}
             </q-td>
             <q-td
               key="role"
@@ -123,12 +123,13 @@
               key="remove"
               style="width: 10px"
             >
-              <q-btn
+              <btn
                 flat
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 @click="coachStore.removeUser(props.row.id)"
+                glow-color="red-2"
               />
             </q-td>
           </q-tr>
@@ -225,7 +226,7 @@ export default defineComponent({
   components: { SegmentedControl },
   setup() {
     const coachStore = useCoachStore()
-    const $q = useQuasar()
+    const q = useQuasar()
     
     onMounted(() => {
       coachStore.loadUsers();
@@ -239,7 +240,7 @@ export default defineComponent({
       columns,
       roles,
       coachStore,
-      $q
+      q
     }
   },
   methods: {
@@ -298,7 +299,7 @@ export default defineComponent({
 //       )
 // 
 //       if (status !== true) {
-//         this.$q.notify({
+//         this.q.notify({
 //           message: 'Browser denied file download...',
 //           color: 'negative',
 //           icon: 'warning',
@@ -309,14 +310,13 @@ export default defineComponent({
     updateRole(user: User, oldRole: string) {
       // nextTick is used cause the user param contains the old role. We need to wait for the next tick to get the new role.
       this!.$nextTick(() => {
-        let newRole = this.coachStore.users.find(u => u.id === user.id)!.role
         this.coachStore
-        .updateRole(user, newRole)
+        .updateRole(user)
         .catch((error) => {
-            this.$q.notify({
+            this.q.notify({
             icon: 'warning',
             color: 'warning',
-            message: `Error ${error.response.status} while updating role to ${user.role} for ${user.firstName} ${user.lastName}`,
+            message: error.detail,
             textColor: 'black'
           });
           this.coachStore.users.find((u: User) => u.id === user.id)!.role = oldRole
