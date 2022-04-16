@@ -45,3 +45,17 @@ class CoachConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'remove_final_decision': suggestion
         }))
+
+    def suggest_student(self, event):
+        suggestion = event['data']
+
+        self.send(text_data=json.dumps({
+            'suggest_student': suggestion
+        }))
+
+    def remove_student(self, event):
+        suggestion = event['data']
+
+        self.send(text_data=json.dumps({
+            'remove_student': suggestion
+        }))

@@ -14,6 +14,19 @@ export const useSkillStore = defineStore('skills', {
     isLoadingSkills: false,
   }),
   actions: {
+    async getSkill(url: string): Promise<Skill> {
+      const skill = this.skills.find((skill) => skill.url === url)
+      if (skill) return skill
+      const { data } = await instance.get<ProjectTableSkill>(url)
+
+      // Check again if not present, it could be added in the meantime.
+      const skill2 = this.skills.find((skill) => skill.url === url)
+      if (skill2) return skill2
+
+      const newSkill = new Skill(data)
+      this.skills.push(newSkill)
+      return newSkill
+    },
     /*
      * SKILLS
      */

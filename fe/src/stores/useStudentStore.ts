@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { User } from '../models/User'
-import { Student } from '../models/Student'
+import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
 import { useCoachStore } from './useCoachStore'
 
@@ -36,6 +36,20 @@ export const useStudentStore = defineStore('user/student', {
     currentStudent: null,
   }),
   actions: {
+    async getStudent(url: string): Promise<Student> {
+      const student = this.students.find((student) => student.url === url)
+      if (student) return student
+      const { data } = await instance.get<StudentInterface>(url)
+      await this.transformStudent(data)
+
+      // Check again if not present, it could be added in the meantime.
+      const student2 = this.students.find((student) => student.url === url)
+      if (student2) return student2
+
+      const newstudent = new Student(data)
+      this.students.push(newstudent)
+      return newstudent
+    },
     async transformStudent(student: any): Promise<void> {
       const skills = [] as Skill[]
 

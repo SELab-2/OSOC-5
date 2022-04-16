@@ -6,6 +6,8 @@ import { Skill, ProjectSkill, TempProjectSkill } from '../models/Skill'
 import { ProjectSuggestion } from '../models/ProjectSuggestion'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
+import { useStudentStore } from './useStudentStore'
+import { useSkillStore } from './useSkillStore'
 
 interface State {
   projects: Array<Project>
@@ -122,6 +124,43 @@ export const useProjectStore = defineStore('project', {
       } catch (error) {
         console.log(error)
         this.isLoadingProjects = false
+      }
+    },
+    async receiveSuggestion({
+      student_id,
+      skill_id,
+      project_id,
+      reason,
+      coach,
+    }: {
+      student_id: number
+      skill_id: number
+      project_id: number
+      reason: string
+      coach: string
+    }) {
+      const project = this.projects.filter(({ id }) => id === project_id)[0]
+      const alreadyExists = project.suggestedStudents?.some(
+        (suggestion) =>
+          suggestion.skill.id === skill_id &&
+          suggestion.student.id === student_id
+      )
+
+      if (!alreadyExists) {
+        const studentStore = useStudentStore()
+        const coachStore = useCoachStore()
+        const skillStore = useSkillStore()
+
+        const student = await studentStore.getStudent(`/students/${student_id}`)
+        const coachObj = await coachStore.getUser(coach)
+        const skill = await skillStore.getSkill(`/skills/${skill_id}`)
+
+        project.suggestedStudents?.push({
+          student,
+          coach: coachObj,
+          skill,
+          reason,
+        })
       }
     },
   },

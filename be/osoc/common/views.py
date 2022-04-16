@@ -286,6 +286,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     reverse("coach-detail", args=(request.user.id,)))
                 response_data['coach_name'] = request.user.get_full_name()
                 response_data['coach_id'] = request.user.id
+                response_data['student_id'] = student.id
+                response_data['project_id'] = pk
+                response_data['skill_id'] = skill.id
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "suggestion",
+                    {
+                        'type': 'suggest_student',
+                        'data': response_data
+                    }
+                )
 
                 return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
             return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
@@ -314,6 +325,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
                 project=self.get_object(), coach=request.user, student=student).delete()
+
+            channel_layer = get_channel_layer()
+            websocket_data = serializer.data
+            websocket_data['project'] = pk
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'remove_student',
+                    'data': websocket_data
+                }
+            )
 
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
