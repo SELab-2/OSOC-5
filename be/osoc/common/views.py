@@ -131,6 +131,17 @@ class StudentViewSet(viewsets.ModelViewSet):
             response_data['coach_id'] = request.user.id
             response_data['coach'] = request.build_absolute_uri(
                 reverse("coach-detail", args=(request.user.id,)))
+            response_data['student_id'] = pk
+            response_data['suggestion'] = request.data['suggestion']
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'final_decision',
+                    'data': response_data
+                }
+            )
 
             return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -147,6 +158,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
             student=self.get_object(), coach=request.user).delete()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'final_decision',
+                'data': {'student_id': pk}
+            }
+        )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 

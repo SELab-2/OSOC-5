@@ -246,11 +246,13 @@ export default defineComponent ({
   setup() {
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
+    const socket = new WebSocket('ws://localhost:8000/ws/socket_server/')
 
     return {
       authenticationStore,
       studentStore,
       possibleFinalDecision: ref("-1"),
+      socket,
     }
   },
   data() {
@@ -324,7 +326,7 @@ export default defineComponent ({
     },
     mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.pk)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.id)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion.toString() : (-1).toString()
       } else {
@@ -371,6 +373,22 @@ export default defineComponent ({
     }
   },
   mounted() {
+      this.socket.onmessage = async (event: { data: string }) => {
+          const data = JSON.parse(event.data)
+
+          if(data.hasOwnProperty('suggestion'))
+            await this.studentStore.receiveSuggestion(data.suggestion)
+          else if(data.hasOwnProperty('remove_suggestion'))
+            this.studentStore.removeSuggestion(data.remove_suggestion)
+          else if(data.hasOwnProperty('final_decision'))
+            this.studentStore.receiveFinalDecision(data.final_decision)
+          else if(data.hasOwnProperty('remove_final_decision'))
+            this.studentStore.removeFinalDecision(data.remove_final_decision)
+
+          this.update()
+      }
+   
+
     // Reload when new student is selected
     this.$watch('id', async (id: number) => {
       await this.studentStore.loadStudent(id)
@@ -384,8 +402,8 @@ export default defineComponent ({
   },
   methods: {
     makeSuggestion: async function () {
-      if (this.student && this.authenticationStore?.loggedInUser?.pk) {
-        await this.studentStore.updateSuggestion(this.student.id, this.authenticationStore?.loggedInUser?.pk, this.possibleSuggestion, this.reason)
+      if (this.student) {
+        await this.studentStore.updateSuggestion(this.student.id, this.reason)
         this.reason = ""
       }
 

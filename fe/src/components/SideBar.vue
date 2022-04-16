@@ -190,11 +190,9 @@ export default defineComponent({
       required: true
     }
   },
-emits: ['update'],
   setup() {
     const studentStore = useStudentStore()
     const $q = useQuasar()
-    const socket = new WebSocket('ws://localhost:8000/ws/socket_server/')
 
     const skillStore = useSkillStore()
 
@@ -206,7 +204,6 @@ emits: ['update'],
     return {
       studentStore,
       $q,
-      socket,
       skillStore,
       thumbStyle: {
         right: '0px',
@@ -221,21 +218,7 @@ emits: ['update'],
       miniState: ref(false),
       drawer: ref(false),
     }
-  },
-  mounted() {
-        this.socket.onmessage = async (event: { data: string }) => {
-            const data = JSON.parse(event.data)
-            console.log(data)
-            if(data.hasOwnProperty('suggestion'))
-              await this.studentStore.receiveSuggestion(data.suggestion)
-            else if(data.hasOwnProperty('remove_suggestion'))
-              this.studentStore.removeSuggestion(data.remove_suggestion)
-            else if(data.hasOwnProperty('final_decision'))
-              this.studentStore.receiveFinalDecision(data.final_decision)
-            
-            this.$emit("update")
-        }
-   },   
+  },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.

@@ -33,16 +33,15 @@ class CoachConsumer(WebsocketConsumer):
         }))
 
     def final_decision(self, event):
-        # def coach_action(self, event):
-        studentId = event['studentId']
-        coachId = event['coachId']
-        suggestion = event['suggestion']
-        reason = event['reason']
+        suggestion = event['data']
 
         self.send(text_data=json.dumps({
-            'type': 'final_decision',
-            'studentId': studentId,
-            'coachId': coachId,
-            'suggestion': suggestion,
-            'reason': reason
+            'final_decision': suggestion
+        }))
+
+    def remove_final_decision(self, event):
+        suggestion = event['data']
+
+        self.send(text_data=json.dumps({
+            'remove_final_decision': suggestion
         }))
