@@ -13,10 +13,13 @@
     :flat="flat"
     ref="glowbutton"
     class="bttn"
+    :class="focusable ? 'focusable' : ''"
     @mousemove="mousemove"
     :color="color"
     :style="glowStyle"
-  />
+  >
+  <slot/>
+  </q-btn>
 </template>
 
 <style scoped>
@@ -51,19 +54,23 @@ export default defineComponent({
     },
     'disableClick': Boolean,
     'unelevated': Boolean,
-    'flat': Boolean
+    'flat': Boolean,
+    'focusable': Boolean
+  },
+  
+  data() {
+    return {
+      x: ref(0),
+      y: ref(0)
+    }
   },
   mounted() {
     // This class produces a tint change on hover, but is unwanted for the glow button.
     const button = this.$refs.glowbutton as any
     button.$el.classList.remove('q-hoverable')
     button.$el.removeChild(button.$el.children[0])
-  },
-  data() {
-    return {
-      x: ref(0),
-      y: ref(0)
-    }
+    this.x = button.$el.clientWidth / 2
+    this.y = button.$el.clientHeight / 2
   },
   computed: {
     glow() {
@@ -148,7 +155,8 @@ export default defineComponent({
     --opacity: 1;
     transition-property: transform, opacity;
   }
-    
+  
+  
   &:active::before {
     --scale: calc(3 * var(--prop-scale));
     --opacity: 1;
@@ -166,6 +174,12 @@ export default defineComponent({
     --press: var(--button-scale);
     --spread: calc(var(--shadow-strength) * var(--shadow-scale));
   }
+}
+
+.focusable:focus::before {
+  --scale: 1;
+  --opacity: 1;
+  transition-property: transform, opacity;
 }
 
 

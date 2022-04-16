@@ -16,7 +16,7 @@
         style="height: 8%; overflow: visible; z-index: 1"
         :class="`text-blue bg-white ${showShadow ? 'shadow-2' : ''}`"
       >
-        <div class="text-bold text-h4 q-ml-md">
+        <div class="text-bold text-h4 q-ml-md text-black">
           Projects
         </div>
         <q-space />
@@ -26,11 +26,21 @@
             dense
             outlined
             label="Outlined"
+            style="margin-right: 10px"
           />
         </div>
         <btn
           padding="7px"
-          icon="warning"
+          :icon="expanded ? 'unfold_less' : 'unfold_more'"
+          color="blue"
+          shadow-color="blue"
+          shadow-strength="1.8"
+          @click="expanded = !expanded"
+        />
+        
+        <btn
+          padding="7px"
+          icon="r_warning"
           color="red"
           label="Conflicts"
           to="/projects/conflicts"
@@ -95,6 +105,23 @@ export default defineComponent({
       sideBarKey: 0,
     }
   },
+  computed: {
+    expanded: {
+      get() {
+        if (this.projectStore.projects.length === 0) return false
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (this as any).projectStore.projects.every((p: { selectedRoles: any; }) => Object.values(p.selectedRoles ?? {k:false}).every(r => r))
+      },
+      set(newValue) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.projectStore.projects.forEach((p: any) => {
+          for (let r in p.selectedRoles) {
+            p.selectedRoles[r] = newValue
+          }
+        })
+      }
+    }
+  },
   created() {
     // Prevent a reload each time switched to the tab.
     if (this.projectStore.projects.length === 0)
@@ -123,6 +150,12 @@ export default defineComponent({
 })
 </script>
 
+<style>
+.rotate180 {
+  transform: rotate(180deg);
+}
+</style>
+
 <style lang="sass" scoped>
 .my-card
     border-radius: 10px !important
@@ -132,4 +165,5 @@ export default defineComponent({
 
 .q-btn
     margin: 5px
+    
 </style>
