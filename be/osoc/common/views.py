@@ -28,6 +28,8 @@ class StudentViewSet(viewsets.ModelViewSet):
         ?alum=[true, false],
         ?language=[0-4],
         ?skills=:id:,
+        ?student_coach=[true, false]
+        ?english_rating=[1-5]
         ?on_project=[true, false],
         ?suggested_by_user=[true, false],
         ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
@@ -36,9 +38,11 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter, StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
-    search_fields = ['first_name', 'last_name', 'call_name', 'email', 'alum', 'language', 'degree', 'studies', 'extra_info']
-    filterset_fields = ['alum', 'language', 'skills'] # TODO practical info, student coach
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter, 
+                       StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
+    search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree', 
+                     'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
+    filterset_fields = ['alum', 'language', 'skills', 'student_coach', 'english_rating']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
