@@ -220,13 +220,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # check if skill is one of the required skills of the project
             if skill in project.required_skills.all():
-                
-                # replace skill url with skill object
-                data['skill'] = skill
 
                 # create ProjectSuggestion if it doesnt exist yet, else update it
                 _, created = ProjectSuggestion.objects.update_or_create(
-                    project=project, student=student, coach=request.user, defaults=data)
+                    project=project, student=student, coach=request.user, skill=skill, defaults=data)
 
                 response_data = serializer.data
                 response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
@@ -260,9 +257,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
             coach_url = serializer.data.pop('coach')
             coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
 
+            # get skill object from url
+            skill_url = serializer.data.pop('skill')
+            skill = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
+
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
-                project=self.get_object(), coach=coach, student=student).delete()
+                project=self.get_object(), coach=coach, student=student, skill=skill).delete()
 
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

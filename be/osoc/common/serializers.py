@@ -108,11 +108,11 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
 class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
     a serializer for the remove_student api endpoint to be able to remove a ProjectSuggestion
-    only the fields student and coach are needed here
+    only the fields student, coach and skill are needed here
     """
     class Meta:
         model = ProjectSuggestion
-        fields = ['student', 'coach']
+        fields = ['student', 'coach', 'skill']
 
 
 class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
