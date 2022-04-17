@@ -23,7 +23,24 @@ export class Skill implements SkillInterface {
       this.url = args[3]
     } 
   }
+}
+
+export class ProjectSkill implements ProjectSkillInterface {
+  amount: number
+  comment: string
+  skill: Skill
   
+  constructor(obj: ProjectSkillInterface);
+  constructor(amount: number, comment: string, skill: Skill);
+  constructor(...args: any[]) {
+    if (args.length == 1) {
+      Object.assign(this, args[0])
+    } else {
+      this.amount = args[0]
+      this.comment = args[1]
+      this.skill = args[2]
+    } 
+  }
 }
 
 export interface TempProjectSkill {
@@ -32,7 +49,7 @@ export interface TempProjectSkill {
   skill: string
 }
 
-export interface ProjectSkill {
+export interface ProjectSkillInterface {
   amount: number
   comment: string
   skill: Skill
