@@ -111,7 +111,7 @@ class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
 class CustomLoginSerializer(LoginSerializer):
     username = None
     email = serializers.CharField(
-        label="Username",
+        label="Email",
         write_only=True
     )
     password = serializers.CharField(
@@ -145,9 +145,9 @@ class CustomLoginSerializer(LoginSerializer):
 
 
 class CustomRegisterSerializer(RegisterSerializer):
+    username = None
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-    username = None
 
     def get_cleaned_data(self):
         super(CustomRegisterSerializer, self).get_cleaned_data()
