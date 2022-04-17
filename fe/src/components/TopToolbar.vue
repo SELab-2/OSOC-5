@@ -86,6 +86,8 @@
           :type="isPwd1 ? 'password' : 'text'"
           class="inputfield"
           label="New Password 1"
+          lazy-rules
+          :rules="[(val) => (val && val.length > 7) || 'Password is too short.']"
         />
         <q-icon
           :name="isPwd1 ? 'visibility_off' : 'visibility'"
@@ -120,7 +122,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 
-import { useMeta } from 'quasar'
+import { useMeta, useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 
 const metaData = {
@@ -145,6 +147,7 @@ export default defineComponent({
     }
   },
   setup() {
+    const $q = useQuasar()
     const authenticationStore = useAuthenticationStore()
     const password1 = ref('')
     const password2 = ref('')
@@ -166,8 +169,29 @@ export default defineComponent({
         }
       },
       change_password_confirm() {
-        display_popup.value = false
-        authenticationStore.changePassword({p1:password1.value, p2:password2.value})
+        if (password1.value == password2.value) {
+          display_popup.value = false
+          authenticationStore.changePassword({p1:password1.value, p2:password2.value}).then(() => {
+            $q.notify({
+              icon: 'done',
+              color: 'positive',
+              message: 'Password was successfully changed',
+            })
+          }).
+          catch((error) => {
+            $q.notify({
+            icon: 'warning',
+            color: 'warning',
+            message: `Error ${error} while changing password, please try again`,
+            textColor: 'black'
+          });
+        })
+        } else {
+          $q.notify({
+            color: 'negative',
+            message: 'Passwords do not match'
+          })
+        }
       },
     }
   },

@@ -2,6 +2,7 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { StoreDefinition } from 'pinia'
 import router from "../router/index"
+import { instance } from '../utils/axios'
 
 const baseURL =
   process.env.NODE_ENV == 'development'
@@ -67,9 +68,8 @@ export const useAuthenticationStore: StoreDefinition<
         new_password2: p2,
       };
       const {data} = await axios.post('http://localhost:8000/api/auth/password/change/', bodyParameters, config)
-      if (data.response.status == 200) {
-        this.loggedInUser = { first_name: this.loggedInUser.first_name, last_name: this.loggedInUser.last_name, email: this.loggedInUser.email, password: p1 }
-      }
+      this.loggedInUser = { first_name: this.loggedInUser.first_name, last_name: this.loggedInUser.last_name, email: this.loggedInUser.email, password: p1 }
+
     },
   },
 })
