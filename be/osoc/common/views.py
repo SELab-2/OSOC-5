@@ -238,7 +238,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body
-    @action(detail=True, methods=['post'], serializer_class=StudentOnlySerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
+    @action(detail=True, methods=['post'], serializer_class=RemoveProjectSuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
     def remove_student(self, request, pk=None):
         """
         let a coach remove a projectsuggestion for this project
@@ -248,18 +248,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
             404 NOT FOUND:   there was no projectsuggestion found
             204 NO CONTENT:  the projectsuggestion was found and removed
         """
-        serializer = StudentOnlySerializer(
+        serializer = RemoveProjectSuggestionSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
 
             # get student object from url
             student_url = serializer.data.pop('student')
-            student = Student.objects.get(
-                **resolve(urlparse(student_url).path).kwargs)
+            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
+            
+            # get coach object from url
+            coach_url = serializer.data.pop('coach')
+            coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
 
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
-                project=self.get_object(), coach=request.user, student=student).delete()
+                project=self.get_object(), coach=coach, student=student).delete()
 
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

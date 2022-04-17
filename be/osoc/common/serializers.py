@@ -105,13 +105,21 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
 
 
-class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
+class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer for the remove_student api endpoint to be able to remove a ProjectSuggestion
+    only the fields student and coach are needed here
+    """
     class Meta:
         model = ProjectSuggestion
-        fields = ['student']
+        fields = ['student', 'coach']
 
 
 class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer for the update_coach_status api endpoint
+    only the fields is_admin and is_active are needed here
+    """
     class Meta:
         model = Coach
         fields = ['is_admin', 'is_active']
