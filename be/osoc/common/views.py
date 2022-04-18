@@ -22,15 +22,16 @@ class StudentViewSet(viewsets.ModelViewSet):
     API endpoint that allows students to be viewed, edited or searched.
     Search students with the query parameter ?search=
     Filter students with the query parameters:
-        ?alum=[true, false],
-        ?language=[0-4],
-        ?skills=:id:,
+        ?alum=[true, false]
+        ?language=string
+        ?skills=:id:
         ?student_coach=[true, false]
         ?english_rating=[1-5]
-        ?on_project=[true, false],
-        ?suggested_by_user=[true, false],
+        ?status=[0-5]
+        ?on_project=[true, false]
+        ?suggested_by_user=[true, false]
         ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
-    example query: /api/students/?alum=true&language=0&skills=1&suggestion=yes&on_project=true
+    example query: /api/students/?alum=true&status=0&skills=1&suggestion=yes&on_project=true&language=Dutch
     """
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
@@ -39,7 +40,7 @@ class StudentViewSet(viewsets.ModelViewSet):
                        StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree', 
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
-    filterset_fields = ['alum', 'language', 'skills', 'student_coach', 'english_rating']
+    filterset_fields = ['alum', 'language', 'skills', 'student_coach', 'english_rating', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
