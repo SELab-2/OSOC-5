@@ -209,7 +209,7 @@
       "degree": "MaNaMa",
       "studies": "Computer Science",
       "status": "0",
-			"skills": [
+      "skills": [
         2
       ]
     }
@@ -242,7 +242,7 @@
       "degree": "500 Masters",
       "studies": "Zeverologie",
       "status": "0",
-			"skills": [
+      "skills": [
         1,
         2
       ]
@@ -276,7 +276,7 @@
       "degree": "Bachelor",
       "studies": "Taal- en letterkunde",
       "status": "1",
-			"skills": [
+      "skills": [
         3
       ]
     }
@@ -309,7 +309,7 @@
       "degree": "Masters",
       "studies": "Computer Science",
       "status": "2",
-			"skills": [
+      "skills": [
         1,
         2,
         3
@@ -344,7 +344,7 @@
       "degree": "Masters",
       "studies": "Communication",
       "status": "4",
-			"skills": [
+      "skills": [
         5,
         6
       ]
@@ -378,7 +378,7 @@
       "degree": "Lower School",
       "studies": "Not applicable",
       "status": "5",
-			"skills": [
+      "skills": [
         6
       ]
     }
@@ -411,7 +411,7 @@
       "degree": "BS & MS",
       "studies": "Mathematics",
       "status": "2",
-			"skills": [
+      "skills": [
         1,
         3,
         4,
@@ -447,7 +447,7 @@
       "degree": "Masters",
       "studies": "Engineering",
       "status": "1",
-			"skills": [
+      "skills": [
         2,
         6,
         7
@@ -482,7 +482,7 @@
       "degree": "Professor",
       "studies": "Engineering",
       "status": "3",
-			"skills": [
+      "skills": [
         3,
         6
       ]
@@ -516,7 +516,7 @@
       "degree": "MA",
       "studies": "Engineering Science",
       "status": "4",
-			"skills": [
+      "skills": [
         2,
         4,
         7
@@ -551,7 +551,7 @@
       "degree": "Masters",
       "studies": "Computer Science",
       "status": "2",
-			"skills": [
+      "skills": [
         1,
         2,
         3,
