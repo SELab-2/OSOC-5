@@ -25,32 +25,66 @@
           </template>
         </q-input>
       </div>
-    </div>
 
-    <q-table
-      class="my-table mail-table shadow-4"
-      :rows="studentStore.students"
-      :columns="columns"
-      row-key="id"
-      separator="horizontal"
-    >
-    </q-table>
+      <q-table
+        class="my-table mail-table shadow-4"
+        :rows="studentStore.students"
+        :columns="columns"
+        row-key="id"
+        separator="horizontal"
+      >
+        <template #body="props">
+          <q-tr
+            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+            :props="props"
+          >
+            <q-td auto-width>
+              <q-btn size="sm" color="yellow" round dense @click="props.expand = !props.expand" :icon="props.expand ? 'remove' : 'add'" />
+            </q-td>
+            <q-td
+              key="name"
+              :props="props"
+            >
+              {{ props.row.fullName }}
+            </q-td>
+            <q-td
+              key="email"
+              :props="props"
+            >
+              {{ props.row.email }}
+            </q-td>
+          </q-tr>
+          <q-tr v-show="props.expand" :props="props">
+            <q-td colspan="100%">
+              <div class="text-left">This is expand slot for row above: {{ props.row.fullName }}.</div>
+            </q-td>
+          </q-tr>
+        </template>
+      </q-table>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {ref} from 'vue'
-import { Student } from "../../models/Student";
 import { useStudentStore } from "../../stores/useStudentStore";
 
 const columns = [
+  {
+    name: 'visibility',
+    required: false,
+    label: '',
+    align: 'left' as const,
+    field: '',
+    sortable: false,
+  },
   {
     name: 'name',
     required: true,
     label: 'Name',
     align: 'left' as const,
-    field: (row: Student) => row.firstName + ' ' + row.lastName,
+    field: 'name',
     sortable: true,
   },
   {

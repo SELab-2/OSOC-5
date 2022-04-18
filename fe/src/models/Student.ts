@@ -139,4 +139,8 @@ export class Student implements StudentInterface {
       this.studentCoach = args[28]
     }
   }
+
+  get fullName(): string {
+    return this.firstName + " " + this.lastName;
+  }
 }
