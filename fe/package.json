@@ -24,7 +24,8 @@
     "vue": "^3.2.25",
     "vue-meta": "^2.4.0",
     "vue-router": "^4.0.14",
-    "vue-tsc": "^0.33.9"
+    "vue-tsc": "^0.33.9",
+    "vitest": "^0.9.3"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
