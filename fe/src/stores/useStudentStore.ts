@@ -72,7 +72,7 @@ export const useStudentStore = defineStore('user/student', {
             const filters = []
 
             if (this.search) filters.push(`search=${this.search}`)
-            if (this.alumni === "alumni") filters.push("alumni=true")
+            if (this.alumni === "alumni") filters.push("alum=true")
             if (this.alumni === "student coaches") filters.push("student_coach=true")
             if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
             if (this.byMe === true) filters.push("suggested_by_user")
