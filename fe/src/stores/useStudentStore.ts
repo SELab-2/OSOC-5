@@ -7,6 +7,7 @@ import {Skill} from "../models/Skill";
 
 interface State {
     search: string
+    searchMails: string
     status: string
     alumni: string
     decision: string
@@ -16,6 +17,7 @@ interface State {
     skillsStudents: Map<string, Skill>
     coaches: Map<string, User>
     students: Array<Student>
+    mailStudents: Array<Student>
     isLoading: boolean
     possibleSuggestion: number
     currentStudent: Student | null
@@ -24,6 +26,7 @@ interface State {
 export const useStudentStore = defineStore('user/student', {
     state: (): State => ({
         search: "",
+        searchMails: "",
         status: "",
         alumni: "all",
         decision: "none",
@@ -33,6 +36,7 @@ export const useStudentStore = defineStore('user/student', {
         skillsStudents: new Map(),
         coaches: new Map(),
         students: [],
+        mailStudents: [],
         isLoading: false,
         possibleSuggestion: -1,
         currentStudent: null,
@@ -78,7 +82,6 @@ export const useStudentStore = defineStore('user/student', {
             if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
             if (this.byMe === true) filters.push("suggested_by_user")
             if (this.onProject === true) filters.push("on_project")
-            console.log(this.status)
             if (this.status) filters.push(`status=${this.status}`)
 
             for (const skill of this.skills) {
@@ -96,6 +99,27 @@ export const useStudentStore = defineStore('user/student', {
                     }
 
                     this.students = data.map((student) => new Student(student))
+                })
+
+            this.isLoading = false
+        },
+        async loadStudentsMails() {
+            this.isLoading = true
+            const filters = []
+
+            if (this.search) filters.push(`search=${this.searchMails}`)
+
+            let url = ""
+            if (filters) url = `?${filters.join('&')}`
+
+            await instance
+                .get<Student[]>(`students/${url}`)
+                .then(async ({data}) => {
+                    for (const student of data) {
+                        await this.transformStudent(student)
+                    }
+
+                    this.mailStudents = data.map((student) => new Student(student))
                 })
 
             this.isLoading = false

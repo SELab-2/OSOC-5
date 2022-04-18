@@ -29,7 +29,7 @@
               debounce="300"
               color="green"
               bg-color="white"
-              label="Search by name..."
+              label="Search"
               @update:modelValue="studentStore.loadStudents"
             >
               <template #append>

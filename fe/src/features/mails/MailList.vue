@@ -13,12 +13,13 @@
         </div>
         <q-space />
         <q-input
-          v-model="filter"
+          v-model="studentStore.searchMails"
           outlined
           dense
           debounce="300"
           color="yellow-4"
           placeholder="Search"
+          @update:modelValue="studentStore.loadStudentsMails"
         >
           <template #append>
             <q-icon name="search" />
@@ -28,7 +29,7 @@
 
       <q-table
         class="my-table mail-table shadow-4"
-        :rows="studentStore.students"
+        :rows="studentStore.mailStudents"
         :columns="columns"
         row-key="id"
         separator="horizontal"
@@ -154,7 +155,7 @@ export default defineComponent({
     }
   },
   created() {
-    this.studentStore.loadStudents()
+    this.studentStore.loadStudentsMails()
   },
   methods: {
     updateStatus(student: Student, oldStatus: string) {
