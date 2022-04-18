@@ -35,17 +35,50 @@
       >
         <template #body="props">
           <q-tr
+            @click="props.expand = !props.expand"
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
             :props="props"
           >
             <q-td auto-width>
-              <q-btn size="sm" color="yellow" round dense @click="props.expand = !props.expand" :icon="props.expand ? 'remove' : 'add'" />
+              <q-icon size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
             </q-td>
             <q-td
               key="name"
               :props="props"
             >
               {{ props.row.fullName }}
+            </q-td>
+            <q-td
+              key="status"
+              :props="props"
+            >
+              <q-select
+                v-model="props.row.status"
+                v-ripple
+                color="yellow"
+                borderless
+                dense
+                style="border-radius: 5px; position: relative; width: 80px"
+                :options="status"
+                transition-show="jump-down"
+                transition-hide="jump-up"
+                transition-duration="300"
+                behavior="menu"
+                map-options
+                emit-value
+              >
+                <template #option="scope">
+                  <q-item
+                    @click="() => updateStatus(props.row, props.row.status)"
+                    class="items-center"
+                    v-bind="scope.itemProps"
+                  >
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </q-td>
             <q-td
               key="email"
@@ -68,7 +101,10 @@
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {ref} from 'vue'
+import { Student } from "../../models/Student";
 import { useStudentStore } from "../../stores/useStudentStore";
+import {User} from "../../models/User";
+import {useQuasar} from "quasar";
 
 const columns = [
   {
@@ -88,6 +124,14 @@ const columns = [
     sortable: true,
   },
   {
+    name: 'status',
+    required: true,
+    label: 'Status',
+    align: 'left' as const,
+    field: 'status',
+    sortable: true,
+  },
+  {
     name: 'email',
     align: 'right' as const,
     label: 'Email',
@@ -96,18 +140,64 @@ const columns = [
   },
 ]
 
+const status = [
+  {
+    label: 'Applied',
+    value: '0'
+  },
+  {
+    label: 'Awaiting project',
+    value: '1'
+  },
+  {
+    label: 'Approved',
+    value: '2'
+  },
+  {
+    label: 'Contract confirmed',
+    value: '3'
+  },
+  {
+    label: 'Contract declined',
+    value: '4'
+  },
+  {
+    label: 'Rejected',
+    value: '5'
+  }
+]
 export default defineComponent({
   setup() {
     const studentStore = useStudentStore()
+    const q = useQuasar()
 
     return {
       studentStore,
       filter: ref(''),
-      columns
+      columns,
+      status,
+      q
     }
   },
   created() {
     this.studentStore.loadStudents()
+  },
+  methods: {
+    updateStatus(student: Student, oldStatus: string) {
+      this!.$nextTick(() => {
+        this.studentStore
+          .updateStatus(student)
+          .catch((error) => {
+            this.q.notify({
+              icon: 'warning',
+              color: 'warning',
+              message: error.detail,
+              textColor: 'black'
+            });
+            this.studentStore.students.find((s: Student) => s.id === student.id)!.status = oldStatus
+          })
+      })
+    }
   }
 })
 </script>
