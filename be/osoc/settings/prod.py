@@ -3,8 +3,8 @@ Django settings for production.
 
 Created to run on "sel2-5.ugent.be" domain.
 """
-from .common import *  # noqa
 import os
+from .common import *  # noqa
 # Import development environment
 
 # General
