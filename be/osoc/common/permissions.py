@@ -34,11 +34,11 @@ class IsOwnerOrAdmin(permissions.BasePermission):
         # else check object permission
         return True
 
-    def has_object_permission(self, request, view, object):
+    def has_object_permission(self, request, view, obj):
 
         # admins have all permissions
         # Write permissions are only allowed to the owner of the data
-        return request.user.is_admin or request.user==object
+        return request.user.is_admin or request.user==obj
 
 class IsActive(permissions.BasePermission):
     """

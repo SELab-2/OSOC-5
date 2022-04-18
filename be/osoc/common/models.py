@@ -1,13 +1,13 @@
 """
 Describes the database (PostgreSQL) models.
 """
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
-from datetime import datetime
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -30,6 +30,9 @@ class Skill(models.Model):
         _('color'),
         max_length=50
     )
+
+    def __str__(self):
+        return self.name
 
 
 class CoachManager(BaseUserManager):
@@ -129,9 +132,7 @@ class Coach(AbstractUser):  # models.Model):
 
 class GithubUser(models.Model):
     """
-    Skill; A talent or ability of a Student.
-
-    Students can more than one skill (many-to-many relationship).
+    Github user; used to log coaches in via github
     """
     login = models.CharField(
         _('login'),
@@ -149,10 +150,10 @@ class Student(models.Model):
     Student; Person who would like to participate in an OSOC project.
     """
     class Gender(models.TextChoices):
-        FEMALE = '0', _('FEMALE')
-        MALE = '1', _('MALE')
-        TRANSGENDER = '2', _('TRANSGENDER')
-        UNKNOWN = '3', _('UNKNOWN')
+        FEMALE = '0', _('Female')
+        MALE = '1', _('Male')
+        TRANSGENDER = '2', _('Transgender')
+        UNKNOWN = '3', _('Unknown')
 
     employment_agreement = models.CharField(
         _('employment agreement'),
@@ -271,24 +272,24 @@ class Student(models.Model):
         null=True
     )
 
-#     def get_full_name(self):
-#         """
-#         Returns the first_name plus the last_name, with a space in between.
-#         (method is required to implement by Django)
-#         """
-#         full_name = f'{self.first_name} {self.last_name}'
-#         return full_name.strip()
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        (method is required to implement by Django)
+        """
+        full_name = f'{self.first_name} {self.last_name}'
+        return full_name.strip()
 
-#     def clean(self):
-#         """
-#         Will be called before saving.
-#         """
-#         # strip first name and last name
-#         self.first_name = self.first_name.strip()
-#         self.last_name = self.last_name.strip()
+    def clean(self):
+        """
+        Will be called before saving.
+        """
+        # strip first name and last name
+        self.first_name = self.first_name.strip()
+        self.last_name = self.last_name.strip()
 
-#         # strip email and transform it to lowercase
-#         self.email = strip_and_lower_email(self.email)
+        # strip email and transform it to lowercase
+        self.email = strip_and_lower_email(self.email)
 
     def save(self, *args, **kwargs):
         """
@@ -297,6 +298,12 @@ class Student(models.Model):
         """
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.get_full_name()
+
+    def __str__(self):
+        return self.get_full_name()
 
 
 class Project(models.Model):
@@ -392,7 +399,7 @@ class Suggestion(models.Model):
 
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -429,10 +436,10 @@ class ProjectSuggestion(models.Model):
 
     class Meta:
         unique_together = (("project", "student", "coach"))
-    
+
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -451,7 +458,7 @@ class SentEmail(models.Model):
     )
     time = models.DateTimeField(
         _("send date and time"),
-        default=datetime.now, 
+        default=datetime.now,
         blank=True
     )
     info = models.CharField(
@@ -460,3 +467,6 @@ class SentEmail(models.Model):
         blank=True,
         default=""
     )
+
+    def __str__(self):
+        return f"{self.info} (from: {self.sender}, to: {self.receiver})"

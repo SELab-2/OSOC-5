@@ -50,17 +50,17 @@ class StudentFinalDecisionFilter(filters.BaseFilterBackend):
     filters students based on final decision
     query parameter 'suggestion' should be one of ['yes', 'no', 'maybe', 'none'] or ['0', '1', '2', '3']
     """
-    param2enum = {'yes': Suggestion.Suggestion.YES, 
-                  'no': Suggestion.Suggestion.NO, 
+    param2enum = {'yes': Suggestion.Suggestion.YES,
+                  'no': Suggestion.Suggestion.NO,
                   'maybe': Suggestion.Suggestion.MAYBE,
-                  '0': Suggestion.Suggestion.YES, 
-                  '1': Suggestion.Suggestion.NO, 
+                  '0': Suggestion.Suggestion.YES,
+                  '1': Suggestion.Suggestion.NO,
                   '2': Suggestion.Suggestion.MAYBE}
 
     def filter_queryset(self, request, queryset, view):
         param = request.query_params.get('suggestion')
         if param is not None:
-            if param.lower() in self.param2enum.keys():
+            if param.lower() in self.param2enum:
                 return queryset.filter(final_decision__suggestion=self.param2enum[param])
             if param.lower() in ['none', '3']:
                 return queryset.filter(final_decision=None)
