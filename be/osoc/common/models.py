@@ -1,13 +1,13 @@
 """
 Describes the database (PostgreSQL) models.
 """
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
-from datetime import datetime
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -302,6 +302,9 @@ class Student(models.Model):
     def __str__(self):
         return self.get_full_name()
 
+    def __str__(self):
+        return self.get_full_name()
+
 
 class Project(models.Model):
     """
@@ -396,7 +399,7 @@ class Suggestion(models.Model):
 
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -433,10 +436,10 @@ class ProjectSuggestion(models.Model):
 
     class Meta:
         unique_together = (("project", "student", "coach"))
-    
+
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -455,7 +458,7 @@ class SentEmail(models.Model):
     )
     time = models.DateTimeField(
         _("send date and time"),
-        default=datetime.now, 
+        default=datetime.now,
         blank=True
     )
     info = models.CharField(
