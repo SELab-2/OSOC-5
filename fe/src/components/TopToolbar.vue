@@ -7,7 +7,7 @@
         </q-avatar>
       </q-btn>
 
-      <q-space />
+      <q-space/>
       <q-tabs
         v-model="tab"
         class="absolute-center"
@@ -37,33 +37,69 @@
           exact
         />
       </q-tabs>
-      <q-space />
+      <q-space/>
       <q-btn-dropdown
         flat
         rounded
         icon="mdi-account"
         :label="fullName"
       >
-        <q-separator />
+        <q-separator/>
+        <q-item
+          v-close-popup
+          clickable
+          tabindex="0"
+        >
+          <q-item-section avatar>
+            <q-icon
+              size="xs"
+              name="email"
+              color="primary"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label :lines="1">
+              Email Templates
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
         <q-list separator>
           <q-item
-            v-for="(item, index) in dropdownitems"
-            :key="`${index}`"
             v-close-popup
             clickable
-            @click="item.click"
             tabindex="0"
           >
             <q-item-section avatar>
               <q-icon
                 size="xs"
-                :name="`${item.icon}`"
+                name="key"
                 color="primary"
               />
             </q-item-section>
             <q-item-section>
               <q-item-label :lines="1">
-                {{ item.name }}
+                Change Password
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            v-close-popup
+            clickable
+            @click="authenticationStore.logout()"
+            tabindex="0"
+          >
+            <q-item-section avatar>
+              <q-icon
+                size="xs"
+                name="logout"
+                color="primary"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label :lines="1">
+                Sign Out
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -74,14 +110,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import {defineComponent, ref} from 'vue'
 
-import { useMeta } from 'quasar'
-import { useAuthenticationStore } from '../stores/useAuthenticationStore'
+import {useMeta} from 'quasar'
+import {useAuthenticationStore} from '../stores/useAuthenticationStore'
 
 const metaData = {
   meta: {
-    themecolor: { name: 'theme-color', content: '#24a3cb' },
+    themecolor: {name: 'theme-color', content: '#24a3cb'},
   },
 }
 
@@ -95,36 +131,10 @@ export default defineComponent({
       authenticationStore
     }
   },
-  data() {
-    return {
-      dropdownitems: [
-        {
-          name: 'Email Templates',
-          icon: 'email',
-          click: () => console.log("test"),
-        },
-        {
-          name: 'Change Password',
-          icon: 'key',
-          click: () => console.log("test"),
-        },
-        {
-          name: 'Sign Out',
-          icon: 'logout',
-          click: this.authenticationStore.logout,
-        },
-      ],
-    }
-  },
   computed: {
     fullName(): string {
       return this.authenticationStore.loggedInUser?.firstName + ' ' + this.authenticationStore.loggedInUser?.lastName
     }
   },
-  method: {
-    logout(): void {
-      this.authenticationStore.logout()
-    }
-  }
 })
 </script>
