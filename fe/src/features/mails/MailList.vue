@@ -58,7 +58,7 @@
                 color="yellow"
                 borderless
                 dense
-                style="border-radius: 5px; position: relative; width: 80px"
+                style="border-radius: 5px; position: relative; width: 170px"
                 :options="status"
                 transition-show="jump-down"
                 transition-hide="jump-up"
@@ -103,8 +103,8 @@ import {defineComponent} from "@vue/runtime-core";
 import {ref} from 'vue'
 import { Student } from "../../models/Student";
 import { useStudentStore } from "../../stores/useStudentStore";
-import {User} from "../../models/User";
 import {useQuasar} from "quasar";
+import status from "./Status";
 
 const columns = [
   {
@@ -140,32 +140,6 @@ const columns = [
   },
 ]
 
-const status = [
-  {
-    label: 'Applied',
-    value: '0'
-  },
-  {
-    label: 'Awaiting project',
-    value: '1'
-  },
-  {
-    label: 'Approved',
-    value: '2'
-  },
-  {
-    label: 'Contract confirmed',
-    value: '3'
-  },
-  {
-    label: 'Contract declined',
-    value: '4'
-  },
-  {
-    label: 'Rejected',
-    value: '5'
-  }
-]
 export default defineComponent({
   setup() {
     const studentStore = useStudentStore()

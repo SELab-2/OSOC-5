@@ -143,8 +143,4 @@ export class Student implements StudentInterface {
   get fullName(): string {
     return this.firstName + " " + this.lastName;
   }
-
-  get status(): string {
-    return '0'
-  }
 }

@@ -7,6 +7,7 @@ import {Skill} from "../models/Skill";
 
 interface State {
     search: string
+    status: string
     alumni: string
     decision: string
     byMe: boolean
@@ -23,6 +24,7 @@ interface State {
 export const useStudentStore = defineStore('user/student', {
     state: (): State => ({
         search: "",
+        status: "",
         alumni: "all",
         decision: "none",
         byMe: false,
@@ -76,6 +78,8 @@ export const useStudentStore = defineStore('user/student', {
             if (this.decision !== "none") filters.push(`suggestion=${this.decision}`)
             if (this.byMe === true) filters.push("suggested_by_user")
             if (this.onProject === true) filters.push("on_project")
+            console.log(this.status)
+            if (this.status) filters.push(`status=${this.status}`)
 
             for (const skill of this.skills) {
                 filters.push(`skills=${skill.id}`)
