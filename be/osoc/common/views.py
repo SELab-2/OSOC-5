@@ -273,14 +273,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive])
     def get_conflicting_projects(self, request):
         students = Student.objects.all()
-        conflicts = []
+        conflicts = {}
         for student in students:
             projects = ProjectSuggestion.objects.filter(student=student)
             if projects.count() > 1:
                 student_url = request.build_absolute_uri(reverse("student-detail", args=(student.id,)))
                 project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,))) 
                                 for project_sug in projects]
-                conflicts.append({student_url: project_urls})
+                conflicts[student_url] = set(project_urls)
         return Response({"conflicts": conflicts}, status=status.HTTP_200_OK)
 
 
