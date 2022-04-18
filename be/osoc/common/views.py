@@ -37,9 +37,9 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('id')
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter, 
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter,
                        StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
-    search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree', 
+    search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills', 'student_coach', 'english_rating']
 
@@ -140,7 +140,7 @@ class CoachViewSet(viewsets.GenericViewSet,
     a coach cannot be created by this API endpoint
     a coach can only update and view its own data, except for admins
     Search coaches with the query parameter ?search=
-    Filter coaches with the query parameters 
+    Filter coaches with the query parameters
         ?is_admin=[true, false],
         ?is_active=[true, false
     example query: /api/coaches/?is_admin=false&is_active=true
@@ -191,10 +191,10 @@ class CoachViewSet(viewsets.GenericViewSet,
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed, edited or searched.
-    only admin users have permission for this endpoint, except for suggesting students or removing suggestions 
+    only admin users have permission for this endpoint, except for suggesting students or removing suggestions
     Search projects with the query parameter ?search=
-    Filter projects with the query parameters 
-        ?required_skills=:id:, 
+    Filter projects with the query parameters
+        ?required_skills=:id:,
         ?coaches=:id:,
         ?suggested_students=:id:
     example query: /api/projects/?required_skills=1&coaches=2&suggested_students=1
@@ -266,7 +266,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             # get student object from url
             student_url = serializer.data.pop('student')
             student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
-            
+
             # get coach object from url
             coach_url = serializer.data.pop('coach')
             coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
@@ -316,7 +316,7 @@ class SkillViewSet(viewsets.ModelViewSet):
             try:
                 self.perform_destroy(self.get_object())
             except RestrictedError:
-                return Response({"detail": "can't delete skill, it is used in at least one project suggestion"}, 
+                return Response({"detail": "can't delete skill, it is used in at least one project suggestion"},
                                 status=status.HTTP_403_FORBIDDEN)
             return Response(status=status.HTTP_204_NO_CONTENT)
         raise PermissionDenied()
@@ -326,10 +326,10 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows sent emails to be viewed, edited or searched.
     Search emails with the query parameter ?search=
-    Filter emails with the query parameters 
-        ?sender=:id:, 
-        ?receiver=:id:, 
-        ?date=yyyy-mm-dd, 
+    Filter emails with the query parameters
+        ?sender=:id:,
+        ?receiver=:id:,
+        ?date=yyyy-mm-dd,
         ?before=yyyy-mm-ddThh:mm:ss,
         ?after=yyyy-mm-ddThh:mm:ss
     example query: /api/emails/?sender=1&after=2022-04-03
