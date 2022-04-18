@@ -428,7 +428,7 @@ class ProjectSuggestion(models.Model):
     )
     skill = models.ForeignKey(
         Skill,
-        on_delete=models.CASCADE
+        on_delete=models.RESTRICT   # not allowed to delete a skill that is used in a suggestion
     )
 
     def coach_name(self):

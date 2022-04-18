@@ -55,7 +55,6 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['amount', 'skill', 'comment']
 
 
-
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion

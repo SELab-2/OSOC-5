@@ -8,8 +8,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import *
 from .serializers import *
 from rest_framework.response import Response
+from rest_framework.views import PermissionDenied
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
+from django.db.models import RestrictedError
 from django.urls import resolve
 from urllib.parse import urlparse
 from rest_framework.reverse import reverse
@@ -292,6 +294,16 @@ class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
+
+    def destroy(self, request, pk=None):
+        if request.user.is_admin:
+            try:
+                self.perform_destroy(self.get_object())
+            except RestrictedError:
+                return Response({"detail": "can't delete skill, it is used in at least one project suggestion"}, 
+                                status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        raise PermissionDenied()
 
 
 class SentEmailViewSet(viewsets.ModelViewSet):
