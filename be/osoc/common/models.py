@@ -154,6 +154,29 @@ class Student(models.Model):
         MALE = '1', _('Male')
         TRANSGENDER = '2', _('Transgender')
         UNKNOWN = '3', _('Unknown')
+    
+    class Status(models.TextChoices):
+        """
+        Status should be changed when the respective email is sent
+        Applied
+            undecided, screening
+        Awaiting project
+            Coaches are looking for a project for this student, sent maybe
+        Approved
+            Student is approved and is able to participate, sent yes
+        Contract confirmed
+            Student has signed the contract
+        Contract declined
+            Student has declined the contract
+        Rejected
+            Student is rejected and is not able to participate, sent no
+        """
+        APPLIED = '0', _('Applied')
+        AWAITING_PROJECT = '1', _('Awaiting project')
+        APPROVED = '2', _('Approved')
+        CONTRACT_CONFIRMED = '3', _('Contract confirmed')
+        CONTRACT_DECLINED = '4', _('Contract declined')
+        REJECTED = '5', _('Rejected')
 
     employment_agreement = models.CharField(
         _('employment agreement'),
@@ -251,6 +274,12 @@ class Student(models.Model):
     student_coach = models.BooleanField(
         _("wants to be student coach"),
         default=False
+    )
+    status = models.CharField(
+        _('status'),
+        max_length=1,
+        choices=Status.choices,
+        default=Status.APPLIED
     )
     skills = models.ManyToManyField(
         Skill,

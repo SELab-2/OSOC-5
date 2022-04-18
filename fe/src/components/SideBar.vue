@@ -194,11 +194,6 @@ export default defineComponent({
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
 
-    onMounted(() => {
-      skillStore.loadSkills()
-      studentStore.loadStudents()
-    })
-
     return {
       studentStore,
       skillStore,
@@ -209,6 +204,10 @@ export default defineComponent({
         width: '4px',
       },
     }
+  },
+  created() {
+    this.skillStore.loadSkills()
+    this.studentStore.loadStudents()
   },
   data() {
     return {
