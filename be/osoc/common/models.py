@@ -1,13 +1,13 @@
 """
 Describes the database (PostgreSQL) models.
 """
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
-from datetime import datetime
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -154,6 +154,29 @@ class Student(models.Model):
         MALE = '1', _('Male')
         TRANSGENDER = '2', _('Transgender')
         UNKNOWN = '3', _('Unknown')
+    
+    class Status(models.TextChoices):
+        """
+        Status should be changed when the respective email is sent
+        Applied
+            undecided, screening
+        Awaiting project
+            Coaches are looking for a project for this student, sent maybe
+        Approved
+            Student is approved and is able to participate, sent yes
+        Contract confirmed
+            Student has signed the contract
+        Contract declined
+            Student has declined the contract
+        Rejected
+            Student is rejected and is not able to participate, sent no
+        """
+        APPLIED = '0', _('Applied')
+        AWAITING_PROJECT = '1', _('Awaiting project')
+        APPROVED = '2', _('Approved')
+        CONTRACT_CONFIRMED = '3', _('Contract confirmed')
+        CONTRACT_DECLINED = '4', _('Contract declined')
+        REJECTED = '5', _('Rejected')
 
     employment_agreement = models.CharField(
         _('employment agreement'),
@@ -252,6 +275,12 @@ class Student(models.Model):
         _("wants to be student coach"),
         default=False
     )
+    status = models.CharField(
+        _('status'),
+        max_length=1,
+        choices=Status.choices,
+        default=Status.APPLIED
+    )
     skills = models.ManyToManyField(
         Skill,
     )
@@ -299,6 +328,9 @@ class Student(models.Model):
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
     
+    def __str__(self):
+        return self.get_full_name()
+
     def __str__(self):
         return self.get_full_name()
 
@@ -396,7 +428,7 @@ class Suggestion(models.Model):
 
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -428,15 +460,12 @@ class ProjectSuggestion(models.Model):
     )
     skill = models.ForeignKey(
         Skill,
-        on_delete=models.CASCADE
+        on_delete=models.RESTRICT   # not allowed to delete a skill that is used in a suggestion
     )
 
-    class Meta:
-        unique_together = (("project", "student", "coach"))
-    
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -455,7 +484,7 @@ class SentEmail(models.Model):
     )
     time = models.DateTimeField(
         _("send date and time"),
-        default=datetime.now, 
+        default=datetime.now,
         blank=True
     )
     info = models.CharField(

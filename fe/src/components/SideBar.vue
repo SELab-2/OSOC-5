@@ -44,6 +44,7 @@
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
+                { name: 'student coaches', label: 'Student Coaches'}
               ]"
               @click="studentStore.loadStudents"
             />
@@ -196,11 +197,6 @@ export default defineComponent({
 
     const skillStore = useSkillStore()
 
-    onMounted(() => {
-      skillStore.loadSkills()
-      studentStore.loadStudents()
-    })
-
     return {
       studentStore,
       $q,
@@ -212,6 +208,10 @@ export default defineComponent({
         width: '4px',
       },
     }
+  },
+  created() {
+    this.skillStore.loadSkills()
+    this.studentStore.loadStudents()
   },
   data() {
     return {

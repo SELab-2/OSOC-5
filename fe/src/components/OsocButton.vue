@@ -135,6 +135,7 @@ export default defineComponent({
     --scale: 0;
     --opacity: 0;
     
+    will-change: transform; /* Fix for webkit artifacts */
     content: '';
     position: absolute;
     left: calc(var(--x) - var(--size) / 2) !important;
