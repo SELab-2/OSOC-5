@@ -131,20 +131,26 @@ export default defineComponent({
       this.socket.onmessage = async (event: { data: string }) => {
           const data = JSON.parse(event.data)
 
-          if(data.hasOwnProperty('suggestion'))
+          if(data.hasOwnProperty('suggestion')) {
             await this.studentStore.receiveSuggestion(data.suggestion)
-          else if(data.hasOwnProperty('remove_suggestion'))
+            this.sideBarKey += 1
+          }
+          else if(data.hasOwnProperty('remove_suggestion')) {
             this.studentStore.removeSuggestion(data.remove_suggestion)
-          else if(data.hasOwnProperty('final_decision'))
+            this.sideBarKey += 1
+          }
+          else if(data.hasOwnProperty('final_decision')) {
             this.studentStore.receiveFinalDecision(data.final_decision)
-          else if(data.hasOwnProperty('remove_final_decision'))
+            this.sideBarKey += 1
+          }
+          else if(data.hasOwnProperty('remove_final_decision')) {
             this.studentStore.removeFinalDecision(data.remove_final_decision)
+            this.sideBarKey += 1
+          }
           else if(data.hasOwnProperty('suggest_student'))
-            console.log(data.suggest_student)
+            this.projectStore.receiveSuggestion(data.suggest_student)
           else if(data.hasOwnProperty('remove_student'))
-            console.log(data.remove_student)
-
-          this.sideBarKey += 1
+            this.projectStore.removeReceivedSuggestion(data.remove_student)
       }
   }
 })

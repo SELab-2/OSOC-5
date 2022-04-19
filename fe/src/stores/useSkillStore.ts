@@ -24,7 +24,14 @@ export const useSkillStore = defineStore('skills', {
       if (skill2) return skill2
 
       const newSkill = new Skill(data)
-      this.skills.push(newSkill)
+      this.skills.push({
+        name: newSkill.name,
+        amount: 0,
+        url: newSkill.url,
+        color: newSkill.color,
+        id: newSkill.id,
+        comment: '',
+      })
       return newSkill
     },
     /*

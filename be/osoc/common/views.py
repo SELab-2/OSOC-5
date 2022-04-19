@@ -297,7 +297,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 response_data['coach_name'] = request.user.get_full_name()
                 response_data['coach_id'] = request.user.id
                 response_data['student_id'] = student.id
-                response_data['project_id'] = pk
+                response_data['project_id'] = int(pk)
                 response_data['skill_id'] = skill.id
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
@@ -348,7 +348,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             channel_layer = get_channel_layer()
             websocket_data = serializer.data
-            websocket_data['project'] = pk
+            websocket_data['skill'] = skill_url
+            websocket_data['student'] = student_url
+            websocket_data['project_id'] = int(pk)
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
