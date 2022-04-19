@@ -3,8 +3,8 @@
 
   <div :key="studentKey"
     class="justify-between row q-px-lg q-pt-lg studentcol">
-    <div class="row q-pa-sm q-gutter-sm items-center">
-      <h class="text-bold text-h4">{{ name }}</h>
+    <div class="row q-px-sm q-gutter-sm items-center">
+      <h class="text-bold text-h4">{{ student ? student.fullName : '' }}</h>
       <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
       <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
@@ -31,7 +31,6 @@
              label="Confirm"/>
     </div>
   </div>
-
   <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
     <InfoDiv
       v-if="student?.alum"
@@ -195,9 +194,6 @@ export default defineComponent ({
     },
     possibleSuggestion(): string {
       return this.studentStore.possibleSuggestion.toString()
-    },
-    name(): string {
-      return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     gender(): string {
       let gender = ''

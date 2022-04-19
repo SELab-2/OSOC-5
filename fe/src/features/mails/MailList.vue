@@ -36,12 +36,13 @@
       >
         <template #body="props">
           <q-tr
-            @click="() => clickRow(props, props.row)"
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
             :props="props"
           >
             <q-td auto-width>
-              <q-icon size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+              <q-icon
+                @click="() => clickRow(props, props.row)"
+                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
             </q-td>
             <q-td
               key="name"
@@ -85,7 +86,7 @@
               key="email"
               :props="props"
             >
-              {{ props.row.email }}
+              <a :href="'mailto:' + props.row.email">{{ props.row.email }}</a>
             </q-td>
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
