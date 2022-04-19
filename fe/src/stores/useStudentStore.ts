@@ -4,6 +4,7 @@ import { User } from '../models/User'
 import {Student} from "../models/Student";
 import {Skill} from "../models/Skill";
 import {Mail} from "../models/Mail";
+import {useAuthenticationStore} from "./useAuthenticationStore";
 
 interface State {
     search: string
@@ -191,6 +192,20 @@ export const useStudentStore = defineStore('user/student', {
                 })
 
             this.isLoading = true
+        },
+        async sendMail(student: Student, info: string) {
+            console.log(student)
+            console.log(info)
+            const authenticationStore = useAuthenticationStore()
+
+            if (authenticationStore.loggedInUser) {
+                await instance
+                    .post(`/emails/`, {
+                        sender: authenticationStore.loggedInUser.url,
+                        receiver: student.url,
+                        info: info
+                    })
+            }
         }
     }
 })
