@@ -15,6 +15,7 @@ export class Mail implements MailInterface {
     time: string;
     url: string;
 
+    constructor(obj: MailInterface);
     constructor(
         id: number,
         info: string,
@@ -22,12 +23,18 @@ export class Mail implements MailInterface {
         sender: string,
         time: string,
         url: string
-    ) {
-        this.id = id
-        this.info = info
-        this.receiver = receiver
-        this.sender = sender
-        this.time = time
-        this.url = url
+    );
+
+    constructor(...args: any[]) {
+        if (args.length == 1) {
+            Object.assign(this, args[0])
+        } else {
+            this.id = args[0]
+            this.info = args[1]
+            this.receiver = args[2]
+            this.sender = args[3]
+            this.time = args[4]
+            this.url = args[5]
+        }
     }
 }
