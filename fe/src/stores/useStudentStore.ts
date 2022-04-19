@@ -176,7 +176,7 @@ export const useStudentStore = defineStore('user/student', {
             await this.loadStudent(studentId)
         },
         async updateStatus(student: Student) {
-            await instance.put(`students/${student.id}/`, {
+            await instance.patch(`students/${student.id}/`, {
                 status: student.status
             })
         },
