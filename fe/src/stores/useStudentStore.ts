@@ -1,9 +1,9 @@
 import {defineStore} from "pinia";
 import {instance} from "../utils/axios";
-import {convertObjectKeysToCamelCase} from "../utils/case-conversion";
 import { User } from '../models/User'
 import {Student} from "../models/Student";
 import {Skill} from "../models/Skill";
+import {Mail} from "../models/Mail";
 
 interface State {
     search: string
@@ -18,6 +18,7 @@ interface State {
     coaches: Map<string, User>
     students: Array<Student>
     mailStudents: Array<Student>
+    mails: Map<number, Mail[]>
     isLoading: boolean
     possibleSuggestion: number
     currentStudent: Student | null
@@ -37,6 +38,7 @@ export const useStudentStore = defineStore('user/student', {
         coaches: new Map(),
         students: [],
         mailStudents: [],
+        mails: new Map(),
         isLoading: false,
         possibleSuggestion: -1,
         currentStudent: null,
@@ -177,6 +179,18 @@ export const useStudentStore = defineStore('user/student', {
             await instance.put(`students/${student.id}/`, {
                 status: student.status
             })
+        },
+        async getMails(student: Student) {
+            this.isLoading = true
+
+            await instance
+                .get<Mail[]>(`emails/?receiver=${student.id}`)
+                .then(({data}) => {
+                    console.log(data)
+                    this.mails.set(student.id, data.map((mail) => new Mail(mail)))
+                })
+
+            this.isLoading = true
         }
     }
 })

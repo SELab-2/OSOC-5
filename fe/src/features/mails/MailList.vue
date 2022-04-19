@@ -36,7 +36,7 @@
       >
         <template #body="props">
           <q-tr
-            @click="props.expand = !props.expand"
+            @click="() => clickRow(props, props.row)"
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
             :props="props"
           >
@@ -172,6 +172,10 @@ export default defineComponent({
             this.studentStore.students.find((s: Student) => s.id === student.id)!.status = oldStatus
           })
       })
+    },
+    clickRow(props: any, student: Student) {
+      props.expand = !props.expand
+      if (props.expand) this.studentStore.getMails(student)
     }
   }
 })
