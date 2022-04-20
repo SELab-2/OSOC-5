@@ -103,7 +103,7 @@
                               <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                                 <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
                                   <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Save" color="primary" flat />
+                                    <q-btn v-close-popup label="Close" color="primary" flat />
                                   </div>
                                 </q-date>
                               </q-popup-proxy>
@@ -115,7 +115,7 @@
                               <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                                 <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
                                   <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Save" color="primary" flat />
+                                    <q-btn v-close-popup label="Close" color="primary" flat />
                                   </div>
                                 </q-time>
                               </q-popup-proxy>
@@ -262,7 +262,7 @@ export default defineComponent({
       this.date = date + ' ' + time
     },
     async sendMail(student: Student) {
-      await this.studentStore.sendMail(student, this.date.value, this.info.value)
+      await this.studentStore.sendMail(student, this.date, this.info)
       await this.studentStore.getMails(student)
 
       this.info = ''

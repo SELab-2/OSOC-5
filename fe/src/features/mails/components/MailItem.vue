@@ -76,7 +76,6 @@ export default defineComponent({
       this.timeout = null
     },
     prepareRemove(mail: Mail) {
-      console.log(mail)
       this.timeout = setTimeout(() => {
         this.remove(mail)
         this.timeout = null
