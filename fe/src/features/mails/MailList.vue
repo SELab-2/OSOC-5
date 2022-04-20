@@ -90,7 +90,7 @@
             </q-td>
             <q-td style="align-content: flex-end">
               <q-btn
-                size="sm" color="yellow" round dense icon="add" @click="resetDate"
+                size="sm" color="yellow" round dense icon="mail" @click="resetDate"
               >
                 <q-menu>
                   <q-list>
@@ -146,19 +146,7 @@
                 The student has no mail.
               </div>
               <div v-else>
-                <q-list>
-                  <q-item v-for="mail in studentStore.mails.get(props.row.id)" :key="mail.id">
-                    <q-item-section>
-                      <q-item-label>By {{ typeof(mail.sender) === 'string' ? mail.sender : mail.sender.fullName }}</q-item-label>
-                      <q-item-label caption lines="2">{{ mail.info }}</q-item-label>
-                    </q-item-section>
-
-                    <q-item-section side top>
-                      <q-item-label caption>{{ mail.time }}</q-item-label>
-                      <q-icon name="delete" color="yellow" @click="() => studentStore.deleteMail(mail)" />
-                    </q-item-section>
-                  </q-item>
-                </q-list>
+                <MailsOverview :student="props.row" />
               </div>
             </q-td>
           </q-tr>
@@ -175,6 +163,7 @@ import {Student} from "../../models/Student";
 import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
+import MailsOverview from "./components/MailsOverview.vue";
 
 const columns = [
   {
@@ -210,14 +199,15 @@ const columns = [
   },
   {
     name: 'sendEmail',
-    align: 'right' as const,
-    label: 'Send Email',
-    field: 'email',
+    align: 'left' as const,
+    label: '',
+    field: '',
     sortable: false,
   },
 ]
 
 export default defineComponent({
+  components: {MailsOverview},
   setup() {
     const studentStore = useStudentStore()
     const q = useQuasar()
