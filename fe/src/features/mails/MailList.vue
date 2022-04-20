@@ -130,7 +130,7 @@
                           type="textarea"
                         />
 
-                        <q-btn class="bg-yellow" @click="() => studentStore.sendMail(props.row, date, info)">
+                        <q-btn class="bg-yellow" @click="() => this.sendMail(props.row)" v-close-popup>
                           Send
                         </q-btn>
                       </div>
@@ -141,7 +141,7 @@
             </q-td>
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
-            <q-td colspan="100%">
+            <q-td colspan="100%" :key="emailKey">
               <div v-if="studentStore.mails.has(props.row.id) && studentStore.mails.get(props.row.id).length === 0">
                 The student has no mail.
               </div>
@@ -227,6 +227,11 @@ export default defineComponent({
       q
     }
   },
+  data() {
+    return {
+      emailKey: 0
+    }
+  },
   created() {
     this.studentStore.loadStudentsMails()
   },
@@ -255,6 +260,12 @@ export default defineComponent({
       const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
       const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       this.date.value = date + ' ' + time
+    },
+    async sendMail(student: Student) {
+      await this.studentStore.sendMail(student, this.date.value, this.info.value)
+      await this.studentStore.getMails(student)
+
+      this.emailKey += 1
     }
   }
 })

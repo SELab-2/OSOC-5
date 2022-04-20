@@ -1,5 +1,5 @@
 <template>
-  <q-list>
+  <q-list :key="emailKey">
     <q-item v-for="mail in studentStore.mails.get(student.id)" :key="mail.id">
       <q-item-section>
         <q-item-label>By {{ typeof(mail.sender) === 'string' ? mail.sender : mail.sender.fullName }}</q-item-label>
@@ -8,16 +8,17 @@
 
       <q-item-section side top>
         <q-item-label caption>{{ mail.time }}</q-item-label>
-        <q-icon name="delete" color="yellow" @click="() => studentStore.deleteMail(mail)" />
+        <q-icon name="delete" color="yellow" @click="() => deleteMail(mail)" />
       </q-item-section>
     </q-item>
   </q-list>
 </template>
 
-<script>
+<script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {useStudentStore} from "../../../stores/useStudentStore";
 import {Student} from "../../../models/Student";
+import {Mail} from "../../../models/Mail";
 
 export default defineComponent({
   props: {
@@ -33,8 +34,21 @@ export default defineComponent({
       studentStore,
     }
   },
+  data() {
+    return {
+      emailKey: 0
+    }
+  },
   created() {
-    this.studentStore.getMails()
+    this.studentStore.getMails(this.student)
+  },
+  methods: {
+    async deleteMail(mail: Mail) {
+      await this.studentStore.deleteMail(mail)
+      await this.studentStore.getMails(this.student)
+
+      this.emailKey += 1
+    }
   }
 })
 </script>
