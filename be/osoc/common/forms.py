@@ -1,8 +1,7 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import *
+from .models import Coach
 
 # Create your forms here.
 

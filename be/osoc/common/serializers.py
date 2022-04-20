@@ -3,9 +3,9 @@ Serializers definitions of the Django models defined in ./models.py.
 """
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import *
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import LoginSerializer
+from .models import *
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
@@ -32,8 +32,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
         if getattr(self.Meta, 'extra_fields', None):
             return self.Meta.extra_fields + expanded_fields
-        else:
-            return expanded_fields
+        return expanded_fields
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
@@ -82,11 +81,11 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
-    
+
 
     # overwrite update method to be able to create/update/delete RequiredSkills objects
     def update(self, instance, validated_data):
-        
+
         # first update required skills
         skills_data = validated_data.pop('requiredskills_set')
         # update or create skills from request

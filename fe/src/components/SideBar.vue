@@ -194,11 +194,6 @@ export default defineComponent({
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
 
-    onMounted(() => {
-      skillStore.loadSkills()
-      studentStore.loadStudents()
-    })
-
     return {
       studentStore,
       skillStore,
@@ -209,6 +204,10 @@ export default defineComponent({
         width: '4px',
       },
     }
+  },
+  created() {
+    this.skillStore.loadSkills()
+    this.studentStore.loadStudents()
   },
   data() {
     return {
@@ -225,8 +224,9 @@ export default defineComponent({
         targetId: e.target.id,
         student: item
       }
-      e.dataTransfer.setData('text', JSON.stringify(data))
+      e.dataTransfer.setData(data.student.id, JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
+      e.dataTransfer.effectAllowed = 'copy'
     },
     clickStudent(student: Student) {
       this.selectStudent(student)
