@@ -102,6 +102,25 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
         model = SentEmail
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
 
+    # overwrite update method to be able to create/update/delete RequiredSkills objects
+    def update(self, instance, validated_data):
+        
+        # first update required skills
+        skills_data = validated_data.pop('requiredskills_set')
+        # update or create skills from request
+        for skill_data in skills_data:
+            RequiredSkills.objects.update_or_create(project=instance, **skill_data)
+        # delete skills not in request
+        skills = [skill_data['skill'] for skill_data in skills_data]
+        RequiredSkills.objects.filter(project=instance).exclude(skill__in=skills).delete()
+        return super().update(instance, validated_data)
+
+
+class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = SentEmail
+        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
+
 
 class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
