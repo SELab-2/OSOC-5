@@ -125,6 +125,13 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return super().update(instance, validated_data)
 
 
+class ProjectListSerializer(ProjectSerializer):
+    """
+    serializer class to show coach info in project list and project instance, but not in post, put, etc
+    """
+    coaches = CoachPartialSerializer(many=True)
+
+
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
     sender = CoachPartialSerializer(read_only=True)
     class Meta:

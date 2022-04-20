@@ -185,7 +185,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
 
-    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
+    def get_serializer_class(self):
+        if hasattr(self, 'action') and self.action == 'list' or self.action == 'retrieve':
+            return ProjectListSerializer
+        return super().get_serializer_class()
+
+    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer, 
+            permission_classes=[permissions.IsAuthenticated, IsActive])
     def suggest_student(self, request, pk=None):
         """
         let a coach suggest a student for this project
