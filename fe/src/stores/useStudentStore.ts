@@ -186,26 +186,49 @@ export const useStudentStore = defineStore('user/student', {
 
             await instance
                 .get<Mail[]>(`emails/?receiver=${student.id}`)
-                .then(({data}) => {
-                    console.log(data)
+                .then(async ({data}) => {
+
+                    for (const mail of data) {
+                        mail.time = new Date(mail.time).toLocaleString()
+
+                        const sender = mail.sender
+
+                        if (typeof (sender) === 'string') {
+                            if (this.coaches.has(sender)) {
+                                mail.sender = this.coaches.get(sender)!
+                            } else {
+                                await instance
+                                    .get<User>(sender)
+                                    .then(({data}) => {
+                                        const coach = new User(data)
+                                        mail.sender = coach
+                                        this.coaches.set(sender, coach)
+                                    })
+                            }
+                        }
+                    }
+
                     this.mails.set(student.id, data.map((mail) => new Mail(mail)))
                 })
 
             this.isLoading = true
         },
-        async sendMail(student: Student, info: string) {
-            console.log(student)
-            console.log(info)
+        async sendMail(student: Student, date: string, info: string) {
             const authenticationStore = useAuthenticationStore()
 
             if (authenticationStore.loggedInUser) {
                 await instance
-                    .post(`/emails/`, {
+                    .post(`emails/`, {
                         sender: authenticationStore.loggedInUser.url,
                         receiver: student.url,
+                        time: date,
                         info: info
                     })
             }
+        },
+        async deleteMail(mail: Mail) {
+            await instance
+                .delete(`/emails/${mail.id}`)
         }
     }
 })

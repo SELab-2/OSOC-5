@@ -88,11 +88,7 @@
             >
               <a :href="'mailto:' + props.row.email" style="color: black">{{ props.row.email }}</a>
             </q-td>
-          </q-tr>
-          <q-tr v-show="props.expand" :props="props">
-            <q-td colspan="100%">
-              <div class="text-left">This is expand slot for row above: {{ props.row.fullName }}.</div>
-
+            <q-td style="align-content: flex-end">
               <q-btn
                 size="sm" color="yellow" round dense icon="add" @click="resetDate"
               >
@@ -134,7 +130,7 @@
                           type="textarea"
                         />
 
-                        <q-btn class="bg-yellow" @click="() => studentStore.sendMail(props.row, info)">
+                        <q-btn class="bg-yellow" @click="() => studentStore.sendMail(props.row, date, info)">
                           Send
                         </q-btn>
                       </div>
@@ -142,11 +138,27 @@
                   </q-list>
                 </q-menu>
               </q-btn>
+            </q-td>
+          </q-tr>
+          <q-tr v-show="props.expand" :props="props">
+            <q-td colspan="100%">
               <div v-if="studentStore.mails.has(props.row.id) && studentStore.mails.get(props.row.id).length === 0">
                 The student has no mail.
               </div>
               <div v-else>
-                The student has mail!
+                <q-list>
+                  <q-item v-for="mail in studentStore.mails.get(props.row.id)" :key="mail.id">
+                    <q-item-section>
+                      <q-item-label>By {{ typeof(mail.sender) === 'string' ? mail.sender : mail.sender.fullName }}</q-item-label>
+                      <q-item-label caption lines="2">{{ mail.info }}</q-item-label>
+                    </q-item-section>
+
+                    <q-item-section side top>
+                      <q-item-label caption>{{ mail.time }}</q-item-label>
+                      <q-icon name="delete" color="yellow" @click="() => studentStore.deleteMail(mail)" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
               </div>
             </q-td>
           </q-tr>
@@ -195,6 +207,13 @@ const columns = [
     label: 'Email',
     field: 'email',
     sortable: true,
+  },
+  {
+    name: 'sendEmail',
+    align: 'right' as const,
+    label: 'Send Email',
+    field: 'email',
+    sortable: false,
   },
 ]
 

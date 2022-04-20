@@ -1,8 +1,10 @@
+import {User} from "./User";
+
 export interface MailInterface {
     url: string
     id: number
-    sender: string
-    receiver: string
+    sender: string | User
+    receiver: string | User
     time: string
     info: string
 }
@@ -10,8 +12,8 @@ export interface MailInterface {
 export class Mail implements MailInterface {
     id: number;
     info: string;
-    receiver: string;
-    sender: string;
+    receiver: string | User;
+    sender: string | User;
     time: string;
     url: string;
 
@@ -19,8 +21,8 @@ export class Mail implements MailInterface {
     constructor(
         id: number,
         info: string,
-        receiver: string,
-        sender: string,
+        receiver: string | User,
+        sender: string | User,
         time: string,
         url: string
     );
