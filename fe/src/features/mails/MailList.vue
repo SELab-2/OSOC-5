@@ -259,11 +259,13 @@ export default defineComponent({
       const today = new Date();
       const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
       const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      this.date.value = date + ' ' + time
+      this.date = date + ' ' + time
     },
     async sendMail(student: Student) {
       await this.studentStore.sendMail(student, this.date.value, this.info.value)
       await this.studentStore.getMails(student)
+
+      this.info = ''
 
       this.emailKey += 1
     }

@@ -1,7 +1,28 @@
 <template>
-  <q-list :key="emailKey">
-    <MailItem v-for="mail in studentStore.mails.get(student.id)" :student="student" :mail="mail" :key="mail.id" />
-  </q-list>
+  <q-item :key="mail.id">
+    <q-item-section>
+      <q-item-label>By {{ typeof(mail.sender) === 'string' ? mail.sender : mail.sender.fullName }}</q-item-label>
+      <q-item-label caption lines="2">{{ mail.info }}</q-item-label>
+    </q-item-section>
+
+    <q-item-section side top>
+      <q-item-label caption>{{ mail.time }}</q-item-label>
+      <btn v-if="!removed"
+           tabindex="-1"
+           class="gt-xs"
+           size="sm"
+           flat
+           dense
+           round
+           icon="delete"
+           @click="() => {
+             removed = true
+             prepareRemove(mail)
+           }"
+      />
+      <btn v-else label="undo" @click="stop" dense style="justify-content: center; height: 30px"/>
+    </q-item-section>
+  </q-item>
 </template>
 
 <script lang="ts">
@@ -10,13 +31,15 @@ import {useStudentStore} from "../../../stores/useStudentStore";
 import {Student} from "../../../models/Student";
 import {Mail} from "../../../models/Mail";
 import {ref} from "vue";
-import MailItem from "./MailItem.vue";
 
 export default defineComponent({
-  components: {MailItem},
   props: {
     student: {
       type: Student,
+      required: true
+    },
+    mail: {
+      type: Mail,
       required: true
     }
   },
@@ -31,7 +54,6 @@ export default defineComponent({
     let timeout: any | null = null
 
     return {
-      emailKey: 0,
       show: ref(true),
       removed: ref(false),
       timeout,
