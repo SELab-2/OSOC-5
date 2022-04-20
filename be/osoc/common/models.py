@@ -422,15 +422,13 @@ class Suggestion(models.Model):
         default="",
         max_length=500
     )
+    final = models.BooleanField(
+        _('final decision'),
+        default=False
+    )
 
     class Meta:
-        unique_together = (("student", "coach"))
-
-    def coach_name(self):
-        return self.coach.get_full_name()
-
-    def coach_id(self):
-        return self.coach.id
+        unique_together = (("student", "coach", "final"))
 
     def __str__(self):
         suggestion_label = self.Suggestion(self.suggestion).label
