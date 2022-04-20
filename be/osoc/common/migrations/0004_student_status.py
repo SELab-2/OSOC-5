@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0002_alter_student_gender'),
+        ('common', '0003_alter_projectsuggestion_unique_together'),
     ]
 
     operations = [
