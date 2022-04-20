@@ -460,11 +460,8 @@ class ProjectSuggestion(models.Model):
     )
     skill = models.ForeignKey(
         Skill,
-        on_delete=models.CASCADE
+        on_delete=models.RESTRICT   # not allowed to delete a skill that is used in a suggestion
     )
-
-    class Meta:
-        unique_together = (("project", "student", "coach"))
 
     def coach_name(self):
         return self.coach.get_full_name()

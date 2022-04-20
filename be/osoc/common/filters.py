@@ -25,7 +25,7 @@ class StudentOnProjectFilter(filters.BaseFilterBackend):
             subquery = suggested_students.distinct()
             if param.lower() in true_strings:
                 return queryset.filter(id__in=subquery.values('id'))
-            elif param.lower() in false_strings:
+            if param.lower() in false_strings:
                 return queryset.exclude(id__in=subquery.values('id'))
         return queryset
 
@@ -40,7 +40,7 @@ class StudentSuggestedByUserFilter(filters.BaseFilterBackend):
         if param is not None:
             if param.lower() in true_strings:
                 return queryset.filter(suggestions__id=request.user.id)
-            elif param.lower() in false_strings:
+            if param.lower() in false_strings:
                 return queryset.exclude(suggestions__id=request.user.id)
         return queryset
 
