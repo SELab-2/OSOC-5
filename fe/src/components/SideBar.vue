@@ -44,6 +44,7 @@
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
+                { name: 'student coaches', label: 'Student Coaches'}
               ]"
               @click="studentStore.loadStudents"
             />
