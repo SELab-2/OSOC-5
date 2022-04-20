@@ -342,6 +342,13 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 
+    def create(self, request):
+        serializer = SentEmailSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(sender=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RegisterView(generics.GenericAPIView):
     """

@@ -120,6 +120,7 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = SentEmail
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
+        read_only_fields = ['sender', 'time']
 
 
 class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
