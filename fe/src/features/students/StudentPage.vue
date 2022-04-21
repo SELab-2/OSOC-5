@@ -380,10 +380,17 @@ export default defineComponent ({
             await this.studentStore.receiveSuggestion(data.suggestion)
           else if(data.hasOwnProperty('remove_suggestion'))
             this.studentStore.removeSuggestion(data.remove_suggestion)
-          else if(data.hasOwnProperty('final_decision'))
+          else if(data.hasOwnProperty('final_decision')) {
             this.studentStore.receiveFinalDecision(data.final_decision)
-          else if(data.hasOwnProperty('remove_final_decision'))
+
+            if(this.student && this.student.finalDecision)
+             this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
+          } else if(data.hasOwnProperty('remove_final_decision')) {
             this.studentStore.removeFinalDecision(data.remove_final_decision)
+
+            if(this.student && this.student.finalDecision)
+              this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
+          }
 
           this.update()
       }
