@@ -1,7 +1,6 @@
 """
 Unit tests for models.py
 """
-from django.dispatch import receiver
 from django.test import TestCase
 from osoc.common.models import *
 
