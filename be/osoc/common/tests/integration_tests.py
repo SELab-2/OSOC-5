@@ -1,6 +1,7 @@
 """
 Integration tests for API endpoints.
 each test simulates an API call to one endpoint and checks if the response data and status code are correct
+these tests test serializers.py and views.py and the API endpoints as a whole
 """
 import json
 from rest_framework import status
@@ -249,6 +250,13 @@ class StudentTestsAdmin(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(student.final_decision.suggestion, data["suggestion"])
         self.assertEqual(before_count, after_count-1)
+    
+    def test_student_make_final_decision_bad_request(self):
+        student = Student.objects.first()
+        url = reverse("student-make-final-decision", args=(student.id,))
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_student_remove_final_decision(self):
         student = Student.objects.first()
@@ -399,17 +407,38 @@ class CoachTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_self_forbidden(self):
+        coach = self.admin
+        url = reverse("coach-detail", args=(coach.id,))
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_coach_update_status(self):
         coach = Coach.objects.exclude(id=self.admin.id).first()
         coach.is_admin = False
         coach.is_active = False
         coach.save()
         url = reverse("coach-update-status", args=(coach.id,))
-        response = self.client.put(url, {"is_admin": True, "is_active": True})
+        response = self.client.put(url, {"is_admin": True, "is_active": True}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Coach.objects.get(id=coach.id).is_admin, True)
         self.assertEqual(Coach.objects.get(id=coach.id).is_active, True)
+
+    def test_update_status_self_forbidden(self):
+        coach = self.admin
+        url = reverse("coach-update-status", args=(coach.id,))
+        response = self.client.put(url, {"is_admin": True, "is_active": True}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_status_bad_request(self):
+        coach = Coach.objects.first()
+        url = reverse("coach-update-status", args=(coach.id,))
+        response = self.client.put(url, {"is_admin": "not a boolean"}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_coach(self):
         coach = Coach.objects.get(email="email@example.com")
@@ -540,7 +569,7 @@ class ProjectTestsCoach(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(before_count, after_count-1)
 
-    def test_project_suggest_student_bad_request(self):
+    def test_project_suggest_student_skill_not_in_required_skills(self):
         project = Project.objects.first()
         url = reverse("project-suggest-student", args=(project.id,))
         student = Student.objects.first()
@@ -559,6 +588,13 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(before_count, after_count)
+
+    def test_project_suggest_student_bad_request(self):
+        project = Project.objects.first()
+        url = reverse("project-suggest-student", args=(project.id,))
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_project_remove_student(self):
         project = Project.objects.first()
@@ -584,6 +620,13 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
+    
+    def test_project_remove_student_bad_request(self):
+        project = Project.objects.first()
+        url = reverse("project-remove-student", args=(project.id,))
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_project_get_conflicting(self):
         student = Student.objects.first()
@@ -967,3 +1010,33 @@ class SentEmailTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(email.info, data["info"])
+
+
+class RegisterTests(APITestCase):
+    def setUp(self):
+        admin = Coach.objects.create_user(
+            first_name="username",
+            password="Pas$w0rd",
+            last_name="last_name",
+            email="email@example.com",
+            is_admin=True
+        )
+        self.client.force_authenticate(admin)
+
+    # def test_register(self):
+    #     url = reverse("register")
+    #     data = {
+    #         "first_name": "John",
+    #         "last_name": "Doe",
+    #         "email": "email2@example.com",
+    #         "password1": "P4$$W0rd123",
+    #         "password2": "P4$$W0rd123"
+    #     }
+    #     before_count = Coach.objects.count()
+    #     response = self.client.post(url, data, format="json")
+    #     after_count = Coach.objects.count()
+
+    #     print(response.content)
+
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(before_count, after_count-1)
