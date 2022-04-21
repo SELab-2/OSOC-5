@@ -216,7 +216,7 @@ export default defineComponent({
   data() {
     return {
       miniState: ref(false),
-      drawer: ref(false),
+      drawer: ref(true),
     }
   },   
   methods: {
