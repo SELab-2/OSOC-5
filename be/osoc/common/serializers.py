@@ -8,11 +8,30 @@ from dj_rest_auth.serializers import LoginSerializer
 from .models import *
 
 
+class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer to show some fields of the coach model,
+    used in other serializers
+    """
+    class Meta:
+        model = Coach
+        fields = ['url', 'id', 'first_name', 'last_name',]
+
+
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    coach = CoachPartialSerializer(read_only=True)
     class Meta:
         model = Suggestion
-        fields = ['suggestion', 'reason', 'coach_name', 'coach_id', 'coach']
-        read_only_fields = ['coach']
+        fields = ['suggestion', 'reason', 'coach']
+    
+    def create(self, validated_data):
+        student = validated_data.pop('student')
+        coach = validated_data.pop('coach')
+        final = validated_data.pop('final')
+        # create Suggestion if it doesnt exist yet, else update it
+        suggestion, _ = Suggestion.objects.update_or_create(
+            student=student, coach=coach, final=final, defaults=validated_data)
+        return suggestion
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -55,10 +74,20 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    coach = CoachPartialSerializer(read_only=True)
     class Meta:
         model = ProjectSuggestion
-        fields = ['student', 'coach', 'coach_name', 'coach_id', 'skill', 'reason']
-        read_only_fields = ['coach']
+        fields = ['student', 'coach', 'skill', 'reason']
+
+    def create(self, validated_data):
+        project = validated_data.pop('project')
+        student = validated_data.pop('student')
+        coach = validated_data.pop('coach')
+        skill = validated_data.pop('skill')
+        # create ProjectSuggestion if it doesnt exist yet, else update it
+        projectsuggestion, _ = ProjectSuggestion.objects.update_or_create(
+            project=project, student=student, coach=coach, skill=skill, defaults=validated_data)
+        return projectsuggestion
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
@@ -82,7 +111,6 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
 
-
     # overwrite update method to be able to create/update/delete RequiredSkills objects
     def update(self, instance, validated_data):
 
@@ -97,10 +125,19 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return super().update(instance, validated_data)
 
 
+class ProjectListSerializer(ProjectSerializer):
+    """
+    serializer class to show coach info in project list and project instance, but not in post, put, etc
+    """
+    coaches = CoachPartialSerializer(many=True)
+
+
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
+    sender = CoachPartialSerializer(read_only=True)
     class Meta:
         model = SentEmail
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
+        read_only_fields = ['time']
 
     # overwrite update method to be able to create/update/delete RequiredSkills objects
     def update(self, instance, validated_data):
@@ -122,13 +159,21 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
 
 
-class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
+class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer for the remove_student api endpoint to be able to remove a ProjectSuggestion
+    only the fields student, coach and skill are needed here
+    """
     class Meta:
         model = ProjectSuggestion
-        fields = ['student']
+        fields = ['student', 'coach', 'skill']
 
 
 class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer for the update_coach_status api endpoint
+    only the fields is_admin and is_active are needed here
+    """
     class Meta:
         model = Coach
         fields = ['is_admin', 'is_active']
