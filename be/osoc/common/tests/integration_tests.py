@@ -1,31 +1,12 @@
 """
-Django tests for API endpoints.
-
-Running tests is different because the project uses Docker:
-
-    1. Run all tests:
-        `docker exec -it osoc-be python manage.py test`
-
-    2. Run one test class:
-        `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>`
-
-    3. Run a single test:
-        `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>.<TESTMETHOD>`
+Integration tests for API endpoints.
+each test simulates an API call to one endpoint and checks if the response data and status code are correct
 """
 import json
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
-from django.test import TestCase
 from osoc.common.models import Coach, Project, ProjectSuggestion, SentEmail, Skill, Student, Suggestion
-from osoc.common.utils import strip_and_lower_email
-
-
-class UtilityTestCases(TestCase):
-    def test_strip_and_lower_email(self):
-        correct_email = 'admin@example.com'
-        test_email = strip_and_lower_email('  Admin@Example.com    ')
-        self.assertEqual(correct_email, test_email)
 
 
 class StudentTestsCoach(APITestCase):

@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
-from django.utils import timezone
 
 
 # Phone number validation
