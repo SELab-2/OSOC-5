@@ -1,14 +1,43 @@
 <template>
-  <SideBar :must-hover="false" :key="sideBarKey" color="bg-grey-3" :selectStudent="selectStudent" :draggable="false"/>
+  <SideBar
+    :key="sideBarKey"
+    color="bg-grey-3"
+    :select-student="selectStudent"
+    :draggable="false"
+    @update="update"
+  />
 
-  <div :key="studentKey"
-    class="justify-between row q-px-lg q-pt-lg studentcol">
+  <div
+    :key="studentKey"
+    class="justify-between row q-px-lg q-pt-lg studentcol"
+  >
     <div class="row q-pa-sm q-gutter-sm items-center">
-      <h class="text-bold text-h4">{{ name }}</h>
-      <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
+      <h class="text-bold text-h4">
+        {{ name }}
+      </h>
+      <q-btn
+        :href="student ? student.cv.toString() : ''"
+        target="_blank"
+        size="12px"
+        rounded
+        outline
+        color="black"
+        label="CV"
+      />
+      <q-btn
+        :href="student ? student.portfolio.toString() : ''"
+        target="_blank"
+        size="12px"
+        rounded
+        outline
+        color="black"
+        label="Portfolio"
+      />
     </div>
-    <div v-if="authenticationStore.loggedInUser?.isAdmin ?? false" class="row q-gutter-sm items-center">
+    <div
+      v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
+      class="row q-gutter-sm items-center"
+    >
       <q-select
         v-model="possibleFinalDecision"
         emit-value
@@ -25,10 +54,12 @@
         ]"
         label="Final decision"
       />
-      <q-btn @click="finalDecision"
-             class="cornered"
-             outline
-             label="Confirm"/>
+      <q-btn
+        class="cornered"
+        outline
+        label="Confirm"
+        @click="finalDecision"
+      />
     </div>
   </div>
 
@@ -66,24 +97,29 @@
   </div>
   <div class="row q-px-lg q-ml-sm items-center">
     <SegmentedControl
-      :color="mySuggestionColor"
-      @update:modelValue="showDialog"
       v-model="mySuggestion"
+      :color="mySuggestionColor"
       :options="[
         { name: '0', label: 'Yes' },
         { name: '2', label: 'Maybe' },
         { name: '1', label: 'No' },
         { name: '-1', label: 'Not decided' },
       ]"
+      @update:modelValue="showDialog"
     />
 
-    <q-dialog v-model="suggestionDialog" >
+    <q-dialog v-model="suggestionDialog">
       <q-card>
         <q-card-section>
-          {{suggestionName}}
-          {{suggestionColor}}
-          <div class="text-h6">Suggest
-            <btn :label="suggestionName" dense rounded class="text-h6" :class="suggestionColor" />
+          <div class="text-h6">
+            Suggest
+            <btn
+              :label="suggestionName"
+              dense
+              rounded
+              class="text-h6"
+              :class="suggestionColor"
+            />
             for {{ name }}
           </div>
         </q-card-section>
@@ -97,9 +133,24 @@
           />
         </q-card-section>
 
-        <q-card-actions align="right" class="text-primary">
-          <btn flat color="grey" label="Cancel" v-close-popup glow-color="grey-4"/>
-          <btn flat label="Suggest" @click="makeSuggestion" v-close-popup glow-color="teal-1"/>
+        <q-card-actions
+          align="right"
+          class="text-primary"
+        >
+          <btn
+            v-close-popup
+            flat
+            color="grey"
+            label="Cancel"
+            glow-color="grey-4"
+          />
+          <btn
+            v-close-popup
+            flat
+            label="Suggest"
+            glow-color="teal-1"
+            @click="makeSuggestion"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -108,29 +159,53 @@
   <div class="q-gutter-sm q-pa-lg">
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SuggestionsCard :index="studentKey" title="Suggestions"/>
+        <SuggestionsCard
+          :index="studentKey"
+          title="Suggestions"
+        />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <AcademiaCard :index="studentKey" title="Academia"/>
+        <AcademiaCard
+          :index="studentKey"
+          title="Academia"
+        />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SkillsCard :index="studentKey" title="Skills"/>
+        <SkillsCard
+          :index="studentKey"
+          title="Skills"
+        />
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <LanguageCard :index="studentKey" title="Language"/>
+        <LanguageCard
+          :index="studentKey"
+          title="Language"
+        />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <ExtraInfoCard :index="studentKey" title="Hinder for work" :content="studentStore.currentStudent?.hinderWork ?? ''"/>
+        <ExtraInfoCard
+          :index="studentKey"
+          title="Hinder for work"
+          :content="studentStore.currentStudent?.hinderWork ?? ''"
+        />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <ExtraInfoCard :index="studentKey" title="Fun fact" :content="studentStore.currentStudent?.funFact ?? ''"/>
+        <ExtraInfoCard
+          :index="studentKey"
+          title="Fun fact"
+          :content="studentStore.currentStudent?.funFact ?? ''"
+        />
       </div>
     </div>
     <div class="row">
       <div class="studentcol col-12">
-        <ExtraInfoCard :index="studentKey" title="Motivation" :content="studentStore.currentStudent?.motivation ?? ''"/>
+        <ExtraInfoCard
+          :index="studentKey"
+          title="Motivation"
+          :content="studentStore.currentStudent?.motivation ?? ''"
+        />
       </div>
     </div>
   </div>
@@ -171,17 +246,19 @@ export default defineComponent ({
   setup() {
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
+    const socket = new WebSocket('ws://localhost:8000/ws/socket_server/')
 
     return {
       authenticationStore,
       studentStore,
       possibleFinalDecision: ref("-1"),
+      socket,
     }
   },
   data() {
     const suggestionDialog = ref(false)
     const reason = ref("")
-
+ 
     return {
       sideBarKey: 0,
       studentKey: 0,
@@ -296,6 +373,29 @@ export default defineComponent ({
     }
   },
   mounted() {
+      this.socket.onmessage = async (event: { data: string }) => {
+          const data = JSON.parse(event.data)
+
+          if(data.hasOwnProperty('suggestion'))
+            await this.studentStore.receiveSuggestion(data.suggestion)
+          else if(data.hasOwnProperty('remove_suggestion'))
+            this.studentStore.removeSuggestion(data.remove_suggestion)
+          else if(data.hasOwnProperty('final_decision')) {
+            this.studentStore.receiveFinalDecision(data.final_decision)
+
+            if(this.student && this.student.finalDecision)
+             this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
+          } else if(data.hasOwnProperty('remove_final_decision')) {
+            this.studentStore.removeFinalDecision(data.remove_final_decision)
+
+            if(this.student && this.student.finalDecision)
+              this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
+          }
+
+          this.update()
+      }
+   
+
     // Reload when new student is selected
     this.$watch('id', async (id: number) => {
       await this.studentStore.loadStudent(id)
@@ -314,9 +414,7 @@ export default defineComponent ({
         this.reason = ""
       }
 
-      // Make components update
-      this.sideBarKey += 1
-      this.studentKey += 1
+      this.update()
     },
     selectStudent: function (selected_student: Student) {
       this.$router.push(`/students/${selected_student.id}`)
@@ -330,6 +428,9 @@ export default defineComponent ({
         await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
       }
 
+      this.update()
+    },
+    update() {
       // Make components update
       this.sideBarKey += 1
       this.studentKey += 1
