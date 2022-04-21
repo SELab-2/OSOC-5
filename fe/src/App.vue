@@ -1,17 +1,22 @@
-<script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-</script>
-
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout style="height: 100vh" view="hHh lpR fFf">
 
-    <q-page-container>
-      <router-view/>
+    <q-page-container style="height: 100%">
+      <router-view />
     </q-page-container>
 
   </q-layout>
 </template>
+
+<script setup lang="ts">
+import { useQuasar, QNotifyAction } from 'quasar'
+
+(useQuasar().notify as any).setDefaults({
+  position: 'bottom-right',
+  actions: [{ icon: 'close', color: 'white' }]
+})
+
+</script>
 
 <style>
 

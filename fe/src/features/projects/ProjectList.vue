@@ -1,207 +1,128 @@
 <template>
-  <div style="margin: 5px">
+  <div style="height: 100%">
     <SideBar
+      :select-student="() => {}"
+      :must-hover="true"
       color="bg-grey-3"
-      :draggable="true"
+      draggable
     />
-    <div class="q-ma-sm">
-      <div class="text-bold text-h3 q-mx-sm">
-        Projects
-      </div>
+    <!-- <div > -->
+    <div style="height: 100%" class="fit">
+      <q-toolbar
+        style="height: 8%; overflow: visible; z-index: 1"
+        :class="`text-blue bg-white ${showShadow ? 'shadow-2' : ''}`"
+      >
+        <div class="text-bold text-h4 q-ml-md text-black">Projects</div>
+        <q-space />
+        <div>
+          <q-input dense v-model="filter" outlined label="Outlined" style="margin-right: 10px" />
+        </div>
+        <btn
+          padding="7px"
+          :icon="expanded ? 'unfold_less' : 'unfold_more'"
+          color="blue"
+          @click="expanded = !expanded"
+          shadow-color="blue"
+          shadow-strength="1.8"
+        />
         
-      <div>
-        <masonry-wall
-          :items="projects"
-          :ssr-columns="1"
-          :column-width="320"
-          :gap="0"
-        >
-          <template #default="{ item, index }">
-            <project-card :project="item" />
-          </template>
-        </masonry-wall>
+        <btn
+          padding="7px"
+          icon="r_warning"
+          color="red"
+          label="Conflicts"
+          to="/projects/conflicts"
+          shadow-color="red"
+          shadow-strength="2.5"
+        />
+      </q-toolbar>
 
-        <q-page-sticky
-          position="top-right"
-          :offset="[15, 10]"
-        >
-          <q-btn
-            padding="7px"
-            icon="warning"
-            color="red"
-            label="Conflicts"
-            to="/projects/conflicts"
-          />
-        </q-page-sticky>
-
-        <q-page-sticky
-          position="bottom-right"
-          :offset="[18, 18]"
-        >
-          <q-btn
-            fab
-            padding="10px"
-            icon="add"
-            color="yellow"
-            to="/projects/create"
-          />
-        </q-page-sticky>
-      </div>
+      <masonry-wall
+        ref="scrol"
+        @scroll="showShadow = $event.target.scrollTop > 5"
+        style="scroll-padding-top: 100px; overflow: auto; height: 92%"
+        :items="projectStore.projects"
+        :ssr-columns="1"
+        :column-width="320"
+        :gap="0"
+      >
+        <template #default="{ item }">
+          <project-card :project="item" />
+        </template>
+      </masonry-wall>
     </div>
+
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <btn
+        fab
+        padding="10px"
+        icon="add"
+        color="yellow"
+        to="/projects/create"
+        shadow-color="orange"
+      />
+    </q-page-sticky>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/runtime-core'
+import { ref, defineComponent } from 'vue'
 import SideBar from '../../components/SideBar.vue'
 import ProjectCard from './components/ProjectCard.vue'
+import { useProjectStore } from '../../stores/useProjectStore'
 
 export default defineComponent({
-    name: 'ProjectList',
-    components: {
-        SideBar, ProjectCard
-    },
-    data() {
-        return {
-            projects: [
-                {
-                    id: 1,
-                    title: "Project #1",
-                    client: "Client #1",
-                    coaches: [
-                        { id: 1, name: "Miet" },
-                        { id: 2, name: "Astrid" }
-                    ],
-                    roles: [
-                        { type: "fullstack", amount: 2, label: "Full-Stack dev", color: 'green', info: "Must know everything." },
-                        { type: "comms", amount: 1, label: "Communication", color: 'purple' },
-                        { type: "frontend", amount: 2, label: "Frontend dev", color: 'orange', info: "Must know React.js." },
-                        { type: "media", amount: 2, label: "Media", color: 'red' },
-                        { type: "backend", amount: 3, label: "Backend dev", color: 'blue' }
-                    ],
-                    students: [
-                        { id: 1, name: "Friedrich Vandenberghe", role: "fullstack"},
-                        { id: 2, name: "Lander Saerens", role: "frontend"},
-                        { id: 3, name: "Simon Heemeryck", role: "backend"},
-                        { id: 4, name: "Wouter Hennen", role: "frontend"},
-                        { id: 5, name: "Lisa De Jonghe", role: "comms"},
-                        { id: 6, name: "Henri Cattoire", role: "backend"},
-                        { id: 7, name: "Lennart Veys", role: "backend"}
-                    ]
-                },
-                {
-                    id: 2,
-                    title: "Project #2",
-                    client: "Client #2",
-                    coaches: [
-                        { id: 1, name: "Miet" },
-                        { id: 2, name: "Astrid" }
-                    ],
-                    roles: [
-                        { type: "fullstack", amount: 2, label: "Full-Stack dev", color: 'green', info: "Must know everything." },
-                        { type: "comms", amount: 1, label: "Communication", color: 'purple' },
-                        { type: "frontend", amount: 2, label: "Frontend dev", color: 'orange', info: "Must know React.js." },
-                        { type: "media", amount: 2, label: "Media", color: 'red' },
-                        { type: "backend", amount: 3, label: "Backend dev", color: 'blue' }
-                    ],
-                    students: [
-                        { id: 1, name: "Friedrich Vandenberghe", role: "fullstack"},
-                        { id: 2, name: "Lander Saerens", role: "frontend"},
-                        { id: 3, name: "Simon Heemeryck", role: "backend"},
-                        { id: 4, name: "Wouter Hennen", role: "frontend"},
-                        { id: 5, name: "Lisa De Jonghe", role: "comms"},
-                        { id: 6, name: "Henri Cattoire", role: "backend"},
-                        { id: 7, name: "Lennart Veys", role: "backend"}
-                    ]
-                },
-                {
-                    id: 3,
-                    title: "Project #3",
-                    client: "Client #3",
-                    coaches: [
-                        { id: 1, name: "Miet" },
-                        { id: 2, name: "Astrid" }
-                    ],
-                    roles: [
-                        { type: "fullstack", amount: 2, label: "Full-Stack dev", color: 'green', info: "Must know everything." },
-                        { type: "comms", amount: 1, label: "Communication", color: 'purple' },
-                        { type: "frontend", amount: 2, label: "Frontend dev", color: 'orange', info: "Must know React.js." },
-                        { type: "media", amount: 2, label: "Media", color: 'red' },
-                        { type: "backend", amount: 3, label: "Backend dev", color: 'blue' }
-                    ],
-                    students: [
-                        { id: 1, name: "Friedrich Vandenberghe", role: "fullstack"},
-                        { id: 2, name: "Lander Saerens", role: "frontend"},
-                        { id: 3, name: "Simon Heemeryck", role: "backend"},
-                        { id: 4, name: "Wouter Hennen", role: "frontend"},
-                        { id: 5, name: "Lisa De Jonghe", role: "comms"},
-                        { id: 6, name: "Henri Cattoire", role: "backend"},
-                        { id: 7, name: "Lennart Veys", role: "backend"}
-                    ]
-                },
-                {
-                    id: 4,
-                    title: "Project #3",
-                    client: "Client #3",
-                    coaches: [
-                        { id: 1, name: "Miet" },
-                        { id: 2, name: "Astrid" }
-                    ],
-                    roles: [
-                        { type: "fullstack", amount: 2, label: "Full-Stack dev", color: 'green', info: "Must know everything." },
-                        { type: "comms", amount: 1, label: "Communication", color: 'purple' },
-                        { type: "frontend", amount: 2, label: "Frontend dev", color: 'orange', info: "Must know React.js." },
-                        { type: "media", amount: 2, label: "Media", color: 'red' },
-                        { type: "backend", amount: 3, label: "Backend dev", color: 'blue' }
-                    ],
-                    students: [
-                        { id: 1, name: "Friedrich Vandenberghe", role: "fullstack"},
-                        { id: 2, name: "Lander Saerens", role: "frontend"},
-                        { id: 3, name: "Simon Heemeryck", role: "backend"},
-                        { id: 4, name: "Wouter Hennen", role: "frontend"},
-                        { id: 5, name: "Lisa De Jonghe", role: "comms"},
-                        { id: 6, name: "Henri Cattoire", role: "backend"},
-                        { id: 7, name: "Lennart Veys", role: "backend"}
-                    ]
-                },
-                {
-                    id: 5,
-                    title: "Project #3",
-                    client: "Client #3",
-                    coaches: [
-                        { id: 1, name: "Miet" },
-                        { id: 2, name: "Astrid" }
-                    ],
-                    roles: [
-                        { type: "fullstack", amount: 2, label: "Full-Stack dev", color: 'green', info: "Must know everything." },
-                        { type: "comms", amount: 1, label: "Communication", color: 'purple' },
-                        { type: "frontend", amount: 2, label: "Frontend dev", color: 'orange', info: "Must know React.js." },
-                        { type: "media", amount: 2, label: "Media", color: 'red' },
-                        { type: "backend", amount: 3, label: "Backend dev", color: 'blue' }
-                    ],
-                    students: [
-                        { id: 1, name: "Friedrich Vandenberghe", role: "fullstack"},
-                        { id: 2, name: "Lander Saerens", role: "frontend"},
-                        { id: 3, name: "Simon Heemeryck", role: "backend"},
-                        { id: 4, name: "Wouter Hennen", role: "frontend"},
-                        { id: 5, name: "Lisa De Jonghe", role: "comms"},
-                        { id: 6, name: "Henri Cattoire", role: "backend"},
-                        { id: 7, name: "Lennart Veys", role: "backend"}
-                    ]
-                }
-            ]
-        }
-    },
+  name: 'ProjectList',
+  components: { SideBar, ProjectCard },
+  data() {
+    return {
+      filter: ref(''),
+      showShadow: ref(false),
+    }
+  },
+  setup() {
+    const projectStore = useProjectStore()
+    return {
+      projectStore,
+    }
+  },
+  created() {
+    // Prevent a reload each time switched to the tab.
+    if (this.projectStore.projects.length === 0)
+      this.projectStore.loadProjects()
+  },
+  computed: {
+    expanded: {
+      get() {
+        if (this.projectStore.projects.length === 0) return false
+        return (this as any).projectStore.projects.every((p: any) => Object.values(p.selectedRoles ?? {k:false}).every(r => r))
+      },
+      set(newValue) {
+        this.projectStore.projects.forEach((p: any) => {
+          for (let r in p.selectedRoles) {
+            p.selectedRoles[r] = newValue
+          }
+        })
+      }
+    }
+  }
 })
 </script>
 
-<style lang='sass' scoped>
+<style>
+.rotate180 {
+  transform: rotate(180deg);
+}
+</style>
+
+<style lang="sass" scoped>
 .my-card
     border-radius: 10px !important
-    
+
 :deep(.q-btn--rectangle)
     border-radius: 12px !important
 
 .q-btn
     margin: 5px
+    
 </style>

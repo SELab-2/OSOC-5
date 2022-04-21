@@ -26,3 +26,7 @@ jobs:
       working-directory: ./fe
       run: |
         npm run build
+    - name: Run tests
+      working-directory: ./fe
+      run: |
+        npm run coverage

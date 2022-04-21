@@ -1,65 +1,68 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { StoreDefinition } from 'pinia'
-import router from "../router/index"
-import { instance } from '../utils/axios'
+import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
+import { User, UserInterface } from '../models/User'
+import {instance} from "../utils/axios";
+import {useStudentStore} from "./useStudentStore";
+import router from "../router";
 
 const baseURL =
   process.env.NODE_ENV == 'development'
     ? 'http://127.0.0.1:8000/api/'
     : 'https://sel2-5.ugent.be/api/'
 
-export const useAuthenticationStore: StoreDefinition<
-  'user/authentication',
-  {
-    loggedInUser: { first_name: string, last_name: string, email: string; password: string } | Record<string, unknown>
-  },
-  Record<string, never>,
-  {
-    login({
+interface State {
+  loggedInUser: UserInterface | null
+}
+
+export const useAuthenticationStore = defineStore('user/authentication', {
+  persist: true,
+  state: (): State => ({
+    loggedInUser: null,
+  }),
+  actions: {
+    checkLogin(): void {
+      if (localStorage.getItem('refreshToken') && localStorage.getItem('accessToken')) {
+        router.push({name: 'Projects'}).then()
+      }
+    },
+    async login({
       email,
       password,
     }: {
-      first_name: string
-      last_name: string
       email: string
       password: string
-    }): Promise<void>
-    logout(): void
-    changePassword({
-      p1,
-      p2,
-    }: {
-      p1: string
-      p2: string
-    }): Promise<void>
-  }
-> = defineStore('user/authentication', {
-  state: () => ({
-    loggedInUser: {first_name:"NO LOGIN", last_name:"NO LOGIN",email:"NO LOGIN",password:"NO LOGIN"},
-  }),
-  actions: {
-    async login({ email, password }) {
-      const {data} = await axios.post('http://localhost:8000/api/auth/login/', {
+    }): Promise<void> {
+      const { data } = await axios.post(baseURL + 'auth/login/', {
         username: email,
         email,
         password,
       })
+      localStorage.setItem('refreshToken', data.refresh_token)
+      localStorage.setItem('accessToken', data.access_token)
 
-      localStorage.setItem("refreshToken", data.refresh_token)
-      localStorage.setItem("accessToken", data.access_token)
-
-      this.loggedInUser = { first_name: data.user.first_name, last_name: data.user.last_name, email: email, password: password }
-
-      router.push('/users')
+      const result = await instance.get<User>('coaches/' + data.user.pk)
+      this.loggedInUser = result.data
     },
     async logout() {
-      localStorage.removeItem("refreshToken")
-      localStorage.removeItem("accessToken")
-      router.push('/')
-      // this.$reset()
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('accessToken')
+
+      const studentStore = useStudentStore()
+      studentStore.$reset()
+      const skillStore = useStudentStore()
+      skillStore.$reset()
+      const coachStore = useStudentStore()
+      coachStore.$reset()
+      const projectStore = useStudentStore()
+      projectStore.$reset()
+
+      this.$reset()
+      router.push({name: 'Login'}).then()
     },
-    async changePassword({p1, p2}) {
+    async changePassword({p1, p2}: 
+      {p1: string, p2: string}) {
       const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
       };
@@ -68,8 +71,6 @@ export const useAuthenticationStore: StoreDefinition<
         new_password2: p2,
       };
       const {data} = await axios.post('http://localhost:8000/api/auth/password/change/', bodyParameters, config)
-      this.loggedInUser = { first_name: this.loggedInUser.first_name, last_name: this.loggedInUser.last_name, email: this.loggedInUser.email, password: p1 }
-
-    },
+      },
   },
 })

@@ -5,9 +5,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
-from datetime import datetime
+from django.utils import timezone
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -30,6 +30,9 @@ class Skill(models.Model):
         _('color'),
         max_length=50
     )
+
+    def __str__(self):
+        return self.name
 
 
 class CoachManager(BaseUserManager):
@@ -129,9 +132,7 @@ class Coach(AbstractUser):  # models.Model):
 
 class GithubUser(models.Model):
     """
-    Skill; A talent or ability of a Student.
-
-    Students can more than one skill (many-to-many relationship).
+    Github user; used to log coaches in via github
     """
     login = models.CharField(
         _('login'),
@@ -148,13 +149,44 @@ class Student(models.Model):
     """
     Student; Person who would like to participate in an OSOC project.
     """
-    class Language(models.TextChoices):
-        DUTCH = '0', _('Dutch')
-        ENGLISH = '1', _('English')
-        FRENCH = '2', _('French')
-        GERMAN = '3', _('German')
-        OTHER = '4', _('Other')
+    class Gender(models.TextChoices):
+        FEMALE = '0', _('Female')
+        MALE = '1', _('Male')
+        TRANSGENDER = '2', _('Transgender')
+        UNKNOWN = '3', _('Unknown')
+    
+    class Status(models.TextChoices):
+        """
+        Status should be changed when the respective email is sent
+        Applied
+            undecided, screening
+        Awaiting project
+            Coaches are looking for a project for this student, sent maybe
+        Approved
+            Student is approved and is able to participate, sent yes
+        Contract confirmed
+            Student has signed the contract
+        Contract declined
+            Student has declined the contract
+        Rejected
+            Student is rejected and is not able to participate, sent no
+        """
+        APPLIED = '0', _('Applied')
+        AWAITING_PROJECT = '1', _('Awaiting project')
+        APPROVED = '2', _('Approved')
+        CONTRACT_CONFIRMED = '3', _('Contract confirmed')
+        CONTRACT_DECLINED = '4', _('Contract declined')
+        REJECTED = '5', _('Rejected')
 
+    employment_agreement = models.CharField(
+        _('employment agreement'),
+        max_length=255,
+    )
+    hinder_work = models.TextField(
+        _('hinder work'),
+        null=True,
+        blank=True
+    )
     first_name = models.CharField(
         _('name'),
         max_length=255,
@@ -168,6 +200,18 @@ class Student(models.Model):
         max_length=255,
         blank=True,
         default=""
+    )
+    gender = models.CharField(
+        _('gender'),
+        max_length=1,
+        choices=Gender.choices,
+        default=Gender.UNKNOWN
+    )
+    pronouns = models.CharField(
+        _('pronouns'),
+        max_length=255,
+        null=True,
+        blank=True
     )
     email = models.EmailField(
         _('email address'),
@@ -183,22 +227,25 @@ class Student(models.Model):
     )
     language = models.CharField(
         _('language'),
-        max_length=1,
-        choices=Language.choices,
-        default=Language.DUTCH,
+        max_length=255
     )
-    extra_info = models.TextField(
-        _('extra info'),
-        blank=True,
-        default=""
+    english_rating = models.PositiveSmallIntegerField(
+        _("english rating"),
+        validators=[MaxValueValidator(5), MinValueValidator(1)],
+    )
+    motivation = models.TextField(
+        _('motivation')
     )
     cv = models.URLField(
         _('cv'),
-        max_length=200
+        max_length=255
     )
     portfolio = models.URLField(
         _('portfolio'),
-        max_length=200
+        max_length=255
+    )
+    fun_fact = models.TextField(
+        _('fun fact'),
     )
     school_name = models.CharField(
         _("school name"),
@@ -208,6 +255,14 @@ class Student(models.Model):
         _("degree"),
         max_length=255
     )
+    degree_duration = models.PositiveSmallIntegerField(
+        _("degree duration"),
+        validators=[MinValueValidator(1)],
+    )
+    degree_current_year = models.PositiveSmallIntegerField(
+        _("degree current year"),
+        validators=[MinValueValidator(1)],
+    )
     studies = models.CharField(
         _("studies"),
         max_length=255
@@ -216,8 +271,22 @@ class Student(models.Model):
         _("alum"),
         default=False
     )
+    student_coach = models.BooleanField(
+        _("wants to be student coach"),
+        default=False
+    )
+    status = models.CharField(
+        _('status'),
+        max_length=1,
+        choices=Status.choices,
+        default=Status.APPLIED
+    )
     skills = models.ManyToManyField(
         Skill,
+    )
+    best_skill = models.CharField(
+        _("best skill"),
+        max_length=255
     )
     suggestions = models.ManyToManyField(
         Coach,
@@ -232,24 +301,24 @@ class Student(models.Model):
         null=True
     )
 
-#     def get_full_name(self):
-#         """
-#         Returns the first_name plus the last_name, with a space in between.
-#         (method is required to implement by Django)
-#         """
-#         full_name = f'{self.first_name} {self.last_name}'
-#         return full_name.strip()
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        (method is required to implement by Django)
+        """
+        full_name = f'{self.first_name} {self.last_name}'
+        return full_name.strip()
 
-#     def clean(self):
-#         """
-#         Will be called before saving.
-#         """
-#         # strip first name and last name
-#         self.first_name = self.first_name.strip()
-#         self.last_name = self.last_name.strip()
+    def clean(self):
+        """
+        Will be called before saving.
+        """
+        # strip first name and last name
+        self.first_name = self.first_name.strip()
+        self.last_name = self.last_name.strip()
 
-#         # strip email and transform it to lowercase
-#         self.email = strip_and_lower_email(self.email)
+        # strip email and transform it to lowercase
+        self.email = strip_and_lower_email(self.email)
 
     def save(self, *args, **kwargs):
         """
@@ -258,6 +327,12 @@ class Student(models.Model):
         """
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.get_full_name()
+
+    def __str__(self):
+        return self.get_full_name()
 
 
 class Project(models.Model):
@@ -353,12 +428,13 @@ class Suggestion(models.Model):
 
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
     def __str__(self):
-        return f"{self.suggestion}: {self.reason}"
+        suggestion_label = self.Suggestion(self.suggestion).label
+        return f"{suggestion_label}: {self.reason}"
 
 
 class ProjectSuggestion(models.Model):
@@ -385,15 +461,12 @@ class ProjectSuggestion(models.Model):
     )
     skill = models.ForeignKey(
         Skill,
-        on_delete=models.CASCADE
+        on_delete=models.RESTRICT   # not allowed to delete a skill that is used in a suggestion
     )
 
-    class Meta:
-        unique_together = (("project", "student", "coach"))
-    
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -412,7 +485,7 @@ class SentEmail(models.Model):
     )
     time = models.DateTimeField(
         _("send date and time"),
-        default=datetime.now, 
+        default=timezone.now, 
         blank=True
     )
     info = models.CharField(
@@ -421,3 +494,6 @@ class SentEmail(models.Model):
         blank=True,
         default=""
     )
+
+    def __str__(self):
+        return f"{self.info} (from: {self.sender}, to: {self.receiver})"

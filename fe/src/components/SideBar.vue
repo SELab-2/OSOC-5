@@ -22,7 +22,7 @@
             </div>
 
             <q-input
-              v-model="search"
+              v-model="studentStore.search"
               outlined
               dense
               rounded
@@ -30,29 +30,28 @@
               color="green"
               bg-color="white"
               label="Search by name..."
-              @keydown.enter="fetchStudents"
+              @update:modelValue="studentStore.loadStudents"
             >
-              >
               <template #append>
                 <q-icon name="search" />
               </template>
             </q-input>
 
             <SegmentedControl
-              v-model="roleFilter"
+              v-model="studentStore.alumni"
               color="primary"
               text-color="white"
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
-                { name: 'studentCoaches', label: 'Student Coaches' },
+                { name: 'student coaches', label: 'Student Coaches'}
               ]"
-              @click="fetchStudents"
+              @click="studentStore.loadStudents"
             />
 
             <label>Suggestion:</label>
             <SegmentedControl
-              v-model="suggestion"
+              v-model="studentStore.decision"
               color="primary"
               :options="[
                 { name: 'yes', label: 'Yes' },
@@ -60,40 +59,53 @@
                 { name: 'no', label: 'No' },
                 { name: 'none', label: 'None' },
               ]"
-              @click="fetchStudents"
+              @click="studentStore.loadStudents"
             />
 
             <q-select
-              v-model="roles"
+              v-model="studentStore.skills"
               rounded
               outlined
               dense
               multiple
               color="primary"
               bg-color="white"
-              :options="[
-                { name: 'fullStack', label: 'Full-stack developer'},
-                { name: 'data', label: 'Data person'},
-                { name: 'frontend', label: 'Front-end developer'}
-              ]"
-              label="Roles"
-              @update:model-value="fetchStudents"
-            />
+              :options="skillStore.skills"
+              :option-label="opt => opt.name"
+              :option-value="opt => opt.id"
+              label="Skills"
+              @update:model-value="studentStore.loadStudents"
+            >
+              <template #selected>
+                <div
+                  class="full-width"
+                  style="max-height: 15vh; overflow-y: auto"
+                >
+                  <StudentSkillChip
+                    v-for="skill of studentStore.skills"
+                    :key="skill.id"
+                    :color="skill.color"
+                    :name="skill.name"
+                    best-skill=""
+                  />
+                </div>
+              </template>
+            </q-select>
 
             <div class="row q-gutter-x-md">
               <q-checkbox
-                v-model="byMe"
+                v-model="studentStore.byMe"
                 color="primary"
                 label="Suggested by you"
                 right-label
-                @click="fetchStudents"
+                @click="studentStore.loadStudents"
               />
               <q-checkbox
-                v-model="onProject"
+                v-model="studentStore.onProject"
                 color="primary"
                 label="On project"
                 right-label
-                @click="fetchStudents"
+                @click="studentStore.loadStudents"
               />
             </div>
 
@@ -110,14 +122,15 @@
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
-                  :draggable="draggable"
-                  @dragstart="onDragStart($event, student.name)"
+                  :draggable="draggable ?? false"
+                  @dragstart="onDragStart($event, student)"
                 >
                   <StudentCard
                     v-ripple
+                    :must-hover="mustHover"
                     :student="student"
-                    :active="this.student ? student.email === this.student.email : false"
-                    @click="this.clickStudent(student)"
+                    :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
+                    @click="clickStudent(student)"
                   />
                 </q-item>
               </q-list>
@@ -130,13 +143,13 @@
         class="absolute"
         style="top: 15px; right: -17px"
       >
-        <q-btn
+        <btn
           dense
           round
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState.value = !miniState"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -151,9 +164,12 @@ import {useStudentStore} from "../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import {onMounted} from "@vue/runtime-core";
 import { Student } from '../models/Student';
+import {useSkillStore} from "../stores/useSkillStore";
+import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 
 export default defineComponent({
   components: {
+    StudentSkillChip,
     StudentCard,
     SegmentedControl,
   },
@@ -168,43 +184,36 @@ export default defineComponent({
     },
     draggable: {
       type: Boolean,
-      required: true
+      required: false
     },
-    student: {
-      type: Student,
+    mustHover: {
+      type: Boolean,
       required: true
     }
   },
   setup() {
     const studentStore = useStudentStore()
-    const $q = useQuasar()
-
-    onMounted(() => {
-      studentStore.loadStudents()
-    })
+    const skillStore = useSkillStore()
 
     return {
       studentStore,
-      $q,
+      skillStore,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
         backgroundColor: 'black',
         width: '4px',
-        opacity: 0.75
       },
     }
+  },
+  created() {
+    this.skillStore.loadSkills()
+    this.studentStore.loadStudents()
   },
   data() {
     return {
       miniState: ref(false),
       drawer: ref(false),
-      search: ref(""),
-      byMe: ref(false),
-      onProject: ref(false),
-      roleFilter: ref('all'),
-      suggestion: ref('yes'),
-      roles: ref([]),
     }
   },
   methods: {
@@ -214,18 +223,11 @@ export default defineComponent({
     onDragStart(e: any, item: any) {
       const data = {
         targetId: e.target.id,
-        name: item
+        student: item
       }
-      e.dataTransfer.setData('text', JSON.stringify(data))
+      e.dataTransfer.setData(data.student.id, JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
-    },
-    fetchStudents() {
-      console.log(this.search)
-      console.log(this.roleFilter)
-      console.log(this.suggestion)
-      console.log(this.roles)
-      console.log(this.byMe)
-      console.log(this.onProject)
+      e.dataTransfer.effectAllowed = 'copy'
     },
     clickStudent(student: Student) {
       this.selectStudent(student)
@@ -241,5 +243,17 @@ export default defineComponent({
   
 :deep(.q-item) {
   padding: 8px 8px !important;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  right: 0px;
+  background-color: darkgray;
+  border-radius: 7px;
+  width: 4px;
+  opacity: 0.75;
 }
 </style>
