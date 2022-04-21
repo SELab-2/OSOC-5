@@ -72,7 +72,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
-    @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer, 
+    @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def make_final_decision(self, request, pk=None):
         """
@@ -91,7 +91,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer, 
+    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def remove_final_decision(self, request, pk=None):
         """
@@ -141,7 +141,7 @@ class CoachViewSet(viewsets.GenericViewSet,
             return Response({"detail": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
         return Response({"detail": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
 
-    @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer, 
+    @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def update_status(self, request, pk=None):
         """
@@ -190,7 +190,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return ProjectListSerializer
         return super().get_serializer_class()
 
-    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer, 
+    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive])
     def suggest_student(self, request, pk=None):
         """
@@ -218,7 +218,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body
-    @action(detail=True, methods=['post'], serializer_class=RemoveProjectSuggestionSerializer, 
+    @action(detail=True, methods=['post'], serializer_class=RemoveProjectSuggestionSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive])
     def remove_student(self, request, pk=None):
         """
