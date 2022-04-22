@@ -4,9 +4,9 @@ import NotFoundPage from '../../src/components/NotFoundPage.vue'
 
 const wrapperFactory = () => mount(NotFoundPage, {})
 
-describe('Not.vue', () => {
+describe('NotFoundPage.vue', () => {
 
-    it('Test if spinner loads correctly', () => {
+    it('Test if the text is displayed correctly', () => {
         expect(NotFoundPage).toBeTruthy();
         const wrapper = wrapperFactory();
         expect(wrapper.find('h1').exists()).toBeTruthy()
