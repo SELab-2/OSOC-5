@@ -24,7 +24,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
   actions: {
     checkLogin(): void {
       if (localStorage.getItem('refreshToken') && localStorage.getItem('accessToken')) {
-        router.push({name: 'Projects'}).then()
+        router.push({name: 'Projects'})
       }
     },
     async login({
@@ -59,7 +59,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       projectStore.$reset()
 
       this.$reset()
-      router.push({name: 'Login'}).then()
+      router.push({name: 'Login'})
     },
     async changePassword({p1, p2}: 
       {p1: string, p2: string}) {
@@ -70,7 +70,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         new_password1: p1,
         new_password2: p2,
       };
-      const {data} = await axios.post('http://localhost:8000/api/auth/password/change/', bodyParameters, config)
+      const {data} = await axios.post(baseURL + 'auth/password/change/', bodyParameters, config)
       },
   },
 })
