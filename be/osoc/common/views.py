@@ -17,6 +17,8 @@ from .filters import *
 from .serializers import *
 from .models import *
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -42,7 +44,8 @@ class StudentViewSet(viewsets.ModelViewSet):
                        StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
-    filterset_fields = ['alum', 'language', 'skills', 'student_coach', 'english_rating', 'status']
+    filterset_fields = ['alum', 'language', 'skills',
+                        'student_coach', 'english_rating', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -56,6 +59,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         serializer = SuggestionSerializer(
             data=request.data, context={'request': request})
+
         if serializer.is_valid():
 
             # create Suggestion object if it doesnt exist yet, else update it
@@ -65,7 +69,18 @@ class StudentViewSet(viewsets.ModelViewSet):
             response_data = serializer.data
             response_data['coach_name'] = request.user.get_full_name()
             response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
+            response_data['coach'] = request.build_absolute_uri(
+                reverse("coach-detail", args=(request.user.id,)))
+            response_data['student_id'] = pk
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'suggestion',
+                    'data': response_data
+                }
+            )
 
             return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -82,6 +97,18 @@ class StudentViewSet(viewsets.ModelViewSet):
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
             student=self.get_object(), coach=request.user).delete()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'remove_suggestion',
+                'data': {
+                    'student': pk,
+                    'coach': request.user.id
+                }
+            }
+        )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
@@ -110,7 +137,19 @@ class StudentViewSet(viewsets.ModelViewSet):
             response_data = serializer.data
             response_data['coach_name'] = request.user.get_full_name()
             response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
+            response_data['coach'] = request.build_absolute_uri(
+                reverse("coach-detail", args=(request.user.id,)))
+            response_data['student_id'] = pk
+            response_data['suggestion'] = request.data['suggestion']
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'final_decision',
+                    'data': response_data
+                }
+            )
 
             return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -127,6 +166,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
             student=self.get_object(), coach=request.user).delete()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'final_decision',
+                'data': {'student_id': pk}
+            }
+        )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
@@ -148,7 +196,8 @@ class CoachViewSet(viewsets.GenericViewSet,
     """
     queryset = Coach.objects.all().order_by('id')
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    permission_classes = [
+        permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
@@ -227,11 +276,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # get student object from url
             student_url = data.pop('student')
-            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
+            student = Student.objects.get(
+                **resolve(urlparse(student_url).path).kwargs)
 
             # get skill object from url
             skill_url = data.pop('skill')
-            skill = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
+            skill = Skill.objects.get(
+                **resolve(urlparse(skill_url).path).kwargs)
 
             # check if skill is one of the required skills of the project
             if skill in project.required_skills.all():
@@ -241,9 +292,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     project=project, student=student, coach=request.user, skill=skill, defaults=data)
 
                 response_data = serializer.data
-                response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
+                response_data['coach'] = request.build_absolute_uri(
+                    reverse("coach-detail", args=(request.user.id,)))
                 response_data['coach_name'] = request.user.get_full_name()
                 response_data['coach_id'] = request.user.id
+                response_data['student_id'] = student.id
+                response_data['project_id'] = int(pk)
+                response_data['skill_id'] = skill.id
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "suggestion",
+                    {
+                        'type': 'suggest_student',
+                        'data': response_data
+                    }
+                )
 
                 return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
             return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
@@ -266,19 +329,35 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # get student object from url
             student_url = serializer.data.pop('student')
-            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
+            student = Student.objects.get(
+                **resolve(urlparse(student_url).path).kwargs)
 
             # get coach object from url
             coach_url = serializer.data.pop('coach')
-            coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
+            coach = Coach.objects.get(
+                **resolve(urlparse(coach_url).path).kwargs)
 
             # get skill object from url
             skill_url = serializer.data.pop('skill')
-            skill = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
+            skill = Skill.objects.get(
+                **resolve(urlparse(skill_url).path).kwargs)
 
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
                 project=self.get_object(), coach=coach, student=student, skill=skill).delete()
+
+            channel_layer = get_channel_layer()
+            websocket_data = serializer.data
+            websocket_data['skill'] = skill_url
+            websocket_data['student'] = student_url
+            websocket_data['project_id'] = int(pk)
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'remove_student',
+                    'data': websocket_data
+                }
+            )
 
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -294,7 +373,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         for student in students:
             projects = ProjectSuggestion.objects.filter(student=student)
             if projects.count() > 1:
-                student_url = request.build_absolute_uri(reverse("student-detail", args=(student.id,)))
+                student_url = request.build_absolute_uri(
+                    reverse("student-detail", args=(student.id,)))
                 project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,)))
                                 for project_sug in projects]
                 conflicts[student_url] = set(project_urls)
@@ -338,7 +418,8 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     queryset = SentEmail.objects.all().order_by('id')
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, EmailDateTimeFilter]
+    filter_backends = [filters.SearchFilter,
+                       DjangoFilterBackend, EmailDateTimeFilter]
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 

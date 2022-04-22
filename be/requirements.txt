@@ -11,3 +11,5 @@ django-nose
 coverage
 django-cors-headers
 django-filter
+channels
+channels_redis
