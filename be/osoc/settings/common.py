@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'corsheaders',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'osoc.wsgi.application'
+ASGI_APPLICATION = 'osoc.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('osoc-redis', 6379)],
+        },
+    },
+}
 
 # Tests
 # https://django-testing-docs.readthedocs.io/en/latest/coverage.html

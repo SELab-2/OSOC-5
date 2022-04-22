@@ -10,17 +10,45 @@
         <LoadingSpinner />
       </div>
 
-      <div v-else class="column">
-        <div v-for="(suggestion, key) in studentStore.currentStudent?.suggestions" :key="key">
+      <div
+        v-else
+        class="column"
+      >
+        <div
+          v-for="(suggestion, key) in studentStore.currentStudent?.suggestions"
+          :key="key"
+        >
           <div class="row">
-            <q-icon v-if="suggestion.suggestion === 0" size="xs" name="mdi-check" color="green" />
-            <q-icon v-else-if="suggestion.suggestion === 1" size="xs" name="mdi-close" color="red" />
-            <q-icon v-else size="xs" name="mdi-help" color="yellow" />
+            <q-icon
+              v-if="suggestion.suggestion === YES"
+              size="xs"
+              name="mdi-check"
+              color="green"
+            />
+            <q-icon
+              v-else-if="suggestion.suggestion === NO"
+              size="xs"
+              name="mdi-close"
+              color="red"
+            />
+            <q-icon
+              v-else
+              size="xs"
+              name="mdi-help"
+              color="yellow"
+            />
             <label class="q-pl-xs">
               {{ suggestion.coachName }}
             </label>
-            <q-icon v-if="suggestion.reason" class="tooltip-icon" name="mdi-information-outline">
-              <q-tooltip anchor="center right" self="center start">
+            <q-icon
+              v-if="suggestion.reason"
+              class="tooltip-icon"
+              name="mdi-information-outline"
+            >
+              <q-tooltip
+                anchor="center right"
+                self="center start"
+              >
                 {{ suggestion.reason }}
               </q-tooltip>
             </q-icon>
@@ -50,6 +78,12 @@ export default defineComponent( {
     return {
       studentStore,
     }
+  },
+   data: function() {
+    return {
+      YES : 0,
+      NO : 1,
+    };
   },
 })
 </script>

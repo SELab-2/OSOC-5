@@ -15,6 +15,8 @@ from .filters import *
 from .serializers import *
 from .models import *
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -40,7 +42,8 @@ class StudentViewSet(viewsets.ModelViewSet):
                        StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
-    filterset_fields = ['alum', 'language', 'skills', 'student_coach', 'english_rating', 'status']
+    filterset_fields = ['alum', 'language', 'skills',
+                        'student_coach', 'english_rating', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -54,6 +57,14 @@ class StudentViewSet(viewsets.ModelViewSet):
         serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(student=self.get_object(), coach=request.user, final=False)
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'suggestion',
+                    'data': serializer.data
+                }
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -69,6 +80,18 @@ class StudentViewSet(viewsets.ModelViewSet):
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
             student=self.get_object(), coach=request.user, final=False).delete()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'remove_suggestion',
+                'data': {
+                    'student': pk,
+                    'coach': request.user.id
+                }
+            }
+        )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
@@ -88,6 +111,14 @@ class StudentViewSet(viewsets.ModelViewSet):
             suggestion = serializer.save(student=student, coach=request.user, final=True)
             student.final_decision = suggestion
             student.save()
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'final_decision',
+                    'data': serializer.data
+                }
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -104,6 +135,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
             student=self.get_object(), coach=request.user, final=True).delete()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'final_decision',
+                'data': {'student_id': pk}
+            }
+        )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
@@ -125,7 +165,8 @@ class CoachViewSet(viewsets.GenericViewSet,
     """
     queryset = Coach.objects.all().order_by('id')
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    permission_classes = [
+        permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
@@ -213,6 +254,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
             # check if skill is one of the required skills of the project
             if skill in project.required_skills.all():
                 serializer.save(project=project, coach=request.user)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "suggestion",
+                    {
+                        'type': 'suggest_student',
+                        'data': serializer.data
+                    }
+                )
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -239,6 +288,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 **serializer.validated_data
             ).delete()
 
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'remove_student',
+                    'data': serializer.data
+                }
+            )
+
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -253,7 +311,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         for student in students:
             projects = ProjectSuggestion.objects.filter(student=student)
             if projects.count() > 1:
-                student_url = request.build_absolute_uri(reverse("student-detail", args=(student.id,)))
+                student_url = request.build_absolute_uri(
+                    reverse("student-detail", args=(student.id,)))
                 project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,)))
                                 for project_sug in projects]
                 conflicts[student_url] = set(project_urls)
@@ -297,7 +356,8 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     queryset = SentEmail.objects.all().order_by('id')
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, EmailDateTimeFilter]
+    filter_backends = [filters.SearchFilter,
+                       DjangoFilterBackend, EmailDateTimeFilter]
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 
