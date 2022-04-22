@@ -1010,33 +1010,3 @@ class SentEmailTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(email.info, data["info"])
-
-
-class RegisterTests(APITestCase):
-    def setUp(self):
-        admin = Coach.objects.create_user(
-            first_name="username",
-            password="Pas$w0rd",
-            last_name="last_name",
-            email="email@example.com",
-            is_admin=True
-        )
-        self.client.force_authenticate(admin)
-
-    # def test_register(self):
-    #     url = reverse("register")
-    #     data = {
-    #         "first_name": "John",
-    #         "last_name": "Doe",
-    #         "email": "email2@example.com",
-    #         "password1": "P4$$W0rd123",
-    #         "password2": "P4$$W0rd123"
-    #     }
-    #     before_count = Coach.objects.count()
-    #     response = self.client.post(url, data, format="json")
-    #     after_count = Coach.objects.count()
-
-    #     print(response.content)
-
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(before_count, after_count-1)
