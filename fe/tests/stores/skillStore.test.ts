@@ -1,5 +1,5 @@
-import {it, expect, describe, beforeEach} from 'vitest'
-import { setActivePinia, createPinia } from 'pinia'
+import {beforeEach, describe, expect, it, test} from 'vitest'
+import {createPinia, setActivePinia} from 'pinia'
 import {useSkillStore} from "../../src/stores/useSkillStore";
 
 
@@ -11,7 +11,27 @@ describe('Skill Store', () => {
         setActivePinia(createPinia())
     })
 
-    it('load skills', () => {
+    it('loadSkills', () => {
+
+        // create a new skillstore
+        const skillStore = useSkillStore()
+
+        // check its initial values
+        expect(skillStore.skills).toHaveLength(0)
+        expect(skillStore.isLoadingSkills).toBe(false)
+
+
+
+        // test.concurrent('concurrent test 1', async () => {
+            // load skills
+            skillStore.loadSkills()
+            // check if it's loading skills
+            expect(skillStore.isLoadingSkills).toBe(true)
+        // })
+
+
+    });
+    it('addSkill', () => {
 
         // create a new skillstore
         const skillStore = useSkillStore()
@@ -21,10 +41,20 @@ describe('Skill Store', () => {
         expect(skillStore.isLoadingSkills).toBe(false)
 
         // load skills
-        skillStore.loadSkills()
+        skillStore.addSkill("newSkillName", "color", {})
 
-        // check if it's loading skills
-        expect(skillStore.isLoadingSkills).toBe(true)
+    });
+    it('deleteSkill', () => {
+
+        // create a new skillstore
+        const skillStore = useSkillStore()
+
+        // check its initial values
+        expect(skillStore.skills).toHaveLength(0)
+        expect(skillStore.isLoadingSkills).toBe(false)
+
+        // load skills
+        skillStore.deleteSkill(-1)
 
     })
 })
