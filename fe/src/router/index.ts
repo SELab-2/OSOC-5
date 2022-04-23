@@ -8,6 +8,7 @@ import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
+import AddUser from '../features/addUser/AddUser.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
 import {useStudentStore} from "../stores/useStudentStore";
 
@@ -73,6 +74,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: UserList,
+      },
+      {
+        path: '/add_user',
+        name: 'add new user',
+        meta: {
+          requiresAuth: true,
+        },
+        component: AddUser,
       },
     ],
   },

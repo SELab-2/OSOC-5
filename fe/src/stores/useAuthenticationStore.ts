@@ -72,5 +72,22 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       };
       const {data} = await axios.post(baseURL + 'auth/password/change/', bodyParameters, config)
       },
+    async register({firstName, lastName, email, password1, password2, is_admin, is_active}:
+      {firstName: string, lastName: string, email: string, password1: string, password2: string, is_admin: boolean, is_active: boolean}) {
+        const config = {
+          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
+        };
+        const bodyParameters = {
+          first_name: firstName,
+          last_name: lastName,
+          username: email,
+          email: email,
+          password1: password1,
+          password2: password2,
+          is_active: is_active,
+          is_admin: is_admin,
+        };
+        const {data} = await axios.post(baseURL + 'auth/register/', bodyParameters, config)
+      }
   },
 })

@@ -182,7 +182,8 @@ class CustomRegisterSerializer(RegisterSerializer):
     username = None
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-
+    is_admin = serializers.BooleanField()
+    is_active = serializers.BooleanField()
     def get_cleaned_data(self):
         super(CustomRegisterSerializer, self).get_cleaned_data()
         return {
@@ -190,5 +191,7 @@ class CustomRegisterSerializer(RegisterSerializer):
             'password2': self.validated_data.get('password2', ''),
             'email': self.validated_data.get('email', ''),
             'first_name': self.validated_data.get('first_name', ''),
-            'last_name': self.validated_data.get('last_name', '')
+            'last_name': self.validated_data.get('last_name', ''),
+            'is_admin' : self.validated_data.get('is_admin', ''),
+            'is_active' : self.validated_data.get('is_active', '')
         }
