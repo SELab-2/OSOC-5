@@ -124,10 +124,10 @@ export default defineComponent({
   components: { SegmentedControl },
   setup() {
     const q = useQuasar()
-    const password = ref(null)
-    const email = ref(null)
-    const firstName = ref(null)
-    const lastName = ref(null)
+    const password = ref('')
+    const email = ref('')
+    const firstName = ref('')
+    const lastName = ref('')
     const admin = ref(false)
     const active = ref(true)
     const authenticationStore = useAuthenticationStore()
@@ -170,8 +170,8 @@ export default defineComponent({
       })
     },
     onReset() {
-      this.email.value = null
-      this.password.value = null
+      this.email.value = ""
+      this.password.value = ""
     },
     onGeneratePasswordToggle() {
       if (this.generate) {
@@ -182,7 +182,7 @@ export default defineComponent({
         }
         this.password = result
       } else {
-        this.password = null
+        this.password = ""
       }
     }
   }
