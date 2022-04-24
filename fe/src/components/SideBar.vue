@@ -163,6 +163,7 @@
         <btn
           dense
           round
+          style="border-radius: 30px;"
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"

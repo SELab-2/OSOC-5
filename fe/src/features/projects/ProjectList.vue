@@ -25,7 +25,6 @@
           shadow-color="blue"
           shadow-strength="1.8"
         />
-        
         <btn
           padding="7px"
           icon="r_warning"

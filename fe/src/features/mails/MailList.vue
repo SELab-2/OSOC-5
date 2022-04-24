@@ -54,33 +54,8 @@
               key="status"
               :props="props"
             >
-              <q-select
-                v-model="props.row.status"
-                v-ripple
-                color="yellow"
-                borderless
-                dense
-                style="border-radius: 5px; position: relative; width: 170px"
-                :options="status"
-                transition-show="jump-down"
-                transition-hide="jump-up"
-                transition-duration="300"
-                behavior="menu"
-                map-options
-                emit-value
-              >
-                <template #option="scope">
-                  <q-item
-                    @click="() => updateStatus(props.row, props.row.status)"
-                    class="items-center"
-                    v-bind="scope.itemProps"
-                  >
-                    <q-item-section>
-                      <q-item-label>{{ scope.opt.label }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
+              {{status.find(s => s.value === props.row.status).label}}
+              
             </q-td>
             <q-td
               key="email"
@@ -140,14 +115,9 @@
               </q-btn>
             </q-td>
           </q-tr>
-          <q-tr v-show="props.expand" :props="props">
+          <q-tr no-hover v-if="props.expand" :props="props">
             <q-td colspan="100%" :key="emailKey">
-              <div v-if="studentStore.mails.has(props.row.id) && studentStore.mails.get(props.row.id).length === 0">
-                The student has no mail.
-              </div>
-              <div v-else>
-                <MailsOverview :student="props.row" />
-              </div>
+              <MailsOverview :student="props.row" />
             </q-td>
           </q-tr>
         </template>
