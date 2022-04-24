@@ -28,6 +28,24 @@ export const useProjectStore = defineStore('project', {
     isLoadingProjects: false,
   }),
   actions: {
+    async getConflictingProjects() {
+      const studentStore = useStudentStore()
+
+      const { data } = await instance.get('projects/get_conflicting_projects')
+      const conflicts = new Map()
+      for (const conflict of Object.entries(data.conflicts)) {
+        console.log(conflict)
+        const student = await studentStore.getStudent(conflict[0])
+        const projects = await Promise.all(
+          (conflict[1] as string[]).map(
+            async (project: string) => await this.getOrFetchProject(project)
+          )
+        )
+        conflicts.set(student, projects)
+      }
+
+      return conflicts
+    },
     async fetchSuggestedStudents(
       students: TempStudent[]
     ): Promise<ProjectSuggestionInterface[]> {
@@ -68,6 +86,28 @@ export const useProjectStore = defineStore('project', {
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
+    },
+    async getOrFetchProject(url: string) {
+      const splittedUrl = url.split('/')
+      const id = Number.parseInt(splittedUrl[splittedUrl.length - 2])
+
+      const localPoject = this.projects.filter(
+        (project) => project.id === id
+      )[0]
+
+      if (localPoject) return localPoject
+
+      const { data } = await instance.get<Project>(`projects/${id}`)
+      const coachStore = useCoachStore()
+
+      if (data.coaches)
+        data.coaches = await Promise.all(
+          data.coaches.map(
+            async (url) => await coachStore.getUser(url as unknown as string)
+          )
+        )
+
+      return data
     },
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(

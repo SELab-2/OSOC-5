@@ -7,9 +7,10 @@ import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
 import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
+import ResolveConflicts from '../features/projects/ResolveConflicts.vue'
 import UserList from '../features/users/UserList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
-import {useStudentStore} from "../stores/useStudentStore";
+import { useStudentStore } from '../stores/useStudentStore'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -65,6 +66,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: CreateProjects,
+      },
+      {
+        path: '/projects/conflicts',
+        name: 'Project Conflicts',
+        meta: {
+          requiresAuth: true,
+        },
+        component: ResolveConflicts,
       },
       {
         path: '/users',
