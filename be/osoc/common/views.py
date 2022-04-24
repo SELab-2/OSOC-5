@@ -56,15 +56,21 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
+            # save suggestion
             serializer.save(student=self.get_object(), coach=request.user, final=False)
+
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['student_id'] = pk
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
                     'type': 'suggestion',
-                    'data': serializer.data
+                    'data': socket_data
                 }
             )
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -81,14 +87,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         deleted, _ = Suggestion.objects.filter(
             student=self.get_object(), coach=request.user, final=False).delete()
 
+        # send data to websocket
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "suggestion",
             {
                 'type': 'remove_suggestion',
                 'data': {
-                    'student': pk,
-                    'coach': request.user.id
+                    'student_id': pk,
+                    'coach_id': request.user.id
                 }
             }
         )
@@ -108,17 +115,24 @@ class StudentViewSet(viewsets.ModelViewSet):
         serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             student = self.get_object()
+            # save suggestion
             suggestion = serializer.save(student=student, coach=request.user, final=True)
+            # set final_decision in student
             student.final_decision = suggestion
             student.save()
+            
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['student_id'] = pk
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
-                    'type': 'final_decision',
-                    'data': serializer.data
+                    'type': 'suggestion',
+                    'data': socket_data
                 }
             )
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -141,7 +155,9 @@ class StudentViewSet(viewsets.ModelViewSet):
             "suggestion",
             {
                 'type': 'final_decision',
-                'data': {'student_id': pk}
+                'data': {
+                    'student_id': pk
+                }
             }
         )
 
@@ -253,15 +269,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # check if skill is one of the required skills of the project
             if skill in project.required_skills.all():
+                # save projectsuggestion
                 serializer.save(project=project, coach=request.user)
+
+                # send data to websocket
+                socket_data = serializer.data
+                socket_data['project_id'] = pk
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
                     "suggestion",
                     {
                         'type': 'suggest_student',
-                        'data': serializer.data
+                        'data': socket_data
                     }
                 )
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -288,12 +310,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 **serializer.validated_data
             ).delete()
 
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['project_id'] = pk
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
                     'type': 'remove_student',
-                    'data': serializer.data
+                    'data': socket_data
                 }
             )
 

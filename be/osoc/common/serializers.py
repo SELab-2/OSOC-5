@@ -15,7 +15,7 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
     """
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name',]
+        fields = ['url', 'id', 'first_name', 'last_name']
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
