@@ -20,11 +20,6 @@ from django.test import TestCase
 from osoc.common.models import Coach, Project, ProjectSuggestion, SentEmail, Skill, Student, Suggestion
 from osoc.common.utils import strip_and_lower_email
 
-TEST_CHANNEL_LAYERS = {                                                                              
-    'default': {                                                                                     
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',                                           
-    }                                                                                                
-}
 
 class UtilityTestCases(TestCase):
     def test_strip_and_lower_email(self):
