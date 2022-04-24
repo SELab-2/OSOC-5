@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 import osoc.common.utils as utils
-from osoc.common.tally import TallyForm
+from osoc.common.tally.tally import TallyForm
 
 class UtilityTestCases(TestCase):
     def testStripAndLowerEmail(self):

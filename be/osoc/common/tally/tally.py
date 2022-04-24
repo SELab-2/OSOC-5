@@ -1,7 +1,7 @@
 """
 Tally form (https://tally.so); method for students to register.
 """
-from .utils import getNested, assertOrRaise
+from ..utils import getNested, assertOrRaise
 import json
 
 class TallyForm:

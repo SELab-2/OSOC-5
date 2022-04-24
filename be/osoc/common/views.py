@@ -14,7 +14,7 @@ from django.urls import resolve
 from urllib.parse import urlparse
 from rest_framework.reverse import reverse
 from .models import *
-from .tally import TallyForm
+from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
