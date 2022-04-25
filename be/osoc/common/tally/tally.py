@@ -144,7 +144,7 @@ class TallyForm:
 
     def __equal(self, this, that):
         """
-        Self-defined equal; if that is a list or dictionary, `this` should be in `that`.
+        Self-defined equal; if `that` is a list or dictionary, `this` should be in `that`.
         Otherwise `this` should be equal to `that`.
         """
         if isinstance(that, list) or isinstance(that, dict):
