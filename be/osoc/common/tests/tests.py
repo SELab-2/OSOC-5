@@ -36,6 +36,7 @@ class UtilityTestCases(TestCase):
 
 class TallyFormTestCases(TestCase):
     def setUp(self):
+       # Dummy questions
        self.questions = {
             1: {
                 "question": [ "What do/did you study?" ],
