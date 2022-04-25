@@ -10,9 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        redis-version: [6]
     services:
       db:
         image: postgres
@@ -22,18 +19,16 @@ jobs:
           POSTGRES_PASSWORD: dev
         ports:
           - 5432:5432
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: "3.9"
-    - name: Start Redis
-      uses: supercharge/redis-github-action@1.4.0
-      with:
-        redis-version: ${{ matrix.redis-version }}
-        redis-container-name: 'osoc-redis'
-        # redis-port: 6379
     - name: Install Dependencies
       working-directory: ./be
       run: |
@@ -46,3 +41,4 @@ jobs:
         python manage.py test
       env:
         POSTGRES_HOST: localhost
+        REDIS_HOST: localhost

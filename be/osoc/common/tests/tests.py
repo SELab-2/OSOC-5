@@ -76,6 +76,7 @@ class TallyFormTestCases(TestCase):
             tallyForm.validate({ "eventType": "FORM_RESPONSE" })
 
     def testValidationQuestionError(self):
+        # Only require one question; makes it easier to test.
         self.questions[1]["required"] = False
         self.questions[2]["required"] = False
         tallyForm = TallyForm(self.questions)
