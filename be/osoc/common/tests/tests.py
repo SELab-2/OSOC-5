@@ -132,7 +132,6 @@ class TallyFormTestCases(TestCase):
             "studies": [ "Backend development", "Business management", "Bioinformatics" ]
             })
 
-
 class StudentTestsCoach(APITestCase):
     def setUp(self) -> None:
         student = Student.objects.create(
