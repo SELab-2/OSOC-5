@@ -3,16 +3,17 @@ Serializers definitions of the Django models defined in ./models.py.
 """
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import *
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import LoginSerializer
+from .models import *
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Suggestion
-        fields = ['suggestion', 'reason', 'coach_name', 'coach_id', 'coach']
-        read_only_fields = ['coach']
+        fields = ['student', 'suggestion', 'reason',
+                  'coach_name', 'coach_id', 'coach']
+        read_only_fields = ['student', 'coach']
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -28,18 +29,19 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     def get_field_names(self, declared_fields, info):
         # Include all fields and id
         # https://stackoverflow.com/questions/38245414/django-rest-framework-how-to-include-all-fields-and-a-related-field-in-mo
-        expanded_fields = super(StudentSerializer, self).get_field_names(declared_fields, info)
+        expanded_fields = super(StudentSerializer, self).get_field_names(
+            declared_fields, info)
 
         if getattr(self.Meta, 'extra_fields', None):
             return self.Meta.extra_fields + expanded_fields
-        else:
-            return expanded_fields
+        return expanded_fields
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin', 'is_active']
+        fields = ['url', 'id', 'first_name', 'last_name',
+                  'email', 'is_admin', 'is_active']
         read_only_fields = ['is_admin', 'is_active']
 
 
@@ -55,11 +57,11 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['amount', 'skill', 'comment']
 
 
-
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
-        fields = ['student', 'coach', 'coach_name', 'coach_id', 'skill', 'reason']
+        fields = ['student', 'coach', 'coach_name',
+                  'coach_id', 'skill', 'reason']
         read_only_fields = ['coach']
 
 
@@ -83,7 +85,27 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         for skill_data in skills_data:
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
-    
+
+    # overwrite update method to be able to create/update/delete RequiredSkills objects
+    def update(self, instance, validated_data):
+
+        # first update required skills
+        skills_data = validated_data.pop('requiredskills_set')
+        # update or create skills from request
+        for skill_data in skills_data:
+            RequiredSkills.objects.update_or_create(
+                project=instance, **skill_data)
+        # delete skills not in request
+        skills = [skill_data['skill'] for skill_data in skills_data]
+        RequiredSkills.objects.filter(
+            project=instance).exclude(skill__in=skills).delete()
+        return super().update(instance, validated_data)
+
+
+class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = SentEmail
+        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
 
     # overwrite update method to be able to create/update/delete RequiredSkills objects
     def update(self, instance, validated_data):
@@ -105,13 +127,21 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
 
 
-class StudentOnlySerializer(serializers.HyperlinkedModelSerializer):
+class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer for the remove_student api endpoint to be able to remove a ProjectSuggestion
+    only the fields student, coach and skill are needed here
+    """
     class Meta:
         model = ProjectSuggestion
-        fields = ['student']
+        fields = ['student', 'coach', 'skill']
 
 
 class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer for the update_coach_status api endpoint
+    only the fields is_admin and is_active are needed here
+    """
     class Meta:
         model = Coach
         fields = ['is_admin', 'is_active']

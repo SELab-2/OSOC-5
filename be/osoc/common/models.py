@@ -7,7 +7,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
-from datetime import datetime
+from django.utils import timezone
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -30,6 +30,9 @@ class Skill(models.Model):
         _('color'),
         max_length=50
     )
+
+    def __str__(self):
+        return self.name
 
 
 class CoachManager(BaseUserManager):
@@ -129,9 +132,7 @@ class Coach(AbstractUser):  # models.Model):
 
 class GithubUser(models.Model):
     """
-    Skill; A talent or ability of a Student.
-
-    Students can more than one skill (many-to-many relationship).
+    Github user; used to log coaches in via github
     """
     login = models.CharField(
         _('login'),
@@ -149,10 +150,33 @@ class Student(models.Model):
     Student; Person who would like to participate in an OSOC project.
     """
     class Gender(models.TextChoices):
-        FEMALE = '0', _('FEMALE')
-        MALE = '1', _('MALE')
-        TRANSGENDER = '2', _('TRANSGENDER')
-        UNKNOWN = '3', _('UNKNOWN')
+        FEMALE = '0', _('Female')
+        MALE = '1', _('Male')
+        TRANSGENDER = '2', _('Transgender')
+        UNKNOWN = '3', _('Unknown')
+    
+    class Status(models.TextChoices):
+        """
+        Status should be changed when the respective email is sent
+        Applied
+            undecided, screening
+        Awaiting project
+            Coaches are looking for a project for this student, sent maybe
+        Approved
+            Student is approved and is able to participate, sent yes
+        Contract confirmed
+            Student has signed the contract
+        Contract declined
+            Student has declined the contract
+        Rejected
+            Student is rejected and is not able to participate, sent no
+        """
+        APPLIED = '0', _('Applied')
+        AWAITING_PROJECT = '1', _('Awaiting project')
+        APPROVED = '2', _('Approved')
+        CONTRACT_CONFIRMED = '3', _('Contract confirmed')
+        CONTRACT_DECLINED = '4', _('Contract declined')
+        REJECTED = '5', _('Rejected')
 
     employment_agreement = models.CharField(
         _('employment agreement'),
@@ -174,8 +198,8 @@ class Student(models.Model):
     call_name = models.CharField(
         _('call name'),
         max_length=255,
-        null=True,
-        blank=True
+        blank=True,
+        default=""
     )
     gender = models.CharField(
         _('gender'),
@@ -199,7 +223,7 @@ class Student(models.Model):
         validators=[phone_regex],
         max_length=17,
         blank=True,
-        null=True
+        default=""
     )
     language = models.CharField(
         _('language'),
@@ -251,6 +275,12 @@ class Student(models.Model):
         _("wants to be student coach"),
         default=False
     )
+    status = models.CharField(
+        _('status'),
+        max_length=1,
+        choices=Status.choices,
+        default=Status.APPLIED
+    )
     skills = models.ManyToManyField(
         Skill,
     )
@@ -271,24 +301,24 @@ class Student(models.Model):
         null=True
     )
 
-#     def get_full_name(self):
-#         """
-#         Returns the first_name plus the last_name, with a space in between.
-#         (method is required to implement by Django)
-#         """
-#         full_name = f'{self.first_name} {self.last_name}'
-#         return full_name.strip()
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        (method is required to implement by Django)
+        """
+        full_name = f'{self.first_name} {self.last_name}'
+        return full_name.strip()
 
-#     def clean(self):
-#         """
-#         Will be called before saving.
-#         """
-#         # strip first name and last name
-#         self.first_name = self.first_name.strip()
-#         self.last_name = self.last_name.strip()
+    def clean(self):
+        """
+        Will be called before saving.
+        """
+        # strip first name and last name
+        self.first_name = self.first_name.strip()
+        self.last_name = self.last_name.strip()
 
-#         # strip email and transform it to lowercase
-#         self.email = strip_and_lower_email(self.email)
+        # strip email and transform it to lowercase
+        self.email = strip_and_lower_email(self.email)
 
     def save(self, *args, **kwargs):
         """
@@ -297,6 +327,12 @@ class Student(models.Model):
         """
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.get_full_name()
+
+    def __str__(self):
+        return self.get_full_name()
 
 
 class Project(models.Model):
@@ -392,12 +428,13 @@ class Suggestion(models.Model):
 
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
     def __str__(self):
-        return f"{self.suggestion}: {self.reason}"
+        suggestion_label = self.Suggestion(self.suggestion).label
+        return f"{suggestion_label}: {self.reason}"
 
 
 class ProjectSuggestion(models.Model):
@@ -424,15 +461,12 @@ class ProjectSuggestion(models.Model):
     )
     skill = models.ForeignKey(
         Skill,
-        on_delete=models.CASCADE
+        on_delete=models.RESTRICT   # not allowed to delete a skill that is used in a suggestion
     )
 
-    class Meta:
-        unique_together = (("project", "student", "coach"))
-    
     def coach_name(self):
         return self.coach.get_full_name()
-    
+
     def coach_id(self):
         return self.coach.id
 
@@ -451,7 +485,7 @@ class SentEmail(models.Model):
     )
     time = models.DateTimeField(
         _("send date and time"),
-        default=datetime.now, 
+        default=timezone.now, 
         blank=True
     )
     info = models.CharField(
@@ -460,3 +494,6 @@ class SentEmail(models.Model):
         blank=True,
         default=""
     )
+
+    def __str__(self):
+        return f"{self.info} (from: {self.sender}, to: {self.receiver})"

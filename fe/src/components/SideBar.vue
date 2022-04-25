@@ -44,6 +44,7 @@
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
+                { name: 'student coaches', label: 'Student Coaches'}
               ]"
               @click="studentStore.loadStudents"
             />
@@ -85,6 +86,7 @@
                     :key="skill.id"
                     :color="skill.color"
                     :name="skill.name"
+                    best-skill=""
                   />
                 </div>
               </template>
@@ -191,15 +193,13 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
-    const skillStore = useSkillStore()
+    const $q = useQuasar()
 
-    onMounted(() => {
-      skillStore.loadSkills()
-      studentStore.loadStudents()
-    })
+    const skillStore = useSkillStore()
 
     return {
       studentStore,
+      $q,
       skillStore,
       thumbStyle: {
         right: '0px',
@@ -209,12 +209,16 @@ export default defineComponent({
       },
     }
   },
+  created() {
+    this.skillStore.loadSkills()
+    this.studentStore.loadStudents()
+  },
   data() {
     return {
       miniState: ref(false),
-      drawer: ref(false),
+      drawer: ref(true),
     }
-  },
+  },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
@@ -224,8 +228,9 @@ export default defineComponent({
         targetId: e.target.id,
         student: item
       }
-      e.dataTransfer.setData('text', JSON.stringify(data))
+      e.dataTransfer.setData(data.student.id, JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
+      e.dataTransfer.effectAllowed = 'copy'
     },
     clickStudent(student: Student) {
       this.selectStudent(student)
