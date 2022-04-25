@@ -94,7 +94,7 @@ class TallyFormTestCases(TestCase):
                 ] } } )
 
     def testValidationSkipQuestions(self):
-        # Skip question 2 and 3 if answer for question 1 is "Backend development"
+        # Skip question 2 and 3 if answer for question 1 is "Backend development".
         self.questions[1]["answers"][0]["skip"] = [2, 3]
         tallyForm = TallyForm(self.questions)
         form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
@@ -103,7 +103,7 @@ class TallyFormTestCases(TestCase):
         self.assertEqual(tallyForm.validate(form), form)
 
     def testTransformOtherQuestion(self):
-        # Skip question 2 and 3 if answer for question 1 is "Other"
+        # Skip question 2 and 3 if answer for question 1 is "Other".
         self.questions[1]["answers"][2]["skip"] = [2, 3]
         tallyForm = TallyForm(self.questions)
         form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
