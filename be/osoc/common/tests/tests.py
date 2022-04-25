@@ -7,10 +7,10 @@ Running tests is different because the project uses Docker:
         `docker exec -it osoc-be python manage.py test`
 
     2. Run one test class:
-        `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>`
+        `docker exec -it osoc-be python manage.py test osoc.common.tests.tests:<TESTCLASS>`
 
     3. Run a single test:
-        `docker exec -it osoc-be python manage.py test osoc.common.tests:<TESTCLASS>.<TESTMETHOD>`
+        `docker exec -it osoc-be python manage.py test osoc.common.tests.tests:<TESTCLASS>.<TESTMETHOD>`
 """
 from rest_framework.test import APITestCase
 from django.test import TestCase
