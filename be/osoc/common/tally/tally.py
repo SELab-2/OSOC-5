@@ -13,6 +13,9 @@ class TallyForm:
 
     @classmethod
     def fromFile(cls, questionsFile='osoc/common/tally/questions.json'):
+        """
+        Create class object using a JSON file.
+        """
         with open(questionsFile, 'r') as f:
             questions = json.load(f)
         return cls(questions)
