@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    strategy:
+      matrix:
+        redis-version: [6]
     services:
       db:
         image: postgres
@@ -28,7 +31,7 @@ jobs:
     - name: Start Redis
       uses: supercharge/redis-github-action@1.4.0
       with:
-        redis-version: [6]
+        redis-version: ${{ matrix.redis-version }}
         redis-port: 6379
     - name: Install Dependencies
       working-directory: ./be
