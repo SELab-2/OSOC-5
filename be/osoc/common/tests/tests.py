@@ -164,8 +164,8 @@ class StudentTestsCoach(APITestCase):
         student.skills.add(skill)
 
         user = Coach.objects.create_user(
-            first_name="username", 
-            last_name="last_name", 
+            first_name="username",
+            last_name="last_name",
             email="email@example.com",
             password="Pas$w0rd"
         )
@@ -265,7 +265,7 @@ class StudentTestsCoach(APITestCase):
         student = Student.objects.first()
         url = reverse("student-make-suggestion", args=(student.id,))
         data = {
-            "suggestion": "0", 
+            "suggestion": "0",
             "reason": "a reason"
         }
         before_count = Suggestion.objects.filter(student=student).count()
@@ -284,13 +284,13 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(before_count, after_count)
-    
+
     def test_student_remove_suggestion(self):
         student = Student.objects.first()
         # first, make sure there is a suggestion
         url = reverse("student-make-suggestion", args=(student.id,))
         data = {
-            "suggestion": "0", 
+            "suggestion": "0",
             "reason": "a reason"
         }
         self.client.post(url, data, format="json")
@@ -302,7 +302,7 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
-    
+
     def test_student_remove_suggestion_not_found(self):
         student = Student.objects.first()
         student.suggestions.all().delete()
@@ -318,7 +318,7 @@ class StudentTestsCoach(APITestCase):
         student = Student.objects.first()
         url = reverse("student-make-final-decision", args=(student.id,))
         data = {
-            "suggestion": "0", 
+            "suggestion": "0",
             "reason": "a reason"
         }
         response = self.client.post(url, data, format="json")
@@ -351,19 +351,19 @@ class StudentTestsAdmin(APITestCase):
         )
 
         admin = Coach.objects.create_user(
-            first_name="admin", 
-            last_name="last_name", 
+            first_name="admin",
+            last_name="last_name",
             email="admin@example.com",
-            password="Pas$w0rd", 
+            password="Pas$w0rd",
             is_admin=True
         )
         self.client.force_authenticate(admin)
-    
+
     def test_student_make_final_decision(self):
         student = Student.objects.first()
         url = reverse("student-make-final-decision", args=(student.id,))
         data = {
-            "suggestion": "0", 
+            "suggestion": "0",
             "reason": "a reason"
         }
         before_count = Suggestion.objects.filter(student=student).count()
@@ -380,7 +380,7 @@ class StudentTestsAdmin(APITestCase):
         # first make sure there is a suggestion to delete
         url = reverse("student-make-final-decision", args=(student.id,))
         data = {
-            "suggestion": "0", 
+            "suggestion": "0",
             "reason": "a reason"
         }
         self.client.post(url, data, format="json")
@@ -423,7 +423,7 @@ class CoachTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_get_coach_instance_not_found(self):
         url = reverse("coach-detail", args=(50,))
         response = self.client.get(url)
@@ -594,8 +594,8 @@ class ProjectTestsCoach(APITestCase):
         )
 
         user = Coach.objects.create_user(
-            first_name="username", 
-            last_name="last_name", 
+            first_name="username",
+            last_name="last_name",
             email="email@example.com",
             password="Pas$w0rd")
         self.client.force_authenticate(user)
@@ -640,7 +640,7 @@ class ProjectTestsCoach(APITestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_update_project_forbidden(self):
         id = Project.objects.first().id
         url = reverse("project-detail", args=(id,))
@@ -715,7 +715,7 @@ class ProjectTestsCoach(APITestCase):
                 "skill": reverse("skill-detail", args=(skill.id,))
             }
             self.client.post(url, data, format="json")
-        
+
         url = reverse("project-get-conflicting-projects")
         response = self.client.get(url, format="json")
 
@@ -735,10 +735,10 @@ class ProjectTestsAdmin(APITestCase):
         )
 
         admin = Coach.objects.create_user(
-            first_name="admin", 
-            password="Pas$w0rd", 
-            last_name="last_name", 
-            email="admin@example.com", 
+            first_name="admin",
+            password="Pas$w0rd",
+            last_name="last_name",
+            email="admin@example.com",
             is_admin=True
         )
         self.client.force_authenticate(admin)
@@ -783,7 +783,7 @@ class ProjectTestsAdmin(APITestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_update_project(self):
         project = Project.objects.first()
         skill = Skill.objects.create(
@@ -791,9 +791,9 @@ class ProjectTestsAdmin(APITestCase):
             color="green"
         )
         coach = Coach.objects.create_user(
-            first_name="coach", 
-            password="Pas$w0rd", 
-            last_name="last_name", 
+            first_name="coach",
+            password="Pas$w0rd",
+            last_name="last_name",
             email="coach@example.com"
         )
         data = {
@@ -827,9 +827,9 @@ class SkillTests(APITestCase):
         )
 
         user = Coach.objects.create_user(
-            first_name="username", 
-            password="Pas$w0rd", 
-            last_name="last_name", 
+            first_name="username",
+            password="Pas$w0rd",
+            last_name="last_name",
             email="email@example.com"
         )
         self.client.force_authenticate(user)
@@ -890,7 +890,7 @@ class SkillTests(APITestCase):
         response = self.client.post(url, {}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_update_skill(self):
         skill = Skill.objects.first()
         url = reverse("skill-detail", args=(skill.id,))
@@ -929,9 +929,9 @@ class SentEmailTests(APITestCase):
             best_skill="test value"
         )
         user = Coach.objects.create_user(
-            first_name="username", 
-            password="Pas$w0rd", 
-            last_name="last_name", 
+            first_name="username",
+            password="Pas$w0rd",
+            last_name="last_name",
             email="email@example.com"
         )
         self.client.force_authenticate(user)
@@ -1000,7 +1000,7 @@ class SentEmailTests(APITestCase):
         response = self.client.post(url, {}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_update_email(self):
         email = SentEmail.objects.first()
         student = Student.objects.first()
