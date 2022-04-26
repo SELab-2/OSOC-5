@@ -40,8 +40,15 @@ describe('Skill Store', () => {
         expect(skillStore.skills).toHaveLength(0)
         expect(skillStore.isLoadingSkills).toBe(false)
 
-        // load skills
-        skillStore.addSkill("newSkillName", "color", {})
+        let callback_finished = false
+
+        test.concurrent('add skill and wait', async () => {
+            // load skills
+            skillStore.addSkill("newSkillName", "color", () => { callback_finished = true})
+
+            expect(callback_finished).toBeTruthy()
+        })
+
 
     });
     it('deleteSkill', () => {

@@ -9,6 +9,6 @@ describe('gitHubSignInButton.vue', () => {
     it('Test if the gitHub Button is displayed correctly', () => {
         expect(gitHubSignInButton).toBeTruthy();
         const wrapper = wrapperFactory();
-        expect(wrapper.find('btn').exists()).toBeTruthy()
+        expect(wrapper.find('button').exists()).toBeTruthy()
     })
 })
