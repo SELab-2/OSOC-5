@@ -102,8 +102,9 @@ export const useProjectStore = defineStore('project', {
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
         data.forEach(async (project, i) => {
+          // TODO: De error zit hier waardoor hij niet alles laadt
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) => useCoachStore().getUser(coach))
+            project.coaches.map((coach) => useCoachStore().getUser(coach.url))
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(
