@@ -106,21 +106,13 @@
 <script lang="ts">
 import {defineComponent, ref} from 'vue'
 
-import {useMeta} from 'quasar'
 import {useAuthenticationStore} from '../stores/useAuthenticationStore'
-
-const metaData = {
-  meta: {
-    themecolor: {name: 'theme-color', content: '#24a3cb'},
-  },
-}
 
 export default defineComponent({
   setup() {
     const authenticationStore = useAuthenticationStore()
 
     return {
-      color: useMeta(metaData),
       tab: ref('students'),
       authenticationStore
     }
