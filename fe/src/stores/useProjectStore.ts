@@ -23,6 +23,8 @@ interface State {
   projectName: string
   projectPartnerName: string
   projectLink: string
+  filterCoaches: string
+  selectedCoaches: Array<User>
 }
 
 export const useProjectStore = defineStore('project', {
@@ -31,7 +33,9 @@ export const useProjectStore = defineStore('project', {
     isLoadingProjects: false,
     projectName: '',
     projectPartnerName: '',
-    projectLink: ''
+    projectLink: '',
+    filterCoaches: '',
+    selectedCoaches: []
   }),
   actions: {
     async fetchSuggestedStudents(
@@ -207,7 +211,6 @@ export const useProjectStore = defineStore('project', {
     },
     submitProject(
         skills: Array<ProjectTableSkill>,
-        coaches: Array<string>,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         callback: any
     ) {
@@ -227,7 +230,7 @@ export const useProjectStore = defineStore('project', {
       const coachList: Array<string> = []
 
       // add the selected coaches to data object
-      coaches.forEach((coach) => coachList.push(coach))
+      this.selectedCoaches.forEach((coach: User) => coachList.push(coach.url))
 
       const data = {
         name: this.projectName,

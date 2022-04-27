@@ -38,48 +38,7 @@
         <div class="row">
           <BasicInfo />
 
-          <div
-            class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
-          >
-            <h4 class="projectsubtitle">
-              Project Coaches
-            </h4>
-            <div class="row">
-              <q-input
-                v-model="filter_coaches"
-                outlined
-                dense
-                debounce="300"
-                color="green"
-                class="inputfield"
-                placeholder="Search"
-                @keydown.enter.prevent=""
-              >
-                <template #append>
-                  <q-icon
-                    v-if="filter_coaches !== ''"
-                    name="close"
-                    class="cursor-pointer"
-                    @click="filter_coaches = ''"
-                  />
-                  <q-icon
-                    v-if="filter_coaches === ''"
-                    name="search"
-                  />
-                </template>
-              </q-input>
-            </div>
-            <q-table
-              v-model:selected="selected_coaches"
-              class="table shadow-4"
-              :rows="coachStore.users"
-              :columns="columns_coaches"
-              :loading="coachStore.isLoadingUsers"
-              row-key="url"
-              selection="multiple"
-              :filter="filter_coaches"
-            />
-          </div>
+          <ProjectCoaches />
 
           <div
             class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-6"
@@ -355,6 +314,7 @@ import { User } from '../../models/User'
 import { SkillInterface } from '../../models/Skill'
 import BasicInfo from "./components/BasicInfo.vue";
 import {useProjectStore} from "../../stores/useProjectStore";
+import ProjectCoaches from "./components/ProjectCoaches.vue";
 const columns_roles = [
   {
     name: 'role',
@@ -393,19 +353,8 @@ const columns_roles = [
   },
 ]
 
-const columns_coaches = [
-  {
-    name: 'displayName',
-    align: 'left' as const,
-    label: 'Coach name',
-    field: (row: { firstName: string; lastName: string }) =>
-      row.firstName + ' ' + row.lastName,
-    sortable: true,
-  },
-]
-
 export default defineComponent({
-  components: {BasicInfo},
+  components: {ProjectCoaches, BasicInfo},
   setup() {
     const skillStore = useSkillStore()
     const coachStore = useCoachStore()
@@ -446,7 +395,6 @@ export default defineComponent({
 
       selected_coaches,
       columns_roles,
-      columns_coaches,
       /*
        * Role amount validation
        */
@@ -527,14 +475,8 @@ export default defineComponent({
   },
   methods: {
     onSubmit() {
-      let selected_coaches_urls: Array<string> = []
-      for(let coach of this.selected_coaches as User[]){
-        selected_coaches_urls.push(coach.url)
-      }
-
       this.projectStore.submitProject(
         this.skillStore.skills,
-        selected_coaches_urls,
         (success: boolean) => {
           if (success) {
             router.push('/projects')

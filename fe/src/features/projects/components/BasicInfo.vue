@@ -50,30 +50,12 @@ import {defineComponent} from "@vue/runtime-core";
 import {useProjectStore} from "../../../stores/useProjectStore";
 
 export default defineComponent({
-  props: {
-    projectName: {
-      type: String,
-      required: true
-    },
-    projectPartnerName: {
-      type: String,
-      required: true
-    },
-    projectLink: {
-      type: String,
-      required: true
-    },
-  },
   setup() {
     const projectStore = useProjectStore()
 
     return {
-      projectStore
+      projectStore,
     }
   }
 })
 </script>
-
-<style scoped>
-
-</style>
