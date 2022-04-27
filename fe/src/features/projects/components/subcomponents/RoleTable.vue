@@ -220,19 +220,6 @@ export default defineComponent ({
     }
   },
   methods: {
-    deleteRoleConfirm(id: number) {
-      if (id !== -1) {
-        this.skillStore.deleteSkill(id).then(() => {
-          this.deleteRole = undefined
-
-          this.$q.notify({
-            icon: 'done',
-            color: 'positive',
-            message: 'Successfully deleted!',
-          })
-        })
-      }
-    },
     newRoleConfirm() {
       // check if the new role value is valid
       if (
