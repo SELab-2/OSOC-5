@@ -33,25 +33,36 @@
         />
 
         <q-space />
-        <q-input
-          v-model="filter"
-          outlined
-          dense
-          debounce="300"
-          color="yellow-4"
-          placeholder="Search"
-        >
-          <template #append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
+        <div class="row q-px-sm">
+          <q-btn color="yellow" icon-right="add" label="Add User" @click="newUserDialog = true"/>
+        </div>
+        <div class="row q-px-sm">
+          <q-space/>
+          <q-dialog v-model="newUserDialog">
+            <q-card>
+              <AddUser />
+            </q-card>
+          </q-dialog>
+          <q-input
+            v-model="filter"
+            outlined
+            dense
+            debounce="300"
+            color="yellow-4"
+            placeholder="Search"
+          >
+            <template #append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </div>
       </div>
-
 
       <!-- filter cannot be empty, since this won't trigger the table filter function call.
              This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
       <q-table
         class="my-table user-table shadow-4"
+        table-header-style="user-table"
         :rows="coachStore.users"
         :columns="columns"
         row-key="id"
@@ -146,6 +157,7 @@ import {ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import { User } from '../../models/User'
+import AddUser from "../addUser/AddUser.vue";
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
@@ -223,7 +235,7 @@ const roles = [
   },
 ]
 export default defineComponent({
-  components: { SegmentedControl },
+  components: {AddUser, SegmentedControl },
   setup() {
     const coachStore = useCoachStore()
     const q = useQuasar()
@@ -234,6 +246,7 @@ export default defineComponent({
     
 
     return {
+      newUserDialog: ref(false),
       active: ref(true),
       filter: ref(''),
       roleFilter: ref('all'),
@@ -349,7 +362,6 @@ export default defineComponent({
 
 <style lang="sass">
 .my-table
-  thead
-    /* bg color is important for th; just specify one */
-    background-color: $yellow-7
+  /* bg color is important for th; just specify one */
+  background-color: $yellow-7
 </style>

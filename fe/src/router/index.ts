@@ -75,14 +75,6 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: UserList,
       },
-      {
-        path: '/add_user',
-        name: 'add new user',
-        meta: {
-          requiresAuth: true,
-        },
-        component: AddUser,
-      },
     ],
   },
   {

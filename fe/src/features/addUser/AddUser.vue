@@ -1,135 +1,127 @@
 <template>
-  <div
-    class="relative-position container flex justify-center"
-    style="width: 100vw"
-  >
-    <div
-      class="q-pa-md q-gutter-md"
-      style="width: 1000px"
+  <q-card-section>
+    <div class="row">
+      <div class="text-bold text-h4">
+        Create user
+      </div>
+      <q-space />
+      <q-select
+        v-model="role"
+        v-ripple
+        color="yellow"
+        borderless
+        dense
+        style="border-radius: 5px; position: relative; width: 80px"
+        :options="roles"
+        transition-show="jump-down"
+        transition-hide="jump-up"
+        transition-duration="300"
+        behavior="menu"
+        map-options
+        emit-value
+      />
+    </div>
+  </q-card-section>
+  <q-card-section>
+    <q-form
+      autocomplete="off"
+      style="text-align: center; min-width: 500px; max-width: 1000px; margin: 0 auto;"
     >
       <div class="row">
-        <div class="text-bold text-h4">
-          Add User
-        </div>
-      </div>
-      <q-form
-          @submit="onSubmit"
-          @reset="onReset"
-
-          class="q-px-xl q-mb-lg"
-          style="text-align: center; max-width: 1000px; margin: 0 auto; margin-top: 7em;"
-      >
-        <div class="row">
-          <div class="q-pr-xs col-6">
-            <q-input
-                outlined
-                v-model="firstName"
-                label="First Name"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'This field cannot be empty',
-                ]"
-            />
-          </div>
-          <div class="q-pr-xs col-6">
-            <q-input
-                outlined
-                v-model="lastName"
-                label="Last Name"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'This field cannot be empty',
-                ]"
-            />
-          </div>
-        </div>
-        <q-input
+        <div class="q-pr-xs col-6">
+          <q-input
             outlined
-            v-model="email"
-            label="E-mail"
-            type="email"
+            v-model="firstName"
+            label="First Name"
             lazy-rules
             :rules="[
+                  (val) => (val && val.length > 0) || 'This field cannot be empty',
+                ]"
+          />
+        </div>
+        <div class="q-pr-xs col-6">
+          <q-input
+            outlined
+            v-model="lastName"
+            label="Last Name"
+            lazy-rules
+            :rules="[
+                  (val) => (val && val.length > 0) || 'This field cannot be empty',
+                ]"
+          />
+        </div>
+      </div>
+      <q-input
+        outlined
+        v-model="email"
+        label="E-mail"
+        type="email"
+        lazy-rules
+        :rules="[
               (val) => (val && val.length > 0) || 'This field cannot be empty',
             ]"
-        />
-        <div >
-          <q-input
-              outlined
-              v-model="password"
-              label="Password"
-              :type="!generate ? 'password' : 'text'"
-              class="inputfield"
-              :readonly="generate"
-              lazy-rules
-              :rules="[
+      />
+      <div :class="generate ? 'q-pb-xl' : ''">
+        <q-input
+          outlined
+          v-model="password"
+          label="Password"
+          :type="isPwd ? 'password' : 'text'"
+          class="inputfield"
+          clearable
+          clear-icon="close"
+          lazy-rules
+          @update:model-value="generate = false"
+          :rules="[
                 (val) => (val && val.length > 0) || 'This field cannot be empty',
               ]"
-          />
-        </div>
-        <div class="warning" v-if="generate">
-          This password will not be shown again after the user is created,
-          so please make sure that you remember it or write it down.
-        </div>
-        <div class="row">
-          <q-checkbox
-            v-model="generate"
-            color="primary"
-            label="Use Generated Password"
-            @click="onGeneratePasswordToggle"
-          />
-        </div>
-        <div class="row">
-          <q-checkbox
-            v-model="admin"
-            color="primary"
-            label="Does this user have admin privileges?"
-          />
-          <q-space></q-space>
-        </div>
-        <div class="row">
-          <q-checkbox
-            v-model="active"
-            color="primary"
-            label="Is this user active?"
-          />
-          <q-space></q-space>
-        </div>
-        <div class="hint">
-          Users that are set as inactive will not be able to login without an admin switching them to
-          the 'active' state.
-        </div>
-        <btn
-          label="add user"
-          type="submit"
-          size="md"
-          color="primary"
-          class="q-mx-md cornered"
-          glow-color="#00ECAA"
-        />
-      </q-form>
-    </div>
-  </div>
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+            <q-icon
+              @click="onGeneratePasswordToggle"
+              name="refresh"
+              class="cursor-pointer"
+            />
+          </template>
+
+          <template v-slot:hint>
+            <div class="warning" v-if="generate">
+              This password will not be shown again after the user is created,
+              so please make sure that you remember it or write it down.
+            </div>
+          </template>
+        </q-input>
+      </div>
+    </q-form>
+  </q-card-section>
+  <q-card-actions align="right">
+    <q-btn flat label="Cancel" @click="onReset" color="green" v-close-popup />
+    <q-btn flat :label="'Create ' + role" @click="onSubmit" color="green" v-close-popup />
+  </q-card-actions>
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted} from '@vue/runtime-core'
+import {defineComponent} from '@vue/runtime-core'
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
 import {ref} from 'vue'
 import {useQuasar} from 'quasar'
-import SegmentedControl from '../../components/SegmentedControl.vue'
+import roles from '../../models/UserRoles'
+import { useCoachStore } from '../../stores/useCoachStore'
 
 export default defineComponent({
-  components: { SegmentedControl },
   setup() {
     const q = useQuasar()
     const password = ref('')
     const email = ref('')
     const firstName = ref('')
     const lastName = ref('')
-    const admin = ref(false)
-    const active = ref(true)
     const authenticationStore = useAuthenticationStore()
+    const coachStore = useCoachStore()
     const generate = ref(false)
     const generatedPassword = ref(null)
     return {
@@ -139,20 +131,29 @@ export default defineComponent({
       password,
       firstName,
       lastName,
-      admin,
-      active,
+      roles,
+      role: ref(roles.at(1)?.value || 'inactive'),
+      isPwd: ref(true),
       filter: ref(''),
       roleFilter: ref('all'),
       q,
-      authenticationStore
+      authenticationStore,
+      coachStore
     }
   },
   methods: {
     onSubmit () {
-      this.authenticationStore.register(
-        {firstName: this.firstName, lastName: this.lastName, email: this.email, 
-        password1: this.password, password2: this.password, is_active: this.active, is_admin: this.admin}
-        ).then(() => {
+      this.authenticationStore.register({
+          firstName: this.firstName,
+          lastName: this.lastName,
+          email: this.email,
+          password1: this.password,
+          password2: this.password,
+          is_active: this.role ? this.role != 'inactive' : true,
+          is_admin: this.role ? this.role == 'admin' : false
+      }).then(() => {
+        this.coachStore.loadUsers()
+
         this.q.notify({
           icon: 'done',
           color: 'positive',
@@ -169,20 +170,18 @@ export default defineComponent({
       })
     },
     onReset() {
-      this.email.value = ""
-      this.password.value = ""
+      this.email = ""
+      this.password = ""
     },
     onGeneratePasswordToggle() {
-      if (this.generate) {
-        let result = ''
-        const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        for ( var i = 0; i < 12; i++ ) {
-          result += characterSet.charAt(Math.floor(Math.random() * characterSet.length));
-        }
-        this.password = result
-      } else {
-        this.password = ""
+      let result = ''
+      const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      for ( var i = 0; i < 12; i++ ) {
+        result += characterSet.charAt(Math.floor(Math.random() * characterSet.length));
       }
+      this.password = result
+      this.generate = true
+      this.isPwd = false
     }
   }
 })

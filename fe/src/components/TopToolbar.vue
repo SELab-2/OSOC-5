@@ -30,12 +30,6 @@
           to="/users"
           exact
         />
-        <q-route-tab
-          name="add user"
-          label="Add Users"
-          to="/add_user"
-          exact
-        />
       </q-tabs>
       <q-space/>
       <q-btn-dropdown
