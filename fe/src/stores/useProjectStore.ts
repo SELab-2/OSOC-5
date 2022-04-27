@@ -35,7 +35,7 @@ export const useProjectStore = defineStore('project', {
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (await instance.get(student.coach)).data as User,
+          coach: (await instance.get(student.coach.url)).data as User,
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
