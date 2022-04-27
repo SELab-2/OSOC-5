@@ -36,50 +36,7 @@
           </div>
         </div>
         <div class="row">
-          <div
-            class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3'"
-          >
-            <h4 class="projectsubtitle">
-              Basic Info
-            </h4>
-            <q-input
-              v-model="project_name"
-              outlined
-              label="Project name"
-              lazy-rules
-              class="inputfield"
-              :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the name of the project.',
-              ]"
-            />
-            <q-input
-              v-model="project_partner_name"
-              outlined
-              label="Partner name"
-              lazy-rules
-              class="inputfield"
-              :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the name of the partner.',
-              ]"
-            />
-            <q-input
-              v-model="project_link"
-              outlined
-              label="Project URL"
-              lazy-rules
-              class="inputfield"
-              type="url"
-              :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the URL of the project.',
-              ]"
-            />
-          </div>
+          <BasicInfo />
 
           <div
             class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
@@ -396,6 +353,8 @@ import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { User } from '../../models/User'
 import { SkillInterface } from '../../models/Skill'
+import BasicInfo from "./components/BasicInfo.vue";
+import {useProjectStore} from "../../stores/useProjectStore";
 const columns_roles = [
   {
     name: 'role',
@@ -446,9 +405,11 @@ const columns_coaches = [
 ]
 
 export default defineComponent({
+  components: {BasicInfo},
   setup() {
     const skillStore = useSkillStore()
     const coachStore = useCoachStore()
+    const projectStore = useProjectStore()
 
     onMounted(() => {
       skillStore.loadSkills()
@@ -456,11 +417,6 @@ export default defineComponent({
     })
 
     const q = useQuasar()
-
-    // input fields
-    const project_name = ref('')
-    const project_partner_name = ref('')
-    const project_link = ref('')
 
     // Role amount error handling
     const errorRoleAmount = ref(false)
@@ -483,10 +439,7 @@ export default defineComponent({
     return {
       skillStore,
       coachStore,
-
-      project_name,
-      project_partner_name,
-      project_link,
+      projectStore,
 
       filter_roles,
       filter_coaches,
@@ -494,42 +447,6 @@ export default defineComponent({
       selected_coaches,
       columns_roles,
       columns_coaches,
-
-      /*
-       * Form Functions
-       */
-      onSubmit() {
-
-        let selected_coaches_urls: Array<string> = []
-        for(let coach of selected_coaches.value as User[]){
-          selected_coaches_urls.push(coach.url)
-        }
-
-        skillStore.submitProject(
-          project_name.value,
-          project_link.value,
-          project_partner_name.value,
-          selected_coaches_urls,
-          (success: boolean) => {
-            if (success) {
-              router.push('/projects')
-
-              q.notify({
-                icon: 'done',
-                color: 'positive',
-                message: 'Project created successfully!',
-              })
-            } else {
-              q.notify({
-                icon: 'close',
-                color: 'negative',
-                message: 'Project creation failed',
-              })
-            }
-          }
-        )
-      },
-
       /*
        * Role amount validation
        */
@@ -608,6 +525,36 @@ export default defineComponent({
 
     }
   },
+  methods: {
+    onSubmit() {
+      let selected_coaches_urls: Array<string> = []
+      for(let coach of this.selected_coaches as User[]){
+        selected_coaches_urls.push(coach.url)
+      }
+
+      this.projectStore.submitProject(
+        this.skillStore.skills,
+        selected_coaches_urls,
+        (success: boolean) => {
+          if (success) {
+            router.push('/projects')
+
+            this.$q.notify({
+              icon: 'done',
+              color: 'positive',
+              message: 'Project created successfully!',
+            })
+          } else {
+            this.$q.notify({
+              icon: 'close',
+              color: 'negative',
+              message: 'Project creation failed',
+            })
+          }
+        }
+      )
+    },
+  }
 })
 </script>
 

@@ -6,7 +6,7 @@ import {
   Skill,
   ProjectSkillInterface,
   ProjectSkill,
-  TempProjectSkill,
+  TempProjectSkill, ProjectTableSkill,
 } from '../models/Skill'
 import {
   ProjectSuggestionInterface,
@@ -20,12 +20,18 @@ import { useSkillStore } from './useSkillStore'
 interface State {
   projects: Array<Project>
   isLoadingProjects: boolean
+  projectName: string
+  projectPartnerName: string
+  projectLink: string
 }
 
 export const useProjectStore = defineStore('project', {
   state: (): State => ({
     projects: [],
     isLoadingProjects: false,
+    projectName: '',
+    projectPartnerName: '',
+    projectLink: ''
   }),
   actions: {
     async fetchSuggestedStudents(
@@ -198,6 +204,50 @@ export const useProjectStore = defineStore('project', {
         )
           project.suggestedStudents?.splice(suggestionIndex, 1)
       }
+    },
+    submitProject(
+        skills: Array<ProjectTableSkill>,
+        coaches: Array<string>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        callback: any
+    ) {
+      const skillsList: Array<TempProjectSkill> = []
+
+      // filter out the used skills
+      for (const skill of skills) {
+        if (skill.amount > 0) {
+          skillsList.push({
+            skill: skill.url,
+            amount: skill.amount,
+            comment: skill.comment,
+          })
+        }
+      }
+
+      const coachList: Array<string> = []
+
+      // add the selected coaches to data object
+      coaches.forEach((coach) => coachList.push(coach))
+
+      const data = {
+        name: this.projectName,
+        partner_name: this.projectPartnerName,
+        extra_info: this.projectLink,
+        required_skills: skillsList,
+        coaches: coachList,
+      }
+
+      // POST request to make a project
+      instance
+          .post('projects/', data)
+          .then(function (response) {
+            console.log(response)
+            callback(true)
+          })
+          .catch(function (error) {
+            console.log(error)
+            callback(false)
+          })
     },
   },
 })

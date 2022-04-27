@@ -115,55 +115,5 @@ export const useSkillStore = defineStore('skills', {
         })
         .catch(() => console.log('Failed to delete'))
     },
-
-    /*
-     * PROJECT TODO: move to a project store once that exists
-     */
-    submitProject(
-      projectName: string,
-      projectURL: string,
-      partnerName: string,
-      coaches: Array<string>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      callback: any
-    ) {
-      const skillsList: Array<TempProjectSkill> = []
-
-      // filter out the used skills
-      for (const skill of this.skills) {
-        if (skill.amount > 0) {
-          skillsList.push({
-            skill: skill.url,
-            amount: skill.amount,
-            comment: skill.comment,
-          })
-        }
-      }
-
-      const coachList: Array<string> = []
-
-      // add the selected coaches to data object
-      coaches.forEach((coach) => coachList.push(coach))
-
-      const data = {
-        name: projectName,
-        partner_name: partnerName,
-        extra_info: projectURL,
-        required_skills: skillsList,
-        coaches: coachList,
-      }
-
-      // POST request to make a project
-      instance
-        .post('projects/', data)
-        .then(function (response) {
-          console.log(response)
-          callback(true)
-        })
-        .catch(function (error) {
-          console.log(error)
-          callback(false)
-        })
-    },
   },
 })
