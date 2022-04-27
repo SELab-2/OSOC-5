@@ -78,11 +78,6 @@
         >
           <template v-slot:append>
             <q-icon
-              :name="isPwd ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              @click="isPwd = !isPwd"
-            />
-            <q-icon
               @click="onGeneratePasswordToggle"
               name="mdi-cached"
               class="cursor-pointer"
@@ -133,7 +128,6 @@ export default defineComponent({
       lastName,
       roles,
       role: ref(roles.at(1)?.value || 'inactive'),
-      isPwd: ref(true),
       filter: ref(''),
       roleFilter: ref('all'),
       q,
@@ -181,7 +175,6 @@ export default defineComponent({
       }
       this.password = result
       this.generate = true
-      this.isPwd = false
     }
   }
 })
