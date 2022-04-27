@@ -116,10 +116,9 @@
 import {defineComponent, onMounted} from '@vue/runtime-core'
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
 import {ref} from 'vue'
-import {exportFile, useQuasar} from 'quasar'
+import {useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
-import { User } from '../../models/User'
-import {floor, random} from 'Math'
+
 export default defineComponent({
   components: { SegmentedControl },
   setup() {
