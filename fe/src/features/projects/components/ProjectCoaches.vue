@@ -30,34 +30,22 @@
         </template>
       </q-input>
     </div>
-    <q-table
-      v-model:selected="projectStore.selectedCoaches"
-      class="table shadow-4"
-      :rows="coachStore.users"
-      :columns="columnsCoaches"
-      :loading="coachStore.isLoadingUsers"
-      row-key="url"
-      selection="multiple"
-      :filter="projectStore.filterCoaches"
-    />
+    <CoachTable />
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {useProjectStore} from "../../../stores/useProjectStore";
-import {useCoachStore} from "../../../stores/useCoachStore";
-import columnsCoaches from "../../../models/ProjectCoachColumns";
+import CoachTable from "./subcomponents/CoachTable.vue";
 
 export default defineComponent({
+  components: {CoachTable},
   setup() {
     const projectStore = useProjectStore()
-    const coachStore = useCoachStore()
 
     return {
       projectStore,
-      coachStore,
-      columnsCoaches
     }
   }
 })
