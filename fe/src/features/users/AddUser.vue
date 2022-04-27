@@ -10,7 +10,7 @@
         v-ripple
         borderless
         dense
-        class="bg-green"
+        class="bg-yellow"
         color="yellow"
         style="padding-left:10px; border-radius: 5px; position: relative; width: 80px"
         :options="roles"
@@ -101,8 +101,8 @@
     </q-form>
   </q-card-section>
   <q-card-actions align="right">
-    <q-btn flat label="Cancel" @click="onReset" color="green" v-close-popup />
-    <q-btn flat :label="'Create ' + role" @click="onSubmit" color="green" v-close-popup />
+    <btn flat label="Cancel" @click="onReset" color="yellow" v-close-popup />
+    <btn flat :label="'Create ' + role" @click="onSubmit" color="yellow" v-close-popup />
   </q-card-actions>
 </template>
 

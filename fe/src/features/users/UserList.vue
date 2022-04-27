@@ -34,7 +34,7 @@
 
         <q-space />
         <div class="row q-px-sm">
-          <q-btn color="yellow" icon-right="add" label="Add User" @click="newUserDialog = true"/>
+          <btn color="yellow" icon-right="add" label="Add User" @click="newUserDialog = true" shadow-color="orange" shadow-strength="2"/>
         </div>
         <div class="row q-px-sm">
           <q-space/>
@@ -157,7 +157,7 @@ import {ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import { User } from '../../models/User'
-import AddUser from "../addUser/AddUser.vue";
+import AddUser from "./AddUser.vue";
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
@@ -240,10 +240,8 @@ export default defineComponent({
     const coachStore = useCoachStore()
     const q = useQuasar()
     
-    onMounted(() => {
-      coachStore.loadUsers();
-    })
-    
+    coachStore.loadUsers();
+
 
     return {
       newUserDialog: ref(false),
