@@ -2,13 +2,13 @@
   <div
     class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
   >
-    <h4 class="projectsubtitle">
+    <div class="text-h4 q-my-md">
       Project Coaches
-    </h4>
+    </div>
     <div class="row">
       <q-input
         v-model="projectStore.filterCoaches"
-        class="inputfield q-pb-sm"
+        class="inputfield q-mb-sm"
         outlined
         dense
         debounce="300"

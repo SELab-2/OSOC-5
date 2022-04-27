@@ -2,9 +2,9 @@
   <div
     class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3'"
   >
-    <h4 class="projectsubtitle">
+    <div class="text-h4 q-my-md">
       Basic Info
-    </h4>
+    </div>
     <q-input
       v-model="projectStore.projectName"
       outlined
