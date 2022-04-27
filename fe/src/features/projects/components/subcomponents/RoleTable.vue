@@ -167,51 +167,12 @@
     </q-card>
   </q-dialog>
 
-  <q-dialog
-    :model-value="deleteRole !== undefined"
-    @update:model-value="deleteRole = undefined"
-    persistent
-  >
-    <q-card style="min-width: 350px">
-      <q-card-section horizontal>
-        <q-card-section class="col-3 flex flex-center">
-          <q-icon
-            name="warning"
-            class="text-red"
-            size="80px"
-          />
-        </q-card-section>
-        <q-card-section class="q-pt-xs">
-          <div class="text-h6 q-mt-sm q-mb-xs">
-            Are you sure you want to delete "{{ deleteRole?.name }}"?
-          </div>
-          <div class="text text-grey">
-            This skill will be deleted immediately from all projects. You can't
-            undo this action.
-          </div>
-        </q-card-section>
-      </q-card-section>
+  <DeleteRoleDialog
+    :show="showDelete"
+    :delete-role="deleteRole"
+    :reset-delete-role="deleteRole = undefined"
+  />
 
-      <q-card-actions
-        align="right"
-        class="text-primary"
-      >
-        <btn
-          v-close-popup
-          flat
-          color="grey"
-          label="Cancel"
-        />
-        <btn
-          flat
-          color="red"
-          label="Delete"
-          @click="deleteRoleConfirm(deleteRole?.id ?? -1)"
-          glow-color="red-2"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
 </template>
 
 <script lang="ts">
@@ -220,8 +181,10 @@ import {Ref, ref} from "vue";
 import { SkillInterface } from "../../../../models/Skill";
 import {useSkillStore} from "../../../../stores/useSkillStore";
 import columnsRoles from "../../../../models/ProjectRolesColumns";
+import DeleteRoleDialog from "./DeleteRoleDialog.vue";
 
 export default defineComponent ({
+  components: { DeleteRoleDialog },
   setup() {
     const skillStore = useSkillStore()
 
@@ -237,7 +200,7 @@ export default defineComponent ({
     const errorRoleAmount = ref(false)
     const errorMessageRoleAmount = ref('')
 
-    const deleteRole: Ref<SkillInterface|undefined> = ref()
+    const deleteRole: Ref<SkillInterface | undefined> = ref()
 
     return {
       newRolePrompt,
@@ -249,6 +212,11 @@ export default defineComponent ({
       errorMessageRoleAmount,
       filterRoles,
       columnsRoles
+    }
+  },
+  computed: {
+    showDelete(): boolean {
+      return this.deleteRole !== undefined
     }
   },
   methods: {
@@ -272,10 +240,12 @@ export default defineComponent ({
         this.newRole.length > 0 &&
         this.newRoleColor.length > 0
       ) {
+
         // when valid call the store object and add the skill
         this.skillStore.addSkill(
           this.newRole,
           this.newRoleColor,
+
           // callback
           (success: boolean) => {
             if (success) {

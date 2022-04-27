@@ -40,9 +40,9 @@
           />
         </template>
       </q-input>
-
-      <RoleTable :new-role-prompt="newRolePrompt" />
     </div>
+
+    <RoleTable :new-role-prompt="newRolePrompt" />
   </div>
 </template>
 
