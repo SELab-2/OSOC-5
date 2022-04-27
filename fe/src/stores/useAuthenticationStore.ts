@@ -1,11 +1,9 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import { StoreDefinition } from 'pinia'
-import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { User, UserInterface } from '../models/User'
-import {instance} from "../utils/axios";
-import {useStudentStore} from "./useStudentStore";
-import router from "../router";
+import { instance } from '../utils/axios'
+import { useStudentStore } from './useStudentStore'
+import router from '../router'
 
 const baseURL =
   process.env.NODE_ENV == 'development'
@@ -23,8 +21,11 @@ export const useAuthenticationStore = defineStore('user/authentication', {
   }),
   actions: {
     checkLogin(): void {
-      if (localStorage.getItem('refreshToken') && localStorage.getItem('accessToken')) {
-        router.push({name: 'Projects'})
+      if (
+        localStorage.getItem('refreshToken') &&
+        localStorage.getItem('accessToken')
+      ) {
+        router.push({ name: 'Projects' }).then()
       }
     },
     async login({
@@ -59,7 +60,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       projectStore.$reset()
 
       this.$reset()
-      router.push({name: 'Login'})
+      router.push({ name: 'Login' }).then()
     },
     async changePassword({p1, p2}: 
       {p1: string, p2: string}) {

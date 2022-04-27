@@ -2,10 +2,20 @@ import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
-import { Skill, ProjectSkillInterface, ProjectSkill, TempProjectSkill } from '../models/Skill'
-import { ProjectSuggestionInterface, ProjectSuggestion } from '../models/ProjectSuggestion'
+import {
+  Skill,
+  ProjectSkillInterface,
+  ProjectSkill,
+  TempProjectSkill,
+} from '../models/Skill'
+import {
+  ProjectSuggestionInterface,
+  ProjectSuggestion,
+} from '../models/ProjectSuggestion'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
+import { useStudentStore } from './useStudentStore'
+import { useSkillStore } from './useSkillStore'
 
 interface State {
   projects: Array<Project>
@@ -33,10 +43,14 @@ export const useProjectStore = defineStore('project', {
       }
       return newStudents
     },
-    async removeSuggestion(project: Project, suggestion: ProjectSuggestionInterface) {
+    async removeSuggestion(
+      project: Project,
+      suggestion: ProjectSuggestionInterface
+    ) {
       return instance.post(`projects/${project.id}/remove_student/`, {
         student: suggestion.student.url,
         skill: suggestion.skill.url,
+        coach: suggestion.coach.url,
       })
     },
     async addSuggestion(
@@ -116,6 +130,73 @@ export const useProjectStore = defineStore('project', {
       } catch (error) {
         console.log(error)
         this.isLoadingProjects = false
+      }
+    },
+    async receiveSuggestion({
+      student_id,
+      skill_id,
+      project_id,
+      reason,
+      coach,
+      student,
+      skill,
+    }: {
+      student_id: number
+      skill_id: number
+      project_id: number
+      reason: string
+      coach: string
+      student: string
+      skill: string
+    }) {
+      const project = this.projects.filter(({ id }) => id === project_id)[0]
+      const alreadyExists = project.suggestedStudents?.some(
+        (suggestion) =>
+          suggestion.skill.id === skill_id &&
+          suggestion.student.id === student_id
+      )
+
+      if (!alreadyExists) {
+        const studentStore = useStudentStore()
+        const coachStore = useCoachStore()
+        const skillStore = useSkillStore()
+
+        const studentObj = await studentStore.getStudent(student)
+        const coachObj = await coachStore.getUser(coach)
+        const skillObj = await skillStore.getSkill(skill)
+
+        project.suggestedStudents?.push({
+          student: studentObj,
+          coach: coachObj,
+          skill: skillObj,
+          reason,
+        })
+      }
+    },
+    removeReceivedSuggestion({
+      skill,
+      student,
+      project_id,
+    }: {
+      skill: string
+      student: string
+      project_id: number
+    }) {
+      const project = this.projects.filter(({ id }) => id === project_id)[0]
+
+      if (project) {
+        const suggestionIndex = project.suggestedStudents?.findIndex(
+          (s) => s.student.url === student && s.skill.url === skill
+        )
+
+        if (
+          suggestionIndex &&
+          suggestionIndex !== -1 &&
+          project.suggestedStudents &&
+          suggestionIndex < project.suggestedStudents.length &&
+          project.suggestedStudents[suggestionIndex].student.url === student
+        )
+          project.suggestedStudents?.splice(suggestionIndex, 1)
       }
     },
   },
