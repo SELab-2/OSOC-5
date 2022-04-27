@@ -1,6 +1,7 @@
 """
 Utility functions
 """
+from django.utils import timezone
 from django.utils.http import urlencode
 from rest_framework.reverse import reverse
 
@@ -19,3 +20,15 @@ def reverse_querystring(view, urlconf=None, args=None, kwargs=None, current_app=
     if query_kwargs:
         return '{}?{}'.format(base_url, urlencode(query_kwargs))
     return base_url
+
+def string_to_datetime_tz(string):
+    """
+    convert a string to a timezone aware datetime object
+    the string must be in one of the following formats:
+    - "%Y-%m-%dT%H:%M:%S"
+    - "%Y-%m-%d"
+    """
+    try:
+        return timezone.make_aware(timezone.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S"))
+    except ValueError:
+        return timezone.make_aware(timezone.datetime.strptime(string, "%Y-%m-%d"))

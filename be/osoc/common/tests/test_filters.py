@@ -189,7 +189,7 @@ class EmailFilterTests(APITestCase):
                 sender=self.user,
                 receiver=student,
                 info="info",
-                time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0)) # date time is timezone aware but still throws runtime warning?
+                time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0))
             )
 
     def test_email_datetime_filter_date(self):
