@@ -11,7 +11,7 @@
       </div>
 
       <div class="column" v-else>
-        <div>
+        <div v-if="language" >
           Language: {{ language }}
         </div>
         <div>
@@ -20,6 +20,12 @@
             v-for="index in (studentStore.currentStudent?.englishRating ?? 0)"
             :key="index"
             color="yellow"
+            name="star"
+          />
+          <q-icon
+            v-for="index in 5 - (studentStore.currentStudent?.englishRating ?? 0)"
+            :key="index"
+            color="grey"
             name="star"
           />
         </div>
@@ -50,7 +56,7 @@ export default defineComponent( {
   },
   computed: {
     language(): string {
-      switch (this.studentStore.currentStudent?.language ?? null) {
+      switch (this.studentStore.currentStudent?.language) {
         case 0:
           return "Dutch"
         case 1:
