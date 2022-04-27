@@ -8,11 +8,11 @@
     <div class="row">
       <q-input
         v-model="projectStore.filterCoaches"
+        class="inputfield q-pb-sm"
         outlined
         dense
         debounce="300"
         color="green"
-        class="inputfield"
         placeholder="Search"
         @keydown.enter.prevent=""
       >
