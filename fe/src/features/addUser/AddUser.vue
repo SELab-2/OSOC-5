@@ -8,10 +8,11 @@
       <q-select
         v-model="role"
         v-ripple
-        color="yellow"
         borderless
         dense
-        style="border-radius: 5px; position: relative; width: 80px"
+        class="bg-green"
+        color="yellow"
+        style="padding-left:10px; border-radius: 5px; position: relative; width: 80px"
         :options="roles"
         transition-show="jump-down"
         transition-hide="jump-up"
@@ -84,7 +85,7 @@
             />
             <q-icon
               @click="onGeneratePasswordToggle"
-              name="refresh"
+              name="mdi-cached"
               class="cursor-pointer"
             />
           </template>
