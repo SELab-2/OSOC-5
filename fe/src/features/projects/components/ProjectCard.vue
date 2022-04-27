@@ -197,13 +197,14 @@ export default defineComponent({
         // If the suggestion has not yet been posted to the server, don't make the POST call.
         if (!(suggestion instanceof NewProjectSuggestion)) {
           await this.projectStore.removeSuggestion(this.project, suggestion)
+        } else {
+          const index = this.project.suggestedStudents!.findIndex(
+            (s) =>
+              s.student.id === suggestion.student.id &&
+              s.skill.id === suggestion.skill.id
+          )
+          this.project.suggestedStudents!.splice(index, 1)
         }
-        const index = this.project.suggestedStudents!.findIndex(
-          (s) =>
-            s.student.id === suggestion.student.id &&
-            s.skill.id === suggestion.skill.id
-        )
-        this.project.suggestedStudents!.splice(index, 1)
       } catch (error: any) {
         this.q.notify({
           icon: 'warning',

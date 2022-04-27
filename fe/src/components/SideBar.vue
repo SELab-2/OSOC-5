@@ -193,10 +193,13 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
+    const $q = useQuasar()
+
     const skillStore = useSkillStore()
 
     return {
       studentStore,
+      $q,
       skillStore,
       thumbStyle: {
         right: '0px',
@@ -213,9 +216,9 @@ export default defineComponent({
   data() {
     return {
       miniState: ref(false),
-      drawer: ref(false),
+      drawer: ref(true),
     }
-  },
+  },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.

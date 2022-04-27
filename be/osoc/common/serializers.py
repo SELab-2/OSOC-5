@@ -15,7 +15,7 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
     """
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name',]
+        fields = ['url', 'id', 'first_name', 'last_name']
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
@@ -47,7 +47,8 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     def get_field_names(self, declared_fields, info):
         # Include all fields and id
         # https://stackoverflow.com/questions/38245414/django-rest-framework-how-to-include-all-fields-and-a-related-field-in-mo
-        expanded_fields = super(StudentSerializer, self).get_field_names(declared_fields, info)
+        expanded_fields = super(StudentSerializer, self).get_field_names(
+            declared_fields, info)
 
         if getattr(self.Meta, 'extra_fields', None):
             return self.Meta.extra_fields + expanded_fields
@@ -57,7 +58,8 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin', 'is_active']
+        fields = ['url', 'id', 'first_name', 'last_name',
+                  'email', 'is_admin', 'is_active']
         read_only_fields = ['is_admin', 'is_active']
 
 
@@ -118,10 +120,12 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         skills_data = validated_data.pop('requiredskills_set')
         # update or create skills from request
         for skill_data in skills_data:
-            RequiredSkills.objects.update_or_create(project=instance, **skill_data)
+            RequiredSkills.objects.update_or_create(
+                project=instance, **skill_data)
         # delete skills not in request
         skills = [skill_data['skill'] for skill_data in skills_data]
-        RequiredSkills.objects.filter(project=instance).exclude(skill__in=skills).delete()
+        RequiredSkills.objects.filter(
+            project=instance).exclude(skill__in=skills).delete()
         return super().update(instance, validated_data)
 
 
