@@ -35,7 +35,11 @@ export const useProjectStore = defineStore('project', {
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (await instance.get(student.coach.url)).data as User,
+          coach: (
+            await instance.get(
+              (student.coach as unknown as { url: string }).url
+            )
+          ).data as User,
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
@@ -71,7 +75,9 @@ export const useProjectStore = defineStore('project', {
     },
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(
-        project.coaches.map((coach) => useCoachStore().getUser(coach))
+        project.coaches.map((coach) =>
+          useCoachStore().getUser(coach as unknown as string)
+        )
       )
 
       const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -104,7 +110,9 @@ export const useProjectStore = defineStore('project', {
         data.forEach(async (project, i) => {
           // TODO: De error zit hier waardoor hij niet alles laadt
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) => useCoachStore().getUser(coach.url))
+            project.coaches.map((coach) =>
+              useCoachStore().getUser((coach as unknown as { url: string }).url)
+            )
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(

@@ -21,12 +21,15 @@ export interface TempProject {
   partnerName: string
   extraInfo: string
   requiredSkills: Array<{ amount: number; comment: string; skill: string }>
-  coaches: Array<{
-    id: number
-    firstName: string
-    lastName: string
-    url: string
-  }>
+  coaches: Array<
+    | {
+        id: number
+        firstName: string
+        lastName: string
+        url: string
+      }
+    | string
+  >
   suggestedStudents: Array<TempProjectSuggestion>
 }
 
