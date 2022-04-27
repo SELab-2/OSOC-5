@@ -25,7 +25,7 @@
             v-model="filter"
             dense
             outlined
-            label="Outlined"
+            label="Search Projects"
             style="margin-right: 10px"
           />
         </div>
