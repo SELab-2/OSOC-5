@@ -67,7 +67,6 @@
           outlined
           v-model="password"
           label="Password"
-          :type="isPwd ? 'password' : 'text'"
           class="inputfield"
           clearable
           clear-icon="close"
