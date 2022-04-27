@@ -40,3 +40,7 @@ class UtilityTestCases(TestCase):
         url = reverse_querystring("student-list", query_kwargs=({"on_project": "true"}))
         correct_url = reverse("student-list") + "?on_project=true"
         self.assertEqual(url, correct_url)
+
+        url = reverse_querystring("student-list")
+        correct_url = reverse("student-list")
+        self.assertEqual(url, correct_url)
