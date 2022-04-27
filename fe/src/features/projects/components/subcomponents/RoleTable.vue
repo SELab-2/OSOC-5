@@ -105,12 +105,16 @@
     </template>
   </q-table>
 
-  <DeleteRoleDialog
-    :show="showDelete"
-    :delete-role="deleteRole"
-    :reset-delete-role="deleteRole = undefined"
-  />
-
+  <q-dialog
+    class="full-width"
+    :model-value="deleteRole !== undefined"
+    @update:model-value="deleteRole = undefined"
+  >
+    <DeleteRoleDialog
+      :reset-delete-role="() => deleteRole.value = undefined"
+      :delete-role="deleteRole"
+    />
+  </q-dialog>
 </template>
 
 <script lang="ts">
@@ -136,11 +140,6 @@ export default defineComponent ({
       deleteRole,
       filterRoles,
       columnsRoles
-    }
-  },
-  computed: {
-    showDelete(): boolean {
-      return this.deleteRole !== undefined
     }
   },
 })
