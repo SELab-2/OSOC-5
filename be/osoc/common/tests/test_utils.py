@@ -44,3 +44,9 @@ class UtilityTestCases(TestCase):
         url = reverse_querystring("student-list")
         correct_url = reverse("student-list")
         self.assertEqual(url, correct_url)
+
+    def testGetNested(self):
+        self.assertEqual(None, getNested({'a': {'b': True}}, None, 'a', 'c'))
+        self.assertEqual(None, getNested({'a': {'b': True}}, None, 'b', 'a'))
+        self.assertEqual(True, getNested({'a': {'b': True }}, None, 'a', 'b'))
+        self.assertEqual(True, getNested({'a': {'b': { 'c': True }}}, None, 'a', 'b', 'c'))

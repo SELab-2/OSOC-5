@@ -25,6 +25,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: "3.9"
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.4.0
+      with:
+        redis-version: [6]
+        redis-port: 6379
     - name: Install Dependencies
       working-directory: ./be
       run: |

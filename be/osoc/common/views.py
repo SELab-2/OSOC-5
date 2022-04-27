@@ -14,6 +14,7 @@ from django.db.models import RestrictedError
 from .filters import *
 from .serializers import *
 from .models import *
+from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -162,6 +163,31 @@ class StudentViewSet(viewsets.ModelViewSet):
         )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
+
+    @action(detail=False, methods=['post'])
+    def tallyregistration(self, request, pk=None):
+        """
+        Endpoint to which Tally's webhook can connect to register students.
+        returns HTTP response:
+            400 BAD REQUEST:  The request data was malformatted or a student tried to register twice
+            201 CREATED:    The student registration resulted in a new student being created
+        """
+        tally = TallyForm.fromFile()
+        try:
+            form = tally.transform(tally.validate(request.data))
+            skillNames = form.pop("skills")
+            student = Student.objects.create(**form)
+            skills = []
+            for skillName in skillNames:
+                existingSkill = Skill.objects.filter(name=skillName).first()
+                if existingSkill == None:
+                    skills.append(Skill.objects.create(name=skillName, color="grey"))
+                else:
+                    skills.append(existingSkill)
+            student.skills.set(skills)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class CoachViewSet(viewsets.GenericViewSet,
