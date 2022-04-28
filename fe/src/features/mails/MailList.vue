@@ -63,60 +63,10 @@
             >
               <a :href="'mailto:' + props.row.email" style="color: black">{{ props.row.email }}</a>
             </q-td>
-            <q-td style="align-content: flex-end">
-              <q-btn
-                size="sm" color="yellow" round dense icon="mail" @click="resetDate"
-              >
-                <q-menu>
-                  <q-list>
-                    <q-item tag="label">
-                      <div class="column q-gutter-sm">
-                        <label>Add new mail:</label>
-                        <q-input filled v-model="date">
-                          <template v-slot:prepend>
-                            <q-icon name="event" class="cursor-pointer">
-                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
-                                  <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                  </div>
-                                </q-date>
-                              </q-popup-proxy>
-                            </q-icon>
-                          </template>
-
-                          <template v-slot:append>
-                            <q-icon name="access_time" class="cursor-pointer">
-                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
-                                  <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                  </div>
-                                </q-time>
-                              </q-popup-proxy>
-                            </q-icon>
-                          </template>
-                        </q-input>
-
-                        <q-input
-                          label="Info"
-                          v-model="info"
-                          filled
-                          type="textarea"
-                        />
-
-                        <q-btn class="bg-yellow" @click="() => sendMail(props.row)" v-close-popup>
-                          Send
-                        </q-btn>
-                      </div>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </q-td>
+            
           </q-tr>
           <q-tr no-hover v-if="props.expand" :props="props">
-            <q-td colspan="100%" :key="emailKey">
+            <q-td colspan="100%">
               <MailsOverview :student="props.row" />
             </q-td>
           </q-tr>
@@ -166,14 +116,7 @@ const columns = [
     label: 'Email',
     field: 'email',
     sortable: true,
-  },
-  {
-    name: 'sendEmail',
-    align: 'left' as const,
-    label: '',
-    field: '',
-    sortable: false,
-  },
+  }
 ]
 
 export default defineComponent({
@@ -181,25 +124,12 @@ export default defineComponent({
   setup() {
     const studentStore = useStudentStore()
     const q = useQuasar()
-
-    const today = new Date();
-    const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    const dateTime = date + ' ' + time;
-
     return {
       studentStore,
       filter: ref(''),
-      info: ref(''),
-      date: ref(dateTime),
       columns,
       status,
       q
-    }
-  },
-  data() {
-    return {
-      emailKey: 0
     }
   },
   created() {
@@ -225,20 +155,6 @@ export default defineComponent({
       props.expand = !props.expand
       if (props.expand) this.studentStore.getMails(student)
     },
-    resetDate() {
-      const today = new Date();
-      const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-      const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      this.date = date + ' ' + time
-    },
-    async sendMail(student: Student) {
-      await this.studentStore.sendMail(student, this.date, this.info)
-      await this.studentStore.getMails(student)
-
-      this.info = ''
-
-      this.emailKey += 1
-    }
   }
 })
 </script>
