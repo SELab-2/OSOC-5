@@ -73,20 +73,20 @@
           <div
             :style="`height: 25px; width:25px; border-radius: 50%;background: ${props.row.color}`"
           />
-          <!-- TODO make this actually change in the database not locally-->
-          <q-popup-edit
-            v-slot="scope"
-            v-model="props.row.color"
-            buttons
-          >
-            <q-color
-              v-model="scope.value"
-              no-header
-              no-footer
-              class="color-picker"
-              @keyup.enter.stop
-            />
-          </q-popup-edit>
+<!--          &lt;!&ndash; TODO make this actually change in the database not locally&ndash;&gt;-->
+<!--          <q-popup-edit-->
+<!--            v-slot="scope"-->
+<!--            v-model="props.row.color"-->
+<!--            buttons-->
+<!--          >-->
+<!--            <q-color-->
+<!--              v-model="scope.value"-->
+<!--              no-header-->
+<!--              no-footer-->
+<!--              class="color-picker"-->
+<!--              @keyup.enter.stop-->
+<!--            />-->
+<!--          </q-popup-edit>-->
         </q-td>
         <q-td
           key="remove"

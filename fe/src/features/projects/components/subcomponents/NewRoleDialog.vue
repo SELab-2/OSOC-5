@@ -31,12 +31,12 @@
       />
       <!--  INFO if picker gives conversion issues use-->
       <!--  INFO https://quasar.dev/quasar-utils/color-utils#color-conversion-->
-      <q-color
-        v-model="newRoleColor"
-        no-header
-        no-footer
-        class="color-picker"
-      />
+<!--      <q-color-->
+<!--        v-model="newRoleColor"-->
+<!--        no-header-->
+<!--        no-footer-->
+<!--        class="color-picker"-->
+<!--      />-->
     </q-card-section>
     <q-card-actions
       align="right"
