@@ -34,7 +34,10 @@
               name="mdi-close"
               color="red"
             />
-            <q-chip v-if="student.alum" size="8px">
+            <q-chip
+              v-if="student.alum"
+              size="8px"
+            >
               Alumni
             </q-chip>
           </div>
@@ -65,7 +68,15 @@
           />
         </div>
       </q-card-section>
-      <q-tooltip class="bg-grey-1 shadow-5 cornered" v-if="mustHover" max-width="300px" anchor="top middle" self="bottom middle" :offset="[0, 5]" :delay="500">
+      <q-tooltip
+        v-if="mustHover"
+        class="bg-grey-1 shadow-5 cornered"
+        max-width="300px"
+        anchor="top middle"
+        self="bottom middle"
+        :offset="[0, 5]"
+        :delay="500"
+      >
         <StudentSkillChip
           v-for="skill of student.skills"
           :key="typeof(skill) !== 'string' ? skill.id : ''"
@@ -150,7 +161,7 @@ export default defineComponent({
       if (this.student) {
         const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
           if (this.authenticationStore.loggedInUser != null) {
-            return suggestion.coachId === this.authenticationStore.loggedInUser.id
+            return suggestion.coach.id === this.authenticationStore.loggedInUser.id
           }
         })
 

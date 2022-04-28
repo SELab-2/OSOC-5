@@ -3,7 +3,9 @@ import { Suggestion } from './Suggestion'
 
 export interface TempStudent {
   student: string
-  coach: string
+  coach:
+    | { id: number; firstName: string; lastName: string; url: string }
+    | string
   skill: string
   reason: string
 }
@@ -73,7 +75,7 @@ export class Student implements StudentInterface {
   studentCoach: boolean
   status: string
 
-  constructor(obj: StudentInterface);
+  constructor(obj: StudentInterface)
   constructor(
     url: string,
     id: number,
@@ -107,7 +109,7 @@ export class Student implements StudentInterface {
     status: string
   );
 
-  constructor (...args: any[]) {
+  constructor(...args: any[]) {
     if (args.length == 1) {
       Object.assign(this, args[0])
     } else {

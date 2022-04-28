@@ -33,10 +33,12 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'corsheaders',
+    'channels',
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -69,15 +71,29 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'osoc.wsgi.application'
+ASGI_APPLICATION = 'osoc.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('osoc-redis', 6379)],
+        },
+    },
+}
 
 # Tests
 # https://django-testing-docs.readthedocs.io/en/latest/coverage.html
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+
 NOSE_ARGS = [
-    '--with-coverage',
+    '--cover-erase',
+    # '--with-coverage',    # for some reason, when this is disabled, the coverage report is different (i think it is correct now)
     '--cover-package=osoc.common',
+    # '--verbosity=3',  # include for more output
+    '--exe'     # include exe's for windows docker because windows thinks python files are exe's
 ]
 
 # Password validation

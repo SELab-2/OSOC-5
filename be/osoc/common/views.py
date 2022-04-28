@@ -11,12 +11,13 @@ from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_auth.registration.views import SocialLoginView
 from django.db.models import RestrictedError
-from django.urls import resolve
-from urllib.parse import urlparse
 from .filters import *
 from .serializers import *
 from .models import *
+from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -42,7 +43,8 @@ class StudentViewSet(viewsets.ModelViewSet):
                        StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
-    filterset_fields = ['alum', 'language', 'skills', 'student_coach', 'english_rating', 'status']
+    filterset_fields = ['alum', 'language', 'skills',
+                        'student_coach', 'english_rating', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -51,23 +53,26 @@ class StudentViewSet(viewsets.ModelViewSet):
         if the coach has already made a suggestion for this student, it is updated
         returns HTTP response:
             400 BAD REQUEST: there was required data missing or the data could not be serialized
-            201 CREATED:     a new suggestion was created
-            200 OK:          an existing suggestion was found for this student from the current user, the found suggestion was updated
+            201 CREATED:     a new suggestion was created or updated
         """
-        serializer = SuggestionSerializer(
-            data=request.data, context={'request': request})
+        serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
+            # save suggestion
+            serializer.save(student=self.get_object(), coach=request.user, final=False)
 
-            # create Suggestion object if it doesnt exist yet, else update it
-            _, created = Suggestion.objects.update_or_create(
-                student=self.get_object(), coach=request.user, defaults=serializer.data)
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['student_id'] = pk
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'suggestion',
+                    'data': socket_data
+                }
+            )
 
-            response_data = serializer.data
-            response_data['coach_name'] = request.user.get_full_name()
-            response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
-
-            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer)
@@ -81,41 +86,59 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
-            student=self.get_object(), coach=request.user).delete()
+            student=self.get_object(), coach=request.user, final=False).delete()
+
+        # send data to websocket
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'remove_suggestion',
+                'data': {
+                    'student_id': pk,
+                    'coach_id': request.user.id
+                }
+            }
+        )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
-    @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def make_final_decision(self, request, pk=None):
         """
         let an admin make a final decision for the current student
         if the admin has already made a final decision for this student, it is updated
         returns HTTP response:
             400 BAD REQUEST: there was required data missing or the data could not be serialized
-            201 CREATED:     the final decision was created
-            200 OK:          an existing final decision was found for this student from the current user, it was updated
+            201 CREATED:     the final decision was created or updated
         """
-        serializer = SuggestionSerializer(
-            data=request.data, context={'request': request})
+        serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-
-            # create Suggestion object if it doesnt exist yet, else update it
-            suggestion, created = Suggestion.objects.update_or_create(
-                student=self.get_object(), coach=request.user, defaults=serializer.data)
-
             student = self.get_object()
+            # save suggestion
+            suggestion = serializer.save(student=student, coach=request.user, final=True)
+            # set final_decision in student
             student.final_decision = suggestion
             student.save()
+            
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['student_id'] = pk
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'suggestion',
+                    'data': socket_data
+                }
+            )
 
-            response_data = serializer.data
-            response_data['coach_name'] = request.user.get_full_name()
-            response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
-
-            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def remove_final_decision(self, request, pk=None):
         """
         let an admin remove the final decision he has made for the current student
@@ -126,9 +149,45 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
-            student=self.get_object(), coach=request.user).delete()
+            student=self.get_object(), coach=request.user, final=True).delete()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "suggestion",
+            {
+                'type': 'final_decision',
+                'data': {
+                    'student_id': pk
+                }
+            }
+        )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
+
+    @action(detail=False, methods=['post'])
+    def tallyregistration(self, request, pk=None):
+        """
+        Endpoint to which Tally's webhook can connect to register students.
+        returns HTTP response:
+            400 BAD REQUEST:  The request data was malformatted or a student tried to register twice
+            201 CREATED:    The student registration resulted in a new student being created
+        """
+        tally = TallyForm.fromFile()
+        try:
+            form = tally.transform(tally.validate(request.data))
+            skillNames = form.pop("skills")
+            student = Student.objects.create(**form)
+            skills = []
+            for skillName in skillNames:
+                existingSkill = Skill.objects.filter(name=skillName).first()
+                if existingSkill == None:
+                    skills.append(Skill.objects.create(name=skillName, color="grey"))
+                else:
+                    skills.append(existingSkill)
+            student.skills.set(skills)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class CoachViewSet(viewsets.GenericViewSet,
@@ -148,7 +207,8 @@ class CoachViewSet(viewsets.GenericViewSet,
     """
     queryset = Coach.objects.all().order_by('id')
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    permission_classes = [
+        permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
@@ -164,7 +224,8 @@ class CoachViewSet(viewsets.GenericViewSet,
             return Response({"detail": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
         return Response({"detail": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
 
-    @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def update_status(self, request, pk=None):
         """
         let an admin update admin rights of another user
@@ -207,7 +268,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
 
-    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
+    def get_serializer_class(self):
+        if hasattr(self, 'action') and self.action == 'list' or self.action == 'retrieve':
+            return ProjectListSerializer
+        return super().get_serializer_class()
+
+    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive])
     def suggest_student(self, request, pk=None):
         """
         let a coach suggest a student for this project
@@ -218,39 +285,38 @@ class ProjectViewSet(viewsets.ModelViewSet):
             200 OK:          an existing projectsuggestion was found for this student and project from the current user,
                              the found projectsuggestion was updated
         """
-        serializer = ProjectSuggestionSerializer(
-            data=request.data, context={'request': request})
+        serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            data = serializer.data
 
             project = self.get_object()
 
-            # get student object from url
-            student_url = data.pop('student')
-            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
-
-            # get skill object from url
-            skill_url = data.pop('skill')
-            skill = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
+            # get skill object
+            skill = serializer.validated_data.get('skill')
 
             # check if skill is one of the required skills of the project
             if skill in project.required_skills.all():
+                # save projectsuggestion
+                serializer.save(project=project, coach=request.user)
 
-                # create ProjectSuggestion if it doesnt exist yet, else update it
-                _, created = ProjectSuggestion.objects.update_or_create(
-                    project=project, student=student, coach=request.user, skill=skill, defaults=data)
+                # send data to websocket
+                socket_data = serializer.data
+                socket_data['project_id'] = pk
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "suggestion",
+                    {
+                        'type': 'suggest_student',
+                        'data': socket_data
+                    }
+                )
 
-                response_data = serializer.data
-                response_data['coach'] = request.build_absolute_uri(reverse("coach-detail", args=(request.user.id,)))
-                response_data['coach_name'] = request.user.get_full_name()
-                response_data['coach_id'] = request.user.id
-
-                return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body
-    @action(detail=True, methods=['post'], serializer_class=RemoveProjectSuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
+    @action(detail=True, methods=['post'], serializer_class=RemoveProjectSuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive])
     def remove_student(self, request, pk=None):
         """
         let a coach remove a projectsuggestion for this project
@@ -264,21 +330,23 @@ class ProjectViewSet(viewsets.ModelViewSet):
             data=request.data, context={'request': request})
         if serializer.is_valid():
 
-            # get student object from url
-            student_url = serializer.data.pop('student')
-            student = Student.objects.get(**resolve(urlparse(student_url).path).kwargs)
-
-            # get coach object from url
-            coach_url = serializer.data.pop('coach')
-            coach = Coach.objects.get(**resolve(urlparse(coach_url).path).kwargs)
-
-            # get skill object from url
-            skill_url = serializer.data.pop('skill')
-            skill = Skill.objects.get(**resolve(urlparse(skill_url).path).kwargs)
-
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
-                project=self.get_object(), coach=coach, student=student, skill=skill).delete()
+                project=self.get_object(),
+                **serializer.validated_data
+            ).delete()
+
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['project_id'] = pk
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "suggestion",
+                {
+                    'type': 'remove_student',
+                    'data': socket_data
+                }
+            )
 
             return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -294,7 +362,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         for student in students:
             projects = ProjectSuggestion.objects.filter(student=student)
             if projects.count() > 1:
-                student_url = request.build_absolute_uri(reverse("student-detail", args=(student.id,)))
+                student_url = request.build_absolute_uri(
+                    reverse("student-detail", args=(student.id,)))
                 project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,)))
                                 for project_sug in projects]
                 conflicts[student_url] = set(project_urls)
@@ -338,9 +407,17 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     queryset = SentEmail.objects.all().order_by('id')
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, EmailDateTimeFilter]
+    filter_backends = [filters.SearchFilter,
+                       DjangoFilterBackend, EmailDateTimeFilter]
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
+
+    def create(self, request):
+        serializer = SentEmailSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(sender=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RegisterView(generics.GenericAPIView):

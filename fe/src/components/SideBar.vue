@@ -180,6 +180,7 @@ import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
 import status from "../features/mails/Status";
+import {useQuasar} from "quasar";
 import { Student } from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
@@ -210,10 +211,13 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
+    const $q = useQuasar()
+
     const skillStore = useSkillStore()
 
     return {
       studentStore,
+      $q,
       skillStore,
       thumbStyle: {
         right: '0px',
@@ -231,9 +235,9 @@ export default defineComponent({
   data() {
     return {
       miniState: ref(false),
-      drawer: ref(false),
+      drawer: ref(true),
     }
-  },
+  },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.

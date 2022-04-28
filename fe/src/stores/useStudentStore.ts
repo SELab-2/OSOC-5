@@ -45,6 +45,20 @@ export const useStudentStore = defineStore('user/student', {
     currentStudent: null,
   }),
   actions: {
+    async getStudent(url: string): Promise<Student> {
+      const student = this.students.find((student) => student.url === url)
+      if (student) return student
+      const { data } = await instance.get<StudentInterface>(url)
+      await this.transformStudent(data)
+
+      // Check again if not present, it could be added in the meantime.
+      const student2 = this.students.find((student) => student.url === url)
+      if (student2) return student2
+
+      const newstudent = new Student(data)
+      this.students.push(newstudent)
+      return newstudent
+    },
     async transformStudent(student: any): Promise<void> {
       const skills = [] as Skill[]
 
@@ -230,6 +244,120 @@ export const useStudentStore = defineStore('user/student', {
     },
     async deleteMail(mail: Mail) {
       await instance.delete(`/emails/${mail.id}`)
+    },
+    async receiveSuggestion({
+      student_id,
+      coach,
+      suggestion,
+      reason,
+    }: {
+      student_id: number
+      coach: { id: number; firstName: string; lastName: string; url: string }
+      suggestion: string
+      reason: string
+    }) {
+      const studentId = Number(student_id)
+      const coachId = coach.id
+      const suggestionParsed = Number.parseInt(suggestion)
+
+      const student = this.students.filter(({ id }) => id === studentId)[0]
+
+      // We found the corresponding student
+      if (student) {
+        let ctr = 0
+        while (
+          ctr < student.suggestions.length &&
+          student.suggestions[ctr].coach.id !== coachId
+        )
+          ctr++
+
+        if (ctr < student.suggestions.length) {
+          // Update suggestion
+          student.suggestions[ctr].suggestion = suggestionParsed
+          student.suggestions[ctr].reason = reason
+        } else {
+          // New suggestion
+          const coaches = useCoachStore()
+          const coach = await coaches.getUser(`/coaches/${coachId.toString()}`)
+
+          student.suggestions.push({
+            student: studentId,
+            suggestion: suggestionParsed,
+            reason,
+            coach,
+          })
+        }
+
+        if (this.currentStudent?.id === studentId) this.currentStudent = student
+      }
+    },
+    removeSuggestion({
+      student,
+      coach,
+    }: {
+      student: string
+      coach: { id: number }
+    }) {
+      const studentId = Number.parseInt(student)
+      const coachId = coach.id
+
+      const matchingStudent = this.students.filter(
+        ({ id }) => id === studentId
+      )[0]
+
+      // We found the corresponding student
+      if (matchingStudent) {
+        const suggestion = matchingStudent.suggestions.findIndex(
+          (s) => s.coach.id === coachId
+        )
+
+        // Corresponding suggestion is found
+        if (suggestion !== -1) matchingStudent.suggestions.splice(suggestion, 1)
+
+        if (this.currentStudent?.id === studentId)
+          this.currentStudent = matchingStudent
+      }
+    },
+    receiveFinalDecision({
+      student_id,
+      suggestion,
+      coach,
+      reason,
+    }: {
+      student_id: string
+      coach_id: string
+      suggestion: number
+      coach: { id: number; firstName: string; lastName: string; url: string }
+      reason: string
+    }) {
+      const studentId = Number.parseInt(student_id)
+
+      const student = this.students.filter(({ id }) => id === studentId)[0]
+
+      // We found the corresponding student
+      if (student) {
+        const finalDecision = {
+          student: studentId,
+          coach: coach,
+          suggestion,
+          reason,
+        }
+        student.finalDecision = finalDecision
+
+        if (this.currentStudent?.id === studentId) this.currentStudent = student
+      }
+    },
+    removeFinalDecision({ student_id }: { student_id: string }) {
+      const studentId = Number.parseInt(student_id)
+
+      const student = this.students.filter(({ id }) => id === studentId)[0]
+
+      // We found the corresponding student
+      if (student) {
+        student.finalDecision = null
+
+        if (this.currentStudent?.id === studentId) this.currentStudent = student
+      }
     },
   },
 })

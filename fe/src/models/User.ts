@@ -12,7 +12,7 @@ export interface UserInterface {
   lastEmailSent?: Date
   hasProjects?: Array<Project>
   suggestions?: Array<Suggestion>
-  isActive: Boolean
+  isActive: boolean
 }
 
 export class User implements UserInterface {
@@ -25,22 +25,22 @@ export class User implements UserInterface {
   lastEmailSent?: Date
   hasProjects?: Project[]
   suggestions?: Suggestion[]
-  isActive: Boolean
-  
+  isActive: boolean
+
   constructor(data: UserInterface) {
     Object.assign(this, data)
   }
-  
+
   get fullName(): string {
-      return this.firstName + " " + this.lastName;
+    return this.firstName + ' ' + this.lastName
   }
-  
+
   get role(): string {
     return this.isActive ? (this.isAdmin ? 'admin' : 'coach') : 'inactive'
   }
-  
+
   set role(newRole: string) {
     this.isAdmin = newRole === 'admin'
-    this.isActive = newRole !== "inactive"
+    this.isActive = newRole !== 'inactive'
   }
 }

@@ -8,11 +8,30 @@ from dj_rest_auth.serializers import LoginSerializer
 from .models import *
 
 
+class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer to show some fields of the coach model,
+    used in other serializers
+    """
+    class Meta:
+        model = Coach
+        fields = ['url', 'id', 'first_name', 'last_name']
+
+
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    coach = CoachPartialSerializer(read_only=True)
     class Meta:
         model = Suggestion
-        fields = ['suggestion', 'reason', 'coach_name', 'coach_id', 'coach']
-        read_only_fields = ['coach']
+        fields = ['suggestion', 'reason', 'coach']
+    
+    def create(self, validated_data):
+        student = validated_data.pop('student')
+        coach = validated_data.pop('coach')
+        final = validated_data.pop('final')
+        # create Suggestion if it doesnt exist yet, else update it
+        suggestion, _ = Suggestion.objects.update_or_create(
+            student=student, coach=coach, final=final, defaults=validated_data)
+        return suggestion
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -28,7 +47,8 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     def get_field_names(self, declared_fields, info):
         # Include all fields and id
         # https://stackoverflow.com/questions/38245414/django-rest-framework-how-to-include-all-fields-and-a-related-field-in-mo
-        expanded_fields = super(StudentSerializer, self).get_field_names(declared_fields, info)
+        expanded_fields = super(StudentSerializer, self).get_field_names(
+            declared_fields, info)
 
         if getattr(self.Meta, 'extra_fields', None):
             return self.Meta.extra_fields + expanded_fields
@@ -38,7 +58,8 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Coach
-        fields = ['url', 'id', 'first_name', 'last_name', 'email', 'is_admin', 'is_active']
+        fields = ['url', 'id', 'first_name', 'last_name',
+                  'email', 'is_admin', 'is_active']
         read_only_fields = ['is_admin', 'is_active']
 
 
@@ -55,10 +76,20 @@ class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    coach = CoachPartialSerializer(read_only=True)
     class Meta:
         model = ProjectSuggestion
-        fields = ['student', 'coach', 'coach_name', 'coach_id', 'skill', 'reason']
-        read_only_fields = ['coach']
+        fields = ['student', 'coach', 'skill', 'reason']
+
+    def create(self, validated_data):
+        project = validated_data.pop('project')
+        student = validated_data.pop('student')
+        coach = validated_data.pop('coach')
+        skill = validated_data.pop('skill')
+        # create ProjectSuggestion if it doesnt exist yet, else update it
+        projectsuggestion, _ = ProjectSuggestion.objects.update_or_create(
+            project=project, student=student, coach=coach, skill=skill, defaults=validated_data)
+        return projectsuggestion
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
@@ -82,7 +113,6 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
 
-
     # overwrite update method to be able to create/update/delete RequiredSkills objects
     def update(self, instance, validated_data):
 
@@ -90,17 +120,28 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         skills_data = validated_data.pop('requiredskills_set')
         # update or create skills from request
         for skill_data in skills_data:
-            RequiredSkills.objects.update_or_create(project=instance, **skill_data)
+            RequiredSkills.objects.update_or_create(
+                project=instance, **skill_data)
         # delete skills not in request
         skills = [skill_data['skill'] for skill_data in skills_data]
-        RequiredSkills.objects.filter(project=instance).exclude(skill__in=skills).delete()
+        RequiredSkills.objects.filter(
+            project=instance).exclude(skill__in=skills).delete()
         return super().update(instance, validated_data)
 
 
+class ProjectListSerializer(ProjectSerializer):
+    """
+    serializer class to show coach info in project list and project instance, but not in post, put, etc
+    """
+    coaches = CoachPartialSerializer(many=True)
+
+
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
+    sender = CoachPartialSerializer(read_only=True)
     class Meta:
         model = SentEmail
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
+        read_only_fields = ['time']
 
 
 class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
