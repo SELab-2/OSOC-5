@@ -10,7 +10,7 @@
       <q-space/>
       <q-tabs
         v-model="tab"
-        class="absolute-center"
+        class="centered-tabs"
         shrink
       >
         <q-route-tab
@@ -132,3 +132,15 @@ export default defineComponent({
   },
 })
 </script>
+
+<style>
+@media only screen and (min-width: 900px) {
+.centered-tabs {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+}
+
+</style>
