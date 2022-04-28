@@ -4,6 +4,7 @@
     color="bg-grey-3"
     :select-student="selectStudent"
     :draggable="false"
+    :must-hover="false"
     @update="update"
   />
 

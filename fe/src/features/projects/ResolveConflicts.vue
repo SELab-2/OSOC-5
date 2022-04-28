@@ -7,14 +7,14 @@
       bordered
       separator
     >
-      <q-item
-        v-for="conflict in conflicts"
-        :key="conflict.user"
-        v-ripple
-        clickable
-      >
-        <q-item-section>{{ fullname(conflict.user) }}</q-item-section>
-      </q-item>
+<!--      <q-item-->
+<!--        v-for="conflict in conflicts"-->
+<!--        :key="conflict.user"-->
+<!--        v-ripple-->
+<!--        clickable-->
+<!--      >-->
+<!--        <q-item-section>{{ conflict.user.fullName() }}</q-item-section>-->
+<!--      </q-item>-->
     </q-list>
   </div>
 </template>
@@ -25,11 +25,11 @@ import { useProjectStore } from '../../stores/useProjectStore'
 export default defineComponent({
     async setup() {
         const projectStore = useProjectStore()
-        const conflicts = await projectStore.getConflictingProjects()
+        // const conflicts = await projectStore.getConflictingProjects()
 
         return {
             projectStore,
-            conflicts
+            // conflicts
         }
     },
     methods: {
