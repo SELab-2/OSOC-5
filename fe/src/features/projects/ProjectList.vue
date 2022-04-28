@@ -130,8 +130,7 @@ export default defineComponent({
   mounted() {
       this.socket.onmessage = async (event: { data: string }) => {
           const data = JSON.parse(event.data)
-          console.log("B")
-          console.log(data)
+
           if(data.hasOwnProperty('suggestion')) {
             await this.studentStore.receiveSuggestion(data.suggestion)
             this.sideBarKey += 1

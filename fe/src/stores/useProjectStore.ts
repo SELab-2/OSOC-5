@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
-import { urlToId } from '../utils/url-conversion'
 import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
 import {
@@ -154,14 +153,12 @@ export const useProjectStore = defineStore('project', {
       student: string
       skill: string
     }) {
-      const skillId = urlToId(skill)
-      const studentId = urlToId(student)
       const projectId = Number.parseInt(project_id)
       const project = this.projects.filter(({ id }) => id === projectId)[0]
 
       const alreadyExists = project.suggestedStudents?.some(
         (suggestion) =>
-          suggestion.skill.id === skillId && suggestion.student.id === studentId
+          suggestion.skill.url === skill && suggestion.student.url === student
       )
 
       if (!alreadyExists) {
@@ -188,9 +185,10 @@ export const useProjectStore = defineStore('project', {
     }: {
       skill: string
       student: string
-      project_id: number
+      project_id: string
     }) {
-      const project = this.projects.filter(({ id }) => id === project_id)[0]
+      const projectId = Number.parseInt(project_id)
+      const project = this.projects.filter(({ id }) => id === projectId)[0]
 
       if (project) {
         const suggestionIndex = project.suggestedStudents?.findIndex(
