@@ -30,6 +30,7 @@ export const useCoachStore = defineStore('user/coach', {
       this.isLoadingUsers = true
       const { data } = await instance.get<UserInterface[]>('coaches')
       this.users = data.map((user) => new User(user))
+      this.isLoadingUsers = false
     },
     async updateRole(user: User) {
       return instance.put(`coaches/${user.id}/update_status/`, {

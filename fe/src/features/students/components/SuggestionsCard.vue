@@ -38,7 +38,7 @@
               color="yellow"
             />
             <label class="q-pl-xs">
-              {{ suggestion.coachName }}
+              {{ `${suggestion.coach.firstName} ${suggestion.coach.lastName}` }}
             </label>
             <q-icon
               v-if="suggestion.reason"
