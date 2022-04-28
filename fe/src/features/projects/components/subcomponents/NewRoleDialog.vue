@@ -21,7 +21,7 @@
       />
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <!--        TODO REMOVE -->
+      <!--  TODO remove the text input if/when we use the color picker -->
       <q-input
         v-model="newRoleColor"
         outlined

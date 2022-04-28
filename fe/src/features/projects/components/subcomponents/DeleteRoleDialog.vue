@@ -68,6 +68,7 @@ export default defineComponent ({
       if (id !== -1) {
         this.skillStore.deleteSkill(id).then(() => {
 
+          // TODO: when skill cannot be deleted change the notification
           this.$q.notify({
             icon: 'done',
             color: 'positive',
