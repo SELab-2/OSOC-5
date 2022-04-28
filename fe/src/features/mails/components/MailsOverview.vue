@@ -53,7 +53,7 @@
       </q-input>
       <div v-else>
         <!-- <div> -->
-        Sent at {{currentsteps.find(s => parseInt(s.info) === step.state).time}}
+        Sent at {{currentsteps.find(s => parseInt(s.info) === step.state)?.time ?? 'unknown time'}}
         <!-- </div> -->
         
       </div>
@@ -69,7 +69,7 @@
         <btn
           :disable="currentstepids.includes(step.state)"
           color="yellow"
-          @click="() => { this.info=step.state; sendMail(), currentStep++; }"
+          @click="onclickmail(step.state)"
           label="Mark as sent"
           shadow-color="orange"
           shadow-strength="2"
@@ -81,7 +81,7 @@
           class="q-mx-md"
           shadow-color="red"
           shadow-strength="2"
-          @click="() => { deleteMail(currentsteps.find(m => parseInt(m.info) === step.state))}"
+          @click="() => { deleteMail(currentsteps.find(m => parseInt(m.info) === step.state)!)}"
         />
       </q-stepper-navigation>
     </q-step>
@@ -93,7 +93,7 @@ import {defineComponent} from "@vue/runtime-core";
 import {useStudentStore} from "../../../stores/useStudentStore";
 import {Student} from "../../../models/Student";
 import {Mail} from "../../../models/Mail";
-import {ref} from "vue";
+import {ref, Ref} from "vue";
 
 enum ApprovalStates {
   Applied = 1,
@@ -125,6 +125,7 @@ export default defineComponent({
     const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     const dateTime = date + ' ' + time;
     const statuses = [ApprovalStates.Applied, ApprovalStates.Awaiting, ApprovalStates.Approved, ApprovalStates.ContractConfirmed, ApprovalStates.ContractDeclined, ApprovalStates.Rejected]
+    const currentStep: Ref<ApprovalStates | undefined> = ref(undefined)
     return {
       emailKey: 0,
       show: ref(true),
@@ -132,7 +133,8 @@ export default defineComponent({
       date: ref(dateTime),
       timeout,
       statuses,
-      currentStep: ref(null),
+      info: '',
+      currentStep,
       steps: [
         {
           state: ApprovalStates.Applied,
@@ -166,6 +168,11 @@ export default defineComponent({
       await this.studentStore.getMails(this.student)
 
       this.emailKey += 1
+    },
+    onclickmail(status: number) {
+      this.info = status.toString();
+      this.sendMail();
+      if (this.currentStep) this.currentStep++;
     },
     async sendMail() {
       await this.studentStore.sendMail(this.student, this.date, this.info)
