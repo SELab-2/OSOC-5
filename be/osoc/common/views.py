@@ -241,8 +241,8 @@ class CoachViewSet(viewsets.GenericViewSet,
             coach = self.get_object()
             # check if coach is not current user
             if coach != request.user:
-                coach.is_admin = serializer.data['is_admin']
-                coach.is_active = serializer.data['is_active']
+                coach.is_admin = serializer.data.get('is_admin', coach.is_admin)
+                coach.is_active = serializer.data.get('is_active', coach.is_active)
                 coach.save()
 
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -269,6 +269,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
 
     def get_serializer_class(self):
+        """
+        override method to change serializer class in list and retrieve (GET) requests
+        this way more coach information can be returned in project responses,
+        but not needed when making POST, PUT, PATCH requests
+        """
         if hasattr(self, 'action') and self.action == 'list' or self.action == 'retrieve':
             return ProjectListSerializer
         return super().get_serializer_class()
@@ -287,13 +292,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """
         serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-
             project = self.get_object()
 
-            # get skill object
-            skill = serializer.validated_data.get('skill')
-
             # check if skill is one of the required skills of the project
+            skill = serializer.validated_data.get('skill')
             if skill in project.required_skills.all():
                 # save projectsuggestion
                 serializer.save(project=project, coach=request.user)
@@ -311,7 +313,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 )
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "skill must be one of the required skills of the project"}, 
+                            status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body

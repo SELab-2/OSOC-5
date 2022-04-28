@@ -5,6 +5,7 @@ Filters used in views.py
 from django.forms import ValidationError
 from rest_framework import filters
 from .models import Project, Student, Suggestion
+from .utils import string_to_datetime_tz
 
 true_strings = ['true', '1', 'yes', 't', 'y']
 false_strings = ['false', '0', 'no', 'f', 'n']
@@ -74,13 +75,16 @@ class EmailDateTimeFilter(filters.BaseFilterBackend):
     """
     def filter_queryset(self, request, queryset, view):
         try:
-            if (date := request.query_params.get('date')) is not None:
-                return queryset.filter(time__date=date)
-            if (before := request.query_params.get('before')) is not None:
-                queryset = queryset.filter(time__lt=before)
-            if (after := request.query_params.get('after')) is not None:
-                queryset = queryset.filter(time__gt=after)
-        except ValidationError:
-            # return default queryset when a validationerror is raised
+            date = request.query_params.get('date')
+            if date is not None:
+                return queryset.filter(time__date=string_to_datetime_tz(date))
+            before = request.query_params.get('before')
+            if before is not None:
+                queryset = queryset.filter(time__lt=string_to_datetime_tz(before))
+            after = request.query_params.get('after')
+            if after is not None:
+                queryset = queryset.filter(time__gt=string_to_datetime_tz(after))
+        except ValueError:
+            # return default queryset when a ValueError is raised (a wrong format was used)
             pass
         return queryset

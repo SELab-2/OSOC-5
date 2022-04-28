@@ -21,7 +21,8 @@ def main():
 
     if is_testing:
         import coverage
-        cov = coverage.coverage(source=['osoc.common'], omit=['*/tests/*', '*/migrations/*', '*/apps.py'])
+        cov = coverage.coverage(source=['osoc.common'], 
+                                omit=['*/tests/*', '*/migrations/*', '*/apps.py', '*/routing.py'])
         cov.set_option('report:show_missing', True)
         cov.erase()
         cov.start()

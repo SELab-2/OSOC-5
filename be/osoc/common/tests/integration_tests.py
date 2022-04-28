@@ -1,136 +1,14 @@
 """
-Django tests for API endpoints.
-
-Running tests is different because the project uses Docker:
-
-    1. Run all tests:
-        `docker exec -it osoc-be python manage.py test`
-
-    2. Run one test class:
-        `docker exec -it osoc-be python manage.py test osoc.common.tests.tests:<TESTCLASS>`
-
-    3. Run a single test:
-        `docker exec -it osoc-be python manage.py test osoc.common.tests.tests:<TESTCLASS>.<TESTMETHOD>`
+Integration tests for API endpoints.
+each test simulates an API call to one endpoint and checks if the response data and status code are correct
+these tests test serializers.py and views.py and the API endpoints as a whole
 """
 import json
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
-from django.test import TestCase
-from osoc.common.tally.tally import TallyForm
 from osoc.common.models import Coach, Project, ProjectSuggestion, SentEmail, Skill, Student, Suggestion
-from osoc.common.utils import strip_and_lower_email
 
-
-class UtilityTestCases(TestCase):
-    def test_strip_and_lower_email(self):
-        correct_email = 'admin@example.com'
-        test_email = strip_and_lower_email('  Admin@Example.com    ')
-        self.assertEqual(correct_email, test_email)
-
-    def testGetNested(self):
-        self.assertEqual(None, utils.getNested({'a': {'b': True}}, None, 'a', 'c'))
-        self.assertEqual(None, utils.getNested({'a': {'b': True}}, None, 'b', 'a'))
-        self.assertEqual(True, utils.getNested({'a': {'b': True }}, None, 'a', 'b'))
-        self.assertEqual(True, utils.getNested({'a': {'b': { 'c': True }}}, None, 'a', 'b', 'c'))
-
-class TallyFormTestCases(TestCase):
-    def setUp(self):
-       self.questions = {
-            1: {
-                "question": [ "What do/did you study?" ],
-                "field": "studies",
-                "type": "CHECKBOXES",
-                "answers": [
-                        { "answer": "Backend development" },
-                        { "answer": "Business management" },
-                        { "answer": "Other", "value": {
-                            "question": [ "What do/did you study?" ],
-                            "type": "INPUT_TEXT"
-                            } } ],
-                "required": True
-            },
-            2: {
-                "question": [ "Are you a student?" ],
-                "field": "student",
-                "type": "MULTIPLE_CHOICE",
-                "answers": [
-                        { "answer": "Yes", "value": True, },
-                        { "answer": "No", "value": False } ],
-                "required": True
-            },
-            3: {
-                "question": [ "Birth name" ],
-                "field": "first_name",
-                "type": "INPUT_TEXT",
-                "required": True
-            },
-       }
-
-    def testValidationFormatError(self):
-        tallyForm = TallyForm({})
-        with self.assertRaisesMessage(ValueError, "Format error: Event type should be 'FORM_RESPONSE'."):
-            tallyForm.validate({})
-        with self.assertRaisesMessage(ValueError, "Format error: No fields (root > data > fields)."):
-            tallyForm.validate({ "eventType": "FORM_RESPONSE" })
-
-    def testValidationQuestionError(self):
-        self.questions[1]["required"] = False
-        self.questions[2]["required"] = False
-        tallyForm = TallyForm(self.questions)
-        with self.assertRaisesMessage(ValueError, "Question is required"):
-            tallyForm.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
-                { "key": "question_mRoXgd", "label": "Birth name", "type": "INPUT_TEXT", "value": None }
-                ] } })
-        with self.assertRaisesMessage(ValueError, "Missing question in form"):
-            tallyForm.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [] } } )
-        self.questions[2]["required"] = True
-        self.questions[3]["required"] = False
-        self.questions[2]["answers"] = []
-        with self.assertRaisesMessage(ValueError, "Question has no answer"):
-            tallyForm.validate({ "eventType": "FORM_RESPONSE", "data": { "fields": [
-                { "key": "question_mRoXgd", "label": "Are you a student?", "type": "MULTIPLE_CHOICE", "value": "abc", "options": [ { "id": "abc", "text": "Yes" } ] }
-                ] } } )
-
-    def testValidationSkipQuestions(self):
-        # Skip question 2 and 3 if answer for question 1 is "Backend development"
-        self.questions[1]["answers"][0]["skip"] = [2, 3]
-        tallyForm = TallyForm(self.questions)
-        form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
-            { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": [ "abc" ], "options": [ { "id": "abc", "text": "Backend development" } ] }
-            ] } }
-        self.assertEqual(tallyForm.validate(form), form)
-
-    def testTransformOtherQuestion(self):
-        # Skip question 2 and 3 if answer for question 1 is "Other"
-        self.questions[1]["answers"][2]["skip"] = [2, 3]
-        tallyForm = TallyForm(self.questions)
-        form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
-            { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": [ "abc" ], "options": [ { "id": "abc", "text": "Other" } ] },
-            { "key": "question_mRfOpr", "label": "What do/did you study?", "type": "INPUT_TEXT", "value": "Bioinformatics" } ] } }
-        self.assertEqual(tallyForm.validate(form), form)
-        transformed = tallyForm.transform(form)
-        self.assertEqual(transformed.get("studies", []), ["Bioinformatics"])
-
-    def testValidateAndTransform(self):
-        tallyForm = TallyForm(self.questions)
-        form = { "eventType": "FORM_RESPONSE", "data": { "fields": [
-            { "key": "question_mRoXgd", "label": "What do/did you study?", "type": "CHECKBOXES", "value": [ "a", "b", "c" ], "options": [
-                { "id": "a", "text": "Backend development" },
-                { "id": "b", "text": "Business management" },
-                { "id": "c", "text": "Other" }
-                ] },
-            { "key": "question_mRfZds", "label": "What do/did you study?", "type": "INPUT_TEXT", "value": "Bioinformatics" },
-            { "key": "question_mRoXgd", "label": "Are you a student?", "type": "MULTIPLE_CHOICE", "value": "a", "options": [ { "id": "a", "text": "Yes" } ] },
-            { "key": "question_mRfLrs", "label": "Birth name", "type": "INPUT_TEXT", "value": "Henri" },
-            ] } }
-        self.assertEqual(tallyForm.validate(form), form)
-        transformed = tallyForm.transform(form)
-        self.assertEqual(transformed, {
-            "first_name": "Henri",
-            "student": True,
-            "studies": [ "Backend development", "Business management", "Bioinformatics" ]
-            })
 
 class StudentTestsCoach(APITestCase):
     def setUp(self) -> None:
@@ -372,6 +250,13 @@ class StudentTestsAdmin(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(student.final_decision.suggestion, data["suggestion"])
         self.assertEqual(before_count, after_count-1)
+    
+    def test_student_make_final_decision_bad_request(self):
+        student = Student.objects.first()
+        url = reverse("student-make-final-decision", args=(student.id,))
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_student_remove_final_decision(self):
         student = Student.objects.first()
@@ -522,17 +407,38 @@ class CoachTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_self_forbidden(self):
+        coach = self.admin
+        url = reverse("coach-detail", args=(coach.id,))
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_coach_update_status(self):
         coach = Coach.objects.exclude(id=self.admin.id).first()
         coach.is_admin = False
         coach.is_active = False
         coach.save()
         url = reverse("coach-update-status", args=(coach.id,))
-        response = self.client.put(url, {"is_admin": True, "is_active": True})
+        response = self.client.put(url, {"is_admin": True, "is_active": True}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Coach.objects.get(id=coach.id).is_admin, True)
         self.assertEqual(Coach.objects.get(id=coach.id).is_active, True)
+
+    def test_update_status_self_forbidden(self):
+        coach = self.admin
+        url = reverse("coach-update-status", args=(coach.id,))
+        response = self.client.put(url, {"is_admin": True, "is_active": True}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_status_bad_request(self):
+        coach = Coach.objects.first()
+        url = reverse("coach-update-status", args=(coach.id,))
+        response = self.client.put(url, {"is_admin": "not a boolean"}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_coach(self):
         coach = Coach.objects.get(email="email@example.com")
@@ -663,7 +569,7 @@ class ProjectTestsCoach(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(before_count, after_count-1)
 
-    def test_project_suggest_student_bad_request(self):
+    def test_project_suggest_student_skill_not_in_required_skills(self):
         project = Project.objects.first()
         url = reverse("project-suggest-student", args=(project.id,))
         student = Student.objects.first()
@@ -682,6 +588,13 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(before_count, after_count)
+
+    def test_project_suggest_student_bad_request(self):
+        project = Project.objects.first()
+        url = reverse("project-suggest-student", args=(project.id,))
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_project_remove_student(self):
         project = Project.objects.first()
@@ -707,6 +620,13 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
+    
+    def test_project_remove_student_bad_request(self):
+        project = Project.objects.first()
+        url = reverse("project-remove-student", args=(project.id,))
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_project_get_conflicting(self):
         student = Student.objects.first()
