@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
-import { TempProjectSkill, ProjectTableSkill, Skill } from '../models/Skill'
+import { ProjectTableSkill, Skill } from '../models/Skill'
 
 interface State {
   skills: Array<ProjectTableSkill>
@@ -56,19 +56,14 @@ export const useSkillStore = defineStore('skills', {
             })
           }
 
-          // turn of the loading animation
-          this.isLoadingSkills = false
         })
         .catch((error) => {
           console.log(error)
-          return (this.isLoadingSkills = false)
-        })
+        }).finally( () => this.isLoadingSkills = false)
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async addSkill(newSkillName: string, color: string, callback: any) {
-      // start the loading animation
-      this.isLoadingSkills = true
 
       // Process the new skill
       console.log(`Adding new skill: ${newSkillName}.`)
@@ -90,10 +85,6 @@ export const useSkillStore = defineStore('skills', {
             id: response['data']['id'],
             comment: '',
           })
-          console.log(this.skills)
-
-          // turn of the loading animation
-          this.isLoadingSkills = false
           // When finished run the callback so the popup closes.
           callback(true)
         })
@@ -114,6 +105,7 @@ export const useSkillStore = defineStore('skills', {
           this.skills.splice(index, 1)
         })
         .catch(() => console.log('Failed to delete'))
+      // TODO: when skill is linked to project delete doesnt work but it does say successful to user
     },
   },
 })
