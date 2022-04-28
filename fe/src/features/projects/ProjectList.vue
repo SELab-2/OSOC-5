@@ -96,7 +96,7 @@ export default defineComponent({
     return {
       projectStore: useProjectStore(),
       studentStore: useStudentStore(),
-      socket: new WebSocket('ws://sel2-5.ugent.be/ws/socket_server/')
+      socket: new WebSocket('wss://sel2-5.ugent.be/ws/socket_server/')
     }
   },
   data() {

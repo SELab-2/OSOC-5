@@ -226,7 +226,7 @@ export default defineComponent ({
   setup() {
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
-    const socket = new WebSocket('ws://sel2-5.ugent.be/ws/socket_server/')
+    const socket = new WebSocket('wss://sel2-5.ugent.be/ws/socket_server/')
 
     return {
       authenticationStore,
