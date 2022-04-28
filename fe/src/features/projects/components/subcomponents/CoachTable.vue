@@ -11,7 +11,7 @@
   />
 </template>
 
-<script>
+<script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {useProjectStore} from "../../../../stores/useProjectStore";
 import {useCoachStore} from "../../../../stores/useCoachStore";

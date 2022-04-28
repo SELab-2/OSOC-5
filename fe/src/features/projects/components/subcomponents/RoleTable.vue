@@ -111,7 +111,7 @@
     @update:model-value="deleteRole = undefined"
   >
     <DeleteRoleDialog
-      :reset-delete-role="() => deleteRole.value = undefined"
+      :reset-delete-role="() => deleteRole = undefined"
       :delete-role="deleteRole"
     />
   </q-dialog>
@@ -120,7 +120,7 @@
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {Ref, ref} from "vue";
-import { SkillInterface } from "../../../../models/Skill";
+import {Skill, SkillInterface } from "../../../../models/Skill";
 import {useSkillStore} from "../../../../stores/useSkillStore";
 import columnsRoles from "../../../../models/ProjectRolesColumns";
 import DeleteRoleDialog from "./DeleteRoleDialog.vue";
@@ -133,14 +133,32 @@ export default defineComponent ({
     // Filters
     const filterRoles = ref('')
 
-    const deleteRole: Ref<SkillInterface | undefined> = ref()
+    const deleteRole: Ref<Skill | undefined> = ref(undefined)
+
+    // Role amount error handling
+    const errorRoleAmount = ref(false)
+    const errorMessageRoleAmount = ref('')
 
     return {
       skillStore,
       deleteRole,
       filterRoles,
-      columnsRoles
+      columnsRoles,
+      errorRoleAmount,
+      errorMessageRoleAmount
     }
   },
+  methods: {
+    amountRangeValidation(val: number) {
+      if (val < 0) {
+        this.errorRoleAmount = true
+        this.errorMessageRoleAmount = 'The value must be positive!'
+        return false
+      }
+      this.errorRoleAmount = false
+      this.errorMessageRoleAmount = ''
+      return true
+    },
+  }
 })
 </script>
