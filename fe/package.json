@@ -15,7 +15,7 @@
     "@quasar/vite-plugin": "^1.0.9",
     "@types/node": "^17.0.26",
     "@vitejs/plugin-vue": "^2.3.1",
-    "@yeger/vue-masonry-wall": "^3.0.28",
+    "@yeger/vue-masonry-wall": "3.0.26",
     "axios": "^0.26.1",
     "pinia": "^2.0.13",
     "pinia-plugin-persistedstate": "^1.5.1",
