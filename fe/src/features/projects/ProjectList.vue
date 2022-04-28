@@ -25,7 +25,7 @@
             v-model="filter"
             dense
             outlined
-            label="Outlined"
+            label="Search Projects"
             style="margin-right: 10px"
           />
         </div>
@@ -37,16 +37,17 @@
           shadow-strength="1.8"
           @click="expanded = !expanded"
         />
-        
         <btn
           padding="7px"
           icon="r_warning"
           color="red"
-          label="Conflicts"
           to="/projects/conflicts"
           shadow-color="red"
           shadow-strength="2.5"
-        />
+          no-wrap
+        >
+        <div class="ellipsis">Conflicts</div>
+        </btn>
       </q-toolbar>
 
       <masonry-wall

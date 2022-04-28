@@ -824,6 +824,7 @@
     "model": "common.suggestion",
     "pk": 1,
     "fields": {
+      "final": false,
       "student": 1,
       "coach": 2,
       "suggestion": "0",
@@ -834,6 +835,7 @@
     "model": "common.suggestion",
     "pk": 2,
     "fields": {
+      "final": true,
       "student": 2,
       "coach": 4,
       "suggestion": "2",
@@ -844,6 +846,7 @@
     "model": "common.suggestion",
     "pk": 3,
     "fields": {
+      "final": false,
       "student": 3,
       "coach": 2,
       "suggestion": "1",
@@ -854,6 +857,7 @@
     "model": "common.suggestion",
     "pk": 4,
     "fields": {
+      "final": false,
       "student": 3,
       "coach": 4,
       "suggestion": "0",
@@ -864,6 +868,7 @@
     "model": "common.suggestion",
     "pk": 5,
     "fields": {
+      "final": false,
       "student": 1,
       "coach": 3,
       "suggestion": "0",
@@ -874,6 +879,7 @@
     "model": "common.suggestion",
     "pk": 6,
     "fields": {
+      "final": true,
       "student": 1,
       "coach": 4,
       "suggestion": "2",
@@ -884,6 +890,7 @@
     "model": "common.suggestion",
     "pk": 7,
     "fields": {
+      "final": false,
       "student": 9,
       "coach": 8,
       "suggestion": "2",
@@ -894,6 +901,7 @@
     "model": "common.suggestion",
     "pk": 8,
     "fields": {
+      "final": false,
       "student": 3,
       "coach": 8,
       "suggestion": "1",
@@ -904,6 +912,7 @@
     "model": "common.suggestion",
     "pk": 9,
     "fields": {
+      "final": false,
       "student": 10,
       "coach": 7,
       "suggestion": "1",
@@ -914,6 +923,7 @@
     "model": "common.suggestion",
     "pk": 10,
     "fields": {
+      "final": true,
       "student": 11,
       "coach": 3,
       "suggestion": "1",
@@ -924,6 +934,7 @@
     "model": "common.suggestion",
     "pk": 11,
     "fields": {
+      "final": false,
       "student": 6,
       "coach": 4,
       "suggestion": "0",
@@ -934,6 +945,7 @@
     "model": "common.suggestion",
     "pk": 12,
     "fields": {
+      "final": false,
       "student": 5,
       "coach": 1,
       "suggestion": "2",
@@ -944,6 +956,7 @@
     "model": "common.suggestion",
     "pk": 13,
     "fields": {
+      "final": true,
       "student": 8,
       "coach": 3,
       "suggestion": "2",
@@ -954,6 +967,7 @@
     "model": "common.suggestion",
     "pk": 14,
     "fields": {
+      "final": false,
       "student": 10,
       "coach": 8,
       "suggestion": "2",
@@ -964,6 +978,7 @@
     "model": "common.suggestion",
     "pk": 15,
     "fields": {
+      "final": true,
       "student": 4,
       "coach": 4,
       "suggestion": "2",
@@ -974,6 +989,7 @@
     "model": "common.suggestion",
     "pk": 16,
     "fields": {
+      "final": false,
       "student": 8,
       "coach": 4,
       "suggestion": "2",

@@ -10,7 +10,7 @@
       <q-space/>
       <q-tabs
         v-model="tab"
-        class="absolute-center"
+        class="centered-tabs"
         shrink
       >
         <q-route-tab
@@ -28,6 +28,12 @@
           name="users"
           label="Manage Users"
           to="/users"
+          exact
+        />
+        <q-route-tab
+          name="mails"
+          label="Mails"
+          to="/mails"
           exact
         />
       </q-tabs>
@@ -135,12 +141,6 @@ import {defineComponent, ref} from 'vue'
 import { useMeta, useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 
-const metaData = {
-  meta: {
-    themecolor: {name: 'theme-color', content: '#24a3cb'},
-  },
-}
-
 export default defineComponent({
   data() {
     return {
@@ -208,3 +208,15 @@ export default defineComponent({
   },
 })
 </script>
+
+<style>
+@media only screen and (min-width: 900px) {
+.centered-tabs {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+}
+
+</style>

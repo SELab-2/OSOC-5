@@ -52,13 +52,6 @@
     <label class="text-bold">or</label>
 
     <GitHubSignInButton />
-    <q-separator class="sep middle-sep q-my-md" />
-    <router-link
-      :to="{ name: 'Signup' }"
-      :class="$q.dark.isActive ? 'text-white' : 'text-black'"
-    >
-      Sign Up
-    </router-link>
   </q-form>
 </template>
 
@@ -143,5 +136,19 @@ export default defineComponent({
   top: 250px;
   right: 50px;
   font-size: 80%;
+}
+
+.q-field__control {
+  border-radius: 10px !important;
+}
+
+.underlined {
+  text-decoration: underline;
+}
+.q-checkbox__bg {
+  border-radius: 6px !important;
+}
+.router-link {
+  color: inherit;
 }
 </style>

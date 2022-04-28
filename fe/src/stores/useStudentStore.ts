@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { User } from '../models/User'
-import { Student, StudentInterface } from '../models/Student'
+import { Student } from '../models/Student'
 import { Skill } from '../models/Skill'
-import { useCoachStore } from './useCoachStore'
+import { Mail } from '../models/Mail'
+import { useAuthenticationStore } from './useAuthenticationStore'
 
 interface State {
   search: string
+  searchMails: string
+  status: string
   alumni: string
   decision: string
   byMe: boolean
@@ -15,6 +18,8 @@ interface State {
   skillsStudents: Map<string, Skill>
   coaches: Map<string, User>
   students: Array<Student>
+  mailStudents: Array<Student>
+  mails: Map<number, Mail[]>
   isLoading: boolean
   possibleSuggestion: number
   currentStudent: Student | null
@@ -23,6 +28,8 @@ interface State {
 export const useStudentStore = defineStore('user/student', {
   state: (): State => ({
     search: '',
+    searchMails: '',
+    status: '',
     alumni: 'all',
     decision: 'none',
     byMe: false,
@@ -31,6 +38,8 @@ export const useStudentStore = defineStore('user/student', {
     skillsStudents: new Map(),
     coaches: new Map(),
     students: [],
+    mailStudents: [],
+    mails: new Map(),
     isLoading: false,
     possibleSuggestion: -1,
     currentStudent: null,
@@ -88,10 +97,12 @@ export const useStudentStore = defineStore('user/student', {
       const filters = []
 
       if (this.search) filters.push(`search=${this.search}`)
-      if (this.alumni === 'alumni') filters.push('alumni=true')
+      if (this.alumni === 'alumni') filters.push('alum=true')
+      if (this.alumni === 'student coaches') filters.push('student_coach=true')
       if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
       if (this.byMe === true) filters.push('suggested_by_user')
       if (this.onProject === true) filters.push('on_project')
+      if (this.status) filters.push(`status=${this.status}`)
 
       for (const skill of this.skills) {
         filters.push(`skills=${skill.id}`)
@@ -108,6 +119,27 @@ export const useStudentStore = defineStore('user/student', {
           }
 
           this.students = data.map((student) => new Student(student))
+        })
+
+      this.isLoading = false
+    },
+    async loadStudentsMails() {
+      this.isLoading = true
+      const filters = []
+
+      if (this.search) filters.push(`search=${this.searchMails}`)
+
+      let url = ''
+      if (filters) url = `?${filters.join('&')}`
+
+      await instance
+        .get<Student[]>(`students/${url}`)
+        .then(async ({ data }) => {
+          for (const student of data) {
+            await this.transformStudent(student)
+          }
+
+          this.mailStudents = data.map((student) => new Student(student))
         })
 
       this.isLoading = false
@@ -161,19 +193,71 @@ export const useStudentStore = defineStore('user/student', {
 
       await this.loadStudent(studentId)
     },
+    async updateStatus(student: Student) {
+      await instance.patch(`students/${student.id}/`, {
+        status: student.status,
+      })
+    },
+    async getMails(student: Student) {
+      this.isLoading = true
+
+      await instance
+        .get<Mail[]>(`emails/?receiver=${student.id}`)
+        .then(async ({ data }) => {
+          for (const mail of data) {
+            mail.time = new Date(mail.time).toLocaleString()
+
+            const sender = mail.sender
+
+            if (typeof sender === 'string') {
+              if (this.coaches.has(sender)) {
+                mail.sender = this.coaches.get(sender)!
+              } else {
+                await instance.get<User>(sender).then(({ data }) => {
+                  const coach = new User(data)
+                  mail.sender = coach
+                  this.coaches.set(sender, coach)
+                })
+              }
+            }
+          }
+
+          this.mails.set(
+            student.id,
+            data.map((mail) => new Mail(mail))
+          )
+        })
+
+      this.isLoading = true
+    },
+    async sendMail(student: Student, date: string, info: string) {
+      const authenticationStore = useAuthenticationStore()
+
+      if (authenticationStore.loggedInUser) {
+        await instance.post(`emails/`, {
+          sender: authenticationStore.loggedInUser.url,
+          receiver: student.url,
+          time: date,
+          info: info,
+        })
+      }
+    },
+    async deleteMail(mail: Mail) {
+      await instance.delete(`/emails/${mail.id}`)
+    },
     async receiveSuggestion({
       student_id,
-      coach_id,
+      coach,
       suggestion,
       reason,
     }: {
       student_id: number
-      coach_id: number
+      coach: { id: number; firstName: string; lastName: string; url: string }
       suggestion: string
       reason: string
     }) {
       const studentId = Number(student_id)
-      const coachId = Number(coach_id)
+      const coachId = coach.id
       const suggestionParsed = Number.parseInt(suggestion)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
@@ -183,7 +267,7 @@ export const useStudentStore = defineStore('user/student', {
         let ctr = 0
         while (
           ctr < student.suggestions.length &&
-          student.suggestions[ctr].coachId !== coachId
+          student.suggestions[ctr].coach.id !== coachId
         )
           ctr++
 
@@ -198,20 +282,24 @@ export const useStudentStore = defineStore('user/student', {
 
           student.suggestions.push({
             student: studentId,
-            coachId: coachId,
             suggestion: suggestionParsed,
             reason,
-            coach: coach.url,
-            coachName: coach.firstName,
+            coach,
           })
         }
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
       }
     },
-    removeSuggestion({ student, coach }: { student: string; coach: number }) {
+    removeSuggestion({
+      student,
+      coach,
+    }: {
+      student: string
+      coach: { id: number }
+    }) {
       const studentId = Number.parseInt(student)
-      const coachId = Number(coach)
+      const coachId = coach.id
 
       const matchingStudent = this.students.filter(
         ({ id }) => id === studentId
@@ -220,7 +308,7 @@ export const useStudentStore = defineStore('user/student', {
       // We found the corresponding student
       if (matchingStudent) {
         const suggestion = matchingStudent.suggestions.findIndex(
-          (s) => s.coachId === coachId
+          (s) => s.coach.id === coachId
         )
 
         // Corresponding suggestion is found
@@ -232,19 +320,17 @@ export const useStudentStore = defineStore('user/student', {
     },
     receiveFinalDecision({
       student_id,
-      coach_id,
       suggestion,
-      coach_name,
+      coach,
       reason,
     }: {
       student_id: string
       coach_id: string
       suggestion: number
-      coach_name: string
+      coach: { id: number; firstName: string; lastName: string; url: string }
       reason: string
     }) {
       const studentId = Number.parseInt(student_id)
-      const coachId = Number.parseInt(coach_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
 
@@ -252,10 +338,8 @@ export const useStudentStore = defineStore('user/student', {
       if (student) {
         const finalDecision = {
           student: studentId,
-          coach: coachId.toString(),
+          coach: coach,
           suggestion,
-          coachId,
-          coachName: coach_name,
           reason,
         }
         student.finalDecision = finalDecision

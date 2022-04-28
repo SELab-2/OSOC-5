@@ -29,7 +29,7 @@
               debounce="300"
               color="green"
               bg-color="white"
-              label="Search by name..."
+              label="Search"
               @update:modelValue="studentStore.loadStudents"
             >
               <template #append>
@@ -92,6 +92,23 @@
               </template>
             </q-select>
 
+            <q-select
+              v-model="studentStore.status"
+              rounded
+              outlined
+              dense
+              clearable
+              color="primary"
+              bg-color="white"
+              :options="status"
+              :option-label="opt => opt.label"
+              :option-value="opt => opt.value"
+              label="Status"
+              emit-value
+              map-options
+              @update:model-value="studentStore.loadStudents"
+            />
+
             <div class="row q-gutter-x-md">
               <q-checkbox
                 v-model="studentStore.byMe"
@@ -146,6 +163,7 @@
         <btn
           dense
           round
+          style="border-radius: 30px;"
           unelevated
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
@@ -161,8 +179,8 @@ import {defineComponent, ref} from 'vue'
 import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
+import status from "../features/mails/Status";
 import {useQuasar} from "quasar";
-import {onMounted} from "@vue/runtime-core";
 import { Student } from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
@@ -207,6 +225,7 @@ export default defineComponent({
         backgroundColor: 'black',
         width: '4px',
       },
+      status
     }
   },
   created() {
