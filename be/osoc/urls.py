@@ -17,6 +17,10 @@ from osoc.common import views
 from rest_framework import routers, permissions
 from django.urls import include, path, re_path
 from django.contrib import admin
+from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView
+from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
+
+from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -43,9 +47,21 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/admin/', admin.site.urls),
+    path(
+        'api/auth/register/account-confirm-email/<str:key>/',
+        ConfirmEmailView.as_view(),
+    ), # Needs to be defined before the registration path
+    path('api/auth/register/', include('dj_rest_auth.registration.urls')),
     path('api/auth/', include('dj_rest_auth.urls')),
-    path('api/register/', views.RegisterView.as_view()),
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path(
+        'api/auth/',
+        VerifyEmailView.as_view(),
+        name='account_email_verification_sent'
+    ),
+    path('api/auth/password-reset/', PasswordResetView.as_view()),
+        path('api/auth/password-reset-confirm/<uidb64>/<token>/',
+         PasswordResetConfirmView.as_view(), name='password_reset_confirm'),  
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger',
