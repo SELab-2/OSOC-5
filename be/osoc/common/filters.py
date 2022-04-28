@@ -85,6 +85,6 @@ class EmailDateTimeFilter(filters.BaseFilterBackend):
             if after is not None:
                 queryset = queryset.filter(time__gt=string_to_datetime_tz(after))
         except ValueError:
-            # return default queryset when a validationerror is raised
+            # return default queryset when a ValueError is raised (a wrong format was used)
             pass
         return queryset
