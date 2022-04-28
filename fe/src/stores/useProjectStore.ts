@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
+import { urlToId } from '../utils/url-conversion'
 import { Student, TempStudent } from '../models/Student'
 import { User } from '../models/User'
 import {
@@ -108,7 +109,6 @@ export const useProjectStore = defineStore('project', {
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
         data.forEach(async (project, i) => {
-          // TODO: De error zit hier waardoor hij niet alles laadt
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) =>
               useCoachStore().getUser((coach as unknown as { url: string }).url)
@@ -142,27 +142,26 @@ export const useProjectStore = defineStore('project', {
       }
     },
     async receiveSuggestion({
-      student_id,
-      skill_id,
       project_id,
       reason,
       coach,
       student,
       skill,
     }: {
-      student_id: number
-      skill_id: number
-      project_id: number
+      project_id: string
       reason: string
-      coach: string
+      coach: { id: number; firstName: string; lastName: string; url: string }
       student: string
       skill: string
     }) {
-      const project = this.projects.filter(({ id }) => id === project_id)[0]
+      const skillId = urlToId(skill)
+      const studentId = urlToId(student)
+      const projectId = Number.parseInt(project_id)
+      const project = this.projects.filter(({ id }) => id === projectId)[0]
+
       const alreadyExists = project.suggestedStudents?.some(
         (suggestion) =>
-          suggestion.skill.id === skill_id &&
-          suggestion.student.id === student_id
+          suggestion.skill.id === skillId && suggestion.student.id === studentId
       )
 
       if (!alreadyExists) {
@@ -171,7 +170,7 @@ export const useProjectStore = defineStore('project', {
         const skillStore = useSkillStore()
 
         const studentObj = await studentStore.getStudent(student)
-        const coachObj = await coachStore.getUser(coach)
+        const coachObj = await coachStore.getUser(coach.url)
         const skillObj = await skillStore.getSkill(skill)
 
         project.suggestedStudents?.push({
