@@ -16,6 +16,7 @@ import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
+import { convertObjectKeysToSnakeCase } from "../utils/case-conversion";
 
 interface State {
   projects: Array<Project>
@@ -147,6 +148,7 @@ export const useProjectStore = defineStore('project', {
         // data.forEach(p => this.getProject(p))
       } catch (error) {
         console.log(error)
+      } finally {
         this.isLoadingProjects = false
       }
     },
@@ -240,18 +242,29 @@ export const useProjectStore = defineStore('project', {
 
       const data = {
         name: this.projectName,
-        partner_name: this.projectPartnerName,
-        extra_info: this.projectLink,
-        required_skills: skillsList,
+        partnerName: this.projectPartnerName,
+        extraInfo: this.projectLink,
+        requiredSkills: skillsList,
         coaches: coachList,
       }
 
       // POST request to make a project
       instance
-          .post('projects/', data)
-          .then(function (response) {
-            console.log(response)
-            callback(true)
+          .post('projects/', convertObjectKeysToSnakeCase(data))
+          .then((response) => {
+            console.log(response);
+            this.loadProjects()
+
+            // this.projects.push({
+            //   name: response['data']['name'],
+            //   id:  response['data']['id'],
+            //   partnerName: response['data']['partner_name'],
+            //   extraInfo: response['data']['extra_info'],
+            //   requiredSkills: response['data']['required_skills'],
+            //   coaches: response['data']['coaches'],
+            // });
+
+            callback(true);
           })
           .catch(function (error) {
             console.log(error)
