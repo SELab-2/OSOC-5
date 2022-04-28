@@ -54,7 +54,33 @@
               key="status"
               :props="props"
             >
-              {{status.find(s => s.value === props.row.status)?.label ?? 'no status'}}
+              <q-select
+                v-model="props.row.status"
+                v-ripple
+                color="yellow"
+                borderless
+                dense
+                style="border-radius: 5px; position: relative; width: 170px"
+                :options="status"
+                transition-show="jump-down"
+                transition-hide="jump-up"
+                transition-duration="300"
+                behavior="menu"
+                map-options
+                emit-value
+              >
+                <template #option="scope">
+                  <q-item
+                    @click="() => updateStatus(props.row, props.row.status)"
+                    class="items-center"
+                    v-bind="scope.itemProps"
+                  >
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
               
             </q-td>
             <q-td
