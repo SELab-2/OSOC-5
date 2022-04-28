@@ -20,14 +20,11 @@ describe('Skill Store', () => {
         expect(skillStore.skills).toHaveLength(0)
         expect(skillStore.isLoadingSkills).toBe(false)
 
+        // load skills
+        skillStore.loadSkills()
 
-
-        // test.concurrent('concurrent test 1', async () => {
-            // load skills
-            skillStore.loadSkills()
-            // check if it's loading skills
-            expect(skillStore.isLoadingSkills).toBe(true)
-        // })
+        // check if it's loading skills
+        expect(skillStore.isLoadingSkills).toBe(true)
 
 
     });
@@ -43,10 +40,11 @@ describe('Skill Store', () => {
         let callback_finished = false
 
         test.concurrent('add skill and wait', async () => {
-            // load skills
-            skillStore.addSkill("newSkillName", "color", () => { callback_finished = true})
 
+            // add a skill and check if callback is executed
+            skillStore.addSkill("newSkillName", "color", () => { callback_finished = true})
             expect(callback_finished).toBeTruthy()
+
         })
 
 
@@ -60,7 +58,8 @@ describe('Skill Store', () => {
         expect(skillStore.skills).toHaveLength(0)
         expect(skillStore.isLoadingSkills).toBe(false)
 
-        // load skills
+        // delete skill,
+        // todo: would be nice in future if this deletes the skill that was previously made
         skillStore.deleteSkill(-1)
 
     })
