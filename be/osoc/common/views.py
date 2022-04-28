@@ -423,27 +423,6 @@ class SentEmailViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class RegisterView(generics.GenericAPIView):
-    """
-    API view that handles registering users; Only admins can
-    register new users.
-    """
-    serializer_class = RegisterSerializer
-    permission_classes = [IsAdmin]
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response({
-            "user": CoachSerializer(user, context=self.get_serializer_context()).data
-        })
-
-
 class GithubLogin(SocialLoginView):
     adapter_class = GitHubOAuth2Adapter
     callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"

@@ -40,6 +40,7 @@ export interface StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
+  status: string
 }
 
 export class Student implements StudentInterface {
@@ -72,6 +73,7 @@ export class Student implements StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
+  status: string
 
   constructor(obj: StudentInterface)
   constructor(
@@ -103,8 +105,8 @@ export class Student implements StudentInterface {
     gender: number,
     hinderWork: string,
     pronouns: string,
-    studentCoach: boolean
-  )
+    studentCoach: boolean,
+    status: string)
 
   constructor(...args: any[]) {
     if (args.length == 1) {
@@ -139,6 +141,11 @@ export class Student implements StudentInterface {
       this.hinderWork = args[26]
       this.pronouns = args[27]
       this.studentCoach = args[28]
+      this.status = args[29]
     }
+  }
+
+  get fullName(): string {
+    return this.firstName + " " + this.lastName;
   }
 }
