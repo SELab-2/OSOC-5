@@ -106,7 +106,7 @@ export class Student implements StudentInterface {
     hinderWork: string,
     pronouns: string,
     studentCoach: boolean,
-    status: string
+    status: string)
 
   constructor(...args: any[]) {
     if (args.length == 1) {
