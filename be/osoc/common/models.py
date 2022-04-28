@@ -5,9 +5,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from .utils import strip_and_lower_email
-from django.utils import timezone
+
 
 # Phone number validation
 phone_regex = RegexValidator(
@@ -154,7 +155,7 @@ class Student(models.Model):
         MALE = '1', _('Male')
         TRANSGENDER = '2', _('Transgender')
         UNKNOWN = '3', _('Unknown')
-    
+
     class Status(models.TextChoices):
         """
         Status should be changed when the respective email is sent
@@ -327,9 +328,6 @@ class Student(models.Model):
         """
         self.full_clean()
         super(Student, self).save(*args, **kwargs)
-    
-    def __str__(self):
-        return self.get_full_name()
 
     def __str__(self):
         return self.get_full_name()
@@ -422,15 +420,13 @@ class Suggestion(models.Model):
         default="",
         max_length=500
     )
+    final = models.BooleanField(
+        _('final decision'),
+        default=False
+    )
 
     class Meta:
-        unique_together = (("student", "coach"))
-
-    def coach_name(self):
-        return self.coach.get_full_name()
-
-    def coach_id(self):
-        return self.coach.id
+        unique_together = (("student", "coach", "final"))
 
     def __str__(self):
         suggestion_label = self.Suggestion(self.suggestion).label
@@ -464,12 +460,6 @@ class ProjectSuggestion(models.Model):
         on_delete=models.RESTRICT   # not allowed to delete a skill that is used in a suggestion
     )
 
-    def coach_name(self):
-        return self.coach.get_full_name()
-
-    def coach_id(self):
-        return self.coach.id
-
 
 class SentEmail(models.Model):
     """
@@ -485,7 +475,7 @@ class SentEmail(models.Model):
     )
     time = models.DateTimeField(
         _("send date and time"),
-        default=timezone.now, 
+        default=timezone.now,
         blank=True
     )
     info = models.CharField(
