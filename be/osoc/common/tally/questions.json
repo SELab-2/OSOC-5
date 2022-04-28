@@ -179,7 +179,7 @@
   },
   "10": {
     "question": [
-      "Your email address\n"
+      "Your email address\n", "Your email address"
     ],
     "field": "email",
     "type": "INPUT_EMAIL",
