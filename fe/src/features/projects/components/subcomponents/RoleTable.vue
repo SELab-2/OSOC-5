@@ -12,16 +12,10 @@
         :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''"
         :props="props"
       >
-        <q-td
-          key="role"
-          :props="props"
-        >
+        <q-td key="role" :props="props">
           {{ props.row.name }}
         </q-td>
-        <q-td
-          key="amount"
-          :props="props"
-        >
+        <q-td key="amount" :props="props">
           {{ props.row.amount }}
           <q-popup-edit
             v-slot="scope"
@@ -44,16 +38,9 @@
             />
           </q-popup-edit>
         </q-td>
-        <q-td
-          key="comment"
-          :props="props"
-        >
+        <q-td key="comment" :props="props">
           <div>{{ props.row.comment }}</div>
-          <q-popup-edit
-            v-slot="scope"
-            v-model="props.row.comment"
-            buttons
-          >
+          <q-popup-edit v-slot="scope" v-model="props.row.comment" buttons>
             <q-input
               v-model="scope.value"
               type="text"
@@ -65,40 +52,33 @@
             />
           </q-popup-edit>
         </q-td>
-        <q-td
-          key="color"
-          :props="props"
-          auto-width
-        >
+        <q-td key="color" :props="props" auto-width>
           <div
             :style="`height: 25px; width:25px; border-radius: 50%;background: ${props.row.color}`"
           />
-<!--          &lt;!&ndash; TODO make this actually change in the database not locally&ndash;&gt;-->
-<!--          <q-popup-edit-->
-<!--            v-slot="scope"-->
-<!--            v-model="props.row.color"-->
-<!--            buttons-->
-<!--          >-->
-<!--            <q-color-->
-<!--              v-model="scope.value"-->
-<!--              no-header-->
-<!--              no-footer-->
-<!--              class="color-picker"-->
-<!--              @keyup.enter.stop-->
-<!--            />-->
-<!--          </q-popup-edit>-->
+          <!--          &lt;!&ndash; TODO make this actually change in the database not locally&ndash;&gt;-->
+          <!--          <q-popup-edit-->
+          <!--            v-slot="scope"-->
+          <!--            v-model="props.row.color"-->
+          <!--            buttons-->
+          <!--          >-->
+          <!--            <q-color-->
+          <!--              v-model="scope.value"-->
+          <!--              no-header-->
+          <!--              no-footer-->
+          <!--              class="color-picker"-->
+          <!--              @keyup.enter.stop-->
+          <!--            />-->
+          <!--          </q-popup-edit>-->
         </q-td>
-        <q-td
-          key="remove"
-          style="width: 10px"
-        >
+        <q-td key="remove" style="width: 10px">
           <btn
             flat
             round
             style="color: #f14a3b"
             icon="mdi-trash-can-outline"
             glow-color="red-2"
-            @click="deleteRole = props.row"
+            @click="delete_role(props.row)"
           />
         </q-td>
       </q-tr>
@@ -107,25 +87,25 @@
 
   <q-dialog
     class="full-width"
-    :model-value="deleteRole !== undefined"
-    @update:model-value="deleteRole = undefined"
+    :model-value="deleteRole !== -1"
+    @update:model-value="deleteRole = -1"
   >
     <DeleteRoleDialog
-      :reset-delete-role="() => deleteRole = undefined"
-      :delete-role="deleteRole"
+      :delete-role-id="deleteRole"
+      :delete-role-name="deleteRoleName"
     />
   </q-dialog>
 </template>
 
 <script lang="ts">
-import {defineComponent} from "@vue/runtime-core";
-import {Ref, ref} from "vue";
-import {Skill, SkillInterface } from "../../../../models/Skill";
-import {useSkillStore} from "../../../../stores/useSkillStore";
-import columnsRoles from "../../../../models/ProjectRolesColumns";
-import DeleteRoleDialog from "./DeleteRoleDialog.vue";
+import { defineComponent } from '@vue/runtime-core'
+import { ref } from 'vue'
+import { ProjectTableSkill } from '../../../../models/Skill'
+import { useSkillStore } from '../../../../stores/useSkillStore'
+import columnsRoles from '../../../../models/ProjectRolesColumns'
+import DeleteRoleDialog from './DeleteRoleDialog.vue'
 
-export default defineComponent ({
+export default defineComponent({
   components: { DeleteRoleDialog },
   setup() {
     const skillStore = useSkillStore()
@@ -133,7 +113,8 @@ export default defineComponent ({
     // Filters
     const filterRoles = ref('')
 
-    const deleteRole: Ref<Skill | undefined> = ref(undefined)
+    const deleteRole = ref(-1)
+    const deleteRoleName = ref('')
 
     // Role amount error handling
     const errorRoleAmount = ref(false)
@@ -145,10 +126,15 @@ export default defineComponent ({
       filterRoles,
       columnsRoles,
       errorRoleAmount,
-      errorMessageRoleAmount
+      errorMessageRoleAmount,
+      deleteRoleName,
     }
   },
   methods: {
+    delete_role(role: ProjectTableSkill) {
+      this.deleteRole = role.id
+      this.deleteRoleName = role.name
+    },
     amountRangeValidation(val: number) {
       if (val < 0) {
         this.errorRoleAmount = true
@@ -159,6 +145,6 @@ export default defineComponent ({
       this.errorMessageRoleAmount = ''
       return true
     },
-  }
+  },
 })
 </script>
