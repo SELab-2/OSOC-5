@@ -44,7 +44,6 @@
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {useSkillStore} from "../../../../stores/useSkillStore";
-import { Skill } from "../../../../models/Skill";
 
 export default defineComponent ({
   props: {
@@ -69,7 +68,6 @@ export default defineComponent ({
       if (id !== -1) {
         this.skillStore.deleteSkill(id).then(() => {
 
-          // this does not work if
           this.$q.notify({
             icon: 'done',
             color: 'positive',

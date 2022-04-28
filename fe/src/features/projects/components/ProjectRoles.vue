@@ -76,18 +76,12 @@ export default defineComponent ({
     const newRole = ref('')
     const newRoleColor = ref('')
 
-    // Role amount error handling
-    const errorRoleAmount = ref(false)
-    const errorMessageRoleAmount = ref('')
-
     return {
       skillStore,
       filterRoles,
       newRolePrompt,
       newRole,
       newRoleColor,
-      errorRoleAmount,
-      errorMessageRoleAmount
     }
   },
 })
