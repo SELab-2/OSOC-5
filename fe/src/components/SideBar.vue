@@ -162,7 +162,6 @@ import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
 import {useQuasar} from "quasar";
-import {onMounted} from "@vue/runtime-core";
 import { Student } from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";

@@ -160,7 +160,7 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(before_count, after_count)
-    
+
     def test_student_remove_suggestion(self):
         student = Student.objects.first()
         # first, make sure there is a suggestion
@@ -178,7 +178,7 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
-    
+
     def test_student_remove_suggestion_not_found(self):
         student = Student.objects.first()
         student.suggestions.all().delete()
@@ -306,7 +306,7 @@ class CoachTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_get_coach_instance_not_found(self):
         url = reverse("coach-detail", args=(50,))
         response = self.client.get(url)
@@ -706,7 +706,7 @@ class ProjectTestsAdmin(APITestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_update_project(self):
         project = Project.objects.first()
         skill = Skill.objects.create(
@@ -797,7 +797,7 @@ class SkillTestsCoach(APITestCase):
         response = self.client.post(url, {}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_update_skill(self):
         skill = Skill.objects.first()
         url = reverse("skill-detail", args=(skill.id,))
@@ -994,7 +994,7 @@ class SentEmailTests(APITestCase):
         response = self.client.post(url, {}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_update_email(self):
         email = SentEmail.objects.first()
         student = Student.objects.first()

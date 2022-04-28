@@ -1,6 +1,6 @@
 <template>
   <div className="row items-center absolute-full">
-    <LightDarkButton/>
+    <!-- <LightDarkButton/> -->
     <div className="col-xs-12 col-md-6 flex-center" style="justify-content: center">
       <OsocLogo/>
     </div>

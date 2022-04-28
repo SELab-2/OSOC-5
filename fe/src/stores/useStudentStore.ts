@@ -88,10 +88,11 @@ export const useStudentStore = defineStore('user/student', {
       const filters = []
 
       if (this.search) filters.push(`search=${this.search}`)
-      if (this.alumni === 'alumni') filters.push('alumni=true')
+      if (this.alumni === 'alumni') filters.push('alum=true')
+      if (this.alumni === 'student coaches') filters.push('student_coach=true')
       if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
-      if (this.byMe === true) filters.push('suggested_by_user')
-      if (this.onProject === true) filters.push('on_project')
+      if (this.byMe) filters.push('suggested_by_user=true')
+      if (this.onProject) filters.push('on_project=true')
 
       for (const skill of this.skills) {
         filters.push(`skills=${skill.id}`)
@@ -163,17 +164,17 @@ export const useStudentStore = defineStore('user/student', {
     },
     async receiveSuggestion({
       student_id,
-      coach_id,
+      coach,
       suggestion,
       reason,
     }: {
       student_id: number
-      coach_id: number
+      coach: { id: number; firstName: string; lastName: string; url: string }
       suggestion: string
       reason: string
     }) {
       const studentId = Number(student_id)
-      const coachId = Number(coach_id)
+      const coachId = coach.id
       const suggestionParsed = Number.parseInt(suggestion)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
@@ -183,7 +184,7 @@ export const useStudentStore = defineStore('user/student', {
         let ctr = 0
         while (
           ctr < student.suggestions.length &&
-          student.suggestions[ctr].coachId !== coachId
+          student.suggestions[ctr].coach.id !== coachId
         )
           ctr++
 
@@ -198,20 +199,24 @@ export const useStudentStore = defineStore('user/student', {
 
           student.suggestions.push({
             student: studentId,
-            coachId: coachId,
             suggestion: suggestionParsed,
             reason,
-            coach: coach.url,
-            coachName: coach.firstName,
+            coach,
           })
         }
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
       }
     },
-    removeSuggestion({ student, coach }: { student: string; coach: number }) {
+    removeSuggestion({
+      student,
+      coach,
+    }: {
+      student: string
+      coach: { id: number }
+    }) {
       const studentId = Number.parseInt(student)
-      const coachId = Number(coach)
+      const coachId = coach.id
 
       const matchingStudent = this.students.filter(
         ({ id }) => id === studentId
@@ -220,7 +225,7 @@ export const useStudentStore = defineStore('user/student', {
       // We found the corresponding student
       if (matchingStudent) {
         const suggestion = matchingStudent.suggestions.findIndex(
-          (s) => s.coachId === coachId
+          (s) => s.coach.id === coachId
         )
 
         // Corresponding suggestion is found
@@ -232,19 +237,17 @@ export const useStudentStore = defineStore('user/student', {
     },
     receiveFinalDecision({
       student_id,
-      coach_id,
       suggestion,
-      coach_name,
+      coach,
       reason,
     }: {
       student_id: string
       coach_id: string
       suggestion: number
-      coach_name: string
+      coach: { id: number; firstName: string; lastName: string; url: string }
       reason: string
     }) {
       const studentId = Number.parseInt(student_id)
-      const coachId = Number.parseInt(coach_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
 
@@ -252,10 +255,8 @@ export const useStudentStore = defineStore('user/student', {
       if (student) {
         const finalDecision = {
           student: studentId,
-          coach: coachId.toString(),
+          coach: coach,
           suggestion,
-          coachId,
-          coachName: coach_name,
           reason,
         }
         student.finalDecision = finalDecision

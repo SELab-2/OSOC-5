@@ -4,6 +4,7 @@
     color="bg-grey-3"
     :select-student="selectStudent"
     :draggable="false"
+    :must-hover="false"
     @update="update"
   />
 
@@ -326,7 +327,7 @@ export default defineComponent ({
     },
     mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.id)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach.id === this.authenticationStore.loggedInUser?.id)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion.toString() : (-1).toString()
       } else {

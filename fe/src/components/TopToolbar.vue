@@ -10,7 +10,7 @@
       <q-space/>
       <q-tabs
         v-model="tab"
-        class="absolute-center"
+        class="centered-tabs"
         shrink
       >
         <q-route-tab
@@ -106,21 +106,13 @@
 <script lang="ts">
 import {defineComponent, ref} from 'vue'
 
-import {useMeta} from 'quasar'
 import {useAuthenticationStore} from '../stores/useAuthenticationStore'
-
-const metaData = {
-  meta: {
-    themecolor: {name: 'theme-color', content: '#24a3cb'},
-  },
-}
 
 export default defineComponent({
   setup() {
     const authenticationStore = useAuthenticationStore()
 
     return {
-      color: useMeta(metaData),
       tab: ref('students'),
       authenticationStore
     }
@@ -132,3 +124,15 @@ export default defineComponent({
   },
 })
 </script>
+
+<style>
+@media only screen and (min-width: 900px) {
+.centered-tabs {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+}
+
+</style>
