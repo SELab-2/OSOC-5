@@ -224,9 +224,14 @@ export default defineComponent ({
     },
   },
   setup() {
+    
+    const baseURL =
+    process.env.NODE_ENV == 'development'
+      ? 'ws://localhost:8000/ws/socket_server/'
+      : 'wss://sel2-5.ugent.be/ws/socket_server/'
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
-    const socket = new WebSocket('wss://sel2-5.ugent.be/ws/socket_server/')
+    const socket = new WebSocket(baseURL)
 
     return {
       authenticationStore,
