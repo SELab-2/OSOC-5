@@ -1,32 +1,14 @@
-import {test, expect, describe, beforeEach, vi, it} from 'vitest'
+import {expect, describe, it} from 'vitest'
 import {mount} from '@vue/test-utils'
-import {Quasar} from 'quasar'
-import Component from '../../src/components/LoadingSpinner.vue'
-import {createPinia, setActivePinia} from "pinia";
-import {createTestingPinia} from '@pinia/testing'
+import LoadingSpinner from '../../src/components/LoadingSpinner.vue'
 
-// This makes sure Quasar is loaded
-const wrapperFactory = () => mount(Component, {
-    global: {
-        plugins: [
-            createTestingPinia({
-                createSpy: vi.fn,
-            }),
-            Quasar
-        ]
-    },
-})
+const wrapperFactory = () => mount(LoadingSpinner, {})
 
-describe('example test typescript', () => {
-    // this makes sure Pinia is loaded before every test
-    beforeEach(() => {
-        setActivePinia(createPinia())
-    })
-    // example test
-    it('mount component', () => {
-        expect(Component).toBeTruthy();
+describe('LoadingSpinner.vue', () => {
+
+    it('Test if spinner loads correctly', () => {
+        expect(LoadingSpinner).toBeTruthy();
         const wrapper = wrapperFactory();
-
-        // console.log(wrapper.html());
+        expect(wrapper.find('.q-spinner').exists()).toBeTruthy()
     })
 })

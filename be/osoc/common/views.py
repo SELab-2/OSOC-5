@@ -164,7 +164,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
     def tallyregistration(self, request, pk=None):
         """
         Endpoint to which Tally's webhook can connect to register students.
