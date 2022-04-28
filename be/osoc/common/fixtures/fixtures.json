@@ -28,7 +28,7 @@
     "pk": 4,
     "fields": {
       "name": "Graphic designer",
-      "color": "magenta"
+      "color": "purple"
     }
   },
   {
@@ -83,16 +83,15 @@
     "model": "common.coach",
     "pk": 1,
     "fields": {
-      "password": "pbkdf2_sha256$260000$KSkTj3rghH0hT1VHV6iiHl$asJxNBNnkwZeceqjETcr74rAcocEdX2ITGCnVbcERck=",
-      "last_login": "2022-04-06T13:16:36.880Z",
-      "is_superuser": true,
-      "is_staff": true,
+      "password": "abcdelf",
+      "is_superuser": false,
+      "is_staff": false,
       "is_active": true,
       "date_joined": "2022-03-19T13:30:53Z",
-      "first_name": "admin",
-      "last_name": "admin",
-      "email": "admin@example.com",
-      "is_admin": true,
+      "first_name": "Peter",
+      "last_name": "Parker",
+      "email": "coach@example.com",
+      "is_admin": false,
       "groups": [],
       "user_permissions": []
     }
@@ -772,7 +771,7 @@
     "fields": {
       "project": 2,
       "skill": 2,
-      "amount": 1
+      "amount": 2
     }
   },
   {
@@ -781,7 +780,7 @@
     "fields": {
       "project": 4,
       "skill": 1,
-      "amount": 1
+      "amount": 3
     }
   },
   {
@@ -817,7 +816,7 @@
     "fields": {
       "project": 4,
       "skill": 4,
-      "amount": 1
+      "amount": 3
     }
   },
   {
@@ -988,7 +987,7 @@
       "project": 1,
       "student": 3,
       "coach": 3,
-      "skill_id": 3
+      "skill_id": 2
     }
   },
   {
@@ -999,7 +998,7 @@
       "project": 5,
       "student": 7,
       "coach": 4,
-      "skill_id": 7
+      "skill_id": 1
     }
   },
   {
@@ -1007,7 +1006,7 @@
     "pk": 3,
     "fields": {
       "reason": "",
-      "project": 11,
+      "project": 3,
       "student": 5,
       "coach": 7,
       "skill_id": 2
@@ -1018,7 +1017,7 @@
     "pk": 4,
     "fields": {
       "reason": "",
-      "project": 8,
+      "project": 4,
       "student": 5,
       "coach": 4,
       "skill_id": 5
@@ -1029,7 +1028,7 @@
     "pk": 5,
     "fields": {
       "reason": "",
-      "project": 10,
+      "project": 4,
       "student": 6,
       "coach": 7,
       "skill_id": 3
@@ -1040,7 +1039,7 @@
     "pk": 6,
     "fields": {
       "reason": "",
-      "project": 9,
+      "project": 2,
       "student": 2,
       "coach": 8,
       "skill_id": 2
@@ -1051,7 +1050,7 @@
     "pk": 7,
     "fields": {
       "reason": "",
-      "project": 6,
+      "project": 1,
       "student": 2,
       "coach": 1,
       "skill_id": 2
@@ -1062,7 +1061,7 @@
     "pk": 8,
     "fields": {
       "reason": "",
-      "project": 5,
+      "project": 6,
       "student": 4,
       "coach": 2,
       "skill_id": 4
@@ -1073,7 +1072,7 @@
     "pk": 9,
     "fields": {
       "reason": "",
-      "project": 3,
+      "project": 5,
       "student": 8,
       "coach": 3,
       "skill_id": 4
@@ -1084,7 +1083,7 @@
     "pk": 10,
     "fields": {
       "reason": "",
-      "project": 7,
+      "project": 4,
       "student": 4,
       "coach": 1,
       "skill_id": 3

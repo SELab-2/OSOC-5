@@ -28,6 +28,7 @@ CMD \
     ./docker/wait-for-it.sh -t 0 db:5432 --strict -- && \
     python manage.py migrate && \
     python manage.py collectstatic --noinput && \
+    python scripts/create_data_fixtures.py && \
     python scripts/create_superuser_production.py \
     && \
     gunicorn osoc.wsgi -b 0.0.0.0:8000 --access-logfile 'accesslogs' --error-logfile 'errorlogs'
