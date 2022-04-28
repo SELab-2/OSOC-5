@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import AppPageVue from '../components/AppPage.vue'
 import FormPageVue from '../features/authentication/FormPage.vue'
 import LoginFormVue from '../features/authentication/LoginForm.vue'
-import SignupFormVue from '../features/authentication/SignupForm.vue'
 import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
 import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
@@ -17,11 +16,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '',
     component: FormPageVue,
     children: [
-      {
-        path: 'signup',
-        component: SignupFormVue,
-        name: 'Signup',
-      },
       {
         path: 'login',
         alias: '',
