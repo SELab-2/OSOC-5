@@ -88,7 +88,8 @@ export const useSkillStore = defineStore('skills', {
           // When finished run the callback so the popup closes.
           callback(true)
         })
-        .catch(function (error) {
+        .catch(error => {
+          this.isLoadingSkills = false
           console.log(error)
           callback(false)
         })
