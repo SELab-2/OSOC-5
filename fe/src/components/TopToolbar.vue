@@ -138,7 +138,7 @@
 
 <script lang="ts">
 import {defineComponent, ref} from 'vue'
-import { useMeta, useQuasar } from 'quasar'
+import { useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 
 export default defineComponent({
@@ -168,7 +168,6 @@ export default defineComponent({
       password1,
       password2,
       display_popup,
-      color: useMeta(metaData),
       tab: ref('students'),
       authenticationStore,
       on_dropdown_click() {
