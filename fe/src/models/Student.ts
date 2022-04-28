@@ -107,7 +107,6 @@ export class Student implements StudentInterface {
     pronouns: string,
     studentCoach: boolean,
     status: string
-  );
 
   constructor(...args: any[]) {
     if (args.length == 1) {
