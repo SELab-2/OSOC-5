@@ -7,6 +7,7 @@ import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
+import MailList from '../features/mails/MailList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
 import {useStudentStore} from "../stores/useStudentStore";
 
@@ -67,6 +68,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: UserList,
+      },
+      {
+        path: '/mails',
+        name: 'Mails',
+        meta: {
+          requiresAuth: true,
+        },
+        component: MailList,
       },
     ],
   },

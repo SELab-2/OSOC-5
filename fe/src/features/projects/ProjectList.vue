@@ -37,7 +37,6 @@
           shadow-strength="1.8"
           @click="expanded = !expanded"
         />
-        
         <btn
           padding="7px"
           icon="r_warning"

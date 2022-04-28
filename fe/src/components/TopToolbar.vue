@@ -30,6 +30,12 @@
           to="/users"
           exact
         />
+        <q-route-tab
+          name="mails"
+          label="Mails"
+          to="/mails"
+          exact
+        />
       </q-tabs>
       <q-space/>
       <q-btn-dropdown
