@@ -169,7 +169,7 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
-    def tallyregistration(self, request, pk=None): # pylint: disable=no-self-use
+    def tallyregistration(self, request, pk=None): # pylint: disable=no-self-use,unused-argument
         """
         Endpoint to which Tally's webhook can connect to register students.
         returns HTTP response:
@@ -193,11 +193,11 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
             return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
 
-class CoachViewSet(viewsets.GenericViewSet,
+class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin): # pylint: disable=too-many-ancestors
+                   mixins.DestroyModelMixin): # No create, this is handled in RegisterView
     """
     API endpoint that allows coaches to be viewed, edited or searched.
     a coach cannot be created by this API endpoint
@@ -208,7 +208,6 @@ class CoachViewSet(viewsets.GenericViewSet,
         ?is_active=[true, false
     example query: /api/coaches/?is_admin=false&is_active=true
     """
-    # No create, this is handled in RegisterView
     queryset = Coach.objects.all().order_by('id')
     serializer_class = CoachSerializer
     permission_classes = [
@@ -217,7 +216,8 @@ class CoachViewSet(viewsets.GenericViewSet,
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
 
-    def destroy(self, request, pk=None): # pylint: disable=unused-argument
+    # pylint: disable=unused-argument,arguments-differ
+    def destroy(self, request, pk=None):
         # override delete method to add a check
         coach = self.get_object()
         if coach != request.user:
@@ -254,7 +254,7 @@ class CoachViewSet(viewsets.GenericViewSet,
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows projects to be viewed, edited or searched.
     only admin users have permission for this endpoint, except for suggesting students or removing suggestions
@@ -388,7 +388,8 @@ class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
-    def destroy(self, request, pk=None): # pytlint: disable=unused-argument
+    # pylint: disable=unused-argument,arguments-differ
+    def destroy(self, request, pk=None):
         if request.user.is_admin:
             try:
                 self.perform_destroy(self.get_object())
@@ -419,6 +420,7 @@ class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancest
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 
+    # pytlint: disable=arguments-differ
     def create(self, request):
         serializer = SentEmailSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
