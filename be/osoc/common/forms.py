@@ -25,7 +25,8 @@ class UserAdminCreationForm(forms.ModelForm):
         return user
 
 class UserAdminChangeForm(forms.ModelForm):
-    """A form for updating users. Includes all the fields on
+    """
+    A form for updating users. Includes all the fields on
     the user, but replaces the password field with admin's
     password hash display field.
     """
@@ -36,9 +37,11 @@ class UserAdminChangeForm(forms.ModelForm):
         fields = ['email', 'password', 'is_active', 'is_admin', 'is_staff']
 
     def clean_password(self):
-        # Regardless of what the user provides, return the initial value.
-        # This is done here, rather than on the field, because the
-        # field does not have access to the initial value
+        """        
+        Regardless of what the user provides, return the initial value.
+        This is done here, rather than on the field, because the
+        field does not have access to the initial value
+        """
         return self.initial["password"]
 
 
@@ -47,7 +50,7 @@ class SimpleSignupForm(SignupForm):
     first_name = forms.CharField(label="first name")
     last_name = forms.CharField(label="last name")
     def save(self, request):
-        user = super(SimpleSignupForm, self).save(request)
+        user = super().save(request)
         user.is_admin = self.cleaned_data['is_admin']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']

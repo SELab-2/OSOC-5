@@ -6,14 +6,14 @@ from django.utils.http import urlencode
 from rest_framework.reverse import reverse
 
 
-def assertOrRaise(check, mesg, error=ValueError):
+def assert_or_raise(check, mesg, error=ValueError):
     """
     If check fails, raise error with message.
     """
     if not check:
         raise error(mesg)
 
-def getNested(dictionary, default, *keys):
+def get_nested(dictionary, default, *keys):
     """
     Get a dictionary but nested; returning the default at the first missing key.
     """
@@ -30,16 +30,16 @@ def strip_and_lower_email(email):
     """
     return email.strip().lower()
 
-def reverse_querystring(view, urlconf=None, args=None, kwargs=None, current_app=None, query_kwargs=None):
+def reverse_querystring(view, urlconf=None, args=None, kwargs=None, query_kwargs=None):
     """
     https://gist.github.com/benbacardi/227f924ec1d9bedd242b
     Custom reverse to handle query strings.
     Usage:
         reverse_querystring("student-list", query_kwargs=({"on_project": "true"}))
     """
-    base_url = reverse(view, urlconf=urlconf, args=args, kwargs=kwargs, current_app=current_app)
+    base_url = reverse(view, urlconf=urlconf, args=args, kwargs=kwargs)
     if query_kwargs:
-        return '{}?{}'.format(base_url, urlencode(query_kwargs))
+        return f"{base_url}?{urlencode(query_kwargs)}"
     return base_url
 
 def string_to_datetime_tz(string):

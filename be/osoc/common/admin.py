@@ -14,6 +14,10 @@ class StudentAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name',)
 
 class CustomUserAdmin(UserAdmin):
+    """
+    Override the default User model in the admin panel;
+    this is needed because we use a custom User model, see model Coach in models.py
+    """
     exclude = ('username',)
     ordering = ('email',)
     form = UserAdminChangeForm

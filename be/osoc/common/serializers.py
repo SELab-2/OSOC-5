@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import LoginSerializer
-from .models import *
+from .models import Coach, Suggestion, Student, Project, ProjectSuggestion, SentEmail, Skill, RequiredSkills
 
 
 class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
@@ -19,12 +19,22 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the Suggestion model
+    fields: suggestion, reason, coach
+    the coach field is read-only because when a suggestion is created/updated, the current user is used
+    """
     coach = CoachPartialSerializer(read_only=True)
     class Meta:
         model = Suggestion
         fields = ['suggestion', 'reason', 'coach']
-    
+
     def create(self, validated_data):
+        """
+        override create method to make it update_or_create;
+        when a suggestion is found with the same student, coach and final state, it is updated, 
+        otherwise it is created
+        """
         student = validated_data.pop('student')
         coach = validated_data.pop('coach')
         final = validated_data.pop('final')
@@ -35,6 +45,11 @@ class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the student model
+    fields: all student fields
+    suggestions and final_decision are read-only
+    """
     suggestions = SuggestionSerializer(
         many=True, source='suggestion_set', read_only=True)
     final_decision = SuggestionSerializer(read_only=True)
@@ -47,7 +62,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     def get_field_names(self, declared_fields, info):
         # Include all fields and id
         # https://stackoverflow.com/questions/38245414/django-rest-framework-how-to-include-all-fields-and-a-related-field-in-mo
-        expanded_fields = super(StudentSerializer, self).get_field_names(
+        expanded_fields = super().get_field_names(
             declared_fields, info)
 
         if getattr(self.Meta, 'extra_fields', None):
@@ -56,6 +71,11 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the coach model
+    fields: first_name, last_name, email, is_admin and is_active
+    is_admin and is_active are read-only
+    """
     class Meta:
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name',
@@ -64,24 +84,44 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the skill model
+    fields: name, color
+    """
     class Meta:
         model = Skill
         fields = ['url', 'id', 'name', 'color']
 
 
 class RequiredSkillsSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the RequiredSkills model
+    fields: amount, skill, comment
+    no url and id fields because the RequiredSkills model does not need API endpoints
+    """
     class Meta:
         model = RequiredSkills
         fields = ['amount', 'skill', 'comment']
 
 
 class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the ProjectSuggestion model
+    fields: student, coach, skill and reason
+    coach is read-only
+    no url and id fields because the ProjectSuggestion model does not need API endpoints
+    """
     coach = CoachPartialSerializer(read_only=True)
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'skill', 'reason']
 
     def create(self, validated_data):
+        """
+        override create method to make it update_or_create;
+        when a projectsuggestion is found with the same project, student, coach and skill, it is updated, 
+        otherwise it is created
+        """
         project = validated_data.pop('project')
         student = validated_data.pop('student')
         coach = validated_data.pop('coach')
@@ -93,6 +133,11 @@ class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the project model
+    fields: name, partner_name, extra_info, required_skills, coaches and suggested_students
+    required_skills and suggested_students are read-only
+    """
     required_skills = RequiredSkillsSerializer(
         many=True, source='requiredskills_set')
     suggested_students = ProjectSuggestionSerializer(
@@ -103,8 +148,12 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'name', 'partner_name', 'extra_info',
                   'required_skills', 'coaches', 'suggested_students']
 
-    # overwrite create method to be able to create RequiredSkills objects
     def create(self, validated_data):
+        """
+        override create method to be able to create RequiredSkills objects,
+        this is needed because required_skills is a many-to-many field with a through model 
+        (because it needs an extra 'amount' field)
+        """
         skills_data = validated_data.pop('requiredskills_set')
         coaches = validated_data.pop('coaches')
         project = Project.objects.create(**validated_data)
@@ -113,9 +162,12 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             RequiredSkills.objects.create(project=project, **skill_data)
         return project
 
-    # overwrite update method to be able to create/update/delete RequiredSkills objects
     def update(self, instance, validated_data):
-
+        """
+        override create method to be able to create/update/remove RequiredSkills objects,
+        this is needed because required_skills is a many-to-many field with a through model 
+        (because it needs an extra 'amount' field)
+        """
         # first update required skills
         skills_data = validated_data.pop('requiredskills_set')
         # update or create skills from request
@@ -129,7 +181,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return super().update(instance, validated_data)
 
 
-class ProjectListSerializer(ProjectSerializer):
+class ProjectGetSerializer(ProjectSerializer):
     """
     serializer class to show coach info in project list and project instance, but not in post, put, etc
     """
@@ -137,6 +189,12 @@ class ProjectListSerializer(ProjectSerializer):
 
 
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the sentemail model
+    fields: sender, receiver, time, info
+    sender and time are read-only
+    sender is the current user
+    """
     sender = CoachPartialSerializer(read_only=True)
     class Meta:
         model = SentEmail
@@ -146,7 +204,7 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
 
 class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
-    a serializer for the remove_student api endpoint to be able to remove a ProjectSuggestion
+    a serializer for the remove_student API endpoint to be able to remove a ProjectSuggestion
     only the fields student, coach and skill are needed here
     """
     class Meta:
@@ -156,7 +214,7 @@ class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
 
 class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
     """
-    a serializer for the update_coach_status api endpoint
+    a serializer for the update_coach_status API endpoint
     only the fields is_admin and is_active are needed here
     """
     class Meta:
@@ -165,6 +223,9 @@ class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CustomLoginSerializer(LoginSerializer):
+    """
+    serializer for the login API endpoint
+    """
     username = None
     email = serializers.CharField(
         label="Email",
@@ -201,19 +262,15 @@ class CustomLoginSerializer(LoginSerializer):
 
 
 class CustomRegisterSerializer(RegisterSerializer):
+    """
+    serializer for the register API endpoint
+    """
     username = None
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     is_admin = serializers.BooleanField()
     is_active = serializers.BooleanField()
     def get_cleaned_data(self):
-        super(CustomRegisterSerializer, self).get_cleaned_data()
-        return {
-            'password1': self.validated_data.get('password1', ''),
-            'password2': self.validated_data.get('password2', ''),
-            'email': self.validated_data.get('email', ''),
-            'first_name': self.validated_data.get('first_name', ''),
-            'last_name': self.validated_data.get('last_name', ''),
-            'is_admin' : self.validated_data.get('is_admin', ''),
-            'is_active' : self.validated_data.get('is_active', '')
-        }
+        super().get_cleaned_data()
+        fields = ['password1', 'password2', 'email', 'first_name', 'last_name', 'is_admin', 'is_active']
+        return {field: self.validated_data.get(field, '') for field in fields}

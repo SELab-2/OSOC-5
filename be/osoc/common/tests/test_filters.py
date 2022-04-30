@@ -4,11 +4,16 @@ Unit tests for filters.py
 from rest_framework.test import APITestCase
 from django.utils import timezone
 from osoc.common.utils import reverse_querystring
-from osoc.common.filters import *
-from osoc.common.models import Coach, ProjectSuggestion, SentEmail, Skill, Student, Project
+from osoc.common.models import Coach, ProjectSuggestion, SentEmail, Skill, Student, Project, Suggestion
 
 class StudentFilterTests(APITestCase):
+    """
+    test class for testing custom student filters
+    """
     def setUp(self):
+        """
+        test setup
+        """
         self.user = Coach.objects.create_user(
             first_name="username",
             last_name="last_name",
@@ -81,8 +86,11 @@ class StudentFilterTests(APITestCase):
             degree_current_year=1,
             best_skill="test value"
         )
-    
+
     def test_student_on_project_filter(self):
+        """
+        test GET /students/?on_project=
+        """
         # add a student to a project
         student = Student.objects.first()
         project = Project.objects.create(name="project")
@@ -102,8 +110,11 @@ class StudentFilterTests(APITestCase):
         url = reverse_querystring("student-list", query_kwargs=({"on_project": "false"}))
         response = self.client.get(url)
         self.assertEqual(len(response.data), 2)
-    
+
     def test_student_suggested_by_user(self):
+        """
+        test GET /students/?suggested_by_user=
+        """
         # make suggestion for student by user
         student = Student.objects.first()
         Suggestion.objects.create(
@@ -133,6 +144,9 @@ class StudentFilterTests(APITestCase):
         self.assertEqual(len(response.data), 2)
 
     def test_student_final_decision_filter(self):
+        """
+        test GET /students/?suggestion=
+        """
         # make final decision
         student = Student.objects.first()
         suggestion = Suggestion.objects.create(
@@ -154,7 +168,13 @@ class StudentFilterTests(APITestCase):
 
 
 class EmailFilterTests(APITestCase):
+    """
+    test class for testing custom email filters
+    """
     def setUp(self):
+        """
+        test setup
+        """
         self.user = Coach.objects.create_user(
             first_name="username",
             last_name="last_name",
@@ -193,6 +213,9 @@ class EmailFilterTests(APITestCase):
             )
 
     def test_email_datetime_filter_date(self):
+        """
+        test GET /sentemails/?date=
+        """
         url = reverse_querystring("sentemail-list", query_kwargs=({"date": "2022-01-01"}))
         response = self.client.get(url)
         self.assertEqual(len(response.data), 1)
@@ -202,6 +225,9 @@ class EmailFilterTests(APITestCase):
         self.assertEqual(len(response.data), 0)
 
     def test_email_datetime_filter_before(self):
+        """
+        test GET /sentemails/?before=
+        """
         url = reverse_querystring("sentemail-list", query_kwargs=({"before": "2022-01-03T13:00:00"}))
         response = self.client.get(url)
         self.assertEqual(len(response.data), 3)
@@ -211,6 +237,9 @@ class EmailFilterTests(APITestCase):
         self.assertEqual(len(response.data), 0)
 
     def test_email_datetime_filter_after(self):
+        """
+        test GET /sentemails/?after=
+        """
         url = reverse_querystring("sentemail-list", query_kwargs=({"after": "2022-01-02T12:00:00"}))
         response = self.client.get(url)
         self.assertEqual(len(response.data), 3)
@@ -218,8 +247,11 @@ class EmailFilterTests(APITestCase):
         url = reverse_querystring("sentemail-list", query_kwargs=({"after": "2022-01-07"}))
         response = self.client.get(url)
         self.assertEqual(len(response.data), 0)
-    
+
     def test_email_datetime_filter_wrong_format(self):
+        """
+        test GET /sentemails/?date= with wrong date format
+        """
         url = reverse_querystring("sentemail-list", query_kwargs=({"date": "wrong format"}))
         response = self.client.get(url)
         self.assertEqual(len(response.data), 5)

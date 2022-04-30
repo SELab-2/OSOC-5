@@ -1,8 +1,9 @@
 """
 Tally form (https://tally.so); method for students to register.
 """
-from ..utils import getNested, assertOrRaise
 import json
+from ..utils import get_nested, assert_or_raise
+
 
 class TallyForm:
     """
@@ -12,65 +13,68 @@ class TallyForm:
         self.questions = questions
 
     @classmethod
-    def fromFile(cls, questionsFile='osoc/common/tally/questions.json'):
-        with open(questionsFile, 'r') as f:
-            questions = json.load(f)
+    def from_file(cls, questionfile='osoc/common/tally/questions.json'):
+        """
+        load questions from a json file
+        """
+        with open(questionfile, 'r', encoding="utf-8") as file:
+            questions = json.load(file)
         return cls(questions)
 
     def validate(self, form):
         """
         Validate Tally form; make sure all student data is present.
         """
-        assertOrRaise(form.get("eventType", None) == "FORM_RESPONSE", "Format error: Event type should be 'FORM_RESPONSE'.")
+        assert_or_raise(form.get("eventType", None) == "FORM_RESPONSE", "Format error: Event type should be 'FORM_RESPONSE'.")
         # Get question fields from form
-        fields = getNested(form, None, "data", "fields")
-        assertOrRaise(fields != None, "Format error: No fields (root > data > fields).")
+        fields = get_nested(form, None, "data", "fields")
+        assert_or_raise(fields is not None, "Format error: No fields (root > data > fields).")
         # Validate (required) questions
-        skipQuestions = []
+        skip_questions = []
         for i, question in self.questions.items():
-            if not question["required"] or i in skipQuestions:
+            if not question["required"] or i in skip_questions:
                 continue
             # Required questions should have matching fields in the form
-            filteredFields = self.findFields(question, fields)
-            assertOrRaise(filteredFields, f"Missing question in form: {', '.join(question['question'])}.")
+            filtered_fields = self.find_fields(question, fields)
+            assert_or_raise(filtered_fields, f"Missing question in form: {', '.join(question['question'])}.")
             # Required questions should have a value
-            fieldValue = self.searchFieldValue(filteredFields, question["type"])
-            assertOrRaise(fieldValue != None, f"Question is required: {', '.join(question['question'])}.")
+            field_value = self.search_field_value(filtered_fields, question["type"])
+            assert_or_raise(field_value is not None, f"Question is required: {', '.join(question['question'])}.")
             # Add skip values if necessary
-            answer = self.getQuestionAnswer(question, fieldValue, fields)
-            assertOrRaise(answer != None, f"Question has no answer: {', '.join(question['question'])}.")
-            skipQuestions.extend(answer.get("skip", []))
+            answer = self.get_question_answer(question, field_value, fields)
+            assert_or_raise(answer is not None, f"Question has no answer: {', '.join(question['question'])}.")
+            skip_questions.extend(answer.get("skip", []))
         return form
 
-    def findFields(self, question, fields):
+    def find_fields(self, question, fields):
         """
         Find fields that correspond with a given question.
         """
-        foundFields = []
+        found_fields = []
         for field in fields:
             if field["label"] in question["question"] and self.__equal(field["type"], question["type"]):
-                foundFields.append(field)
-        return foundFields
+                found_fields.append(field)
+        return found_fields
 
-    def searchFieldValue(self, fields, qtype):
+    def search_field_value(self, fields, qtype):
         """
         Search (filtered) fields for a value with a given type.
         """
         value = None
         i = 0
-        while value == None and i < len(fields):
-            value = self.getFieldValue(fields[i], qtype)
+        while value is None and i < len(fields):
+            value = self.get_field_value(fields[i], qtype)
             i += 1
         return value
 
-    def getFieldValue(self, field, qtype):
+    def get_field_value(self, field, qtype):
         """
         Get value from field with the given type.
         """
         if qtype == "MULTIPLE_CHOICE":
-            optionId = field["value"]
+            option_id = field["value"]
             for option in field["options"]:
-                if option["id"] == optionId:
+                if option["id"] == option_id:
                     return option["text"]
         elif qtype == "CHECKBOXES":
             checked = field["value"]
@@ -88,55 +92,55 @@ class TallyForm:
         Transform validated Tally form to easier format; run validate before
         calling this method.
         """
-        newForm = {}
-        fields = getNested(form, None, "data", "fields")
+        new_form = {}
+        fields = get_nested(form, None, "data", "fields")
         # Transform Tally form
-        skipQuestions = []
+        skip_questions = []
         for i, question in self.questions.items():
-            if i in skipQuestions:
+            if i in skip_questions:
                 continue
-            fieldValue = self.searchFieldValue(self.findFields(question, fields), question["type"])
-            if fieldValue:
-                answer = self.getQuestionAnswer(question, fieldValue, fields)
+            field_value = self.search_field_value(self.find_fields(question, fields), question["type"])
+            if field_value:
+                answer = self.get_question_answer(question, field_value, fields)
                 # Add processed answer to new form
-                newForm[question["field"]] = answer["value"]
+                new_form[question["field"]] = answer["value"]
                 # Skip questions
-                skipQuestions.extend(answer.get("skip", []))
-        return newForm
+                skip_questions.extend(answer.get("skip", []))
+        return new_form
 
-    def getQuestionAnswer(self, question, fieldValue, fields):
+    def get_question_answer(self, question, field_value, fields):
         """
         Get question answer from its field value.
         """
         answer = None
         if question["type"] == "MULTIPLE_CHOICE":
             for ans in question["answers"]:
-                if ans["answer"] == fieldValue:
-                    answer = self.processAnswer(ans, fields)
+                if ans["answer"] == field_value:
+                    answer = self.process_answer(ans, fields)
                     break # Multiple choice allows just 1 answer
         elif question["type"] == "CHECKBOXES":
             answer = { "value": [], "skip": [] }
             for ans in question["answers"]:
-                if ans["answer"] in fieldValue:
-                    nextAnswer = self.processAnswer(ans, fields)
-                    answer["value"].append(nextAnswer["value"])
-                    answer["skip"].extend(nextAnswer.get("skip", []))
+                if ans["answer"] in field_value:
+                    next_answer = self.process_answer(ans, fields)
+                    answer["value"].append(next_answer["value"])
+                    answer["skip"].extend(next_answer.get("skip", []))
             if len(answer["value"]) == 0:
                 answer = None
         else:
             # Text as value
-            answer = { "value": fieldValue }
+            answer = { "value": field_value }
         return answer
 
-    def processAnswer(self, answer, fields):
+    def process_answer(self, answer, fields):
         """
         Process a question answer; map it to its corresponding question value (if needed).
         """
-        questionValue = answer.get("value", None)
-        if questionValue == None:
+        question_value = answer.get("value", None)
+        if question_value is None:
             answer["value"] = answer["answer"]
-        elif isinstance(questionValue, dict):
-            answer["value"] = self.searchFieldValue(self.findFields(questionValue, fields), questionValue["type"])
+        elif isinstance(question_value, dict):
+            answer["value"] = self.search_field_value(self.find_fields(question_value, fields), question_value["type"])
         return answer
 
     def __equal(self, this, that):
@@ -144,7 +148,6 @@ class TallyForm:
         Self-defined equal; if that is a list or dictionary, `this` should be in `that`.
         Otherwise `this` should be equal to `that`.
         """
-        if isinstance(that, list) or isinstance(that, dict):
+        if isinstance(that, (dict, list)):
             return this in that
-        else:
-            return this == that
+        return this == that

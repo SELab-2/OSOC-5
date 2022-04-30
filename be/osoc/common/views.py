@@ -1,7 +1,7 @@
 """
 Views that create a connection between the database and the application.
 """
-from rest_framework import viewsets, mixins, permissions, status, generics, filters
+from rest_framework import viewsets, mixins, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import PermissionDenied
 from rest_framework.decorators import action
@@ -11,13 +11,16 @@ from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_auth.registration.views import SocialLoginView
 from django.db.models import RestrictedError
-from .filters import *
-from .serializers import *
-from .models import *
-from .tally.tally import TallyForm
-from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
+    StudentFinalDecisionFilter, EmailDateTimeFilter
+from .serializers import StudentSerializer, CoachSerializer, ProjectSerializer, \
+    ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
+    UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
+from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
+from .tally.tally import TallyForm
+from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -121,7 +124,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             # set final_decision in student
             student.final_decision = suggestion
             student.save()
-            
+
             # send data to websocket
             socket_data = serializer.data
             socket_data['student_id'] = pk
@@ -175,15 +178,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         tally = TallyForm.fromFile()
         try:
             form = tally.transform(tally.validate(request.data))
-            skillNames = form.pop("skills")
+            skill_names = form.pop("skills")
             student = Student.objects.create(**form)
             skills = []
-            for skillName in skillNames:
-                existingSkill = Skill.objects.filter(name=skillName).first()
-                if existingSkill == None:
-                    skills.append(Skill.objects.create(name=skillName, color="grey"))
+            for skill_name in skill_names:
+                existing_skill = Skill.objects.filter(name=skill_name).first()
+                if existing_skill is None:
+                    skills.append(Skill.objects.create(name=skill_name, color="grey"))
                 else:
-                    skills.append(existingSkill)
+                    skills.append(existing_skill)
             student.skills.set(skills)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -275,7 +278,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         but not needed when making POST, PUT, PATCH requests
         """
         if hasattr(self, 'action') and self.action == 'list' or self.action == 'retrieve':
-            return ProjectListSerializer
+            return ProjectGetSerializer
         return super().get_serializer_class()
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer,
@@ -313,7 +316,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 )
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response({"detail": "skill must be one of the required skills of the project"}, 
+            return Response({"detail": "skill must be one of the required skills of the project"},
                             status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
