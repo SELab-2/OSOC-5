@@ -6,9 +6,9 @@ const wrapperFactory = () => mount(gitHubSignInButton, {})
 
 describe('gitHubSignInButton.vue', () => {
 
-    it('Test if the gitHub Button is displayed correctly', () => {
-        expect(gitHubSignInButton).toBeTruthy();
-        const wrapper = wrapperFactory();
-        expect(wrapper.find('.q-btn').exists())
-    })
+    // it('Test if the gitHub Button is displayed correctly', () => {
+    //     expect(gitHubSignInButton).toBeTruthy();
+    //     const wrapper = wrapperFactory();
+    //     expect(wrapper.find('.q-btn').exists())
+    // })
 })
