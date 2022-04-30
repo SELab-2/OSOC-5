@@ -1,6 +1,7 @@
 """
 Django settings for development.
 """
+# pylint: disable=wildcard-import,unused-wildcard-import
 from os import getenv
 from .common import *  # noqa
 
@@ -13,7 +14,7 @@ SECRET_KEY = 'django-insecure-)glohf%v3h(8%5&zqfc)k*69&nz1!4bn#1g1s3_ndvf$zt37&4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'localhost:8000',
+ALLOWED_HOSTS = ['192.168.99.100', 'localhost', 'localhost:8000',
                  '0.0.0.0', '127.0.0.1', 'sel2-5.ugent.be']
 
 CORS_ALLOWED_ORIGINS = [

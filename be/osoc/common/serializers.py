@@ -222,7 +222,7 @@ class UpdateCoachSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['is_admin', 'is_active']
 
 
-class CustomLoginSerializer(LoginSerializer):
+class CustomLoginSerializer(LoginSerializer): # pylint: disable=abstract-method
     """
     serializer for the login API endpoint
     """
@@ -260,8 +260,7 @@ class CustomLoginSerializer(LoginSerializer):
         attrs['user'] = user
         return attrs
 
-
-class CustomRegisterSerializer(RegisterSerializer):
+class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-method
     """
     serializer for the register API endpoint
     """
