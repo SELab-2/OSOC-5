@@ -420,7 +420,7 @@ class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancest
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 
-    # pytlint: disable=arguments-differ
+    # pylint: disable=arguments-differ
     def create(self, request):
         serializer = SentEmailSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
