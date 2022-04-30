@@ -3,8 +3,9 @@ Unit tests for filters.py
 """
 from rest_framework.test import APITestCase
 from django.utils import timezone
+from osoc.common.tests import AdminFactory, CoachFactory, ProjectFactory, SentEmailFactory, SkillFactory, StudentFactory
 from osoc.common.utils import reverse_querystring
-from osoc.common.models import Coach, ProjectSuggestion, SentEmail, Skill, Student, Project, Suggestion
+from osoc.common.models import ProjectSuggestion, Suggestion, Student
 
 class StudentFilterTests(APITestCase):
     """
@@ -14,78 +15,12 @@ class StudentFilterTests(APITestCase):
         """
         test setup
         """
-        self.user = Coach.objects.create_user(
-            first_name="username",
-            last_name="last_name",
-            email="user@example.com",
-            password="Pas$w0rd",
-            is_admin=True
-        )
+        self.user = AdminFactory()
         self.client.force_authenticate(self.user)
 
-        Student.objects.create(
-            first_name="John",
-            last_name="Doe",
-            call_name="call name",
-            email="email@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
-        Student.objects.create(
-            first_name="Jane",
-            last_name="Doe",
-            call_name="call name",
-            email="email2@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
-        Student.objects.create(
-            first_name="Jimmy",
-            last_name="Doe",
-            call_name="call name",
-            email="email3@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
+        StudentFactory()
+        StudentFactory(email="email2@example.com")
+        StudentFactory(email="email3@example.com")
 
     def test_student_on_project_filter(self):
         """
@@ -93,8 +28,8 @@ class StudentFilterTests(APITestCase):
         """
         # add a student to a project
         student = Student.objects.first()
-        project = Project.objects.create(name="project")
-        skill = Skill.objects.create(name="skill")
+        project = ProjectFactory()
+        skill = SkillFactory()
         project.required_skills.add(skill)
         ProjectSuggestion.objects.create(
             project=project,
@@ -122,12 +57,7 @@ class StudentFilterTests(APITestCase):
             coach=self.user
         )
         # make suggestion for another student by another coach
-        coach = Coach.objects.create_user(
-            first_name="username",
-            last_name="last_name",
-            email="coach@example.com",
-            password="Pas$w0rd"
-        )
+        coach = CoachFactory(email="coach2@example.com")
         # different student
         student2 = Student.objects.exclude(id=student.id).first()
         Suggestion.objects.create(
@@ -175,42 +105,18 @@ class EmailFilterTests(APITestCase):
         """
         test setup
         """
-        self.user = Coach.objects.create_user(
-            first_name="username",
-            last_name="last_name",
-            email="user@example.com",
-            password="Pas$w0rd",
-            is_admin=True
-        )
-        student = Student.objects.create(
-            first_name="John",
-            last_name="Doe",
-            call_name="call name",
-            email="email@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
+        self.user = AdminFactory()
+        student = StudentFactory()
         self.client.force_authenticate(self.user)
         for day in range(1, 6):
-            SentEmail.objects.create(
-                sender=self.user,
-                receiver=student,
-                info="info",
-                time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0))
-            )
+            SentEmailFactory(sender=self.user, receiver=student, time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0)))
+
+            # SentEmail.objects.create(
+            #     sender=self.user,
+            #     receiver=student,
+            #     info="info",
+            #     time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0))
+            # )
 
     def test_email_datetime_filter_date(self):
         """
