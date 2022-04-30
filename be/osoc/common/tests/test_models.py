@@ -3,6 +3,7 @@ Unit tests for models.py
 """
 # pylint: disable=duplicate-code,too-many-lines
 from django.test import TestCase
+from osoc.common.tests import CoachFactory, ProjectFactory, SentEmailFactory, SkillFactory, StudentFactory
 from osoc.common.models import Student, Skill, Coach, Project, Suggestion, SentEmail
 
 
@@ -14,9 +15,7 @@ class SkillTests(TestCase):
         """
         test setup
         """
-        Skill.objects.create(
-            name="skill"
-        )
+        SkillFactory(name="skill")
 
     def test_str(self):
         """
@@ -87,9 +86,9 @@ class CoachTests(TestCase):
         """
         Coach.objects.create_user(
             email="  Email@EXAMPLE.com",
-            password="password",
             first_name=" John  ",
-            last_name="    Doe   "
+            last_name="    Doe   ",
+            password="password"
         )
 
     def test_full_name(self):
@@ -125,26 +124,9 @@ class StudentTests(TestCase):
         """
         test setup
         """
-        Student.objects.create(
+        StudentFactory(
             first_name="   Jane   ",
-            last_name="  Doe   ",
-            call_name="call name",
-            email="email@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
+            last_name="  Doe   "
         )
 
     def test_full_name(self):
@@ -159,7 +141,6 @@ class StudentTests(TestCase):
         test clean() method
         """
         student = Student.objects.first()
-        self.assertEqual(student.email, "email@example.com")
         self.assertEqual(student.first_name, "Jane")
         self.assertEqual(student.last_name, "Doe")
 
@@ -180,9 +161,7 @@ class ProjectTests(TestCase):
         """
         test setup
         """
-        Project.objects.create(
-            name="project"
-        )
+        ProjectFactory(name="project")
 
     def test_str(self):
         """
@@ -201,33 +180,8 @@ class SuggestionTests(TestCase):
         """
         test setup
         """
-        coach = Coach.objects.create_user(
-            email="  Email@EXAMPLE.com",
-            password="password",
-            first_name=" John  ",
-            last_name="    Doe   "
-        )
-        student = Student.objects.create(
-            first_name="   Jane   ",
-            last_name="  Doe   ",
-            call_name="call name",
-            email="email@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
+        coach = CoachFactory()
+        student = StudentFactory()
         Suggestion.objects.create(
             suggestion="0",
             reason="a reason",
@@ -253,38 +207,9 @@ class SentEmailTests(TestCase):
         """
         test setup
         """
-        coach = Coach.objects.create_user(
-            email="  Email@EXAMPLE.com",
-            password="password",
-            first_name=" John  ",
-            last_name="    Doe   "
-        )
-        student = Student.objects.create(
-            first_name="   Jane   ",
-            last_name="  Doe   ",
-            call_name="call name",
-            email="email@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
-        SentEmail.objects.create(
-            sender=coach,
-            receiver=student,
-            info="email info"
-        )
+        coach = CoachFactory(first_name="John", last_name="Doe")
+        student = StudentFactory(first_name="Jane", last_name="Doe")
+        SentEmailFactory(sender=coach, receiver=student, info="email info")
 
     def test_str(self):
         """

@@ -8,6 +8,7 @@ import json
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
+from osoc.common.tests import AdminFactory, CoachFactory, ProjectFactory, SentEmailFactory, SkillFactory, StudentFactory
 from osoc.common.models import Coach, Project, ProjectSuggestion, SentEmail, Skill, Student, Suggestion
 
 
@@ -19,39 +20,10 @@ class StudentTestsCoach(APITestCase):
         """
         test setup
         """
-        student = Student.objects.create(
-            first_name="First name",
-            last_name="Last name",
-            call_name="call name",
-            email="example@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
-        skill = Skill.objects.create(
-            name="skill",
-            color="blue"
-        )
+        student = StudentFactory()
+        skill = SkillFactory()
         student.skills.add(skill)
-
-        user = Coach.objects.create_user(
-            first_name="username",
-            last_name="last_name",
-            email="email@example.com",
-            password="Pas$w0rd"
-        )
+        user = CoachFactory()
         self.client.force_authenticate(user)
 
     def test_get_student_list(self):
@@ -256,35 +228,8 @@ class StudentTestsAdmin(APITestCase):
         """
         test setup
         """
-        Student.objects.create(
-            first_name="First name",
-            last_name="Last name",
-            call_name="call name",
-            email="example@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
-
-        admin = Coach.objects.create_user(
-            first_name="admin",
-            last_name="last_name",
-            email="admin@example.com",
-            password="Pas$w0rd",
-            is_admin=True
-        )
+        StudentFactory()
+        admin = AdminFactory()
         self.client.force_authenticate(admin)
 
     def test_student_make_final_decision(self):
@@ -346,19 +291,8 @@ class CoachTestsCoach(APITestCase):
         """
         test setup
         """
-        Coach.objects.create(
-            first_name="first name",
-            last_name="last name",
-            email="email2@example.com",
-            password="p4ssWorD"
-        )
-
-        self.user = Coach.objects.create_user(
-            first_name="username",
-            last_name="last_name",
-            email="email@example.com",
-            password="Pas$w0rd"
-        )
+        CoachFactory()
+        self.user = CoachFactory(email="coach2@example.com")
         self.client.force_authenticate(self.user)
 
     def test_get_coach_list_forbidden(self):
@@ -455,20 +389,8 @@ class CoachTestsAdmin(APITestCase):
         """
         test setup
         """
-        Coach.objects.create(
-            first_name="first name",
-            last_name="last name",
-            password="p4ssWorD",
-            email="email@example.com"
-        )
-
-        self.admin = Coach.objects.create_user(
-            first_name="admin",
-            password="Pas$w0rd",
-            last_name="last_name",
-            email="admin@example.com",
-            is_admin=True
-        )
+        CoachFactory()
+        self.admin = AdminFactory(email="admin@example.com")
         self.client.force_authenticate(self.admin)
 
     def test_get_coach_list(self):
@@ -562,15 +484,15 @@ class CoachTestsAdmin(APITestCase):
         """
         test PUT /coaches/{id}/
         """
-        coach = Coach.objects.get(email="email@example.com")
+        coach = Coach.objects.get(email="coach@example.com")
         url = reverse("coach-detail", args=(coach.id,))
         data = {
-            "first_name": "new first name",
-            "last_name": "last name",
-            "email": "email@example.com"
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "email": "coach@example.com"
         }
         response = self.client.put(url, data=data, format="json")
-        coach = Coach.objects.get(email="email@example.com")
+        coach = Coach.objects.get(email="coach@example.com")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["first_name"], data["first_name"])
@@ -586,49 +508,13 @@ class ProjectTestsCoach(APITestCase):
         """
         test setup
         """
-        skill = Skill.objects.create(
-            name="skill",
-            color="blue"
-        )
-        project1 = Project.objects.create(
-            name="Test",
-            partner_name="Partner",
-            extra_info="Extra info",
-        )
+        skill = SkillFactory()
+        project1 = ProjectFactory()
         project1.required_skills.add(skill)
-        project2 = Project.objects.create(
-            name="Test_2",
-            partner_name="Partner",
-            extra_info="Exra info",
-        )
+        project2 = ProjectFactory(name="project2")
         project2.required_skills.add(skill)
-        Student.objects.create(
-            first_name="First name",
-            last_name="Last name",
-            call_name="call name",
-            email="example@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
-
-        self.user = Coach.objects.create_user(
-            first_name="username",
-            last_name="last_name",
-            email="email@example.com",
-            password="Pas$w0rd")
+        StudentFactory()
+        self.user = CoachFactory()
         self.client.force_authenticate(self.user)
 
     def test_get_project_list(self):
@@ -724,10 +610,7 @@ class ProjectTestsCoach(APITestCase):
         project = Project.objects.first()
         url = reverse("project-suggest-student", args=(project.id,))
         student = Student.objects.first()
-        skill = Skill.objects.create(
-            name="skill2",
-            color="green"
-        )
+        skill = SkillFactory(name="skill2")
         data = {
             "student": reverse("student-detail", args=(student.id,)),
             "skill": reverse("skill-detail", args=(skill.id,)),
@@ -816,23 +699,9 @@ class ProjectTestsAdmin(APITestCase):
         """
         test setup
         """
-        Project.objects.create(
-            name="Test",
-            partner_name="Partner",
-            extra_info="Extra info"
-        )
-        Skill.objects.create(
-            name="skill",
-            color="blue"
-        )
-
-        admin = Coach.objects.create_user(
-            first_name="admin",
-            password="Pas$w0rd",
-            last_name="last_name",
-            email="admin@example.com",
-            is_admin=True
-        )
+        ProjectFactory()
+        SkillFactory()
+        admin = AdminFactory()
         self.client.force_authenticate(admin)
 
     def test_create_project(self):
@@ -893,16 +762,8 @@ class ProjectTestsAdmin(APITestCase):
         test PUT /projects/{id}/
         """
         project = Project.objects.first()
-        skill = Skill.objects.create(
-            name="skill2",
-            color="green"
-        )
-        coach = Coach.objects.create_user(
-            first_name="coach",
-            password="Pas$w0rd",
-            last_name="last_name",
-            email="coach@example.com"
-        )
+        skill = SkillFactory(name="skill2")
+        coach = CoachFactory(email="coach2@example.com")
         data = {
             "name": "new project name",
             "partner_name": "partner",
@@ -926,21 +787,9 @@ class SkillTestsCoach(APITestCase):
         """
         test setup
         """
-        Skill.objects.create(
-            name="skill",
-            color="blue"
-        )
-        Skill.objects.create(
-            name="skill_2",
-            color="red"
-        )
-
-        user = Coach.objects.create_user(
-            first_name="username",
-            password="Pas$w0rd",
-            last_name="last_name",
-            email="email@example.com"
-        )
+        SkillFactory()
+        SkillFactory(name="skill2")
+        user = CoachFactory()
         self.client.force_authenticate(user)
 
     def test_get_skill_list(self):
@@ -1034,22 +883,9 @@ class SkillTestsAdmin(APITestCase):
         """
         test setup
         """
-        Skill.objects.create(
-            name="skill",
-            color="blue"
-        )
-        Skill.objects.create(
-            name="skill_2",
-            color="red"
-        )
-
-        self.admin = Coach.objects.create_user(
-            first_name="username",
-            password="Pas$w0rd",
-            last_name="last_name",
-            email="email@example.com",
-            is_admin=True
-        )
+        SkillFactory()
+        SkillFactory(name="skill2")
+        self.admin = AdminFactory()
         self.client.force_authenticate(self.admin)
 
     def test_delete_skill_not_used(self):
@@ -1070,34 +906,10 @@ class SkillTestsAdmin(APITestCase):
         test DELETE /skills/{id}/ that is used in a project
         """
         skill = Skill.objects.first()
-        project = Project.objects.create(
-            name="Test",
-            partner_name="Partner",
-            extra_info="Extra info"
-        )
+        project = ProjectFactory()
         # add skill to project such that a projectsuggestion can be made
         project.required_skills.add(skill)
-        student = Student.objects.create(
-            first_name="First name",
-            last_name="Last name",
-            call_name="call name",
-            email="example@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
+        student = StudentFactory()
         # add student to projectsuggestions, now the skill is "used" in this project
         ProjectSuggestion.objects.create(
             project=project,
@@ -1129,39 +941,10 @@ class SentEmailTests(APITestCase):
         """
         test setup
         """
-        student = Student.objects.create(
-            first_name="First name",
-            last_name="Last name",
-            call_name="call name",
-            email="example@example.com",
-            phone_number="+14255550123",
-            language="dutch",
-            cv="https://example.com",
-            portfolio="https://example.com",
-            school_name="Example",
-            degree="Example",
-            studies="Example",
-            alum=False,
-            employment_agreement="test value",
-            english_rating=2,
-            motivation="test value",
-            fun_fact="test value",
-            degree_duration=2,
-            degree_current_year=1,
-            best_skill="test value"
-        )
-        user = Coach.objects.create_user(
-            first_name="username",
-            password="Pas$w0rd",
-            last_name="last_name",
-            email="email@example.com"
-        )
+        student = StudentFactory()
+        user = CoachFactory()
         self.client.force_authenticate(user)
-        SentEmail.objects.create(
-            sender=user,
-            receiver=student,
-            info="email info"
-        )
+        SentEmailFactory(sender=user, receiver=student)
 
     def test_get_email_list(self):
         """
