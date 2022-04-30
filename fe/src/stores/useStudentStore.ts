@@ -24,6 +24,7 @@ interface State {
   isLoading: boolean
   possibleSuggestion: number
   currentStudent: Student | null
+  nextPage: string
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -44,6 +45,7 @@ export const useStudentStore = defineStore('user/student', {
     isLoading: false,
     possibleSuggestion: -1,
     currentStudent: null,
+    nextPage: ''
   }),
   actions: {
     async getStudent(url: string): Promise<Student> {
@@ -110,10 +112,12 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       let url = ''
-      if (filters) url = `?${filters.join('&')}`
+      if (filters.length > 0) {
+        url = `&${filters.join('&')}`
+      }
 
       await instance
-        .get<Student[]>(`students/${url}`)
+        .get<Student[]>(`students/?page=1${url}`)
         .then(async ({ data }) => {
           for (const student of data) {
             await this.transformStudent(student)
@@ -123,6 +127,17 @@ export const useStudentStore = defineStore('user/student', {
         })
 
       this.isLoading = false
+    },
+    async loadNext(index: number, done: any) {
+      if (this.nextPage) {
+        done()
+      } else {
+        await instance
+            .get<Student[]>(this.nextPage)
+            .then(async ({data}) => {
+              console.log(data)
+            })
+      }
     },
     async loadStudentsMails() {
       this.isLoading = true

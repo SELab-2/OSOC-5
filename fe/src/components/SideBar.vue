@@ -150,23 +150,33 @@
               :thumb-style="thumbStyle"
               style="flex: 1 1 auto"
             >
-              <q-list>
-                <q-item
+              <q-infinite-scroll
+                class="q-px-sm"
+                :offset="250"
+                @load="(index, done) => studentStore.loadNext(index, done)"
+              >
+                <StudentCard
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
+                  v-ripple
+                  class="q-ma-sm"
                   :draggable="draggable ?? false"
+                  :must-hover="mustHover"
+                  :student="student"
+                  :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
+                  @click="clickStudent(student)"
                   @dragstart="onDragStart($event, student)"
-                >
-                  <StudentCard
-                    v-ripple
-                    :must-hover="mustHover"
-                    :student="student"
-                    :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
-                    @click="clickStudent(student)"
-                  />
-                </q-item>
-              </q-list>
+                />
+                <template #loading>
+                  <div class="row justify-center q-my-md">
+                    <q-spinner-dots
+                      color="primary"
+                      size="40px"
+                    />
+                  </div>
+                </template>
+              </q-infinite-scroll>
             </q-scroll-area>
           </div>
         </div>
@@ -244,15 +254,15 @@ export default defineComponent({
       status
     }
   },
-  created() {
-    this.skillStore.loadSkills()
-    this.studentStore.loadStudents()
-  },
   data() {
     return {
       miniState: ref(false),
       drawer: ref(true),
     }
+  },
+  created() {
+    this.skillStore.loadSkills()
+    this.studentStore.loadStudents()
   },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
