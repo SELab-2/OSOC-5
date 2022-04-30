@@ -110,14 +110,11 @@ class EmailFilterTests(APITestCase):
         student = StudentFactory()
         self.client.force_authenticate(self.user)
         for day in range(1, 6):
-            SentEmailFactory(sender=self.user, receiver=student, time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0)))
-
-            # SentEmail.objects.create(
-            #     sender=self.user,
-            #     receiver=student,
-            #     info="info",
-            #     time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0))
-            # )
+            SentEmailFactory(
+                sender=self.user,
+                receiver=student,
+                time=timezone.make_aware(timezone.datetime(2022, 1, day, 12, 0, 0))
+            )
 
     def test_email_datetime_filter_date(self):
         """

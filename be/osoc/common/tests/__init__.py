@@ -9,7 +9,7 @@ class StudentFactory(DjangoModelFactory):
     first_name="Jonathan"
     last_name="Doe"
     call_name="John"
-    email="example@example.com"
+    email="student@example.com"
     phone_number="+14255550123"
     language="dutch"
     cv="https://example.com"
