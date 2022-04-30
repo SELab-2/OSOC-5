@@ -1,6 +1,7 @@
 """
 Unit tests for utils.py
 """
+# pylint: disable=duplicate-code,too-many-lines
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.reverse import reverse

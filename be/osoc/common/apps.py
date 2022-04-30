@@ -12,4 +12,4 @@ class CommonConfig(AppConfig):
     name = 'osoc.common'
 
     def ready(self):
-        import osoc.common.signals
+        import osoc.common.signals # pylint: disable=unused-import

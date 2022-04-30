@@ -1,6 +1,7 @@
 """
 Unit tests for tally.py
 """
+# pylint: disable=duplicate-code,too-many-lines
 from django.test import TestCase
 from osoc.common.tally.tally import TallyForm
 

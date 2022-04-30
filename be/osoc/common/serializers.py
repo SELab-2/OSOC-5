@@ -17,7 +17,6 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name']
 
-
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the Suggestion model
@@ -272,4 +271,4 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
     def get_cleaned_data(self):
         super().get_cleaned_data()
         fields = ['password1', 'password2', 'email', 'first_name', 'last_name', 'is_admin', 'is_active']
-        return {field: self.validated_data.get(field, '') for field in fields}
+        return {field: self.validated_data.get(field, '') for field in fields} # pylint: disable=no-member

@@ -67,25 +67,27 @@ class TallyForm:
             i += 1
         return value
 
-    def get_field_value(self, field, qtype):
+    def get_field_value(self, field, qtype): # pylint: disable=no-self-use
         """
         Get value from field with the given type.
         """
+        fval = None
         if qtype == "MULTIPLE_CHOICE":
             option_id = field["value"]
             for option in field["options"]:
                 if option["id"] == option_id:
-                    return option["text"]
+                    fval = option["text"]
+                    break
         elif qtype == "CHECKBOXES":
             checked = field["value"]
-            values = []
+            fval = []
             for option in field["options"]:
                 if option["id"] in checked:
-                    values.append(option["text"])
-            return values
+                    fval.append(option["text"])
         else:
             # Text as value
-            return field["value"]
+            fval = field["value"]
+        return fval
 
     def transform(self, form):
         """
@@ -143,7 +145,7 @@ class TallyForm:
             answer["value"] = self.search_field_value(self.find_fields(question_value, fields), question_value["type"])
         return answer
 
-    def __equal(self, this, that):
+    def __equal(self, this, that): # pylint: disable=no-self-use
         """
         Self-defined equal; if that is a list or dictionary, `this` should be in `that`.
         Otherwise `this` should be equal to `that`.

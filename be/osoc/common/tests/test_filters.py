@@ -1,6 +1,7 @@
 """
 Unit tests for filters.py
 """
+# pylint: disable=duplicate-code,too-many-lines
 from rest_framework.test import APITestCase
 from django.utils import timezone
 from osoc.common.utils import reverse_querystring
