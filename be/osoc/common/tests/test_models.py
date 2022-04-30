@@ -43,7 +43,7 @@ class CoachManagerTests(TestCase):
         coach = Coach.objects.get(email="email@example.com")
         self.assertIsNotNone(coach)
         self.assertEqual(coach.first_name, "john")
-    
+
     def test_create_user_email_not_set(self):
         """
         test create_user() method without an email
@@ -97,7 +97,7 @@ class CoachTests(TestCase):
         """
         coach = Coach.objects.first()
         self.assertEqual(coach.get_full_name(), "John Doe")
-    
+
     def test_clean(self):
         """
         test clean() method
@@ -145,14 +145,14 @@ class StudentTests(TestCase):
             degree_current_year=1,
             best_skill="test value"
         )
-    
+
     def test_full_name(self):
         """
         test get_full_name() method
         """
         student = Student.objects.first()
         self.assertEqual(student.get_full_name(), "Jane Doe")
-    
+
     def test_clean(self):
         """
         test clean() method
@@ -284,7 +284,7 @@ class SentEmailTests(TestCase):
             receiver=student,
             info="email info"
         )
-    
+
     def test_str(self):
         """
         test __str__() method

@@ -175,7 +175,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             400 BAD REQUEST:  The request data was malformatted or a student tried to register twice
             201 CREATED:    The student registration resulted in a new student being created
         """
-        tally = TallyForm.fromFile()
+        tally = TallyForm.from_file()
         try:
             form = tally.transform(tally.validate(request.data))
             skill_names = form.pop("skills")
@@ -188,8 +188,8 @@ class StudentViewSet(viewsets.ModelViewSet):
                 else:
                     skills.append(existing_skill)
             student.skills.set(skills)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:
+            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
 
 
@@ -427,6 +427,9 @@ class SentEmailViewSet(viewsets.ModelViewSet):
 
 
 class GithubLogin(SocialLoginView):
+    """
+    github login view
+    """
     adapter_class = GitHubOAuth2Adapter
     callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"
     client_class = OAuth2Client

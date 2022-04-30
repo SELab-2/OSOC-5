@@ -41,11 +41,11 @@ class UtilityTestCases(TestCase):
         with self.assertRaises(ValueError):
             string = "2022-04-01T25:75:98"
             date = string_to_datetime_tz(string)
-        
+
         with self.assertRaises(ValueError):
             string = "not-a-date"
             date = string_to_datetime_tz(string)
-    
+
     def test_reverse_querystring(self):
         """
         test reverse_querystring funtion

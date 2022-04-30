@@ -7,11 +7,11 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         try:
             Coach.objects.get(email=sociallogin.user.email)
-        except Coach.DoesNotExist as e:
+        except Coach.DoesNotExist as exc:
             raise ImmediateHttpResponse(HttpResponse(
                     'No existing email found in the database. \
                     Please be sure you already have an account with the same email'
-                )) from e
+                )) from exc
         coach = Coach.objects.get(email=sociallogin.user.email)
         GithubUser.objects.get_or_create(login=sociallogin.account.extra_data['login'], coach=coach)
         if not sociallogin.is_existing:

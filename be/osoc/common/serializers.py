@@ -32,7 +32,7 @@ class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         """
         override create method to make it update_or_create;
-        when a suggestion is found with the same student, coach and final state, it is updated, 
+        when a suggestion is found with the same student, coach and final state, it is updated,
         otherwise it is created
         """
         student = validated_data.pop('student')
@@ -119,7 +119,7 @@ class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         """
         override create method to make it update_or_create;
-        when a projectsuggestion is found with the same project, student, coach and skill, it is updated, 
+        when a projectsuggestion is found with the same project, student, coach and skill, it is updated,
         otherwise it is created
         """
         project = validated_data.pop('project')
@@ -151,7 +151,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         """
         override create method to be able to create RequiredSkills objects,
-        this is needed because required_skills is a many-to-many field with a through model 
+        this is needed because required_skills is a many-to-many field with a through model
         (because it needs an extra 'amount' field)
         """
         skills_data = validated_data.pop('requiredskills_set')
@@ -165,7 +165,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     def update(self, instance, validated_data):
         """
         override create method to be able to create/update/remove RequiredSkills objects,
-        this is needed because required_skills is a many-to-many field with a through model 
+        this is needed because required_skills is a many-to-many field with a through model
         (because it needs an extra 'amount' field)
         """
         # first update required skills

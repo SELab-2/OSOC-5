@@ -319,7 +319,6 @@ class StudentTestsAdmin(APITestCase):
         """
         test DELETE /students/{id}/remove_final_decision
         """
-        
         student = Student.objects.first()
         # first make sure there is a suggestion to delete
         url = reverse("student-make-final-decision", args=(student.id,))
@@ -381,6 +380,9 @@ class CoachTestsCoach(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_coach_instance_not_found(self):
+        """
+        test GET /coaches/{id}/ with non-existing id
+        """
         url = reverse("coach-detail", args=(50,))
         response = self.client.get(url)
 
