@@ -112,6 +112,14 @@
             <div class="row q-gutter-x-md">
               <q-checkbox
                 v-model="studentStore.byMe"
+                toggle-indeterminate
+                checked-icon="mdi-check"
+                true-value="true"
+                unchecked-icon="mdi-minus-thick"
+                false-value="false"
+                indeterminate-icon="mdi-help"
+                indeterminate-value="maybe"
+                toggle-order="tf"
                 color="primary"
                 label="Suggested by you"
                 right-label
@@ -119,6 +127,14 @@
               />
               <q-checkbox
                 v-model="studentStore.onProject"
+                toggle-indeterminate
+                checked-icon="mdi-check"
+                true-value="true"
+                unchecked-icon="mdi-minus-thick"
+                false-value="false"
+                indeterminate-icon="mdi-help"
+                indeterminate-value="maybe"
+                toggle-order="tf"
                 color="primary"
                 label="On project"
                 right-label
