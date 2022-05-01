@@ -23,11 +23,11 @@ describe('Skill Store', () => {
         expect(skillStore.isLoadingSkills).toBe(false)
 
         // test invalid
-        console.log(skillStore.skills)
+        // console.log(skillStore.skills)
         skillStore.getSkill(baseURL + "skills/1/")
-        console.log(skillStore.skills)
+        // console.log(skillStore.skills)
         skillStore.getSkill(baseURL + "skills/-1/")
-        console.log(skillStore.skills)
+        // console.log(skillStore.skills)
 
     })
 
