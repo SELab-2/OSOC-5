@@ -189,7 +189,7 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
                 else:
                     skills.append(existing_skill)
             student.skills.set(skills)
-        except Exception as exc:
+        except Exception as exc: # pylint: disable=broad-except
             return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
 
