@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.reverse import reverse
+from rest_framework.settings import api_settings
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -14,13 +15,14 @@ from django.db.models import RestrictedError
 from .filters import *
 from .serializers import *
 from .models import *
+from .pagination import PaginationMixin
 from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 
-class StudentViewSet(viewsets.ModelViewSet):
+class StudentViewSet(PaginationMixin, viewsets.ModelViewSet):
     """
     API endpoint that allows students to be viewed, edited or searched.
     Search students with the query parameter ?search=
@@ -37,6 +39,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     example query: /api/students/?alum=true&status=0&skills=1&suggestion=yes&on_project=true&language=Dutch
     """
     queryset = Student.objects.all().order_by('id')
+    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter,
