@@ -10,13 +10,13 @@ from rest_framework.reverse import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from rest_auth.registration.views import SocialLoginView
+from rest_auth.registration.views import SocialLoginView, RegisterView
 from django.db.models import RestrictedError
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
-from .serializers import StudentSerializer, CoachSerializer, ProjectSerializer, \
+from .serializers import CustomRegisterSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, \
     ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
 from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
@@ -427,6 +427,14 @@ class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancest
             serializer.save(sender=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomRegisterView(RegisterView):
+    serializer_class = CustomRegisterSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
+
+    # user gets logged in directly after registering, this is not what we want because admins create an account for coaches
+    # i dont know how to disable this or if it is even possible
 
 
 class GithubLogin(SocialLoginView):

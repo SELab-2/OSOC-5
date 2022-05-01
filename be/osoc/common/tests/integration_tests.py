@@ -1045,3 +1045,24 @@ class SentEmailTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(email.info, data["info"])
+
+
+class RegisterTests(APITestCase):
+    """
+    test class for testing register functionality
+    """
+
+    def test_register(self):
+        url = reverse("rest_register")
+        data = {
+            "email": "test@example.com",
+            "password1": "password&%^$",
+            "password2": "password&%^$",
+            "first_name": "test",
+            "last_name": "user"
+        }
+        self.client.post(url, data, format="json")
+        coach = Coach.objects.get(email="test@example.com")
+        
+        self.assertIsNotNone(coach)
+        self.assertFalse(coach.is_active)   # fails, see signals.py

@@ -47,20 +47,14 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/admin/', admin.site.urls),
-    path(
-        'api/auth/register/account-confirm-email/<str:key>/',
-        ConfirmEmailView.as_view(),
-    ), # Needs to be defined before the registration path
+    path('api/auth/register/account-confirm-email/<str:key>/', 
+         ConfirmEmailView.as_view()), # Needs to be defined before the registration path
     path('api/auth/register/', include('dj_rest_auth.registration.urls')),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path(
-        'api/auth/',
-        VerifyEmailView.as_view(),
-        name='account_email_verification_sent'
-    ),
+    path('api/auth/', VerifyEmailView.as_view(),name='account_email_verification_sent'),
     path('api/auth/password-reset/', PasswordResetView.as_view()),
-        path('api/auth/password-reset-confirm/<uidb64>/<token>/',
+         path('api/auth/password-reset-confirm/<uidb64>/<token>/',
          PasswordResetConfirmView.as_view(), name='password_reset_confirm'),  
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
