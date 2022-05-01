@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, test} from 'vitest'
 import {createPinia, setActivePinia} from 'pinia'
 import {useSkillStore} from "../../src/stores/useSkillStore";
 
+const baseURL = 'https://sel2-5.ugent.be/api/'
 
 describe('Skill Store', () => {
     beforeEach(() => {
@@ -9,6 +10,25 @@ describe('Skill Store', () => {
         // up by any useStore() call without having to pass it to it:
         // `useStore(pinia)`
         setActivePinia(createPinia())
+    })
+
+    it('getSkill: get invalid skill', () => {
+        // if u can mock the instance of axios then we can check if the call is made
+
+        // create a new skillstore
+        const skillStore = useSkillStore()
+
+        // check its initial values
+        // expect(skillStore.skills).toHaveLength(0)
+        expect(skillStore.isLoadingSkills).toBe(false)
+
+        // test invalid
+        console.log(skillStore.skills)
+        skillStore.getSkill(baseURL + "skills/1/")
+        console.log(skillStore.skills)
+        skillStore.getSkill(baseURL + "skills/-1/")
+        console.log(skillStore.skills)
+
     })
 
     it('loadSkills', () => {
@@ -34,7 +54,7 @@ describe('Skill Store', () => {
         const skillStore = useSkillStore()
 
         // check its initial values
-        expect(skillStore.skills).toHaveLength(0)
+        // expect(skillStore.skills).toHaveLength(0)
         expect(skillStore.isLoadingSkills).toBe(false)
 
         let callback_finished = false
@@ -55,7 +75,7 @@ describe('Skill Store', () => {
         const skillStore = useSkillStore()
 
         // check its initial values
-        expect(skillStore.skills).toHaveLength(0)
+        // expect(skillStore.skills).toHaveLength(0)
         expect(skillStore.isLoadingSkills).toBe(false)
 
         // delete skill,
