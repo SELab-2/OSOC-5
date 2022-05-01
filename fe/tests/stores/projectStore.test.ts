@@ -16,18 +16,11 @@ describe("Skill Store", () => {
 
   it("removeSuggestion", () => {
 
-    // create a new skillstore
     const projectStore = useProjectStore();
 
-    // check its initial values
-    // expect(projectStore.skills).toHaveLength(0)
     expect(projectStore.isLoadingProjects).toBe(false);
-
-    // let callback_finished = false;
-
     test.concurrent("remove suggestion and wait", async () => {
 
-      // add a skill and check if callback is executed
       const project: Project =
         {
           "name": "name",
@@ -35,9 +28,9 @@ describe("Skill Store", () => {
           "extraInfo": "extraInfo",
           "id": 0
         };
+
       // @ts-ignore
       projectStore.removeSuggestion(project, undefined);
-      // expect(callback_finished).toBeTruthy();
 
     });
 
