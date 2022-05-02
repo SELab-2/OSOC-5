@@ -1,31 +1,15 @@
+"""
+Pagination for backend.
+"""
+from rest_framework.pagination import PageNumberPagination
 
-class PaginationMixin(object):
+class StandardPagination(PageNumberPagination):
     """
-    Pagination mixin which implements methods used to paginate non-generic Views.
+    StandardPagination used throughout osoc app.
+
+    Note: no generic views are used, so it is not possible to use
+          REST_FRAMEWORK: DEFAULT_PAGINATION_CLASS in settings.
     """
-    @property
-    def paginator(self):
-        """
-        Get the paginator associated with the view (or None).
-        """
-        if not hasattr(self, '_paginator'):
-            if self.pagination_class is None:
-                self._paginator = None
-            else:
-                self._paginator = self.pagination_class()
-        return self._paginator
-
-    def paginate_queryset(self, queryset):
-        """
-        Return one page (or None).
-        """
-        if self.paginator is None:
-            return None
-        return self.paginator.paginate_queryset(queryset, self.request, view=self)
-
-    def get_paginated_response(self, data):
-        """
-        Return a paginated style Response object for the given output data.
-        """
-        assert self.paginator is not None
-        return self.paginator.get_paginated_response(data)
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 500
