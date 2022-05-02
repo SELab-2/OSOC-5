@@ -208,6 +208,7 @@ class CoachViewSet(viewsets.GenericViewSet,
     example query: /api/coaches/?is_admin=false&is_active=true
     """
     queryset = Coach.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = CoachSerializer
     permission_classes = [
         permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
@@ -264,6 +265,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     example query: /api/projects/?required_skills=1&coaches=2&suggested_students=1
     """
     queryset = Project.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
@@ -381,6 +383,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     Search skills with the query parameter ?search=
     """
     queryset = Skill.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = SkillSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter]
