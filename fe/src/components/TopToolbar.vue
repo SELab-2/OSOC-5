@@ -25,12 +25,14 @@
           exact
         />
         <q-route-tab
+          v-if="authenticationStore.loggedInUser.isAdmin"
           name="users"
           label="Manage Users"
           to="/users"
           exact
         />
         <q-route-tab
+          v-if="authenticationStore.loggedInUser.isAdmin"
           name="mails"
           label="Mails"
           to="/mails"

@@ -153,11 +153,13 @@
 <script lang="ts">
 import {defineComponent, onMounted} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
-import {ref} from 'vue'
+import {onBeforeMount, ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import { User } from '../../models/User'
 import AddUser from "./AddUser.vue";
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
+import router from "../../router";
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
@@ -238,10 +240,16 @@ export default defineComponent({
   components: {AddUser, SegmentedControl },
   setup() {
     const coachStore = useCoachStore()
+    const authenticationStore = useAuthenticationStore()
     const q = useQuasar()
     
     coachStore.loadUsers();
 
+    onBeforeMount(() => {
+      if (authenticationStore.loggedInUser && ! authenticationStore.loggedInUser.isAdmin) {
+        router.replace('/projects')
+      }
+    })
 
     return {
       newUserDialog: ref(false),

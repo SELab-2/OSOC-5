@@ -7,7 +7,6 @@ import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
-import AddUser from '../features/addUser/AddUser.vue'
 import MailList from '../features/mails/MailList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
 import {useStudentStore} from "../stores/useStudentStore";
