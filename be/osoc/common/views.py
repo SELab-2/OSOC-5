@@ -1,7 +1,8 @@
 """
 Views that create a connection between the database and the application.
 """
-from rest_framework import viewsets, mixins, permissions, status, generics, filters
+# pylint: disable=invalid-name
+from rest_framework import viewsets, mixins, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import PermissionDenied
 from rest_framework.decorators import action
@@ -11,17 +12,20 @@ from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_auth.registration.views import SocialLoginView
 from django.db.models import RestrictedError
-from .filters import *
-from .serializers import *
-from .models import *
+from asgiref.sync import async_to_sync
 from .pagination import StandardPagination
+from channels.layers import get_channel_layer
+from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
+    StudentFinalDecisionFilter, EmailDateTimeFilter
+from .serializers import StudentSerializer, CoachSerializer, ProjectSerializer, \
+    ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
+    UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
+from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
 from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 
 
-class StudentViewSet(viewsets.ModelViewSet):
+class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows students to be viewed, edited or searched.
     Search students with the query parameter ?search=
@@ -123,7 +127,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             # set final_decision in student
             student.final_decision = suggestion
             student.save()
-            
+
             # send data to websocket
             socket_data = serializer.data
             socket_data['student_id'] = pk
@@ -167,36 +171,35 @@ class StudentViewSet(viewsets.ModelViewSet):
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
-    def tallyregistration(self, request, pk=None):
+    def tallyregistration(self, request, pk=None): # pylint: disable=no-self-use,unused-argument
         """
         Endpoint to which Tally's webhook can connect to register students.
         returns HTTP response:
             400 BAD REQUEST:  The request data was malformatted or a student tried to register twice
             201 CREATED:    The student registration resulted in a new student being created
         """
-        tally = TallyForm.fromFile()
+        tally = TallyForm.from_file()
         try:
             form = tally.transform(tally.validate(request.data))
-            skillNames = form.pop("skills")
+            skill_names = form.pop("skills")
             student = Student.objects.create(**form)
             skills = []
-            for skillName in skillNames:
-                existingSkill = Skill.objects.filter(name=skillName).first()
-                if existingSkill == None:
-                    skills.append(Skill.objects.create(name=skillName, color="grey"))
+            for skill_name in skill_names:
+                existing_skill = Skill.objects.filter(name=skill_name).first()
+                if existing_skill is None:
+                    skills.append(Skill.objects.create(name=skill_name, color="grey"))
                 else:
-                    skills.append(existingSkill)
+                    skills.append(existing_skill)
             student.skills.set(skills)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc: # pylint: disable=broad-except
+            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
 
-
-class CoachViewSet(viewsets.GenericViewSet,
+class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin):   # no create, this is handled in RegisterView
+                   mixins.DestroyModelMixin): # No create, this is handled in RegisterView
     """
     API endpoint that allows coaches to be viewed, edited or searched.
     a coach cannot be created by this API endpoint
@@ -216,6 +219,7 @@ class CoachViewSet(viewsets.GenericViewSet,
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
 
+    # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
         # override delete method to add a check
         coach = self.get_object()
@@ -229,7 +233,7 @@ class CoachViewSet(viewsets.GenericViewSet,
 
     @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def update_status(self, request, pk=None):
+    def update_status(self, request, pk=None): # pylint: disable=unused-argument
         """
         let an admin update admin rights of another user
         returns HTTP response:
@@ -253,7 +257,7 @@ class CoachViewSet(viewsets.GenericViewSet,
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows projects to be viewed, edited or searched.
     only admin users have permission for this endpoint, except for suggesting students or removing suggestions
@@ -279,7 +283,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         but not needed when making POST, PUT, PATCH requests
         """
         if hasattr(self, 'action') and self.action == 'list' or self.action == 'retrieve':
-            return ProjectListSerializer
+            return ProjectGetSerializer
         return super().get_serializer_class()
 
     @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer,
@@ -317,7 +321,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 )
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response({"detail": "skill must be one of the required skills of the project"}, 
+            return Response({"detail": "skill must be one of the required skills of the project"},
                             status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -359,7 +363,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive])
-    def get_conflicting_projects(self, request):
+    def get_conflicting_projects(self, request): # pylint: disable=no-self-use
         """
         get a list of conflicting projects;
         two projects are conflicting if one student has been suggested/assigned to both of them
@@ -377,7 +381,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response({"conflicts": conflicts}, status=status.HTTP_200_OK)
 
 
-class SkillViewSet(viewsets.ModelViewSet):
+class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows skills to be viewed, edited or searched.
     Search skills with the query parameter ?search=
@@ -389,6 +393,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
+    # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
         if request.user.is_admin:
             try:
@@ -400,7 +405,7 @@ class SkillViewSet(viewsets.ModelViewSet):
         raise PermissionDenied()
 
 
-class SentEmailViewSet(viewsets.ModelViewSet):
+class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows sent emails to be viewed, edited or searched.
     Search emails with the query parameter ?search=
@@ -420,6 +425,7 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 
+    # pylint: disable=arguments-differ
     def create(self, request):
         serializer = SentEmailSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -429,6 +435,9 @@ class SentEmailViewSet(viewsets.ModelViewSet):
 
 
 class GithubLogin(SocialLoginView):
+    """
+    github login view
+    """
     adapter_class = GitHubOAuth2Adapter
     callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"
     client_class = OAuth2Client
