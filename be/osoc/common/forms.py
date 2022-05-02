@@ -1,4 +1,3 @@
-from allauth.account.forms import SignupForm
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from .models import Coach
@@ -43,16 +42,3 @@ class UserAdminChangeForm(forms.ModelForm):
         field does not have access to the initial value
         """
         return self.initial["password"]
-
-
-class SimpleSignupForm(SignupForm):
-    is_admin = forms.BooleanField(label='is admin')
-    first_name = forms.CharField(label="first name")
-    last_name = forms.CharField(label="last name")
-    def save(self, request):
-        user = super().save(request)
-        user.is_admin = self.cleaned_data['is_admin']
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.save()
-        return user

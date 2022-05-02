@@ -15,8 +15,16 @@ class StudentAdmin(admin.ModelAdmin):
 
 class CustomUserAdmin(UserAdmin):
     """
-    Override the default User model in the admin panel;
-    this is needed because we use a custom User model, see model Coach in models.py
+    ! This function only exists because of an issue that passwords would be saved in plaintext
+    when creating new users in the admin panel !
+    Here you define what fields are listed when
+    changing a user, listing a user and creating a user.
+    > We exclude the username because of form issues since we're using emails as pk.
+    > Ordering needs to be changed because otherwise it tries to order on non-existant username.
+    > form: the fields that change when changing a user.
+    > add_form: the fields that are required when creating a user.
+    > fieldsset: the visible fieldsets in the admin panel when changing a user.
+    > add_fieldsets: the visible fieldsets in the admin panel when creating a user.
     """
     exclude = ('username',)
     ordering = ('email',)
