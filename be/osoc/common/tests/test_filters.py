@@ -41,11 +41,11 @@ class StudentFilterTests(APITestCase):
 
         url = reverse_querystring("student-list", query_kwargs=({"on_project": "true"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data['count'], 1)
 
         url = reverse_querystring("student-list", query_kwargs=({"on_project": "false"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data['count'], 2)
 
     def test_student_suggested_by_user(self):
         """
@@ -68,11 +68,11 @@ class StudentFilterTests(APITestCase):
 
         url = reverse_querystring("student-list", query_kwargs=({"suggested_by_user": "true"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data['count'], 1)
 
         url = reverse_querystring("student-list", query_kwargs=({"suggested_by_user": "false"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data['count'], 2)
 
     def test_student_final_decision_filter(self):
         """
@@ -91,11 +91,11 @@ class StudentFilterTests(APITestCase):
 
         url = reverse_querystring("student-list", query_kwargs=({"suggestion": "yes"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data['count'], 1)
 
         url = reverse_querystring("student-list", query_kwargs=({"suggestion": "none"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data['count'], 2)
 
 
 class EmailFilterTests(APITestCase):
@@ -122,11 +122,11 @@ class EmailFilterTests(APITestCase):
         """
         url = reverse_querystring("sentemail-list", query_kwargs=({"date": "2022-01-01"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data['count'], 1)
 
         url = reverse_querystring("sentemail-list", query_kwargs=({"date": "2022-02-01"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(response.data['count'], 0)
 
     def test_email_datetime_filter_before(self):
         """
@@ -134,11 +134,11 @@ class EmailFilterTests(APITestCase):
         """
         url = reverse_querystring("sentemail-list", query_kwargs=({"before": "2022-01-03T13:00:00"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.data['count'], 3)
 
         url = reverse_querystring("sentemail-list", query_kwargs=({"before": "2022-01-01T11:00:00"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(response.data['count'], 0)
 
     def test_email_datetime_filter_after(self):
         """
@@ -146,11 +146,11 @@ class EmailFilterTests(APITestCase):
         """
         url = reverse_querystring("sentemail-list", query_kwargs=({"after": "2022-01-02T12:00:00"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.data['count'], 3)
 
         url = reverse_querystring("sentemail-list", query_kwargs=({"after": "2022-01-07"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(response.data['count'], 0)
 
     def test_email_datetime_filter_wrong_format(self):
         """
@@ -158,4 +158,4 @@ class EmailFilterTests(APITestCase):
         """
         url = reverse_querystring("sentemail-list", query_kwargs=({"date": "wrong format"}))
         response = self.client.get(url)
-        self.assertEqual(len(response.data), 5)
+        self.assertEqual(response.data['count'], 5)

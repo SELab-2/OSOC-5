@@ -418,6 +418,7 @@ class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancest
     example query: /api/emails/?sender=1&after=2022-04-03
     """
     queryset = SentEmail.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter,
