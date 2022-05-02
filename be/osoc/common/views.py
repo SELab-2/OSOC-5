@@ -13,8 +13,8 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_auth.registration.views import SocialLoginView
 from django.db.models import RestrictedError
 from asgiref.sync import async_to_sync
-from .pagination import StandardPagination
 from channels.layers import get_channel_layer
+from .pagination import StandardPagination
 from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
 from .serializers import StudentSerializer, CoachSerializer, ProjectSerializer, \
