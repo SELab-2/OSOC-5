@@ -4,7 +4,7 @@ import { useCoachStore } from "../../src/stores/useCoachStore";
 
 const baseURL = "https://sel2-5.ugent.be/api/";
 
-describe("Skill Store", () => {
+describe("Coach Store", () => {
   beforeEach(() => {
     // creates a fresh pinia and make it active so it's automatically picked
     // up by any useStore() call without having to pass it to it:

@@ -4,9 +4,8 @@ import { useProjectStore } from "../../src/stores/useProjectStore";
 import { Project } from "../../src/models/Project";
 import { ProjectSuggestionInterface } from "../../src/models/ProjectSuggestion";
 
-const baseURL = "https://sel2-5.ugent.be/api/";
 
-describe("Skill Store", () => {
+describe("Project Store", () => {
   beforeEach(() => {
     // creates a fresh pinia and make it active so it's automatically picked
     // up by any useStore() call without having to pass it to it:
