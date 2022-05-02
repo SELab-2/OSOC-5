@@ -1,3 +1,8 @@
+"""
+All the forms used for overriding existing forms that are not
+usable in our application.
+"""
+
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from .models import Coach
