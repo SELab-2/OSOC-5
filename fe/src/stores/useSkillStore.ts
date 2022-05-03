@@ -45,7 +45,7 @@ export const useSkillStore = defineStore('skills', {
         .get('skills/')
         .then(({ data }) => {
           // set the skill of the store
-          for (const skill of data as Skill[]) {
+          for (const skill of data.results as Skill[]) {
             this.skills.push({
               name: skill.name,
               amount: 0,

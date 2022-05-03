@@ -34,7 +34,7 @@
 
         <q-space />
         <div class="row q-px-sm">
-          <btn color="yellow" icon-right="add" label="Add User" @click="newUserDialog = true" shadow-color="orange" shadow-strength="2"/>
+          <btn color="yellow" icon-right="add" class="text-black" label="Add User" @click="newUserDialog = true" shadow-color="orange" shadow-strength="2"/>
         </div>
         <div class="row q-px-sm">
           <q-space/>
