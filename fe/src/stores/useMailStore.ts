@@ -36,7 +36,6 @@ export const useMailStore = defineStore('user/mail', {
                 .get<{ results: Student[], count: number }>(`students/?page_size=${pagination.rowsPerPage}&page=${pagination.page}${url}`)
                 .then(async ({ data }) => {
                     setNumberOfRows(data.count)
-                    console.log(pagination)
 
                     for (const student of data.results) {
                         await studentStore.transformStudent(student)
