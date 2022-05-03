@@ -199,8 +199,6 @@ export const useStudentStore = defineStore('user/student', {
           student.suggestions[ctr].reason = reason
         } else {
           // New suggestion
-          const coaches = useCoachStore()
-          const coach = await coaches.getUser(`/coaches/${coachId.toString()}`)
 
           student.suggestions.push({
             student: studentId,
