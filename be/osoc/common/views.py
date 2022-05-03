@@ -55,8 +55,8 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
     pagination_class = StandardPagination
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend, 
-                       StudentOnProjectFilter, StudentSuggestedByUserFilter, 
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
+                       StudentOnProjectFilter, StudentSuggestedByUserFilter,
                        StudentFinalDecisionFilter,]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
