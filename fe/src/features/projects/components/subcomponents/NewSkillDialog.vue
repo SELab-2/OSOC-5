@@ -83,10 +83,6 @@ import quasarColors from "../../../../models/QuasarColors";
 
 export default defineComponent({
   props: {
-    newSkillPrompt: {
-      type: Boolean,
-      required: true
-    },
     resetNewSkillPrompt: {
       type: Function,
       required: true

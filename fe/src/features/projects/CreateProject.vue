@@ -70,14 +70,11 @@ export default defineComponent({
       coachStore.loadUsers()
     })
 
-    const selected_coaches = ref([])
-
     return {
       skillStore,
       coachStore,
       projectStore,
 
-      selected_coaches,
     }
   },
   methods: {

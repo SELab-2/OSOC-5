@@ -4,7 +4,7 @@
     :rows="skillStore.skills"
     :columns="columnsSkills"
     :loading="skillStore.isLoadingSkills"
-    row-key="name"
+    row-key="skill"
     :filter="filterSkills"
   >
     <template #body="props">
@@ -12,10 +12,18 @@
         :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''"
         :props="props"
       >
-        <q-td key="skill" :props="props" auto-width>
+        <q-td
+          key="skill"
+          :props="props"
+          auto-width
+        >
           {{ props.row.name }}
         </q-td>
-        <q-td key="amount" :props="props" auto-width>
+        <q-td
+          key="amount"
+          :props="props"
+          auto-width
+        >
           {{ props.row.amount }}
           <q-popup-edit
             v-slot="scope"
@@ -38,10 +46,24 @@
             />
           </q-popup-edit>
         </q-td>
-        <q-td key="comment" :props="props">
-          <div v-if="props.row.comment.length !== 0">{{ props.row.comment }}</div>
-          <div v-else style="font-style: italic; color: gray">Click to add comment.</div>
-          <q-popup-edit v-slot="scope" v-model="props.row.comment" buttons>
+        <q-td
+          key="comment"
+          :props="props"
+        >
+          <div v-if="props.row.comment.length !== 0">
+            {{ props.row.comment }}
+          </div>
+          <div
+            v-else
+            style="font-style: italic; color: gray"
+          >
+            Click to add comment.
+          </div>
+          <q-popup-edit
+            v-slot="scope"
+            v-model="props.row.comment"
+            buttons
+          >
             <q-input
               v-model="scope.value"
               type="text"
@@ -53,7 +75,11 @@
             />
           </q-popup-edit>
         </q-td>
-        <q-td key="color" :props="props" auto-width>
+        <q-td
+          key="color"
+          :props="props"
+          auto-width
+        >
           <q-chip
             clickable
             :color="`${props.row.color}-8`"
@@ -75,7 +101,10 @@
           <!--            />-->
           <!--          </q-popup-edit>-->
         </q-td>
-        <q-td key="remove" style="width: 10px">
+        <q-td
+          key="remove"
+          style="width: 10px"
+        >
           <btn
             flat
             round
@@ -111,11 +140,14 @@ import DeleteSkillDialog from './DeleteSkillDialog.vue'
 
 export default defineComponent({
   components: { DeleteSkillDialog },
+  props: {
+    filterSkills: {
+      type: String,
+      required: true,
+    },
+  },
   setup() {
     const skillStore = useSkillStore()
-
-    // Filters
-    const filterSkills = ref('')
 
     const deleteSkill = ref(-1)
     const deleteSkillName = ref('')
@@ -127,7 +159,6 @@ export default defineComponent({
     return {
       skillStore,
       deleteSkill,
-      filterSkills,
       columnsSkills,
       errorSkillAmount,
       errorMessageSkillAmount,
