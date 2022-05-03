@@ -111,26 +111,32 @@
         </div>
       </q-slide-transition>
 
-      <q-slide-transition
+      <div
         v-for="(role, index) in project.requiredSkills ?? []"
         :key="index"
       >
-        <div v-show="selectedRoles[role.skill.id] || hovered === role.skill.id">
+      
+        <q-slide-transition v-show="selectedRoles[role.skill.id] || hovered === role.skill.id">
           <q-item-label
             class="text-subtitle1 text-bold"
             :class="'text-' + role.skill.color + '-8'"
           >
             {{ role.skill.name }}
           </q-item-label>
+          </q-slide-transition>
+          
+          <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
           <project-card-suggestion
+            
+            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as NewProjectSuggestion).fromWebsocket"
             :confirmSuggestion="confirmSuggestion"
             :removeSuggestion="removeSuggestion"
             :suggestion="suggestion"
-            v-for="suggestion in groupedStudents[role.skill.id] ?? []"
+            
             :key="suggestion.student.id"
           />
         </div>
-      </q-slide-transition>
+      </div>
     </q-card-section>
   </q-card>
 </template>
@@ -151,9 +157,9 @@ import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-import router from "../../../router";
+import { Suggestion } from '../../../models/Suggestion'
 
-
+var test = 0
 export default defineComponent({
   props: {
     project: {
@@ -193,10 +199,10 @@ export default defineComponent({
 
   methods: {
 
-    async removeSuggestion(suggestion: ProjectSuggestion) {
+    async removeSuggestion(suggestion: ProjectSuggestionInterface) {
       try {
         // If the suggestion has not yet been posted to the server, don't make the POST call.
-        if (!(suggestion instanceof NewProjectSuggestion)) {
+        if (!(suggestion instanceof NewProjectSuggestion && (suggestion as NewProjectSuggestion)?.fromLocal)) {
           await this.projectStore.removeSuggestion(this.project, suggestion)
         } else {
           const index = this.project.suggestedStudents!.findIndex(
@@ -286,7 +292,7 @@ export default defineComponent({
           reason: '',
           skill: skill.skill,
           student: data.student,
-        })
+        }, false)
       )
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
@@ -318,7 +324,7 @@ export default defineComponent({
   computed: {
     anyNew() {
       return (this.project.requiredSkills ?? []).filter(s => {
-        return !this.selectedRoles[s.skill.id] && (this.project.suggestedStudents ?? []).filter(student => student.skill.id === s.skill.id).some(student => student instanceof NewProjectSuggestion)
+        return !this.selectedRoles[s.skill.id] && (this.project.suggestedStudents ?? []).filter(student => student.skill.id === s.skill.id).some(student => (student as NewProjectSuggestion)?.fromLocal)
       })
       // return this.project.suggestedStudents?.some(s => s instanceof NewProjectSuggestion )
     },

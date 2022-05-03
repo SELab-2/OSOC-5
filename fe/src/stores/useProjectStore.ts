@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
-import { TempProjectSuggestion } from '../models/ProjectSuggestion'
+import { TempProjectSuggestion, NewProjectSuggestion } from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   Skill,
@@ -172,6 +172,8 @@ export const useProjectStore = defineStore('project', {
         (suggestion) =>
           suggestion.skill.url === skill && suggestion.student.url === student
       )
+      
+      console.log(student)
 
       if (!alreadyExists) {
         const studentStore = useStudentStore()
@@ -181,13 +183,21 @@ export const useProjectStore = defineStore('project', {
         const studentObj = await studentStore.getStudent(student)
         const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
-
-        project.suggestedStudents?.push({
+        const newSuggestion = new NewProjectSuggestion({
           student: studentObj,
           coach: coachObj,
           skill: skillObj,
           reason,
-        })
+        }, true)
+        const l = project.suggestedStudents?.length
+        project.suggestedStudents?.push(newSuggestion)
+        setTimeout(() => (project.suggestedStudents?.[l!] as NewProjectSuggestion).fromWebsocket = false, 5000)
+        // project.suggestedStudents?.push({
+        //   student: studentObj,
+        //   coach: coachObj,
+        //   skill: skillObj,
+        //   reason,
+        // })
       }
     },
     removeReceivedSuggestion({
