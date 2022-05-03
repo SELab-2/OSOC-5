@@ -114,6 +114,7 @@ class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'skill', 'reason']
+        extra_kwargs = {'student': {'required': True, 'allow_null': False}}
 
     def create(self, validated_data):
         """
@@ -199,6 +200,7 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
         model = SentEmail
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
         read_only_fields = ['time']
+        extra_kwargs = {'receiver': {'required': True, 'allow_null': False}}
 
 
 class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
