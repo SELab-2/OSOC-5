@@ -94,6 +94,7 @@ import {useStudentStore} from "../../../stores/useStudentStore";
 import {Student} from "../../../models/Student";
 import {Mail} from "../../../models/Mail";
 import {ref, Ref} from "vue";
+import {useMailStore} from "../../../stores/useMailStore";
 
 enum ApprovalStates {
   Applied = 1,
@@ -112,10 +113,10 @@ export default defineComponent({
     }
   },
   setup() {
-    const studentStore = useStudentStore()
+    const mailStore = useMailStore()
 
     return {
-      studentStore,
+      mailStore,
     }
   },
   data() {
@@ -159,13 +160,30 @@ export default defineComponent({
       ],
     }
   },
-  created() {
-    this.studentStore.getMails(this.student)
+  computed: {
+    currentsteps() {
+      const mails = this.mailStore.mails
+      console.log(mails)
+      if (!this.mailStore.mails.has(this.student.id)) return []
+      const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => {
+        return this.statuses.includes(parseInt(mail.info))
+      })
+      if (!this.currentStep) {
+        this.currentStep = this.statuses.find(s => !data.map(d=>parseInt(d.info)).includes(s))
+      }
+      return data
+    },
+    currentstepids() {
+      return this.currentsteps.map(s => parseInt(s.info))
+    },
+  },
+  mounted() {
+    this.mailStore.getMails(this.student)
   },
   methods: {
     async deleteMail(mail: Mail) {
-      await this.studentStore.deleteMail(mail)
-      await this.studentStore.getMails(this.student)
+      await this.mailStore.deleteMail(mail)
+      await this.mailStore.getMails(this.student)
 
       this.emailKey += 1
     },
@@ -175,9 +193,9 @@ export default defineComponent({
       if (this.currentStep) this.currentStep++;
     },
     async sendMail() {
-      await this.studentStore.sendMail(this.student, this.date, this.info)
-      await this.studentStore.getMails(this.student)
-    
+      await this.mailStore.sendMail(this.student, this.date, this.info)
+      await this.mailStore.getMails(this.student)
+
       this.info = ''
       this.resetDate()
       this.emailKey += 1
@@ -202,29 +220,12 @@ export default defineComponent({
       }, 500)
       return
     },
-    
+
     resetDate() {
       const today = new Date();
       const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
       const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       this.date = date + ' ' + time
-    },
-  },
-  computed: {
-    currentsteps() {
-      const mails = this.studentStore.mails
-      console.log(mails)
-      if (!this.studentStore.mails.has(this.student.id)) return []
-      const data = (this.studentStore.mails.get(this.student.id) ?? []).filter(mail => {
-        return this.statuses.includes(parseInt(mail.info))
-      })
-      if (!this.currentStep) {
-        this.currentStep = this.statuses.find(s => !data.map(d=>parseInt(d.info)).includes(s))
-      }
-      return data
-    },
-    currentstepids() {
-      return this.currentsteps.map(s => parseInt(s.info))
     },
   }
 })
