@@ -134,13 +134,13 @@ export const useStudentStore = defineStore('user/student', {
       if (filters) url = `?${filters.join('&')}`
 
       await instance
-        .get<Student[]>(`students/${url}`)
+        .get<{ results: Student[] }>(`students/${url}`)
         .then(async ({ data }) => {
-          for (const student of data) {
+          for (const student of data.results) {
             await this.transformStudent(student)
           }
 
-          this.mailStudents = data.map((student) => new Student(student))
+          this.mailStudents = data.results.map((student) => new Student(student))
         })
 
       this.isLoading = false
@@ -203,9 +203,9 @@ export const useStudentStore = defineStore('user/student', {
       this.isLoading = true
 
       await instance
-        .get<Mail[]>(`emails/?receiver=${student.id}`)
+        .get<{ results: Mail[] }>(`emails/?receiver=${student.id}`)
         .then(async ({ data }) => {
-          for (const mail of data) {
+          for (const mail of data.results) {
             mail.time = new Date(mail.time).toLocaleString()
 
             const sender = mail.sender
@@ -225,7 +225,7 @@ export const useStudentStore = defineStore('user/student', {
 
           this.mails.set(
             student.id,
-            data.map((mail) => new Mail(mail))
+            data.results.map((mail) => new Mail(mail))
           )
         })
 
