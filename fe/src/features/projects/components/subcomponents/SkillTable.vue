@@ -12,10 +12,10 @@
         :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''"
         :props="props"
       >
-        <q-td key="skill" :props="props">
+        <q-td key="skill" :props="props" auto-width>
           {{ props.row.name }}
         </q-td>
-        <q-td key="amount" :props="props">
+        <q-td key="amount" :props="props" auto-width>
           {{ props.row.amount }}
           <q-popup-edit
             v-slot="scope"
@@ -53,10 +53,13 @@
           </q-popup-edit>
         </q-td>
         <q-td key="color" :props="props" auto-width>
-          <div
-            :style="`height: 25px; width:25px; border-radius: 50%;background: ${props.row.color}`"
+          <q-chip
+            clickable
+            :color="`${props.row.color}-8`"
+            :class="`bg-${props.row.color}-4`"
+            :style="`height: 25px; width:25px; border-radius: 50%`"
           />
-          <!--          &lt;!&ndash; TODO make this actually change in the database not locally&ndash;&gt;-->
+          <!--         TODO: edit color, same dropdown as make new skill -->
           <!--          <q-popup-edit-->
           <!--            v-slot="scope"-->
           <!--            v-model="props.row.color"-->

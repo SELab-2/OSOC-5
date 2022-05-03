@@ -15,28 +15,38 @@
         label="Skill name"
         lazy-rules
         :rules="[
-            (val) =>
-              (val && val.length > 0) || 'Enter the name of the new skill.',
-          ]"
+          (val) =>
+            (val && val.length > 0) || 'Enter the name of the new skill.',
+        ]"
       />
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <!--  TODO remove the text input if/when we use the color picker -->
-      <q-input
+      <!--      <q-input-->
+      <!--        v-model="newSkillColor"-->
+      <!--        outlined-->
+      <!--        label="text color"-->
+      <!--        class="inputfield"-->
+      <!--        type="url"-->
+      <!--      />-->
+      <q-select
         v-model="newSkillColor"
-        outlined
-        label="text color"
-        class="inputfield"
-        type="url"
-      />
-      <!--  INFO if picker gives conversion issues use-->
-      <!--  INFO https://quasar.dev/quasar-utils/color-utils#color-conversion-->
-<!--      <q-color-->
-<!--        v-model="newSkillColor"-->
-<!--        no-header-->
-<!--        no-footer-->
-<!--        class="color-picker"-->
-<!--      />-->
+        filled
+        use-input
+        input-debounce="0"
+        label="Color picker"
+        :options="options"
+        style="width: 250px"
+        behavior="menu"
+        @filter="filterFn"
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
     </q-card-section>
     <q-card-actions
       align="right"
@@ -52,19 +62,20 @@
         v-close-popup
         flat
         label="Add skill"
-        @click="newSkillConfirm"
         glow-color="#C0FFF4"
+        @click="newSkillConfirm"
       />
     </q-card-actions>
   </q-card>
 </template>
 
 <script lang="ts">
-import {defineComponent} from "@vue/runtime-core";
+import { defineComponent } from "@vue/runtime-core";
 import { ref } from "vue";
-import {useSkillStore} from "../../../../stores/useSkillStore";
+import { useSkillStore } from "../../../../stores/useSkillStore";
+import quasarColors from "../../../../models/QuasarColors";
 
-export default defineComponent ({
+export default defineComponent({
   props: {
     newSkillPrompt: {
       type: Boolean,
@@ -76,21 +87,38 @@ export default defineComponent ({
     }
   },
   setup() {
-    const skillStore = useSkillStore()
-
-    // Filters
-    const filterSkills = ref('')
+    const skillStore = useSkillStore();
 
     // variables for the new skill dialog popup
-    const newSkill = ref('')
-    const newSkillColor = ref('')
+    const newSkill = ref("");
+    const newSkillColor = ref("");
+
+    const options = ref(quasarColors);
 
     return {
       skillStore,
-      filterSkills,
       newSkill,
-      newSkillColor
-    }
+      newSkillColor,
+
+      options,
+
+      quasarColors,
+
+      filterFn(val: string, update: any) {
+        if (val === "") {
+          update(() => {
+            options.value = quasarColors;
+          });
+          return;
+        } else {
+          update(() => {
+            const needle = val.toLowerCase();
+            options.value = quasarColors.filter(v => v.toLowerCase().indexOf(needle) > -1);
+          });
+        }
+
+      }
+    };
   },
   methods: {
     newSkillConfirm() {
@@ -100,7 +128,7 @@ export default defineComponent ({
         this.newSkill.length > 0 &&
         this.newSkillColor.length > 0
       ) {
-        console.log("test")
+        console.log("test");
         // when valid call the store object and add the skill
         this.skillStore.addSkill(
           this.newSkill,
@@ -110,31 +138,31 @@ export default defineComponent ({
           (success: boolean) => {
             if (success) {
               this.$q.notify({
-                icon: 'done',
-                color: 'positive',
+                icon: "done",
+                color: "positive",
                 message: `Added new project skill: ${this.newSkill}.`,
-                textColor: 'black',
-              })
-              this.resetNewSkillPrompt()
-              this.newSkill = ''
-              this.newSkillColor = ''
+                textColor: "black"
+              });
+              this.resetNewSkillPrompt();
+              this.newSkill = "";
+              this.newSkillColor = "";
             } else {
               this.$q.notify({
-                icon: 'close',
-                color: 'negative',
-                message: 'Failed to add skill!',
-              })
+                icon: "close",
+                color: "negative",
+                message: "Failed to add skill!"
+              });
             }
           }
-        )
+        );
       } else {
         this.$q.notify({
-          icon: 'close',
-          color: 'negative',
-          message: 'Invalid name/color!',
-        })
+          icon: "close",
+          color: "negative",
+          message: "Invalid name/color!"
+        });
       }
-    },
+    }
   }
-})
+});
 </script>
