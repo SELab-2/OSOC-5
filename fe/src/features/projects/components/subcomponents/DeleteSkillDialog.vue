@@ -66,15 +66,23 @@ export default defineComponent ({
   methods: {
     deleteSkillConfirm(id: number) {
       if (id !== -1) {
-        this.skillStore.deleteSkill(id).then(() => {
-
-          // TODO: when skill cannot be deleted change the notification
-          this.$q.notify({
-            icon: 'done',
-            color: 'positive',
-            message: 'Successfully deleted!',
-          })
-        })
+        this.skillStore.deleteSkill(id, // callback
+          (success: boolean) => {
+            if (success) {
+              this.$q.notify({
+                icon: 'done',
+                color: 'positive',
+                message: 'Successfully deleted!',
+              })
+            } else {
+              this.$q.notify({
+                icon: "close",
+                color: "negative",
+                message: "Failed to delete, skill is in use!"
+              });
+            }
+          }
+        )
       }
     },
   }
