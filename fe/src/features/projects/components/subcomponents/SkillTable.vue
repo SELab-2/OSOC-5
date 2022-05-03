@@ -39,7 +39,8 @@
           </q-popup-edit>
         </q-td>
         <q-td key="comment" :props="props">
-          <div>{{ props.row.comment }}</div>
+          <div v-if="props.row.comment.length !== 0">{{ props.row.comment }}</div>
+          <div v-else style="font-style: italic; color: gray">Click to add comment.</div>
           <q-popup-edit v-slot="scope" v-model="props.row.comment" buttons>
             <q-input
               v-model="scope.value"

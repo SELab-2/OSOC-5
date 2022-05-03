@@ -21,13 +21,6 @@
       />
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <!--      <q-input-->
-      <!--        v-model="newSkillColor"-->
-      <!--        outlined-->
-      <!--        label="text color"-->
-      <!--        class="inputfield"-->
-      <!--        type="url"-->
-      <!--      />-->
       <q-select
         v-model="newSkillColor"
         filled
@@ -39,6 +32,19 @@
         behavior="menu"
         @filter="filterFn"
       >
+        <template #option="scope">
+          <q-item v-bind="scope.itemProps">
+            <div class="row items-center">
+              <q-chip
+                clickable
+                :color="`${scope.opt}-8`"
+                :class="`bg-${scope.opt}-4`"
+                :style="`height: 25px; width:25px; border-radius: 50%; margin-right: 15px`"
+              />
+              <q-item-label>{{ scope.opt }}</q-item-label>
+            </div>
+          </q-item>
+        </template>
         <template #no-option>
           <q-item>
             <q-item-section class="text-grey">
