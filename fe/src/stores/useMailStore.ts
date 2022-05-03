@@ -21,7 +21,9 @@ export const useMailStore = defineStore('user/mail', {
         mails: new Map(),
     }),
     actions: {
-        async loadStudentsMails() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async loadStudentsMails(pagination: any, setNumberOfRows: any) {
+            console.log(pagination)
             this.isLoading = true
             const studentStore = useStudentStore()
 
@@ -29,11 +31,14 @@ export const useMailStore = defineStore('user/mail', {
             if (this.searchMails) filters.push(`search=${this.searchMails}`)
 
             let url = ''
-            if (filters) url = `?${filters.join('&')}`
+            if (filters) url = `&${filters.join('&')}`
 
             await instance
-                .get<{ results: Student[] }>(`students/${url}`)
+                .get<{ results: Student[], count: number }>(`students/?page_size=${pagination.rowsPerPage}&page=${pagination.page}${url}`)
                 .then(async ({ data }) => {
+                    setNumberOfRows(data.count)
+                    console.log(pagination)
+
                     for (const student of data.results) {
                         await studentStore.transformStudent(student)
                     }

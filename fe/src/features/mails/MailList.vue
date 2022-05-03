@@ -19,7 +19,7 @@
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="mailStore.loadStudentsMails"
+          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count) => pagination.rowsNumber = count)"
         >
           <template #append>
             <q-icon name="search" />
@@ -33,6 +33,10 @@
         :columns="columnsMails"
         row-key="id"
         separator="horizontal"
+        :filter="filter"
+        v-model:pagination="pagination"
+        :loading="mailStore.isLoading"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -42,7 +46,10 @@
             <q-td auto-width>
               <q-icon
                 @click="() => clickRow(props, props.row)"
-                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+                size="sm"
+                color="yellow"
+                :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              />
             </q-td>
             <q-td
               key="name"
@@ -118,20 +125,34 @@ export default defineComponent({
   setup() {
     const mailStore = useMailStore()
     const q = useQuasar()
+
+    const pagination = ref({
+        sortBy: 'desc',
+        descending: false,
+        page: 1,
+        rowsPerPage: 5,
+        rowsNumber: 10 // if getting data from a server
+      })
+
     return {
       mailStore,
       filter: ref(''),
       columnsMails,
       status,
-      q
+      q,
+      pagination,
     }
   },
-  mounted() {
-    this.mailStore.loadStudentsMails()
+  async mounted() {
+    await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
+    async onRequest(props: any) {
+      this.pagination = props.pagination
+      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
     updateStatus(student: Student, oldStatus: string) {
-      this!.$nextTick(() => {
+      this?.$nextTick(() => {
         this.mailStore
           .updateStatus(student)
           .catch((error) => {
