@@ -3,21 +3,22 @@
     class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-6"
   >
     <div class="text-h4 q-my-md">
-      Project Roles
+      Project Skills
     </div>
     <div class="row">
       <btn
         class="cornered q-mb-sm"
         color="primary"
         icon="add"
-        label="Add role"
-        @click="newRolePrompt = true"
+        label="Add skill"
+        shadow-strength="2"
         glow-color="#00F1AF"
-        shadow-strength=2
+        style="color: black !important; font-weight: bold"
+        @click="newSkillPrompt = true"
       />
       <q-space />
       <q-input
-        v-model="filterRoles"
+        v-model="filterSkills"
         style="max-width: 190px"
         outlined
         dense
@@ -29,13 +30,13 @@
       >
         <template #append>
           <q-icon
-            v-if="filterRoles !== ''"
+            v-if="filterSkills !== ''"
             name="close"
             class="cursor-pointer"
-            @click="filterRoles = ''"
+            @click="filterSkills = ''"
           />
           <q-icon
-            v-if="filterRoles === ''"
+            v-if="filterSkills === ''"
             name="search"
           />
         </template>
@@ -43,45 +44,34 @@
     </div>
 
     <q-dialog
-      v-model="newRolePrompt"
+      v-model="newSkillPrompt"
       persistent
     >
-      <NewRoleDialog
-        :new-role-prompt="newRolePrompt"
-        :reset-new-role-prompt="() => newRolePrompt = false"
-      />
+      <NewSkillDialog :reset-new-skill-prompt="() => newSkillPrompt = false" />
     </q-dialog>
 
-    <RoleTable :new-role-prompt="newRolePrompt" />
+    <SkillTable :filter-skills="filterSkills" />
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import { ref } from "vue";
-import RoleTable from "./subcomponents/RoleTable.vue";
-import {useSkillStore} from "../../../stores/useSkillStore";
-import NewRoleDialog from "./subcomponents/NewRoleDialog.vue";
+import SkillTable from "./subcomponents/SkillTable.vue";
+import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
 
 export default defineComponent ({
-  components: {NewRoleDialog, RoleTable},
+  components: {NewSkillDialog, SkillTable},
   setup() {
-    const skillStore = useSkillStore()
-
     // Filters
-    const filterRoles = ref('')
+    const filterSkills = ref('')
 
-    // variables for the new role dialog popup
-    const newRolePrompt = ref(false)
-    const newRole = ref('')
-    const newRoleColor = ref('')
+    // variables for the new skill dialog popup
+    const newSkillPrompt = ref(false)
 
     return {
-      skillStore,
-      filterRoles,
-      newRolePrompt,
-      newRole,
-      newRoleColor,
+      filterSkills,
+      newSkillPrompt,
     }
   },
 })

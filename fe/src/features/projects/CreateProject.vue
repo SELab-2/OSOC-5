@@ -18,9 +18,9 @@
                 type="cancel"
                 size="md"
                 class="q-mx-md cornered"
-                to="/projects"
                 glow-color="#00F1AF"
                 shadow-strength=2
+                @click="onCancel"
               />
               <btn
                 elevated
@@ -40,7 +40,7 @@
 
           <ProjectCoaches />
 
-          <ProjectRoles />
+          <ProjectSkills />
         </div>
       </div>
     </q-form>
@@ -58,9 +58,10 @@ import {useProjectStore} from "../../stores/useProjectStore";
 import ProjectCoaches from "./components/ProjectCoaches.vue";
 import ProjectRoles from "./components/ProjectRoles.vue";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
+import ProjectSkills from "./components/ProjectSkills.vue";
 
 export default defineComponent({
-  components: {ProjectCoaches, BasicInfo, ProjectRoles},
+  components: {ProjectCoaches, BasicInfo, ProjectSkills},
   setup() {
     const skillStore = useSkillStore()
     const coachStore = useCoachStore()
@@ -108,6 +109,15 @@ export default defineComponent({
         }
       )
     },
+    onCancel(){
+      router.push('/projects')
+      this.projectStore.projectName= ''
+      this.projectStore.projectPartnerName= ''
+      this.projectStore.projectLink= ''
+      this.projectStore.filterCoaches=''
+      this.projectStore.selectedCoaches= []
+      this.skillStore.loadSkills()
+    }
   }
 })
 </script>

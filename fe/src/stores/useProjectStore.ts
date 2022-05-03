@@ -255,6 +255,15 @@ export const useProjectStore = defineStore('project', {
             console.log(response);
             this.loadProjects()
 
+            // clear fields when project is made successfully
+            this.isLoadingProjects=  false
+            this.projectName= ''
+            this.projectPartnerName= ''
+            this.projectLink= ''
+            this.filterCoaches=''
+            this.selectedCoaches= []
+            useSkillStore().loadSkills()
+
             // this.projects.push({
             //   name: response['data']['name'],
             //   id:  response['data']['id'],
@@ -271,5 +280,12 @@ export const useProjectStore = defineStore('project', {
             callback(false)
           })
     },
+    editProject(project: Project){
+      this.projectName= project.name
+      this.projectPartnerName= project.partnerName
+      this.projectLink= project.extraInfo
+      this.selectedCoaches= []
+      // skills
+    }
   },
 })

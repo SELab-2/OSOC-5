@@ -12,8 +12,8 @@ interface State {
   status: string
   alumni: string
   decision: string
-  byMe: boolean
-  onProject: boolean
+  byMe: string
+  onProject: string
   skills: Array<Skill>
   skillsStudents: Map<string, Skill>
   coaches: Map<string, User>
@@ -21,6 +21,7 @@ interface State {
   isLoading: boolean
   possibleSuggestion: number
   currentStudent: Student | null
+  nextPage: string | null
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -29,8 +30,8 @@ export const useStudentStore = defineStore('user/student', {
     status: '',
     alumni: 'all',
     decision: 'none',
-    byMe: false,
-    onProject: false,
+    byMe: 'maybe',
+    onProject: 'maybe',
     skills: [],
     skillsStudents: new Map(),
     coaches: new Map(),
@@ -38,6 +39,7 @@ export const useStudentStore = defineStore('user/student', {
     isLoading: false,
     possibleSuggestion: -1,
     currentStudent: null,
+    nextPage: ''
   }),
   actions: {
     async getStudent(url: string): Promise<Student> {
@@ -95,8 +97,8 @@ export const useStudentStore = defineStore('user/student', {
       if (this.alumni === 'alumni') filters.push('alum=true')
       if (this.alumni === 'student coaches') filters.push('student_coach=true')
       if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
-      if (this.byMe === true) filters.push('suggested_by_user')
-      if (this.onProject === true) filters.push('on_project')
+      if (this.byMe !== 'maybe') filters.push(`suggested_by_user=${this.byMe}`)
+      if (this.onProject !== 'maybe') filters.push(`on_project=${this.onProject}`)
       if (this.status) filters.push(`status=${this.status}`)
 
       for (const skill of this.skills) {
@@ -104,11 +106,15 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       let url = ''
-      if (filters) url = `?${filters.join('&')}`
+      if (filters.length > 0) {
+        url = `&${filters.join('&')}`
+      }
 
       await instance
-        .get<{results: Student[]}>(`students/${url}`)
+        .get<{results: Student[], next: string}>(`students/?page=1${url}`)
         .then(async ({ data }) => {
+          this.nextPage = data.next
+
           for (const student of data.results) {
             await this.transformStudent(student)
           }
@@ -117,6 +123,28 @@ export const useStudentStore = defineStore('user/student', {
         })
 
       this.isLoading = false
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async loadNext(index: number, done: any) {
+      if (this.nextPage === null) {
+        done(true)
+        return
+      }
+
+      if (this.nextPage !== '') {
+        await instance
+            .get(this.nextPage)
+            .then(async ({data}) => {
+              this.nextPage = data.next
+
+              for (const student of data.results) {
+                await this.transformStudent(student)
+              }
+
+              this.students.push(...data.results.map((student: Student) => new Student(student)))
+            })
+      }
+      done()
     },
     async loadStudent(studentId: number) {
       this.isLoading = true

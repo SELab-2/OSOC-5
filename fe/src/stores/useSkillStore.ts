@@ -41,11 +41,12 @@ export const useSkillStore = defineStore('skills', {
       // start the loading animation
       this.isLoadingSkills = true
       this.skills = []
+      // console.log('LOAD SKILLS')
       instance
-        .get('skills/')
+        .get('skills/?page_size=500')
         .then(({ data }) => {
           // set the skill of the store
-          for (const skill of data.results as Skill[]) {
+          for (const skill of data['results'] as Skill[]) {
             this.skills.push({
               name: skill.name,
               amount: 0,
@@ -55,16 +56,15 @@ export const useSkillStore = defineStore('skills', {
               comment: '',
             })
           }
-
         })
         .catch((error) => {
           console.log(error)
-        }).finally( () => this.isLoadingSkills = false)
+        })
+        .finally(() => (this.isLoadingSkills = false))
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async addSkill(newSkillName: string, color: string, callback: any) {
-
       // Process the new skill
       console.log(`Adding new skill: ${newSkillName}.`)
 
@@ -88,13 +88,14 @@ export const useSkillStore = defineStore('skills', {
           // When finished run the callback so the popup closes.
           callback(true)
         })
-        .catch(error => {
+        .catch((error) => {
           this.isLoadingSkills = false
           console.log(error)
           callback(false)
         })
     },
-    async deleteSkill(deletedSkillId: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async deleteSkill(deletedSkillId: number, callback: any) {
       // delete in database
       await instance
         .delete(`skills/${deletedSkillId}/`)
@@ -104,9 +105,12 @@ export const useSkillStore = defineStore('skills', {
             (skill) => skill.id === deletedSkillId
           )
           this.skills.splice(index, 1)
+          callback(true)
         })
-        .catch(() => console.log('Failed to delete'))
-      // TODO: when skill is linked to project delete doesnt work but it does say successful to user
+        .catch((error) => {
+          console.log(error)
+          callback(false)
+        })
     },
   },
 })
