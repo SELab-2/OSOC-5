@@ -1,5 +1,5 @@
 <template>
-  <q-card class="create-role-popup">
+  <q-card class="create-skill-popup">
     <q-card-section>
       <div class="text-h6">
         Create a new skill
@@ -12,7 +12,7 @@
         outlined
         autofocus
         class="inputfield"
-        label="Role name"
+        label="Skill name"
         lazy-rules
         :rules="[
             (val) =>
@@ -79,22 +79,22 @@ export default defineComponent ({
     const skillStore = useSkillStore()
 
     // Filters
-    const filterRoles = ref('')
+    const filterSkills = ref('')
 
-    // variables for the new role dialog popup
+    // variables for the new skill dialog popup
     const newSkill = ref('')
     const newSkillColor = ref('')
 
     return {
       skillStore,
-      filterRoles,
+      filterSkills,
       newSkill,
       newSkillColor
     }
   },
   methods: {
     newSkillConfirm() {
-      // check if the new role value is valid
+      // check if the new skill value is valid
       if (
         this.newSkill &&
         this.newSkill.length > 0 &&

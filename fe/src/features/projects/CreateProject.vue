@@ -40,7 +40,7 @@
 
           <ProjectCoaches />
 
-          <ProjectRoles />
+          <ProjectSkills />
         </div>
       </div>
     </q-form>
@@ -56,10 +56,10 @@ import { useCoachStore } from '../../stores/useCoachStore'
 import BasicInfo from "./components/BasicInfo.vue";
 import {useProjectStore} from "../../stores/useProjectStore";
 import ProjectCoaches from "./components/ProjectCoaches.vue";
-import ProjectRoles from "./components/ProjectRoles.vue";
+import ProjectSkills from "./components/ProjectSkills.vue";
 
 export default defineComponent({
-  components: {ProjectCoaches, BasicInfo, ProjectRoles},
+  components: {ProjectCoaches, BasicInfo, ProjectSkills},
   setup() {
     const skillStore = useSkillStore()
     const coachStore = useCoachStore()

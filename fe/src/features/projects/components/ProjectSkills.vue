@@ -3,14 +3,14 @@
     class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-6"
   >
     <div class="text-h4 q-my-md">
-      Project Roles
+      Project Skills
     </div>
     <div class="row">
       <btn
         class="cornered q-mb-sm"
         color="primary"
         icon="add"
-        label="Add role"
+        label="Add skill"
         @click="newSkillPrompt = true"
         glow-color="#00F1AF"
         shadow-strength=2
@@ -46,32 +46,32 @@
       v-model="newSkillPrompt"
       persistent
     >
-      <NewRoleDialog
-        :new-role-prompt="newSkillPrompt"
-        :reset-new-role-prompt="() => newSkillPrompt = false"
+      <NewSkillDialog
+        :new-skill-prompt="newSkillPrompt"
+        :reset-new-skill-prompt="() => newSkillPrompt = false"
       />
     </q-dialog>
 
-    <RoleTable :new-role-prompt="newSkillPrompt" />
+    <SkillTable :new-skill-prompt="newSkillPrompt" />
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import { ref } from "vue";
-import RoleTable from "./subcomponents/RoleTable.vue";
+import SkillTable from "./subcomponents/SkillTable.vue";
 import {useSkillStore} from "../../../stores/useSkillStore";
-import NewRoleDialog from "./subcomponents/NewSkillDialog.vue";
+import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
 
 export default defineComponent ({
-  components: {NewRoleDialog, RoleTable},
+  components: {NewSkillDialog, SkillTable},
   setup() {
     const skillStore = useSkillStore()
 
     // Filters
     const filterSkills = ref('')
 
-    // variables for the new role dialog popup
+    // variables for the new skill dialog popup
     const newSkillPrompt = ref(false)
     const newSkill = ref('')
     const newSkillColor = ref('')
