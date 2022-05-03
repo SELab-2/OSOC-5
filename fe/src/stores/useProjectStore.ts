@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
+import { TempProjectSuggestion } from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   Skill,
@@ -40,17 +41,13 @@ export const useProjectStore = defineStore('project', {
   }),
   actions: {
     async fetchSuggestedStudents(
-      students: TempStudent[]
+      students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
       const newStudents: ProjectSuggestionInterface[] = []
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (
-            await instance.get(
-              (student.coach as unknown as { url: string }).url
-            )
-          ).data as User,
+          coach: (await useCoachStore().getUser(student.coach)),
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
@@ -84,10 +81,13 @@ export const useProjectStore = defineStore('project', {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
+    
+    // NOTE: this may be broken.
     async getProject(project: TempProject) {
+      console.log("Loading")
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) =>
-          useCoachStore().getUser(coach as unknown as string)
+          useCoachStore().getUser(coach)
         )
       )
 
@@ -114,14 +114,14 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       this.isLoadingProjects = true
       try {
-        const { data } = await instance.get<TempProject[]>('projects/')
-        this.projects = data.map(
+        const { results } = (await instance.get<{results: TempProject[]}>('projects/')).data
+        this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
-        data.forEach(async (project, i) => {
+        results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) =>
-              useCoachStore().getUser((coach as unknown as { url: string }).url)
+              useCoachStore().getUser(coach)
             )
           )
 
@@ -179,7 +179,7 @@ export const useProjectStore = defineStore('project', {
         const skillStore = useSkillStore()
 
         const studentObj = await studentStore.getStudent(student)
-        const coachObj = await coachStore.getUser(coach.url)
+        const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
 
         project.suggestedStudents?.push({

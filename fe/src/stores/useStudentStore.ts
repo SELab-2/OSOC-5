@@ -9,7 +9,6 @@ import { useCoachStore } from './useCoachStore'
 
 interface State {
   search: string
-  searchMails: string
   status: string
   alumni: string
   decision: string
@@ -19,8 +18,6 @@ interface State {
   skillsStudents: Map<string, Skill>
   coaches: Map<string, User>
   students: Array<Student>
-  mailStudents: Array<Student>
-  mails: Map<number, Mail[]>
   isLoading: boolean
   possibleSuggestion: number
   currentStudent: Student | null
@@ -29,7 +26,6 @@ interface State {
 export const useStudentStore = defineStore('user/student', {
   state: (): State => ({
     search: '',
-    searchMails: '',
     status: '',
     alumni: 'all',
     decision: 'none',
@@ -39,8 +35,6 @@ export const useStudentStore = defineStore('user/student', {
     skillsStudents: new Map(),
     coaches: new Map(),
     students: [],
-    mailStudents: [],
-    mails: new Map(),
     isLoading: false,
     possibleSuggestion: -1,
     currentStudent: null,
@@ -113,34 +107,13 @@ export const useStudentStore = defineStore('user/student', {
       if (filters) url = `?${filters.join('&')}`
 
       await instance
-        .get<Student[]>(`students/${url}`)
+        .get<{results: Student[]}>(`students/${url}`)
         .then(async ({ data }) => {
-          for (const student of data) {
+          for (const student of data.results) {
             await this.transformStudent(student)
           }
 
-          this.students = data.map((student) => new Student(student))
-        })
-
-      this.isLoading = false
-    },
-    async loadStudentsMails() {
-      this.isLoading = true
-      const filters = []
-
-      if (this.search) filters.push(`search=${this.searchMails}`)
-
-      let url = ''
-      if (filters) url = `?${filters.join('&')}`
-
-      await instance
-        .get<Student[]>(`students/${url}`)
-        .then(async ({ data }) => {
-          for (const student of data) {
-            await this.transformStudent(student)
-          }
-
-          this.mailStudents = data.map((student) => new Student(student))
+          this.students = data.results.map((student) => new Student(student))
         })
 
       this.isLoading = false
@@ -194,58 +167,6 @@ export const useStudentStore = defineStore('user/student', {
 
       await this.loadStudent(studentId)
     },
-    async updateStatus(student: Student) {
-      await instance.patch(`students/${student.id}/`, {
-        status: student.status,
-      })
-    },
-    async getMails(student: Student) {
-      this.isLoading = true
-
-      await instance
-        .get<Mail[]>(`emails/?receiver=${student.id}`)
-        .then(async ({ data }) => {
-          for (const mail of data) {
-            mail.time = new Date(mail.time).toLocaleString()
-
-            const sender = mail.sender
-
-            if (typeof sender === 'string') {
-              if (this.coaches.has(sender)) {
-                mail.sender = this.coaches.get(sender)!
-              } else {
-                await instance.get<User>(sender).then(({ data }) => {
-                  const coach = new User(data)
-                  mail.sender = coach
-                  this.coaches.set(sender, coach)
-                })
-              }
-            }
-          }
-
-          this.mails.set(
-            student.id,
-            data.map((mail) => new Mail(mail))
-          )
-        })
-
-      this.isLoading = true
-    },
-    async sendMail(student: Student, date: string, info: string) {
-      const authenticationStore = useAuthenticationStore()
-
-      if (authenticationStore.loggedInUser) {
-        await instance.post(`emails/`, {
-          sender: authenticationStore.loggedInUser.url,
-          receiver: student.url,
-          time: date,
-          info: info,
-        })
-      }
-    },
-    async deleteMail(mail: Mail) {
-      await instance.delete(`/emails/${mail.id}`)
-    },
     async receiveSuggestion({
       student_id,
       coach,
@@ -278,8 +199,6 @@ export const useStudentStore = defineStore('user/student', {
           student.suggestions[ctr].reason = reason
         } else {
           // New suggestion
-          const coaches = useCoachStore()
-          const coach = await coaches.getUser(`/coaches/${coachId.toString()}`)
 
           student.suggestions.push({
             student: studentId,

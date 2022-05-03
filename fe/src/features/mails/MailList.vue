@@ -13,13 +13,13 @@
         </div>
         <q-space />
         <q-input
-          v-model="studentStore.searchMails"
+          v-model="mailStore.searchMails"
           outlined
           dense
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="studentStore.loadStudentsMails"
+          @update:modelValue="mailStore.loadStudentsMails"
         >
           <template #append>
             <q-icon name="search" />
@@ -29,7 +29,7 @@
 
       <q-table
         class="my-table mail-table shadow-4"
-        :rows="studentStore.mailStudents"
+        :rows="mailStore.mailStudents"
         :columns="columns"
         row-key="id"
         separator="horizontal"
@@ -110,6 +110,7 @@ import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
+import {useMailStore} from "../../stores/useMailStore";
 import router from "../../router";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 
@@ -150,6 +151,7 @@ const columns = [
 export default defineComponent({
   components: {MailsOverview},
   setup() {
+    const mailStore = useMailStore()
     const studentStore = useStudentStore()
     const authenticationStore = useAuthenticationStore()
     const q = useQuasar()
@@ -161,20 +163,20 @@ export default defineComponent({
     })
 
     return {
-      studentStore,
+      mailStore,
       filter: ref(''),
       columns,
       status,
       q
     }
   },
-  created() {
-    this.studentStore.loadStudentsMails()
+  mounted() {
+    this.mailStore.loadStudentsMails()
   },
   methods: {
     updateStatus(student: Student, oldStatus: string) {
       this!.$nextTick(() => {
-        this.studentStore
+        this.mailStore
           .updateStatus(student)
           .catch((error) => {
             this.q.notify({
@@ -183,13 +185,13 @@ export default defineComponent({
               message: error.detail,
               textColor: 'black'
             });
-            this.studentStore.students.find((s: Student) => s.id === student.id)!.status = oldStatus
+            this.mailStore.mailStudents.find((s: Student) => s.id === student.id)!.status = oldStatus
           })
       })
     },
     clickRow(props: any, student: Student) {
       props.expand = !props.expand
-      if (props.expand) this.studentStore.getMails(student)
+      if (props.expand) this.mailStore.getMails(student)
     },
   }
 })
