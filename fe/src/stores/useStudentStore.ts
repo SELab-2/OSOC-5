@@ -90,7 +90,6 @@ export const useStudentStore = defineStore('user/student', {
       student.englishRating = parseInt(student.englishRating)
     },
     async loadStudents() {
-      console.log('in there')
       this.isLoading = true
       const filters = []
 
@@ -125,6 +124,7 @@ export const useStudentStore = defineStore('user/student', {
 
       this.isLoading = false
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadNext(index: number, done: any) {
       if (this.nextPage === null) {
         done(true)
