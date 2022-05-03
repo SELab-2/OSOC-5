@@ -13,8 +13,7 @@
         label="Add skill"
         shadow-strength="2"
         glow-color="#00F1AF"
-        style="color: black !important; font-weight: bold"
-        @click="newSkillPrompt = true"
+        @click="openDialog"
       />
       <q-space />
       <q-input
@@ -47,7 +46,9 @@
       v-model="newSkillPrompt"
       persistent
     >
-      <NewSkillDialog :reset-new-skill-prompt="() => newSkillPrompt = false" />
+      <NewSkillDialog
+        dialog-title="Create a new skill"
+      />
     </q-dialog>
 
     <SkillTable :filter-skills="filterSkills" />
@@ -59,10 +60,14 @@ import {defineComponent} from "@vue/runtime-core";
 import { ref } from "vue";
 import SkillTable from "./subcomponents/SkillTable.vue";
 import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
+import { useSkillStore } from "../../../stores/useSkillStore";
 
 export default defineComponent ({
   components: {NewSkillDialog, SkillTable},
   setup() {
+
+    const skillStore = useSkillStore()
+
     // Filters
     const filterSkills = ref('')
 
@@ -70,8 +75,17 @@ export default defineComponent ({
     const newSkillPrompt = ref(false)
 
     return {
+      skillStore,
       filterSkills,
       newSkillPrompt,
+
+      openDialog(){
+        newSkillPrompt.value = true;
+        skillStore.popupName = ''
+        skillStore.popupColor = ''
+        skillStore.popupID = -1
+
+      },
     }
   },
 })

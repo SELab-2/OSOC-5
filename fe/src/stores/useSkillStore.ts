@@ -2,16 +2,23 @@ import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
 import { ProjectTableSkill, Skill } from '../models/Skill'
+import { User } from '../models/User'
 
 interface State {
   skills: Array<ProjectTableSkill>
   isLoadingSkills: boolean
+  popupName: string
+  popupColor: string
+  popupID: number
 }
 
 export const useSkillStore = defineStore('skills', {
   state: (): State => ({
     skills: [],
     isLoadingSkills: false,
+    popupName: '',
+    popupColor: '',
+    popupID: -1,
   }),
   actions: {
     async getSkill(url: string): Promise<Skill> {
@@ -64,35 +71,51 @@ export const useSkillStore = defineStore('skills', {
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async addSkill(newSkillName: string, color: string, callback: any) {
+    async addSkill(callback: any) {
       // Process the new skill
-      console.log(`Adding new skill: ${newSkillName}.`)
+      console.log(`Adding new skill: ${this.popupName}.`)
+      if (
+        this.popupName &&
+        this.popupName.length > 0 &&
+        this.popupColor.length > 0
+      ) {
+        if (this.popupID >= 0) {
+          // skill already exists so we update it
+          instance
+            .put(`skills/${this.popupID}/`, { color: this.popupColor })
+            .then(() => callback(0))
+            .catch(() => callback(1))
+        } else {
+          // make new skill
+          instance
+            .post('skills/', {
+              name: this.popupName,
+              color: this.popupColor,
+            })
+            .then((response) => {
+              console.log(response['data'])
 
-      instance
-        .post('skills/', {
-          name: newSkillName,
-          color: color,
-        })
-        .then((response) => {
-          console.log(response['data'])
-
-          // ON SUCCESS ADD THIS TO THE LOCAL STORE
-          this.skills.push({
-            name: response['data']['name'],
-            amount: 0,
-            url: response['data']['url'],
-            color: response['data']['color'],
-            id: response['data']['id'],
-            comment: '',
-          })
-          // When finished run the callback so the popup closes.
-          callback(true)
-        })
-        .catch((error) => {
-          this.isLoadingSkills = false
-          console.log(error)
-          callback(false)
-        })
+              // ON SUCCESS ADD THIS TO THE LOCAL STORE
+              this.skills.push({
+                name: response['data']['name'],
+                amount: 0,
+                url: response['data']['url'],
+                color: response['data']['color'],
+                id: response['data']['id'],
+                comment: '',
+              })
+              // When finished run the callback so the popup closes.
+              callback(0)
+            })
+            .catch((error) => {
+              this.isLoadingSkills = false
+              console.log(error)
+              callback(1)
+            })
+        }
+      } else {
+        callback(2)
+      }
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async deleteSkill(deletedSkillId: number, callback: any) {

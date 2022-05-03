@@ -82,25 +82,23 @@
           auto-width
         >
           <q-chip
-            clickable
             :color="`${props.row.color}-8`"
             :class="`bg-${props.row.color}-4`"
             :style="`height: 25px; width:25px; border-radius: 50%`"
           />
-          <!--         TODO: edit color, same dropdown as make new skill -->
-          <!--          <q-popup-edit-->
-          <!--            v-slot="scope"-->
-          <!--            v-model="props.row.color"-->
-          <!--            buttons-->
-          <!--          >-->
-          <!--            <q-color-->
-          <!--              v-model="scope.value"-->
-          <!--              no-header-->
-          <!--              no-footer-->
-          <!--              class="color-picker"-->
-          <!--              @keyup.enter.stop-->
-          <!--            />-->
-          <!--          </q-popup-edit>-->
+        </q-td>
+        <q-td
+          key="remove"
+          style="width: 10px"
+        >
+          <btn
+            flat
+            round
+            style="color: #3d3d3d"
+            icon="mdi-pencil-outline"
+            glow-color="grey-5"
+            @click="editSkill(props.row)"
+          />
         </q-td>
         <q-td
           key="remove"
@@ -119,6 +117,16 @@
     </template>
   </q-table>
 
+  <q-dialog
+    :model-value="editSkillDialog"
+    class="full-width"
+    persistent
+  >
+    <NewSkillDialog
+      :reset-new-skill-prompt="() => editSkillDialog.value = false"
+      dialog-title="Edit skill"
+    />
+  </q-dialog>
   <q-dialog
     class="full-width"
     :model-value="deleteSkill !== -1"
@@ -157,6 +165,9 @@ export default defineComponent({
     const errorSkillAmount = ref(false)
     const errorMessageSkillAmount = ref('')
 
+    // variables for the new skill dialog popup
+    const editSkillDialog = ref(false)
+
     return {
       skillStore,
       deleteSkill,
@@ -164,12 +175,19 @@ export default defineComponent({
       errorSkillAmount,
       errorMessageSkillAmount,
       deleteSkillName,
+      editSkillDialog,
     }
   },
   methods: {
     deleteSkillMethod(skill: ProjectTableSkill) {
       this.deleteSkill = skill.id
       this.deleteSkillName = skill.name
+    },
+    editSkill(skill: ProjectTableSkill) {
+      this.editSkillDialog = true
+      this.skillStore.popupID = skill.id
+      this.skillStore.popupName = skill.name
+      this.skillStore.popupColor = skill.color
     },
     amountRangeValidation(val: number) {
       if (val < 0) {
