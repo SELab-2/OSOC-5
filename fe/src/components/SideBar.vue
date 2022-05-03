@@ -151,6 +151,7 @@
               style="flex: 1 1 auto"
             >
               <q-infinite-scroll
+                :key="scrollKey"
                 ref="infiniteScroll"
                 class="q-px-sm"
                 :offset="250"
@@ -252,7 +253,8 @@ export default defineComponent({
         backgroundColor: 'black',
         width: '4px',
       },
-      status
+      status,
+      scrollKey: 0
     }
   },
   data() {
@@ -282,8 +284,9 @@ export default defineComponent({
       this.selectStudent(student)
     },
     loadStudents(scroll: any) {
-      scroll.poll()
+      scroll.resume()
       this.studentStore.loadStudents()
+      this.scrollKey += 1
     }
   }
 })

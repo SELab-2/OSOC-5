@@ -136,13 +136,11 @@ export const useStudentStore = defineStore('user/student', {
         done(true)
         return
       }
-      console.log("in here")
-      console.log(this.nextPage)
+
       if (this.nextPage !== '') {
         await instance
             .get(this.nextPage)
             .then(async ({data}) => {
-              console.log(data)
               this.nextPage = data.next
 
               for (const student of data.results) {
@@ -150,7 +148,6 @@ export const useStudentStore = defineStore('user/student', {
               }
 
               this.students.push(...data.results.map((student: Student) => new Student(student)))
-              console.log(this.students)
             })
       }
       done()
