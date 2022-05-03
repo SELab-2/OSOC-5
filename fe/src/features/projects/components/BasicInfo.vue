@@ -35,7 +35,6 @@
       label="Project URL"
       lazy-rules
       class="inputfield"
-      type="url"
       :rules="[
                 (val) =>
                   (val && val.length > 0) ||
