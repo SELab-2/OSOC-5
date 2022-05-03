@@ -4,8 +4,8 @@ on:
   push:
     # branches:
     #   - main
-    paths:
-      - 'be/osoc/**/*.py'
+    # paths:
+    #   - 'be/osoc/**/*.py'
 
 jobs:
   django:
@@ -43,3 +43,7 @@ jobs:
       env:
         POSTGRES_HOST: localhost
         REDIS_HOST: localhost
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        fail_ci_if_error: true
