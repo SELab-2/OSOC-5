@@ -216,9 +216,8 @@ export const useProjectStore = defineStore('project', {
         const suggestionIndex = project.suggestedStudents?.findIndex(
           (s) => s.student.url === student && s.skill.url === skill
         )
-
         if (
-          suggestionIndex &&
+          suggestionIndex !== undefined &&
           suggestionIndex !== -1 &&
           project.suggestedStudents &&
           suggestionIndex < project.suggestedStudents.length &&
