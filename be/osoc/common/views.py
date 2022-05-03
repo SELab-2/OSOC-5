@@ -1,7 +1,8 @@
 """
 Views that create a connection between the database and the application.
 """
-from rest_framework import viewsets, mixins, permissions, status, generics, filters
+# pylint: disable=invalid-name
+from rest_framework import viewsets, mixins, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import PermissionDenied
 from rest_framework.decorators import action
@@ -11,33 +12,44 @@ from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_auth.registration.views import SocialLoginView
 from django.db.models import RestrictedError
-from django.urls import resolve
-from urllib.parse import urlparse
-from .filters import *
-from .serializers import *
-from .models import *
-from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from .pagination import StandardPagination
+from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
+    StudentFinalDecisionFilter, EmailDateTimeFilter
+from .serializers import StudentSerializer, CoachSerializer, ProjectSerializer, \
+    ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
+    UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
+from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
+from .tally.tally import TallyForm
+from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
 
-class StudentViewSet(viewsets.ModelViewSet):
+class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows students to be viewed, edited or searched.
-    Search students with the query parameter ?search=
-    Filter students with the query parameters:
-        ?alum=[true, false]
-        ?language=string
-        ?skills=:id:
-        ?student_coach=[true, false]
-        ?english_rating=[1-5]
-        ?status=[0-5]
-        ?on_project=[true, false]
-        ?suggested_by_user=[true, false]
-        ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
-    example query: /api/students/?alum=true&status=0&skills=1&suggestion=yes&on_project=true&language=Dutch
+
+    - Search students with ?search=string query parameter.
+    - Filter students with the following query parameters:
+        * ?alum=[true, false]
+        * ?language=string
+        * ?skills=:id:
+        * ?student_coach=[true, false]
+        * ?english_rating=[1-5]
+        * ?status=[0-5]
+        * ?on_project=[true, false]
+        * ?suggested_by_user=[true, false]
+        * ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
+    - Use a specific page size with ?page_size=[1-500] query parameter.
+
+    Example queries:
+
+        /api/students/?search=Jan
+        /api/students/?alum=true&status=0&skills=1&suggestion=yes&on_project=true&language=Dutch
+        /api/students/?page_size=2
     """
     queryset = Student.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter,
@@ -54,35 +66,26 @@ class StudentViewSet(viewsets.ModelViewSet):
         if the coach has already made a suggestion for this student, it is updated
         returns HTTP response:
             400 BAD REQUEST: there was required data missing or the data could not be serialized
-            201 CREATED:     a new suggestion was created
-            200 OK:          an existing suggestion was found for this student from the current user, the found suggestion was updated
+            201 CREATED:     a new suggestion was created or updated
         """
-        serializer = SuggestionSerializer(
-            data=request.data, context={'request': request})
-
+        serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
+            # save suggestion
+            serializer.save(student=self.get_object(), coach=request.user, final=False)
 
-            # create Suggestion object if it doesnt exist yet, else update it
-            _, created = Suggestion.objects.update_or_create(
-                student=self.get_object(), coach=request.user, defaults=serializer.data)
-
-            response_data = serializer.data
-            response_data['coach_name'] = request.user.get_full_name()
-            response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(
-                reverse("coach-detail", args=(request.user.id,)))
-            response_data['student_id'] = pk
-
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['student_id'] = pk
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
                     'type': 'suggestion',
-                    'data': response_data
+                    'data': socket_data
                 }
             )
 
-            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer)
@@ -96,65 +99,59 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
-            student=self.get_object(), coach=request.user).delete()
+            student=self.get_object(), coach=request.user, final=False).delete()
 
+        # send data to websocket
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "suggestion",
             {
                 'type': 'remove_suggestion',
                 'data': {
-                    'student': pk,
-                    'coach': request.user.id
+                    'student_id': pk,
+                    'coach_id': request.user.id
                 }
             }
         )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
-    @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def make_final_decision(self, request, pk=None):
         """
         let an admin make a final decision for the current student
         if the admin has already made a final decision for this student, it is updated
         returns HTTP response:
             400 BAD REQUEST: there was required data missing or the data could not be serialized
-            201 CREATED:     the final decision was created
-            200 OK:          an existing final decision was found for this student from the current user, it was updated
+            201 CREATED:     the final decision was created or updated
         """
-        serializer = SuggestionSerializer(
-            data=request.data, context={'request': request})
+        serializer = SuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-
-            # create Suggestion object if it doesnt exist yet, else update it
-            suggestion, created = Suggestion.objects.update_or_create(
-                student=self.get_object(), coach=request.user, defaults=serializer.data)
-
             student = self.get_object()
+            # save suggestion
+            suggestion = serializer.save(student=student, coach=request.user, final=True)
+            # set final_decision in student
             student.final_decision = suggestion
             student.save()
 
-            response_data = serializer.data
-            response_data['coach_name'] = request.user.get_full_name()
-            response_data['coach_id'] = request.user.id
-            response_data['coach'] = request.build_absolute_uri(
-                reverse("coach-detail", args=(request.user.id,)))
-            response_data['student_id'] = pk
-            response_data['suggestion'] = request.data['suggestion']
-
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['student_id'] = pk
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
-                    'type': 'final_decision',
-                    'data': response_data
+                    'type': 'suggestion',
+                    'data': socket_data
                 }
             )
 
-            return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    @action(detail=True, methods=['delete'], serializer_class=SuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def remove_final_decision(self, request, pk=None):
         """
         let an admin remove the final decision he has made for the current student
@@ -165,36 +162,74 @@ class StudentViewSet(viewsets.ModelViewSet):
         """
         # delete Suggestion object if it is found
         deleted, _ = Suggestion.objects.filter(
-            student=self.get_object(), coach=request.user).delete()
+            student=self.get_object(), coach=request.user, final=True).delete()
 
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "suggestion",
             {
                 'type': 'final_decision',
-                'data': {'student_id': pk}
+                'data': {
+                    'student_id': pk
+                }
             }
         )
 
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    def tallyregistration(self, request, pk=None): # pylint: disable=no-self-use,unused-argument
+        """
+        Endpoint to which Tally's webhook can connect to register students.
+        returns HTTP response:
+            400 BAD REQUEST:  The request data was malformatted or a student tried to register twice
+            201 CREATED:    The student registration resulted in a new student being created
+        """
+        tally = TallyForm.from_file()
+        try:
+            form = tally.transform(tally.validate(request.data))
+            skill_names = form.pop("skills")
+            student = Student.objects.create(**form)
+            skills = []
+            for skill_name in skill_names:
+                existing_skill = Skill.objects.filter(name=skill_name).first()
+                if existing_skill is None:
+                    skills.append(Skill.objects.create(name=skill_name, color="grey"))
+                else:
+                    skills.append(existing_skill)
+            student.skills.set(skills)
+        except Exception as exc: # pylint: disable=broad-except
+            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
 
-class CoachViewSet(viewsets.GenericViewSet,
+class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin):   # no create, this is handled in RegisterView
+                   mixins.DestroyModelMixin): # No create, this is handled in RegisterView
     """
     API endpoint that allows coaches to be viewed, edited or searched.
-    a coach cannot be created by this API endpoint
-    a coach can only update and view its own data, except for admins
-    Search coaches with the query parameter ?search=
-    Filter coaches with the query parameters
-        ?is_admin=[true, false],
-        ?is_active=[true, false
-    example query: /api/coaches/?is_admin=false&is_active=true
+
+    Remarks:
+
+    A coach cannot be created using this (API) endpoint.
+    A coach can only update and view his/her own data, only
+    admins can update and view all data.
+
+    - Search coaches with ?search=string query parameter.
+    - Filter coaches with the following query parameters:
+        * ?is_admin=[true, false]
+        * ?is_active=[true, false]
+    - Use a specific page size with ?page_size=[1-500] query parameter.
+
+    Example queries:
+
+        /api/coaches/?is_admin=false&is_active=true
+        /api/coaches/?search=Cattoire
+        /api/coaches/?page_size=10
     """
     queryset = Coach.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = CoachSerializer
     permission_classes = [
         permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
@@ -202,6 +237,7 @@ class CoachViewSet(viewsets.GenericViewSet,
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
 
+    # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
         # override delete method to add a check
         coach = self.get_object()
@@ -213,8 +249,9 @@ class CoachViewSet(viewsets.GenericViewSet,
             return Response({"detail": "you cannot remove the only admin"}, status=status.HTTP_403_FORBIDDEN)
         return Response({"detail": "you cannot remove your own account"}, status=status.HTTP_403_FORBIDDEN)
 
-    @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer, permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def update_status(self, request, pk=None):
+    @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def update_status(self, request, pk=None): # pylint: disable=unused-argument
         """
         let an admin update admin rights of another user
         returns HTTP response:
@@ -229,8 +266,8 @@ class CoachViewSet(viewsets.GenericViewSet,
             coach = self.get_object()
             # check if coach is not current user
             if coach != request.user:
-                coach.is_admin = serializer.data['is_admin']
-                coach.is_active = serializer.data['is_active']
+                coach.is_admin = serializer.data.get('is_admin', coach.is_admin)
+                coach.is_active = serializer.data.get('is_active', coach.is_active)
                 coach.save()
 
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -238,25 +275,46 @@ class CoachViewSet(viewsets.GenericViewSet,
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows projects to be viewed, edited or searched.
-    only admin users have permission for this endpoint, except for suggesting students or removing suggestions
-    Search projects with the query parameter ?search=
-    Filter projects with the query parameters
-        ?required_skills=:id:,
-        ?coaches=:id:,
-        ?suggested_students=:id:
-    example query: /api/projects/?required_skills=1&coaches=2&suggested_students=1
+
+    Remark:
+
+    Only admins can access this (API) endpoint, coaches can just
+    add or remove student suggestions.
+
+    - Search projects with ?search=string query parameter.
+    - Filter projects with the following query parameters:
+        * ?required_skills=:id:,
+        * ?coaches=:id:,
+        * ?suggested_students=:id:
+    - Use a specific page size with ?page_size=[1-500] query parameter.
+
+    Example queries:
+
+        /api/projects/?required_skills=1&coaches=2&suggested_students=1
     """
     queryset = Project.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
 
-    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
+    def get_serializer_class(self):
+        """
+        override method to change serializer class in list and retrieve (GET) requests
+        this way more coach information can be returned in project responses,
+        but not needed when making POST, PUT, PATCH requests
+        """
+        if hasattr(self, 'action') and self.action == 'list' or self.action == 'retrieve':
+            return ProjectGetSerializer
+        return super().get_serializer_class()
+
+    @action(detail=True, methods=['post'], serializer_class=ProjectSuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive])
     def suggest_student(self, request, pk=None):
         """
         let a coach suggest a student for this project
@@ -267,53 +325,36 @@ class ProjectViewSet(viewsets.ModelViewSet):
             200 OK:          an existing projectsuggestion was found for this student and project from the current user,
                              the found projectsuggestion was updated
         """
-        serializer = ProjectSuggestionSerializer(
-            data=request.data, context={'request': request})
+        serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            data = serializer.data
-
             project = self.get_object()
 
-            # get student object from url
-            student_url = data.pop('student')
-            student = Student.objects.get(
-                **resolve(urlparse(student_url).path).kwargs)
-
-            # get skill object from url
-            skill_url = data.pop('skill')
-            skill = Skill.objects.get(
-                **resolve(urlparse(skill_url).path).kwargs)
-
             # check if skill is one of the required skills of the project
+            skill = serializer.validated_data.get('skill')
             if skill in project.required_skills.all():
+                # save projectsuggestion
+                serializer.save(project=project, coach=request.user)
 
-                # create ProjectSuggestion if it doesnt exist yet, else update it
-                _, created = ProjectSuggestion.objects.update_or_create(
-                    project=project, student=student, coach=request.user, skill=skill, defaults=data)
-
-                response_data = serializer.data
-                response_data['coach'] = request.build_absolute_uri(
-                    reverse("coach-detail", args=(request.user.id,)))
-                response_data['coach_name'] = request.user.get_full_name()
-                response_data['coach_id'] = request.user.id
-                response_data['student_id'] = student.id
-                response_data['project_id'] = int(pk)
-                response_data['skill_id'] = skill.id
+                # send data to websocket
+                socket_data = serializer.data
+                socket_data['project_id'] = pk
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
                     "suggestion",
                     {
                         'type': 'suggest_student',
-                        'data': response_data
+                        'data': socket_data
                     }
                 )
 
-                return Response(response_data, status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK))
-            return Response({"detail": "skill must be one of the required skills of the project"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"detail": "skill must be one of the required skills of the project"},
+                            status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # method should be delete but this is not possible because delete requests cannot handle request body
-    @action(detail=True, methods=['post'], serializer_class=RemoveProjectSuggestionSerializer, permission_classes=[permissions.IsAuthenticated, IsActive])
+    @action(detail=True, methods=['post'], serializer_class=RemoveProjectSuggestionSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive])
     def remove_student(self, request, pk=None):
         """
         let a coach remove a projectsuggestion for this project
@@ -327,35 +368,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
             data=request.data, context={'request': request})
         if serializer.is_valid():
 
-            # get student object from url
-            student_url = serializer.data.pop('student')
-            student = Student.objects.get(
-                **resolve(urlparse(student_url).path).kwargs)
-
-            # get coach object from url
-            coach_url = serializer.data.pop('coach')
-            coach = Coach.objects.get(
-                **resolve(urlparse(coach_url).path).kwargs)
-
-            # get skill object from url
-            skill_url = serializer.data.pop('skill')
-            skill = Skill.objects.get(
-                **resolve(urlparse(skill_url).path).kwargs)
-
             # delete ProjectSuggestion object if it is found
             deleted, _ = ProjectSuggestion.objects.filter(
-                project=self.get_object(), coach=coach, student=student, skill=skill).delete()
+                project=self.get_object(),
+                **serializer.validated_data
+            ).delete()
 
+            # send data to websocket
+            socket_data = serializer.data
+            socket_data['project_id'] = pk
             channel_layer = get_channel_layer()
-            websocket_data = serializer.data
-            websocket_data['skill'] = skill_url
-            websocket_data['student'] = student_url
-            websocket_data['project_id'] = int(pk)
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
                     'type': 'remove_student',
-                    'data': websocket_data
+                    'data': socket_data
                 }
             )
 
@@ -363,7 +390,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive])
-    def get_conflicting_projects(self, request):
+    def get_conflicting_projects(self, request): # pylint: disable=no-self-use
         """
         get a list of conflicting projects;
         two projects are conflicting if one student has been suggested/assigned to both of them
@@ -381,17 +408,25 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response({"conflicts": conflicts}, status=status.HTTP_200_OK)
 
 
-class SkillViewSet(viewsets.ModelViewSet):
+class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows skills to be viewed, edited or searched.
-    Search skills with the query parameter ?search=
+
+    - Search skills with ?search=string query parameter.
+    - Use a specific page size with ?page_size=[1-500] query parameter.
+
+    Example queries:
+
+        /api/skills/?search=Back-end Developer
     """
     queryset = Skill.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = SkillSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
+    # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
         if request.user.is_admin:
             try:
@@ -403,19 +438,25 @@ class SkillViewSet(viewsets.ModelViewSet):
         raise PermissionDenied()
 
 
-class SentEmailViewSet(viewsets.ModelViewSet):
+class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows sent emails to be viewed, edited or searched.
-    Search emails with the query parameter ?search=
-    Filter emails with the query parameters
-        ?sender=:id:,
-        ?receiver=:id:,
-        ?date=yyyy-mm-dd,
-        ?before=yyyy-mm-ddThh:mm:ss,
-        ?after=yyyy-mm-ddThh:mm:ss
-    example query: /api/emails/?sender=1&after=2022-04-03
+
+    - Search emails with ?search=string query parameter.
+    - Filter emails with the following query parameters:
+        * ?sender=:id:,
+        * ?receiver=:id:,
+        * ?date=yyyy-mm-dd,
+        * ?before=yyyy-mm-ddThh:mm:ss,
+        * ?after=yyyy-mm-ddThh:mm:ss
+    - Use a specific page size with ?page_size=[1-500] query parameter.
+
+    Example queries:
+
+        /api/emails/?sender=1&after=2022-04-03
     """
     queryset = SentEmail.objects.all().order_by('id')
+    pagination_class = StandardPagination
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter,
@@ -423,29 +464,19 @@ class SentEmailViewSet(viewsets.ModelViewSet):
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
 
-
-class RegisterView(generics.GenericAPIView):
-    """
-    API view that handles registering users; Only admins can
-    register new users.
-    """
-    serializer_class = RegisterSerializer
-    permission_classes = (permissions.IsAdminUser,)
-
-    @classmethod
-    def get_extra_actions(cls):
-        return []
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response({
-            "user": CoachSerializer(user, context=self.get_serializer_context()).data
-        })
+    # pylint: disable=arguments-differ
+    def create(self, request):
+        serializer = SentEmailSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(sender=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GithubLogin(SocialLoginView):
+    """
+    Github login view.
+    """
     adapter_class = GitHubOAuth2Adapter
     callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"
     client_class = OAuth2Client

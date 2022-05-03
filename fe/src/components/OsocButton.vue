@@ -117,8 +117,6 @@ export default defineComponent({
 })
 </script>
 
-
-
 <style lang="scss">
 
 .bttn {
@@ -126,7 +124,7 @@ export default defineComponent({
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  
+  border-radius: 10px;
   span {
     pointer-events: none;
   }

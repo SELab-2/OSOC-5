@@ -2,13 +2,14 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import AppPageVue from '../components/AppPage.vue'
 import FormPageVue from '../features/authentication/FormPage.vue'
 import LoginFormVue from '../features/authentication/LoginForm.vue'
-import SignupFormVue from '../features/authentication/SignupForm.vue'
 import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
 import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
 import ResolveConflicts from '../features/projects/ResolveConflicts.vue'
 import UserList from '../features/users/UserList.vue'
+import AddUser from '../features/addUser/AddUser.vue'
+import MailList from '../features/mails/MailList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
 import { useStudentStore } from '../stores/useStudentStore'
 
@@ -17,11 +18,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '',
     component: FormPageVue,
     children: [
-      {
-        path: 'signup',
-        component: SignupFormVue,
-        name: 'Signup',
-      },
       {
         path: 'login',
         alias: '',
@@ -82,6 +78,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: UserList,
+      },
+      {
+        path: '/mails',
+        name: 'Mails',
+        meta: {
+          requiresAuth: true,
+        },
+        component: MailList,
       },
     ],
   },

@@ -4,35 +4,16 @@
     color="bg-grey-3"
     :select-student="selectStudent"
     :draggable="false"
+    :must-hover="false"
     @update="update"
   />
 
-  <div
-    :key="studentKey"
-    class="justify-between row q-px-lg q-pt-lg studentcol"
-  >
-    <div class="row q-pa-sm q-gutter-sm items-center">
-      <h class="text-bold text-h4">
-        {{ name }}
-      </h>
-      <q-btn
-        :href="student ? student.cv.toString() : ''"
-        target="_blank"
-        size="12px"
-        rounded
-        outline
-        color="black"
-        label="CV"
-      />
-      <q-btn
-        :href="student ? student.portfolio.toString() : ''"
-        target="_blank"
-        size="12px"
-        rounded
-        outline
-        color="black"
-        label="Portfolio"
-      />
+  <div :key="studentKey"
+    class="justify-between row q-px-lg q-pt-lg studentcol">
+    <div class="row q-px-sm q-gutter-sm items-center">
+      <h class="text-bold text-h4">{{ student ? student.fullName : '' }}</h>
+      <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
+      <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
     <div
       v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
@@ -62,7 +43,6 @@
       />
     </div>
   </div>
-
   <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
     <InfoDiv
       v-if="student?.alum"
@@ -244,9 +224,14 @@ export default defineComponent ({
     },
   },
   setup() {
+    
+    const baseURL =
+    process.env.NODE_ENV == 'development'
+      ? 'ws://localhost:8000/ws/socket_server/'
+      : 'wss://sel2-5.ugent.be/ws/socket_server/'
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
-    const socket = new WebSocket('ws://localhost:8000/ws/socket_server/')
+    const socket = new WebSocket(baseURL)
 
     return {
       authenticationStore,
@@ -272,9 +257,6 @@ export default defineComponent ({
     },
     possibleSuggestion(): string {
       return this.studentStore.possibleSuggestion.toString()
-    },
-    name(): string {
-      return this.student ? this.student.firstName + ' ' + this.student.lastName : ""
     },
     gender(): string {
       let gender = ''
@@ -326,7 +308,7 @@ export default defineComponent ({
     },
     mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coachId === this.authenticationStore.loggedInUser?.id)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach.id === this.authenticationStore.loggedInUser?.id)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion.toString() : (-1).toString()
       } else {

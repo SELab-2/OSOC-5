@@ -3,7 +3,9 @@ import { Suggestion } from './Suggestion'
 
 export interface TempStudent {
   student: string
-  coach: string
+  coach:
+    | { id: number; firstName: string; lastName: string; url: string }
+    | string
   skill: string
   reason: string
 }
@@ -38,6 +40,7 @@ export interface StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
+  status: string
 }
 
 export class Student implements StudentInterface {
@@ -70,8 +73,9 @@ export class Student implements StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
+  status: string
 
-  constructor(obj: StudentInterface);
+  constructor(obj: StudentInterface)
   constructor(
     url: string,
     id: number,
@@ -101,10 +105,10 @@ export class Student implements StudentInterface {
     gender: number,
     hinderWork: string,
     pronouns: string,
-    studentCoach: boolean
-  );
+    studentCoach: boolean,
+    status: string)
 
-  constructor (...args: any[]) {
+  constructor(...args: any[]) {
     if (args.length == 1) {
       Object.assign(this, args[0])
     } else {
@@ -137,6 +141,11 @@ export class Student implements StudentInterface {
       this.hinderWork = args[26]
       this.pronouns = args[27]
       this.studentCoach = args[28]
+      this.status = args[29]
     }
+  }
+
+  get fullName(): string {
+    return this.firstName + " " + this.lastName;
   }
 }

@@ -25,7 +25,7 @@
             v-model="filter"
             dense
             outlined
-            label="Outlined"
+            label="Search Projects"
             style="margin-right: 10px"
           />
         </div>
@@ -37,16 +37,17 @@
           shadow-strength="1.8"
           @click="expanded = !expanded"
         />
-        
         <btn
           padding="7px"
           icon="r_warning"
           color="red"
-          label="Conflicts"
           to="/projects/conflicts"
           shadow-color="red"
           shadow-strength="2.5"
-        />
+          no-wrap
+        >
+        <div class="ellipsis">Conflicts</div>
+        </btn>
       </q-toolbar>
 
       <masonry-wall
@@ -87,15 +88,21 @@ import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
 import {useStudentStore} from "../../stores/useStudentStore";
 
+
+
 export default defineComponent({
   name: 'ProjectList',
   components: { SideBar, ProjectCard },
   setup() {
-
+  const baseURL =
+    process.env.NODE_ENV == 'development'
+      ? 'ws://localhost:8000/ws/socket_server/'
+      : 'wss://sel2-5.ugent.be/ws/socket_server/'
+    console.log(baseURL)
     return {
       projectStore: useProjectStore(),
       studentStore: useStudentStore(),
-      socket: new WebSocket('ws://localhost:8000/ws/socket_server/')
+      socket: new WebSocket(baseURL)
     }
   },
   data() {
