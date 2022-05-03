@@ -9,6 +9,7 @@ djangorestframework
 drf-yasg
 django-nose
 coverage
+factory_boy
 django-cors-headers
 django-filter
 channels

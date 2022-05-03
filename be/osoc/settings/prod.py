@@ -3,6 +3,7 @@ Django settings for production.
 
 Created to run on "sel2-5.ugent.be" domain.
 """
+# pylint: disable=wildcard-import,unused-wildcard-import
 import os
 from .common import *  # noqa
 # Import development environment

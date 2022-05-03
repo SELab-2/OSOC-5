@@ -125,7 +125,7 @@ class Coach(AbstractUser):  # models.Model):
         See https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.clean_fields
         """
         self.full_clean()
-        super(Coach, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.get_full_name()
@@ -151,6 +151,10 @@ class Student(models.Model):
     Student; Person who would like to participate in an OSOC project.
     """
     class Gender(models.TextChoices):
+        """
+        Gender enum, gender can be Male, Female, Transgender or Unknown
+        when a student chooses 'rather not tell' on the tally form (see tally.py), the Unknown state is selected here
+        """
         FEMALE = '0', _('Female')
         MALE = '1', _('Male')
         TRANSGENDER = '2', _('Transgender')
@@ -327,7 +331,7 @@ class Student(models.Model):
         See https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.clean_fields
         """
         self.full_clean()
-        super(Student, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.get_full_name()
@@ -397,6 +401,10 @@ class Suggestion(models.Model):
                 can be used.
     """
     class Suggestion(models.TextChoices):
+        """
+        suggestion type enum, suggestion type can be Yesm No or Maybe
+        when a coach selects 'undecided' for a suggestion, the suggestion is removed in the backend
+        """
         YES = '0', _('Yes')
         NO = '1', _('No')
         MAYBE = '2', _('Maybe')
