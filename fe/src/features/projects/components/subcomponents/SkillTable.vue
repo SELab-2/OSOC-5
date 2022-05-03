@@ -6,6 +6,7 @@
     :loading="skillStore.isLoadingSkills"
     row-key="skill"
     :filter="filterSkills"
+    :filter-method="filterSkillsMethode"
   >
     <template #body="props">
       <q-tr
@@ -111,7 +112,7 @@
             style="color: #f14a3b"
             icon="mdi-trash-can-outline"
             glow-color="red-2"
-            @click="delete_skill(props.row)"
+            @click="deleteSkillMethode(props.row)"
           />
         </q-td>
       </q-tr>
@@ -166,7 +167,7 @@ export default defineComponent({
     }
   },
   methods: {
-    delete_skill(skill: ProjectTableSkill) {
+    deleteSkillMethode(skill: ProjectTableSkill) {
       this.deleteSkill = skill.id
       this.deleteSkillName = skill.name
     },
@@ -180,6 +181,9 @@ export default defineComponent({
       this.errorMessageSkillAmount = ''
       return true
     },
-  },
+    filterSkillsMethode(){
+      return this.skillStore.skills.filter(row => row.name.toLowerCase().startsWith(this.filterSkills))
+    },
+  }
 })
 </script>
