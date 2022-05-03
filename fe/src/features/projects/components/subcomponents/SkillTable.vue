@@ -102,7 +102,7 @@ import { defineComponent } from '@vue/runtime-core'
 import { ref } from 'vue'
 import { ProjectTableSkill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
-import columnsSkills from '../../../../models/ProjectRolesColumns'
+import columnsSkills from '../../../../models/ProjectSkillsColumns'
 import DeleteSkillDialog from './DeleteSkillDialog.vue'
 
 export default defineComponent({
