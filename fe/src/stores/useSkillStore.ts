@@ -43,7 +43,7 @@ export const useSkillStore = defineStore('skills', {
       this.skills = []
       console.log("LOAD SKILLS")
       instance
-        .get('skills/')
+        .get('skills/?page_size=500')
         .then(({ data }) => {
           // set the skill of the store
           for (const skill of data['results'] as Skill[]) {
@@ -70,7 +70,7 @@ export const useSkillStore = defineStore('skills', {
       console.log(`Adding new skill: ${newSkillName}.`)
 
       instance
-        .post('skills/?page_size=500', {
+        .post('skills/', {
           name: newSkillName,
           color: color,
         })
