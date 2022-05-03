@@ -37,7 +37,7 @@
           </btn>
           <btn flat round size="12px" color="primary" icon="mail" />
           <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
-          <btn flat round size="12px" color="primary" icon="edit" />
+          <btn flat round size="12px" color="primary" icon="edit" @click="triggerEditProject"/>
         </div>
       </div>
 
@@ -138,21 +138,22 @@
 <script lang="ts">
 import ProjectRoleChip from './ProjectRoleChip.vue'
 import { useProjectStore } from '../../../stores/useProjectStore'
-import { reactive, ref, Ref, nextTick, defineComponent } from 'vue'
+import { ref, defineComponent } from 'vue'
 import { useQuasar } from 'quasar'
 import {
   ProjectSuggestionInterface,
   ProjectSuggestion,
   NewProjectSuggestion
 } from '../../../models/ProjectSuggestion'
-import { ProjectSkillInterface, Skill } from '../../../models/Skill'
+import { ProjectSkillInterface } from '../../../models/Skill'
 import { Project } from '../../../models/Project'
 import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-import { Suggestion } from '../../../models/Suggestion'
-var test = 0
+import router from "../../../router";
+
+
 export default defineComponent({
   props: {
     project: {
@@ -304,6 +305,13 @@ export default defineComponent({
         suggestion.skill.url,
         suggestion.reason
       )
+    },
+    triggerEditProject(){
+      // this.projectStore
+      // this.project
+      // todo wss gwn url redirecten voor edit naar juiste url en dan project store, skill store setten
+      // this.projectStore.editProject(this.project)
+      // router.push('/projects/create')
     }
     
   },

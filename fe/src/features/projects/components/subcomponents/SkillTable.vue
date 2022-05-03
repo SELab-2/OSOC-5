@@ -2,20 +2,29 @@
   <q-table
     class="table shadow-4"
     :rows="skillStore.skills"
-    :columns="columnsRoles"
+    :columns="columnsSkills"
     :loading="skillStore.isLoadingSkills"
-    row-key="name"
-    :filter="filterRoles"
+    row-key="skill"
+    :filter="filterSkills"
+    :filter-method="filterSkillsMethod"
   >
     <template #body="props">
       <q-tr
         :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''"
         :props="props"
       >
-        <q-td key="role" :props="props">
+        <q-td
+          key="skill"
+          :props="props"
+          auto-width
+        >
           {{ props.row.name }}
         </q-td>
-        <q-td key="amount" :props="props">
+        <q-td
+          key="amount"
+          :props="props"
+          auto-width
+        >
           {{ props.row.amount }}
           <q-popup-edit
             v-slot="scope"
@@ -29,8 +38,8 @@
               v-model.number="scope.value"
               type="number"
               hint="Enter a positive number."
-              :error="errorRoleAmount"
-              :error-message="errorMessageRoleAmount"
+              :error="errorSkillAmount"
+              :error-message="errorMessageSkillAmount"
               dense
               autofocus
               borderless
@@ -38,9 +47,24 @@
             />
           </q-popup-edit>
         </q-td>
-        <q-td key="comment" :props="props">
-          <div>{{ props.row.comment }}</div>
-          <q-popup-edit v-slot="scope" v-model="props.row.comment" buttons>
+        <q-td
+          key="comment"
+          :props="props"
+        >
+          <div v-if="props.row.comment.length !== 0">
+            {{ props.row.comment }}
+          </div>
+          <div
+            v-else
+            style="font-style: italic; color: gray"
+          >
+            Click to add comment.
+          </div>
+          <q-popup-edit
+            v-slot="scope"
+            v-model="props.row.comment"
+            buttons
+          >
             <q-input
               v-model="scope.value"
               type="text"
@@ -52,11 +76,18 @@
             />
           </q-popup-edit>
         </q-td>
-        <q-td key="color" :props="props" auto-width>
-          <div
-            :style="`height: 25px; width:25px; border-radius: 50%;background: ${props.row.color}`"
+        <q-td
+          key="color"
+          :props="props"
+          auto-width
+        >
+          <q-chip
+            clickable
+            :color="`${props.row.color}-8`"
+            :class="`bg-${props.row.color}-4`"
+            :style="`height: 25px; width:25px; border-radius: 50%`"
           />
-          <!--          &lt;!&ndash; TODO make this actually change in the database not locally&ndash;&gt;-->
+          <!--         TODO: edit color, same dropdown as make new skill -->
           <!--          <q-popup-edit-->
           <!--            v-slot="scope"-->
           <!--            v-model="props.row.color"-->
@@ -71,14 +102,17 @@
           <!--            />-->
           <!--          </q-popup-edit>-->
         </q-td>
-        <q-td key="remove" style="width: 10px">
+        <q-td
+          key="remove"
+          style="width: 10px"
+        >
           <btn
             flat
             round
             style="color: #f14a3b"
             icon="mdi-trash-can-outline"
             glow-color="red-2"
-            @click="delete_role(props.row)"
+            @click="deleteSkillMethod(props.row)"
           />
         </q-td>
       </q-tr>
@@ -87,12 +121,12 @@
 
   <q-dialog
     class="full-width"
-    :model-value="deleteRole !== -1"
-    @update:model-value="deleteRole = -1"
+    :model-value="deleteSkill !== -1"
+    @update:model-value="deleteSkill = -1"
   >
-    <DeleteRoleDialog
-      :delete-role-id="deleteRole"
-      :delete-role-name="deleteRoleName"
+    <DeleteSkillDialog
+      :delete-skill-id="deleteSkill"
+      :delete-skill-name="deleteSkillName"
     />
   </q-dialog>
 </template>
@@ -102,49 +136,54 @@ import { defineComponent } from '@vue/runtime-core'
 import { ref } from 'vue'
 import { ProjectTableSkill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
-import columnsRoles from '../../../../models/ProjectRolesColumns'
-import DeleteRoleDialog from './DeleteRoleDialog.vue'
+import columnsSkills from '../../../../models/ProjectSkillsColumns'
+import DeleteSkillDialog from './DeleteSkillDialog.vue'
 
 export default defineComponent({
-  components: { DeleteRoleDialog },
+  components: { DeleteSkillDialog },
+  props: {
+    filterSkills: {
+      type: String,
+      required: true,
+    },
+  },
   setup() {
     const skillStore = useSkillStore()
 
-    // Filters
-    const filterRoles = ref('')
+    const deleteSkill = ref(-1)
+    const deleteSkillName = ref('')
 
-    const deleteRole = ref(-1)
-    const deleteRoleName = ref('')
-
-    // Role amount error handling
-    const errorRoleAmount = ref(false)
-    const errorMessageRoleAmount = ref('')
+    // Skill amount error handling
+    const errorSkillAmount = ref(false)
+    const errorMessageSkillAmount = ref('')
 
     return {
       skillStore,
-      deleteRole,
-      filterRoles,
-      columnsRoles,
-      errorRoleAmount,
-      errorMessageRoleAmount,
-      deleteRoleName,
+      deleteSkill,
+      columnsSkills,
+      errorSkillAmount,
+      errorMessageSkillAmount,
+      deleteSkillName,
     }
   },
   methods: {
-    delete_role(role: ProjectTableSkill) {
-      this.deleteRole = role.id
-      this.deleteRoleName = role.name
+    deleteSkillMethod(skill: ProjectTableSkill) {
+      this.deleteSkill = skill.id
+      this.deleteSkillName = skill.name
     },
     amountRangeValidation(val: number) {
       if (val < 0) {
-        this.errorRoleAmount = true
-        this.errorMessageRoleAmount = 'The value must be positive!'
+        this.errorSkillAmount = true
+        this.errorMessageSkillAmount = 'The value must be positive!'
         return false
       }
-      this.errorRoleAmount = false
-      this.errorMessageRoleAmount = ''
+      this.errorSkillAmount = false
+      this.errorMessageSkillAmount = ''
       return true
     },
-  },
+    filterSkillsMethod(){
+      return this.skillStore.skills.filter(row => row.name.toLowerCase().startsWith(this.filterSkills))
+    },
+  }
 })
 </script>
