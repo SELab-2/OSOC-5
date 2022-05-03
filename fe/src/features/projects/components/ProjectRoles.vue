@@ -11,13 +11,13 @@
         color="primary"
         icon="add"
         label="Add role"
-        @click="newRolePrompt = true"
+        @click="newSkillPrompt = true"
         glow-color="#00F1AF"
         shadow-strength=2
       />
       <q-space />
       <q-input
-        v-model="filterRoles"
+        v-model="filterSkills"
         style="max-width: 190px"
         outlined
         dense
@@ -29,13 +29,13 @@
       >
         <template #append>
           <q-icon
-            v-if="filterRoles !== ''"
+            v-if="filterSkills !== ''"
             name="close"
             class="cursor-pointer"
-            @click="filterRoles = ''"
+            @click="filterSkills = ''"
           />
           <q-icon
-            v-if="filterRoles === ''"
+            v-if="filterSkills === ''"
             name="search"
           />
         </template>
@@ -43,16 +43,16 @@
     </div>
 
     <q-dialog
-      v-model="newRolePrompt"
+      v-model="newSkillPrompt"
       persistent
     >
       <NewRoleDialog
-        :new-role-prompt="newRolePrompt"
-        :reset-new-role-prompt="() => newRolePrompt = false"
+        :new-role-prompt="newSkillPrompt"
+        :reset-new-role-prompt="() => newSkillPrompt = false"
       />
     </q-dialog>
 
-    <RoleTable :new-role-prompt="newRolePrompt" />
+    <RoleTable :new-role-prompt="newSkillPrompt" />
   </div>
 </template>
 
@@ -61,7 +61,7 @@ import {defineComponent} from "@vue/runtime-core";
 import { ref } from "vue";
 import RoleTable from "./subcomponents/RoleTable.vue";
 import {useSkillStore} from "../../../stores/useSkillStore";
-import NewRoleDialog from "./subcomponents/NewRoleDialog.vue";
+import NewRoleDialog from "./subcomponents/NewSkillDialog.vue";
 
 export default defineComponent ({
   components: {NewRoleDialog, RoleTable},
@@ -69,19 +69,19 @@ export default defineComponent ({
     const skillStore = useSkillStore()
 
     // Filters
-    const filterRoles = ref('')
+    const filterSkills = ref('')
 
     // variables for the new role dialog popup
-    const newRolePrompt = ref(false)
-    const newRole = ref('')
-    const newRoleColor = ref('')
+    const newSkillPrompt = ref(false)
+    const newSkill = ref('')
+    const newSkillColor = ref('')
 
     return {
       skillStore,
-      filterRoles,
-      newRolePrompt,
-      newRole,
-      newRoleColor,
+      filterSkills,
+      newSkillPrompt,
+      newSkill,
+      newSkillColor,
     }
   },
 })

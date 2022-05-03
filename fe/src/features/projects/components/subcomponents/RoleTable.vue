@@ -103,7 +103,7 @@ import { ref } from 'vue'
 import { ProjectTableSkill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import columnsRoles from '../../../../models/ProjectRolesColumns'
-import DeleteRoleDialog from './DeleteRoleDialog.vue'
+import DeleteRoleDialog from './DeleteSkillDialog.vue'
 
 export default defineComponent({
   components: { DeleteRoleDialog },

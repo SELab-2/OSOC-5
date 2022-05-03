@@ -2,13 +2,13 @@
   <q-card class="create-role-popup">
     <q-card-section>
       <div class="text-h6">
-        Create a new role
+        Create a new skill
       </div>
     </q-card-section>
 
     <q-card-section class="q-pt-none">
       <q-input
-        v-model="newRole"
+        v-model="newSkill"
         outlined
         autofocus
         class="inputfield"
@@ -16,14 +16,14 @@
         lazy-rules
         :rules="[
             (val) =>
-              (val && val.length > 0) || 'Enter the name of the new role.',
+              (val && val.length > 0) || 'Enter the name of the new skill.',
           ]"
       />
     </q-card-section>
     <q-card-section class="q-pt-none">
       <!--  TODO remove the text input if/when we use the color picker -->
       <q-input
-        v-model="newRoleColor"
+        v-model="newSkillColor"
         outlined
         label="text color"
         class="inputfield"
@@ -32,7 +32,7 @@
       <!--  INFO if picker gives conversion issues use-->
       <!--  INFO https://quasar.dev/quasar-utils/color-utils#color-conversion-->
 <!--      <q-color-->
-<!--        v-model="newRoleColor"-->
+<!--        v-model="newSkillColor"-->
 <!--        no-header-->
 <!--        no-footer-->
 <!--        class="color-picker"-->
@@ -51,8 +51,8 @@
       <btn
         v-close-popup
         flat
-        label="Add role"
-        @click="newRoleConfirm"
+        label="Add skill"
+        @click="newSkillConfirm"
         glow-color="#C0FFF4"
       />
     </q-card-actions>
@@ -66,11 +66,11 @@ import {useSkillStore} from "../../../../stores/useSkillStore";
 
 export default defineComponent ({
   props: {
-    newRolePrompt: {
+    newSkillPrompt: {
       type: Boolean,
       required: true
     },
-    resetNewRolePrompt: {
+    resetNewSkillPrompt: {
       type: Function,
       required: true
     }
@@ -82,29 +82,29 @@ export default defineComponent ({
     const filterRoles = ref('')
 
     // variables for the new role dialog popup
-    const newRole = ref('')
-    const newRoleColor = ref('')
+    const newSkill = ref('')
+    const newSkillColor = ref('')
 
     return {
       skillStore,
       filterRoles,
-      newRole,
-      newRoleColor
+      newSkill,
+      newSkillColor
     }
   },
   methods: {
-    newRoleConfirm() {
+    newSkillConfirm() {
       // check if the new role value is valid
       if (
-        this.newRole &&
-        this.newRole.length > 0 &&
-        this.newRoleColor.length > 0
+        this.newSkill &&
+        this.newSkill.length > 0 &&
+        this.newSkillColor.length > 0
       ) {
         console.log("test")
         // when valid call the store object and add the skill
         this.skillStore.addSkill(
-          this.newRole,
-          this.newRoleColor,
+          this.newSkill,
+          this.newSkillColor,
 
           // callback
           (success: boolean) => {
@@ -112,17 +112,17 @@ export default defineComponent ({
               this.$q.notify({
                 icon: 'done',
                 color: 'positive',
-                message: `Added new project role: ${this.newRole}.`,
+                message: `Added new project skill: ${this.newSkill}.`,
                 textColor: 'black',
               })
-              this.resetNewRolePrompt()
-              this.newRole = ''
-              this.newRoleColor = ''
+              this.resetNewSkillPrompt()
+              this.newSkill = ''
+              this.newSkillColor = ''
             } else {
               this.$q.notify({
                 icon: 'close',
                 color: 'negative',
-                message: 'Failed to add role!',
+                message: 'Failed to add skill!',
               })
             }
           }
