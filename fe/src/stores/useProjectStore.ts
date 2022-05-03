@@ -6,7 +6,8 @@ import {
   Skill,
   ProjectSkillInterface,
   ProjectSkill,
-  TempProjectSkill, ProjectTableSkill,
+  TempProjectSkill,
+  ProjectTableSkill,
 } from '../models/Skill'
 import {
   ProjectSuggestionInterface,
@@ -16,7 +17,7 @@ import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
-import { convertObjectKeysToSnakeCase } from "../utils/case-conversion";
+import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
@@ -36,7 +37,7 @@ export const useProjectStore = defineStore('project', {
     projectPartnerName: '',
     projectLink: '',
     filterCoaches: '',
-    selectedCoaches: []
+    selectedCoaches: [],
   }),
   actions: {
     async getConflictingProjects() {
@@ -45,7 +46,6 @@ export const useProjectStore = defineStore('project', {
       const { data } = await instance.get('projects/get_conflicting_projects')
       const conflicts = new Map()
       for (const conflict of Object.entries(data.conflicts)) {
-        console.log(conflict)
         const student = await studentStore.getStudent(conflict[0])
         const projects = await Promise.all(
           (conflict[1] as string[]).map(
@@ -154,7 +154,9 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       this.isLoadingProjects = true
       try {
-        const { results } = (await instance.get<{results: TempProject[]}>('projects/')).data
+        const { results } = (
+          await instance.get<{ results: TempProject[] }>('projects/')
+        ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
@@ -258,9 +260,9 @@ export const useProjectStore = defineStore('project', {
       }
     },
     submitProject(
-        skills: Array<ProjectTableSkill>,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        callback: any
+      skills: Array<ProjectTableSkill>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      callback: any
     ) {
       const skillsList: Array<TempProjectSkill> = []
 
@@ -290,26 +292,27 @@ export const useProjectStore = defineStore('project', {
 
       // POST request to make a project
       instance
-          .post('projects/', convertObjectKeysToSnakeCase(data))
-          .then((response) => {
-            console.log(response);
-            this.loadProjects()
+        .post('projects/', convertObjectKeysToSnakeCase(data))
+        .then((response) => {
+          console.log(response)
+          this.loadProjects()
 
-            // this.projects.push({
-            //   name: response['data']['name'],
-            //   id:  response['data']['id'],
-            //   partnerName: response['data']['partner_name'],
-            //   extraInfo: response['data']['extra_info'],
-            //   requiredSkills: response['data']['required_skills'],
-            //   coaches: response['data']['coaches'],
-            // });
+          // this.projects.push({
+          //   name: response['data']['name'],
+          //   id:  response['data']['id'],
+          //   partnerName: response['data']['partner_name'],
+          //   extraInfo: response['data']['extra_info'],
+          //   requiredSkills: response['data']['required_skills'],
+          //   coaches: response['data']['coaches'],
+          // });
 
-            callback(true);
-          })
-          .catch(function (error) {
-            console.log(error)
-            callback(false)
-          })
+          callback(true)
+        })
+        .catch(function (error) {
+          console.log(error)
+          callback(false)
+        })
     },
+    resolveConflict() {},
   },
 })

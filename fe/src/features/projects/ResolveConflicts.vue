@@ -48,6 +48,11 @@
               @scroll="showShadow = $event.target.scrollTop > 5"
             >
               <template #default="{ item }">
+                <q-radio
+                  v-model="selectedProject"
+                  :val="item"
+                  label="Select this project "
+                />
                 <ProjectConflictCard :project="item" />
               </template>
             </masonry-wall>
@@ -55,6 +60,16 @@
           <div v-else>
             Please select a student
           </div>
+        </div>
+        <div
+          v-if="studentProjects.length !== 0"
+          class="col-2"
+        >
+          <q-btn
+            color="primary"
+            label="Submit"
+            @click="resolveConflict()"
+          />
         </div>
       </div>
     </div>
@@ -78,12 +93,16 @@ export default defineComponent({
             conflicts,
             selectedStudent,
             showShadow: ref(false),
+            selectedProject: ref({}),
             studentProjects
         }
     },
     methods: {
       fullName(user: { firstName: string; lastName: string }) {
         return `${user.firstName} ${user.lastName}`
+      },
+      resolveConflict() {
+        this.projectStore.resolveConflict(this.selectedProject)
       }
     }
 })

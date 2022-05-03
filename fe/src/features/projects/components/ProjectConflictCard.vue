@@ -127,6 +127,10 @@
         </div>
       </q-slide-transition>
     </q-card-section>
+
+    <!-- <q-card-actions>
+     
+    </q-card-actions> -->
   </q-card>
 </template>
 
