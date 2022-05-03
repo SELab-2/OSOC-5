@@ -2,17 +2,17 @@
   <q-table
     class="table shadow-4"
     :rows="skillStore.skills"
-    :columns="columnsRoles"
+    :columns="columnsSkills"
     :loading="skillStore.isLoadingSkills"
     row-key="name"
-    :filter="filterRoles"
+    :filter="filterSkills"
   >
     <template #body="props">
       <q-tr
         :class="props.rowIndex % 2 === 1 ? 'bg-green-1' : ''"
         :props="props"
       >
-        <q-td key="role" :props="props">
+        <q-td key="skill" :props="props">
           {{ props.row.name }}
         </q-td>
         <q-td key="amount" :props="props">
@@ -29,8 +29,8 @@
               v-model.number="scope.value"
               type="number"
               hint="Enter a positive number."
-              :error="errorRoleAmount"
-              :error-message="errorMessageRoleAmount"
+              :error="errorSkillAmount"
+              :error-message="errorMessageSkillAmount"
               dense
               autofocus
               borderless
@@ -78,7 +78,7 @@
             style="color: #f14a3b"
             icon="mdi-trash-can-outline"
             glow-color="red-2"
-            @click="delete_role(props.row)"
+            @click="delete_skill(props.row)"
           />
         </q-td>
       </q-tr>
@@ -87,12 +87,12 @@
 
   <q-dialog
     class="full-width"
-    :model-value="deleteRole !== -1"
-    @update:model-value="deleteRole = -1"
+    :model-value="deleteSkill !== -1"
+    @update:model-value="deleteSkill = -1"
   >
-    <DeleteRoleDialog
-      :delete-role-id="deleteRole"
-      :delete-role-name="deleteRoleName"
+    <DeleteSkillDialog
+      :delete-skill-id="deleteSkill"
+      :delete-skill-name="deleteSkillName"
     />
   </q-dialog>
 </template>
@@ -102,47 +102,47 @@ import { defineComponent } from '@vue/runtime-core'
 import { ref } from 'vue'
 import { ProjectTableSkill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
-import columnsRoles from '../../../../models/ProjectRolesColumns'
-import DeleteRoleDialog from './DeleteSkillDialog.vue'
+import columnsSkills from '../../../../models/ProjectRolesColumns'
+import DeleteSkillDialog from './DeleteSkillDialog.vue'
 
 export default defineComponent({
-  components: { DeleteRoleDialog },
+  components: { DeleteSkillDialog },
   setup() {
     const skillStore = useSkillStore()
 
     // Filters
-    const filterRoles = ref('')
+    const filterSkills = ref('')
 
-    const deleteRole = ref(-1)
-    const deleteRoleName = ref('')
+    const deleteSkill = ref(-1)
+    const deleteSkillName = ref('')
 
-    // Role amount error handling
-    const errorRoleAmount = ref(false)
-    const errorMessageRoleAmount = ref('')
+    // Skill amount error handling
+    const errorSkillAmount = ref(false)
+    const errorMessageSkillAmount = ref('')
 
     return {
       skillStore,
-      deleteRole,
-      filterRoles,
-      columnsRoles,
-      errorRoleAmount,
-      errorMessageRoleAmount,
-      deleteRoleName,
+      deleteSkill,
+      filterSkills,
+      columnsSkills,
+      errorSkillAmount,
+      errorMessageSkillAmount,
+      deleteSkillName,
     }
   },
   methods: {
-    delete_role(role: ProjectTableSkill) {
-      this.deleteRole = role.id
-      this.deleteRoleName = role.name
+    delete_skill(skill: ProjectTableSkill) {
+      this.deleteSkill = skill.id
+      this.deleteSkillName = skill.name
     },
     amountRangeValidation(val: number) {
       if (val < 0) {
-        this.errorRoleAmount = true
-        this.errorMessageRoleAmount = 'The value must be positive!'
+        this.errorSkillAmount = true
+        this.errorMessageSkillAmount = 'The value must be positive!'
         return false
       }
-      this.errorRoleAmount = false
-      this.errorMessageRoleAmount = ''
+      this.errorSkillAmount = false
+      this.errorMessageSkillAmount = ''
       return true
     },
   },
