@@ -23,7 +23,6 @@ export const useMailStore = defineStore('user/mail', {
     actions: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async loadStudentsMails(pagination: any, setNumberOfRows: any) {
-            console.log(pagination)
             this.isLoading = true
             const studentStore = useStudentStore()
 
@@ -44,9 +43,9 @@ export const useMailStore = defineStore('user/mail', {
                     }
 
                     this.mailStudents = data.results.map((student) => new Student(student))
-                })
 
-            this.isLoading = false
+                    this.isLoading = false
+                })
         },
         async getMails(student: Student) {
             this.isLoading = true
