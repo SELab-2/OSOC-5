@@ -113,13 +113,13 @@ export const useStudentStore = defineStore('user/student', {
       if (filters) url = `?${filters.join('&')}`
 
       await instance
-        .get<Student[]>(`students/${url}`)
+        .get<{results: Student[]}>(`students/${url}`)
         .then(async ({ data }) => {
-          for (const student of data) {
+          for (const student of data.results) {
             await this.transformStudent(student)
           }
 
-          this.students = data.map((student) => new Student(student))
+          this.students = data.results.map((student) => new Student(student))
         })
 
       this.isLoading = false
