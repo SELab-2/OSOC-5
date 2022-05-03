@@ -13,7 +13,7 @@ export interface ProjectSuggestionInterface {
 
 export interface TempProjectSuggestion {
   student: string
-  coach: string
+  coach: User
   skill: string
   reason: string
   coachId: number

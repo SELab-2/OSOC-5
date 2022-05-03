@@ -6,13 +6,13 @@ export interface UserInterface {
   url: string
   firstName: string
   lastName: string
-  email: string
-  isAdmin: boolean
-  role: string
+  email?: string
+  isAdmin?: boolean
+  role?: string
   lastEmailSent?: Date
   hasProjects?: Array<Project>
   suggestions?: Array<Suggestion>
-  isActive: boolean
+  isActive?: boolean
 }
 
 export class User implements UserInterface {
@@ -20,12 +20,12 @@ export class User implements UserInterface {
   url: string
   firstName: string
   lastName: string
-  email: string
-  isAdmin: boolean
+  email?: string
+  isAdmin?: boolean
   lastEmailSent?: Date
   hasProjects?: Project[]
   suggestions?: Suggestion[]
-  isActive: boolean
+  isActive?: boolean
 
   constructor(data: UserInterface) {
     Object.assign(this, data)
