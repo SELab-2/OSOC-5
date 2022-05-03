@@ -1,8 +1,8 @@
-const columnsRoles = [
+const columnsSkills = [
     {
         name: 'role',
         align: 'left' as const,
-        label: 'Project Role',
+        label: 'Project Skill',
         field: 'role',
         sortable: true,
     },
@@ -36,4 +36,4 @@ const columnsRoles = [
     },
 ]
 
-export default columnsRoles
+export default columnsSkills
