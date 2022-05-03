@@ -4,11 +4,11 @@ on:
   push:
     # branches:
     #   - main
-    # paths:
-    #   - 'be/osoc/**/*.py'
+    paths:
+      - 'be/osoc/**/*.py'
 
 jobs:
-  build:
+  django:
     runs-on: ubuntu-latest
     services:
       db:

@@ -4,13 +4,13 @@ on:
   push:
     # branches:
     #   - main
-    paths:
-      - 'fe/src/**/*.js'
-      - 'fe/src/**/*.ts'
-      - 'fe/src/**/*.vue'
+    # paths:
+    #   - 'fe/src/**/*.js'
+    #   - 'fe/src/**/*.ts'
+    #   - 'fe/src/**/*.vue'
 
 jobs:
-  build:
+  vue:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
