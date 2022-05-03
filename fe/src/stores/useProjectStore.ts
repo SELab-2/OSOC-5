@@ -262,6 +262,7 @@ export const useProjectStore = defineStore('project', {
             this.projectLink= ''
             this.filterCoaches=''
             this.selectedCoaches= []
+            useSkillStore().loadSkills()
 
             // this.projects.push({
             //   name: response['data']['name'],
@@ -279,5 +280,12 @@ export const useProjectStore = defineStore('project', {
             callback(false)
           })
     },
+    editProject(project: Project){
+      this.projectName= project.name
+      this.projectPartnerName= project.partnerName
+      this.projectLink= project.extraInfo
+      this.selectedCoaches= []
+      // skills
+    }
   },
 })

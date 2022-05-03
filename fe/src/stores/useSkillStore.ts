@@ -41,7 +41,7 @@ export const useSkillStore = defineStore('skills', {
       // start the loading animation
       this.isLoadingSkills = true
       this.skills = []
-      console.log('LOAD SKILLS')
+      // console.log('LOAD SKILLS')
       instance
         .get('skills/?page_size=500')
         .then(({ data }) => {
@@ -94,6 +94,7 @@ export const useSkillStore = defineStore('skills', {
           callback(false)
         })
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async deleteSkill(deletedSkillId: number, callback: any) {
       // delete in database
       await instance
@@ -106,8 +107,8 @@ export const useSkillStore = defineStore('skills', {
           this.skills.splice(index, 1)
           callback(true)
         })
-        .catch(() => {
-          console.log('Failed to delete')
+        .catch((error) => {
+          console.log(error)
           callback(false)
         })
     },

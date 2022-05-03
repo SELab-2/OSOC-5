@@ -18,10 +18,9 @@
                 type="cancel"
                 size="md"
                 class="q-mx-md cornered"
-                to="/projects"
                 glow-color="#00F1AF"
                 shadow-strength=2
-                style="color: red !important; font-weight: bold"
+                @click="onCancel"
               />
               <btn
                 elevated
@@ -32,7 +31,6 @@
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
                 shadow-strength=2
-                style="color: black !important; font-weight: bold"
               />
             </div>
           </div>
@@ -102,6 +100,15 @@ export default defineComponent({
         }
       )
     },
+    onCancel(){
+      router.push('/projects')
+      this.projectStore.projectName= ''
+      this.projectStore.projectPartnerName= ''
+      this.projectStore.projectLink= ''
+      this.projectStore.filterCoaches=''
+      this.projectStore.selectedCoaches= []
+      this.skillStore.loadSkills()
+    }
   }
 })
 </script>

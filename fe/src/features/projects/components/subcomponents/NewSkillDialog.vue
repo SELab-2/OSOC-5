@@ -130,7 +130,6 @@ export default defineComponent({
         this.newSkill.length > 0 &&
         this.newSkillColor.length > 0
       ) {
-        console.log("test");
         // when valid call the store object and add the skill
         this.skillStore.addSkill(
           this.newSkill,
