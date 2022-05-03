@@ -4,8 +4,8 @@ on:
   push:
     # branches:
     #   - main
-    # paths:
-    #   - 'be/osoc/**/*.py'
+    paths:
+      - 'be/osoc/**/*.py'
 
 jobs:
   django:
