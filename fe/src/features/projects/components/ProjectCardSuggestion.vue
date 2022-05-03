@@ -1,4 +1,5 @@
 <template>
+  <!-- appear only when a new entry is added. Otherwise, the suggestions may be glitchy when removing suggestions. -->
   <q-slide-transition :appear="(fromLocal || fromWebsocket) && !suggestion.reason">
     <div v-if="show" style="margin-left: 10px">
       <div class="column full-width">
@@ -124,18 +125,22 @@ export default defineComponent({
       clearTimeout(this.timeout)
       this.timeout = null
     },
+    
+    // This shows the undo button for a short period of time, and will call the actual remove method after a short period of time.
     prepareRemove() {
       this.timeout = setTimeout(() => {
         this.remove()
         this.timeout = null
       }, 2000)
     },
+    
+    // Actually removes the suggestion from the server. If the suggestion is a draft, it only gets removed locally.
     remove() {
       this.show = false
+      // A short timeout is added to play the remove animation.
       setTimeout(() => {
         this.removeSuggestion(this.suggestion)
       }, 500)
-      return
     },
     async confirm() {
       this.progress = 1

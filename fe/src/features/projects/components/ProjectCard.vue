@@ -202,9 +202,12 @@ export default defineComponent({
     async removeSuggestion(suggestion: ProjectSuggestionInterface) {
       try {
         // If the suggestion has not yet been posted to the server, don't make the POST call.
+        // A suggestion has not yet been posted if it's an instance of NPS and the var fromLocal is enabled.
         if (!(suggestion instanceof NewProjectSuggestion && (suggestion as NewProjectSuggestion)?.fromLocal)) {
+          // Remove from the server.
           await this.projectStore.removeSuggestion(this.project, suggestion)
         } else {
+          // Only remove locally, this suggestion does not exist on the server yet.
           const index = this.project.suggestedStudents!.findIndex(
             (s) =>
               s.student.id === suggestion.student.id &&
@@ -221,6 +224,7 @@ export default defineComponent({
         })
       }
     },
+    
     expand(skills: ProjectSkillInterface[]) {
       const indexes = skills.map(s => s.skill.id);
       for (let i in this.selectedRoles) {
@@ -300,6 +304,8 @@ export default defineComponent({
         // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
       }
     },
+    
+    
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
       // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
       const i = this.project.suggestedStudents!.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
