@@ -104,13 +104,15 @@
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import {ref} from 'vue'
+import {onBeforeMount, ref} from 'vue'
 import {Student} from "../../models/Student";
 import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
+import router from "../../router";
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 
 const columns = [
   {
@@ -150,7 +152,16 @@ export default defineComponent({
   components: {MailsOverview},
   setup() {
     const mailStore = useMailStore()
+    const studentStore = useStudentStore()
+    const authenticationStore = useAuthenticationStore()
     const q = useQuasar()
+
+    onBeforeMount(() => {
+      if (authenticationStore.loggedInUser && ! authenticationStore.loggedInUser.isAdmin) {
+        router.replace('/projects')
+      }
+    })
+
     return {
       mailStore,
       filter: ref(''),
