@@ -24,7 +24,7 @@ interface State {
   isLoading: boolean
   possibleSuggestion: number
   currentStudent: Student | null
-  nextPage: string
+  nextPage: string | null
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -96,6 +96,7 @@ export const useStudentStore = defineStore('user/student', {
       student.englishRating = parseInt(student.englishRating)
     },
     async loadStudents() {
+      console.log('in there')
       this.isLoading = true
       const filters = []
 
@@ -117,27 +118,42 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       await instance
-        .get<Student[]>(`students/?page=1${url}`)
+        .get(`students/?page=1${url}`)
         .then(async ({ data }) => {
-          for (const student of data) {
+          this.nextPage = data.next
+
+          for (const student of data.results) {
             await this.transformStudent(student)
           }
 
-          this.students = data.map((student) => new Student(student))
+          this.students = data.results.map((student: Student) => new Student(student))
         })
 
       this.isLoading = false
     },
     async loadNext(index: number, done: any) {
-      if (this.nextPage) {
-        done()
-      } else {
+      if (this.nextPage === null) {
+        done(true)
+        return
+      }
+      console.log("in here")
+      console.log(this.nextPage)
+      if (this.nextPage !== '') {
         await instance
-            .get<Student[]>(this.nextPage)
+            .get(this.nextPage)
             .then(async ({data}) => {
               console.log(data)
+              this.nextPage = data.next
+
+              for (const student of data.results) {
+                await this.transformStudent(student)
+              }
+
+              this.students.push(...data.results.map((student: Student) => new Student(student)))
+              console.log(this.students)
             })
       }
+      done()
     },
     async loadStudentsMails() {
       this.isLoading = true

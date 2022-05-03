@@ -30,7 +30,7 @@
               color="green"
               bg-color="white"
               label="Search"
-              @update:modelValue="studentStore.loadStudents"
+              @update:modelValue="() => loadStudents($refs.infiniteScroll)"
             >
               <template #append>
                 <q-icon name="search" />
@@ -46,7 +46,7 @@
                 { name: 'alumni', label: 'Alumni' },
                 { name: 'student coaches', label: 'Student Coaches'}
               ]"
-              @click="studentStore.loadStudents"
+              @click="() => loadStudents($refs.infiniteScroll)"
             />
 
             <label>Suggestion:</label>
@@ -59,7 +59,7 @@
                 { name: 'no', label: 'No' },
                 { name: 'none', label: 'None' },
               ]"
-              @click="studentStore.loadStudents"
+              @click="() => loadStudents($refs.infiniteScroll)"
             />
 
             <q-select
@@ -74,7 +74,7 @@
               :option-label="opt => opt.name"
               :option-value="opt => opt.id"
               label="Skills"
-              @update:model-value="studentStore.loadStudents"
+              @update:model-value="() => loadStudents($refs.infiniteScroll)"
             >
               <template #selected>
                 <div
@@ -106,7 +106,7 @@
               label="Status"
               emit-value
               map-options
-              @update:model-value="studentStore.loadStudents"
+              @update:model-value="() => loadStudents($refs.infiniteScroll)"
             />
 
             <div class="row q-gutter-x-md">
@@ -123,7 +123,7 @@
                 color="primary"
                 label="Suggested by you"
                 right-label
-                @click="studentStore.loadStudents"
+                @click="() => loadStudents($refs.infiniteScroll)"
               />
               <q-checkbox
                 v-model="studentStore.onProject"
@@ -138,7 +138,7 @@
                 color="primary"
                 label="On project"
                 right-label
-                @click="studentStore.loadStudents"
+                @click="() => loadStudents($refs.infiniteScroll)"
               />
             </div>
 
@@ -151,6 +151,7 @@
               style="flex: 1 1 auto"
             >
               <q-infinite-scroll
+                ref="infiniteScroll"
                 class="q-px-sm"
                 :offset="250"
                 @load="(index, done) => studentStore.loadNext(index, done)"
@@ -261,7 +262,7 @@ export default defineComponent({
     }
   },
   created() {
-    this.skillStore.loadSkills()
+    //this.skillStore.loadSkills()
     this.studentStore.loadStudents()
   },   
   methods: {
@@ -280,6 +281,10 @@ export default defineComponent({
     clickStudent(student: Student) {
       this.selectStudent(student)
     },
+    loadStudents(scroll: any) {
+      scroll.poll()
+      this.studentStore.loadStudents()
+    }
   }
 })
 </script>
