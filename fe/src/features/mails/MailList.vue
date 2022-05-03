@@ -30,7 +30,7 @@
       <q-table
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
-        :columns="columns"
+        :columns="columnsMails"
         row-key="id"
         separator="horizontal"
       >
@@ -111,40 +111,7 @@ import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
-
-const columns = [
-  {
-    name: 'visibility',
-    required: false,
-    label: '',
-    align: 'left' as const,
-    field: '',
-    sortable: false,
-  },
-  {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left' as const,
-    field: 'name',
-    sortable: true,
-  },
-  {
-    name: 'status',
-    required: true,
-    label: 'Status',
-    align: 'left' as const,
-    field: 'status',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    align: 'right' as const,
-    label: 'Email',
-    field: 'email',
-    sortable: true,
-  }
-]
+import columnsMails from "../../models/MailStudentColumns";
 
 export default defineComponent({
   components: {MailsOverview},
@@ -154,7 +121,7 @@ export default defineComponent({
     return {
       mailStore,
       filter: ref(''),
-      columns,
+      columnsMails,
       status,
       q
     }
