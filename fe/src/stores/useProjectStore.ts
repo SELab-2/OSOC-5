@@ -85,6 +85,7 @@ export const useProjectStore = defineStore('project', {
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
     async getProject(project: TempProject) {
+      console.log("Loading")
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) =>
           useCoachStore().getUser(coach as unknown as string)
@@ -121,7 +122,7 @@ export const useProjectStore = defineStore('project', {
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) =>
-              useCoachStore().getUser((coach as unknown as { url: string }).url)
+              useCoachStore().getUser(coach)
             )
           )
 

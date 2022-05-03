@@ -13,18 +13,31 @@ export const useCoachStore = defineStore('user/coach', {
     isLoadingUsers: false,
   }),
   actions: {
-    async getUser(url: string): Promise<User> {
-      const user = this.users.find((user) => user.url === url)
+    async getUser(newUser: UserInterface): Promise<User> {
+      const user = this.users.find((user) => user.url === newUser.url)
       if (user) return user
-      const { data } = await instance.get<UserInterface>(url)
+      console.log("HEllo")
+      let fetchedUser: User
+      try {
+        // Logged in user is admin and can fetch users.
+        const { data } = await instance.get<UserInterface>(newUser.url)
+        console.log("admin")
+        fetchedUser = new User(data)
+      } catch (error) {
+        console.log("coach")
+        // Logged in user is coach and cannot fetch users.
+        fetchedUser = new User(newUser)
+      }
+      
+      console.log("HEllo222")
 
       // Check again if not present, it could be added in the meantime.
-      const user2 = this.users.find((user) => user.url === url)
+      const user2 = this.users.find((user) => user.url === newUser.url)
       if (user2) return user2
 
-      const newUser = new User(data)
-      this.users.push(newUser)
-      return newUser
+      
+      this.users.push(fetchedUser)
+      return fetchedUser
     },
     async loadUsers() {
       this.isLoadingUsers = true
