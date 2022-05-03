@@ -114,11 +114,11 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       this.isLoadingProjects = true
       try {
-        const { data } = await instance.get<TempProject[]>('projects/')
-        this.projects = data.map(
+        const { results } = (await instance.get<{results: TempProject[]}>('projects/')).data
+        this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
-        data.forEach(async (project, i) => {
+        results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) =>
               useCoachStore().getUser((coach as unknown as { url: string }).url)
