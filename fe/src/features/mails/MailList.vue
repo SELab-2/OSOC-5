@@ -104,7 +104,7 @@
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import {onBeforeMount, ref} from 'vue'
+import {ref} from 'vue'
 import {Student} from "../../models/Student";
 import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
@@ -152,22 +152,20 @@ export default defineComponent({
   components: {MailsOverview},
   setup() {
     const mailStore = useMailStore()
-    const studentStore = useStudentStore()
-    const authenticationStore = useAuthenticationStore()
     const q = useQuasar()
-
-    onBeforeMount(() => {
-      if (authenticationStore.loggedInUser && ! authenticationStore.loggedInUser.isAdmin) {
-        router.replace('/projects')
-      }
-    })
 
     return {
       mailStore,
+      authenticationStore: useAuthenticationStore(),
       filter: ref(''),
       columns,
       status,
       q
+    }
+  },
+  beforeMount() {
+    if (!this.authenticationStore.loggedInUser?.isAdmin) {
+      router.replace('/projects')
     }
   },
   mounted() {

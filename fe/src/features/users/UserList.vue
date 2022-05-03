@@ -153,7 +153,7 @@
 <script lang="ts">
 import {defineComponent, onMounted} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
-import {onBeforeMount, ref} from 'vue'
+import {ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import { User } from '../../models/User'
@@ -240,18 +240,12 @@ export default defineComponent({
   components: {AddUser, SegmentedControl },
   setup() {
     const coachStore = useCoachStore()
-    const authenticationStore = useAuthenticationStore()
     const q = useQuasar()
     
     coachStore.loadUsers();
 
-    onBeforeMount(() => {
-      if (authenticationStore.loggedInUser && ! authenticationStore.loggedInUser.isAdmin) {
-        router.replace('/projects')
-      }
-    })
-
     return {
+      authenticationStore: useAuthenticationStore(),
       newUserDialog: ref(false),
       active: ref(true),
       filter: ref(''),
@@ -260,6 +254,11 @@ export default defineComponent({
       roles,
       coachStore,
       q
+    }
+  },
+  beforeMount() {
+    if (!this.authenticationStore.loggedInUser?.isAdmin) {
+      router.replace('/projects')
     }
   },
   methods: {

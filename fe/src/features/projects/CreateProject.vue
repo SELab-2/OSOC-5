@@ -77,7 +77,7 @@ export default defineComponent({
     }
   },
   beforeMount() {
-    if (this.authenticationStore.loggedInUser && ! this.authenticationStore.loggedInUser.isAdmin) {
+    if (!this.authenticationStore.loggedInUser?.isAdmin) {
       router.replace('/projects')
     }
   },
