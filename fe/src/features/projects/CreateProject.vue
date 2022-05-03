@@ -21,6 +21,7 @@
                 to="/projects"
                 glow-color="#00F1AF"
                 shadow-strength=2
+                style="color: red !important; font-weight: bold"
               />
               <btn
                 elevated
@@ -31,6 +32,7 @@
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
                 shadow-strength=2
+                style="color: black !important; font-weight: bold"
               />
             </div>
           </div>

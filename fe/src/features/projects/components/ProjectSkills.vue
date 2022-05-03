@@ -13,6 +13,7 @@
         label="Add skill"
         shadow-strength="2"
         glow-color="#00F1AF"
+        style="color: black !important; font-weight: bold"
         @click="newSkillPrompt = true"
       />
       <q-space />
