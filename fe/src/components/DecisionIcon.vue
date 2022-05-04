@@ -8,56 +8,27 @@
 </template>
 
 <script lang="ts">
-import {Student} from "../models/Student";
 import {defineComponent} from "@vue/runtime-core";
-import yesMaybeNo from "../models/YesMaybeNo";
+import yesMaybeNoOptions from "../models/YesMaybeNoOptions";
 
 export default defineComponent({
   props: {
-    student: {
-      type: Student,
+    decision: {
+      type: Number,
       required: true
     }
   },
   setup() {
     return {
-      yesMaybeNo
+      yesMaybeNoOptions
     }
   },
   computed: {
-    /**
-     * Get the final decision suggestion or -1 if there is no final decision
-     */
-    official(): number {
-      if (this.student.finalDecision) {
-        return this.student.finalDecision.suggestion
-      } else {
-        return -1
-      }
-    },
     icon(): string {
-      switch (this.official) {
-        case yesMaybeNo.YES.value:
-          return yesMaybeNo.YES.icon
-        case yesMaybeNo.MAYBE.value:
-          return yesMaybeNo.MAYBE.icon
-        case yesMaybeNo.NO.value:
-          return yesMaybeNo.NO.icon
-        default:
-          return ''
-      }
+      return yesMaybeNoOptions.find(element => element.value === this.decision)?.icon ?? ''
     },
     color(): string {
-      switch (this.official) {
-        case yesMaybeNo.YES.value:
-          return yesMaybeNo.YES.color
-        case yesMaybeNo.MAYBE.value:
-          return yesMaybeNo.MAYBE.color
-        case yesMaybeNo.NO.value:
-          return yesMaybeNo.NO.color
-        default:
-          return ''
-      }
+      return yesMaybeNoOptions.find(element => element.value === this.decision)?.color ?? ''
     }
   }
 })
