@@ -307,9 +307,6 @@ export default defineComponent({
       )
     },
     triggerEditProject(){
-      // this.projectStore
-      // this.project
-      // todo wss gwn url redirecten voor edit naar juiste url en dan project store, skill store setten
       router.push('/projects/' + this.project.id)
     }
 

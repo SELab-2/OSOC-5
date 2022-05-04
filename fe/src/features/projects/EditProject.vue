@@ -45,20 +45,8 @@
           </div>
         </div>
         <div class="row">
-          <!--          <p>-->
-          <!--            id: {{ id }}<br>-->
-          <!--            Name: {{ projectStore.projectName }}<br>-->
-          <!--            Partner name: {{ projectStore.projectPartnerName }}<br>-->
-          <!--            Link: {{ projectStore.projectLink }}<br>-->
-          <!--            Coachfilter: {{ projectStore.filterCoaches }}<br>-->
-          <!--            Coaches: {{ projectStore.selectedCoaches }}<br>-->
-          <!--            Skillstore skills: {{ skillStore.skills }}<br>-->
-          <!--          </p>-->
-
           <BasicInfo />
-
           <ProjectCoaches />
-
           <ProjectSkills />
         </div>
       </div>
@@ -129,14 +117,22 @@ export default defineComponent({
   },
   methods: {
     updateProject() {
-      console.log('updateProject') //TODO REMOVE
-      // TODO implement
-      // CHECK IF ALLE VELDEN GOED ZIJN of stuur patch die enkel velden update die goed zin
-      // this.projectStore.updateProject()
-      this.$q.notify({
-        icon: 'close',
-        color: 'negative',
-        message: 'Not yet implemented!',
+      console.log('updateProject')
+      this.projectStore.updateProject(this.projectID, this.skillStore.skills, (positive: boolean) => {
+        if (positive) {
+          router.push('/projects')
+          this.$q.notify({
+            icon: 'done',
+            color: 'positive',
+            message: 'Successfully updated project!',
+          })
+        } else {
+          this.$q.notify({
+            icon: 'close',
+            color: 'negative',
+            message: 'Failed to update project!',
+          })
+        }
       })
     },
     cancelEditProject() {
