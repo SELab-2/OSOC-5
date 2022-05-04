@@ -307,7 +307,7 @@ export default defineComponent({
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
       // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
       const i = this.project.suggestedStudents!.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
-      setTimeout(() => this.project.suggestedStudents![i].fromLocal = false, 500)
+      setTimeout(() => (this.project.suggestedStudents![i] as NewProjectSuggestion).fromLocal = false, 500) // This is needed, because JS will otherwise somehow report true, even when the object doesn't exist anymore? Don't know why.
       this.project.suggestedStudents![i] = new ProjectSuggestion(suggestion)
 
       await this.projectStore.addSuggestion(
