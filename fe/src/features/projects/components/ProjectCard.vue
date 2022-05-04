@@ -19,22 +19,6 @@
         />
         <q-space />
         <div>
-          <btn 
-            v-if="anyNew.length > 0" 
-            icon="r_warning" 
-            color="yellow"
-            flat
-            round
-            size="12px"
-            glow-color="amber-3"
-            @click="expand(anyNew)"
-            >
-            <q-tooltip class="shadow-4 bg-amber-7">
-            <div class="text-subtitle2">
-              There are still draft suggestions open.
-            </div>
-          </q-tooltip>
-          </btn>
           <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
           <btn flat round size="12px" color="primary" icon="edit" @click="triggerEditProject"/>
         </div>
@@ -327,12 +311,6 @@ export default defineComponent({
     
   },
   computed: {
-    anyNew() {
-      return (this.project.requiredSkills ?? []).filter(s => {
-        return !this.selectedRoles[s.skill.id] && (this.project.suggestedStudents ?? []).filter(student => student.skill.id === s.skill.id).some(student => (student as NewProjectSuggestion)?.fromLocal)
-      })
-      // return this.project.suggestedStudents?.some(s => s instanceof NewProjectSuggestion )
-    },
     me() {
       return this.authenticationStore.loggedInUser as User
     },
