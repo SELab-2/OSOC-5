@@ -99,6 +99,7 @@
                 behavior="menu"
                 map-options
                 emit-value
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
               >
                 <template #option="scope">
                   <q-item
