@@ -8,7 +8,7 @@ interface State {
   search: string
   status: string
   alumni: string
-  decision: string
+  suggestion: number
   byMe: string
   onProject: string
   skills: Array<Skill>
@@ -26,7 +26,7 @@ export const useStudentStore = defineStore('user/student', {
     search: '',
     status: '',
     alumni: 'all',
-    decision: 'none',
+    suggestion: -1,
     byMe: 'maybe',
     onProject: 'maybe',
     skills: [],
@@ -104,7 +104,7 @@ export const useStudentStore = defineStore('user/student', {
       if (this.search) filters.push(`search=${this.search}`)
       if (this.alumni === 'alumni') filters.push('alum=true')
       if (this.alumni === 'student coaches') filters.push('student_coach=true')
-      if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
+      if (this.suggestion !== -1) filters.push(`suggestion=${this.suggestion}`)
       if (this.byMe !== 'maybe') filters.push(`suggested_by_user=${this.byMe}`)
       if (this.onProject !== 'maybe') filters.push(`on_project=${this.onProject}`)
       if (this.status) filters.push(`status=${this.status}`)

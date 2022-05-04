@@ -5,7 +5,7 @@
       show-if-above
       :mini="!drawer || miniState"
       :mini-width="30"
-      :width="350"
+      :width="370"
       :breakpoint="100"
       bordered
       class="full-height"
@@ -41,24 +41,15 @@
               v-model="studentStore.alumni"
               color="primary"
               text-color="white"
-              :options="[
-                { name: 'all', label: 'All' },
-                { name: 'alumni', label: 'Alumni' },
-                { name: 'student coaches', label: 'Student Coaches'}
-              ]"
+              :options="rolesOptions"
               @click="() => loadStudents($refs.infiniteScroll)"
             />
 
             <label>Suggestion:</label>
             <SegmentedControl
-              v-model="studentStore.decision"
+              v-model="studentStore.suggestion"
               color="primary"
-              :options="[
-                { name: 'yes', label: 'Yes' },
-                { name: 'maybe', label: 'Maybe' },
-                { name: 'no', label: 'No' },
-                { name: 'none', label: 'None' },
-              ]"
+              :options="yesMaybeNoOptions"
               @click="() => loadStudents($refs.infiniteScroll)"
             />
 
@@ -212,6 +203,8 @@ import {useQuasar} from "quasar";
 import { Student } from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
+import rolesOptions from "../models/RolesOptions";
+import yesMaybeNoOptions from "../models/YesMaybeNoOptions";
 
 export default defineComponent({
   components: {
@@ -255,7 +248,9 @@ export default defineComponent({
         width: '4px',
       },
       status,
-      scrollKey: 0
+      scrollKey: 0,
+      rolesOptions,
+      yesMaybeNoOptions
     }
   },
   data() {
@@ -291,9 +286,9 @@ export default defineComponent({
     /**
      * Load all students and make the infinite scroll reload
      */
-    loadStudents(scroll: any) {
+    async loadStudents(scroll: any) {
       scroll.resume()
-      this.studentStore.loadStudents()
+      await this.studentStore.loadStudents()
       this.scrollKey += 1
     },
     /**
