@@ -128,7 +128,7 @@
           <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
           <project-card-suggestion
             
-            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as NewProjectSuggestion).fromWebsocket"
+            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as any).fromWebsocket"
             :confirmSuggestion="confirmSuggestion"
             :removeSuggestion="removeSuggestion"
             :suggestion="suggestion"
