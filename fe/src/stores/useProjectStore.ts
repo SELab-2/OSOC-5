@@ -1,13 +1,17 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
-import { TempProjectSuggestion, NewProjectSuggestion } from '../models/ProjectSuggestion'
+import {
+  TempProjectSuggestion,
+  NewProjectSuggestion,
+} from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   Skill,
   ProjectSkillInterface,
   ProjectSkill,
-  TempProjectSkill, ProjectTableSkill,
+  TempProjectSkill,
+  ProjectTableSkill,
 } from '../models/Skill'
 import {
   ProjectSuggestionInterface,
@@ -17,7 +21,7 @@ import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
-import { convertObjectKeysToSnakeCase } from "../utils/case-conversion";
+import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
@@ -37,7 +41,7 @@ export const useProjectStore = defineStore('project', {
     projectPartnerName: '',
     projectLink: '',
     filterCoaches: '',
-    selectedCoaches: []
+    selectedCoaches: [],
   }),
   actions: {
     async fetchSuggestedStudents(
@@ -47,7 +51,7 @@ export const useProjectStore = defineStore('project', {
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (await useCoachStore().getUser(student.coach)),
+          coach: await useCoachStore().getUser(student.coach),
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
@@ -71,23 +75,31 @@ export const useProjectStore = defineStore('project', {
       skillUrl: string,
       reason: string
     ) {
-      return await instance.post(`projects/${projectId}/suggest_student/`, {
-        student: studentUrl,
-        skill: skillUrl,
-        reason: reason,
-      })
+      const response = await instance.post(
+        `projects/${projectId}/suggest_student/`,
+        {
+          student: studentUrl,
+          skill: skillUrl,
+          reason: reason,
+        }
+      )
+
+      const studentStore = useStudentStore()
+      studentStore.students = studentStore.students.filter(
+        ({ url }) => url !== studentUrl
+      )
+
+      return response
     },
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
-    
+
     // NOTE: this may be broken.
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(
-        project.coaches.map((coach) =>
-          useCoachStore().getUser(coach)
-        )
+        project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
 
       const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -113,15 +125,15 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       this.isLoadingProjects = true
       try {
-        const { results } = (await instance.get<{results: TempProject[]}>('projects/')).data
+        const { results } = (
+          await instance.get<{ results: TempProject[] }>('projects/')
+        ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) =>
-              useCoachStore().getUser(coach)
-            )
+            project.coaches.map((coach) => useCoachStore().getUser(coach))
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -171,7 +183,7 @@ export const useProjectStore = defineStore('project', {
         (suggestion) =>
           suggestion.skill.url === skill && suggestion.student.url === student
       )
-      
+
       if (!alreadyExists) {
         const studentStore = useStudentStore()
         const coachStore = useCoachStore()
@@ -180,20 +192,31 @@ export const useProjectStore = defineStore('project', {
         const studentObj = await studentStore.getStudent(student)
         const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
-        project.suggestedStudents?.push(new NewProjectSuggestion({
-            student: studentObj,
-            coach: coachObj,
-            skill: skillObj,
-            reason,
-          }, true))
-          
+        project.suggestedStudents?.push(
+          new NewProjectSuggestion(
+            {
+              student: studentObj,
+              coach: coachObj,
+              skill: skillObj,
+              reason,
+            },
+            true
+          )
+        )
+
         // Remove the "New" badge from the new suggestion after a short period.
-        setTimeout(() => 
-        (project.suggestedStudents?.find(s => 
-          s.student.url === studentObj.url && 
-          s.coach.url === coachObj.url && 
-          s.skill.url === skillObj.url) as NewProjectSuggestion).fromWebsocket = false,
-           5000)
+        setTimeout(
+          () =>
+            ((
+              project.suggestedStudents?.find(
+                (s) =>
+                  s.student.url === studentObj.url &&
+                  s.coach.url === coachObj.url &&
+                  s.skill.url === skillObj.url
+              ) as NewProjectSuggestion
+            ).fromWebsocket = false),
+          5000
+        )
       }
     },
     removeReceivedSuggestion({
@@ -223,9 +246,9 @@ export const useProjectStore = defineStore('project', {
       }
     },
     submitProject(
-        skills: Array<ProjectTableSkill>,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        callback: any
+      skills: Array<ProjectTableSkill>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      callback: any
     ) {
       const skillsList: Array<TempProjectSkill> = []
 
@@ -255,41 +278,41 @@ export const useProjectStore = defineStore('project', {
 
       // POST request to make a project
       instance
-          .post('projects/', convertObjectKeysToSnakeCase(data))
-          .then((response) => {
-            this.loadProjects()
+        .post('projects/', convertObjectKeysToSnakeCase(data))
+        .then((response) => {
+          this.loadProjects()
 
-            // clear fields when project is made successfully
-            this.isLoadingProjects=  false
-            this.projectName= ''
-            this.projectPartnerName= ''
-            this.projectLink= ''
-            this.filterCoaches=''
-            this.selectedCoaches= []
-            useSkillStore().loadSkills()
+          // clear fields when project is made successfully
+          this.isLoadingProjects = false
+          this.projectName = ''
+          this.projectPartnerName = ''
+          this.projectLink = ''
+          this.filterCoaches = ''
+          this.selectedCoaches = []
+          useSkillStore().loadSkills()
 
-            // this.projects.push({
-            //   name: response['data']['name'],
-            //   id:  response['data']['id'],
-            //   partnerName: response['data']['partner_name'],
-            //   extraInfo: response['data']['extra_info'],
-            //   requiredSkills: response['data']['required_skills'],
-            //   coaches: response['data']['coaches'],
-            // });
+          // this.projects.push({
+          //   name: response['data']['name'],
+          //   id:  response['data']['id'],
+          //   partnerName: response['data']['partner_name'],
+          //   extraInfo: response['data']['extra_info'],
+          //   requiredSkills: response['data']['required_skills'],
+          //   coaches: response['data']['coaches'],
+          // });
 
-            callback(true);
-          })
-          .catch(function (error) {
-            console.log(error)
-            callback(false)
-          })
+          callback(true)
+        })
+        .catch(function (error) {
+          console.log(error)
+          callback(false)
+        })
     },
-    editProject(project: Project){
-      this.projectName= project.name
-      this.projectPartnerName= project.partnerName
-      this.projectLink= project.extraInfo
-      this.selectedCoaches= []
+    editProject(project: Project) {
+      this.projectName = project.name
+      this.projectPartnerName = project.partnerName
+      this.projectLink = project.extraInfo
+      this.selectedCoaches = []
       // skills
-    }
+    },
   },
 })
