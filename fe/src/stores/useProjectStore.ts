@@ -84,7 +84,6 @@ export const useProjectStore = defineStore('project', {
     
     // NOTE: this may be broken.
     async getProject(project: TempProject) {
-      console.log("Loading")
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) =>
           useCoachStore().getUser(coach)
@@ -173,8 +172,6 @@ export const useProjectStore = defineStore('project', {
           suggestion.skill.url === skill && suggestion.student.url === student
       )
       
-      console.log(student)
-
       if (!alreadyExists) {
         const studentStore = useStudentStore()
         const coachStore = useCoachStore()
@@ -260,7 +257,6 @@ export const useProjectStore = defineStore('project', {
       instance
           .post('projects/', convertObjectKeysToSnakeCase(data))
           .then((response) => {
-            console.log(response);
             this.loadProjects()
 
             // clear fields when project is made successfully

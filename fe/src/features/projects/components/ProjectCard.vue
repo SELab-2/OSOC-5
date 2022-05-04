@@ -159,7 +159,6 @@ import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
 import { Suggestion } from '../../../models/Suggestion'
 
-var test = 0
 export default defineComponent({
   props: {
     project: {

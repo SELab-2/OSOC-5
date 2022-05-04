@@ -99,7 +99,6 @@ export default defineComponent({
     process.env.NODE_ENV == 'development'
       ? 'ws://localhost:8000/ws/socket_server/'
       : 'wss://sel2-5.ugent.be/ws/socket_server/'
-    console.log(baseURL)
     return {
       projectStore: useProjectStore(),
       studentStore: useStudentStore(),

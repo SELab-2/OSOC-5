@@ -163,7 +163,6 @@ export default defineComponent({
   computed: {
     currentsteps() {
       const mails = this.mailStore.mails
-      console.log(mails)
       if (!this.mailStore.mails.has(this.student.id)) return []
       const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => {
         return this.statuses.includes(parseInt(mail.info))
@@ -207,7 +206,6 @@ export default defineComponent({
       this.timeout = null
     },
     prepareRemove(mail: Mail) {
-      console.log(mail)
       this.timeout = setTimeout(() => {
         this.remove(mail)
         this.timeout = null
