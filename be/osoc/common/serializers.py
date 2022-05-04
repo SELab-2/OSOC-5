@@ -187,6 +187,31 @@ class ProjectGetSerializer(ProjectSerializer):
     coaches = CoachPartialSerializer(many=True)
 
 
+class Conflict():
+    """
+    conflict class, only used to initialize ConflictSerializer
+    a conflict has a student which is assigned to more than 1 project
+    """
+    def __init__(self, student, projects):
+        self.student = student
+        self.projects = projects
+
+class ConflictSerializer(serializers.Serializer):
+    """
+    serializer class for conflicts
+    """
+    student = serializers.HyperlinkedRelatedField(
+        view_name='student-detail', queryset=Student.objects.all())
+    projects = serializers.HyperlinkedRelatedField(
+        view_name='project-detail', queryset=Project.objects.all(), many=True)
+
+
+class ResolveConflictSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['project', 'student', 'coach', 'skill']
+
+
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the sentemail model
