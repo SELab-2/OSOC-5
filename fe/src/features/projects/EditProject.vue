@@ -1,9 +1,14 @@
 <template>
   <div style="align-items: center; justify-content: center">
-    <q-form class="createProjectForm q-py-lg" @submit="onSubmit">
+    <q-form
+      class="createProjectForm q-py-lg"
+      @submit="onSubmit"
+    >
       <div>
         <div class="row justify-between items-center q-gutter-sm">
-          <div class="text-bold text-h4 projectcol">Edit project</div>
+          <div class="text-bold text-h4 projectcol">
+            Edit project
+          </div>
           <div>
             <div>
               <btn
@@ -43,20 +48,20 @@
         </div>
         <div class="row">
           <p>
-            id: {{ id }}<br />
-            Name: {{ projectStore.projectName }}<br />
-            Partner name: {{ projectStore.projectPartnerName }}<br />
-            Link: {{ projectStore.projectLink }}<br />
-            Coachfilter: {{ projectStore.filterCoaches }}<br />
-            Coaches: {{ projectStore.selectedCoaches }}<br />
-            Skillstore skills: {{ skillStore.skills }}<br />
+            id: {{ id }}<br>
+            Name: {{ projectStore.projectName }}<br>
+            Partner name: {{ projectStore.projectPartnerName }}<br>
+            Link: {{ projectStore.projectLink }}<br>
+            Coachfilter: {{ projectStore.filterCoaches }}<br>
+            Coaches: {{ projectStore.selectedCoaches }}<br>
+            Skillstore skills: {{ skillStore.skills }}<br>
           </p>
 
           <BasicInfo />
 
-                    <ProjectCoaches />
+          <ProjectCoaches />
 
-                    <ProjectSkills />
+          <ProjectSkills />
         </div>
       </div>
     </q-form>
@@ -70,12 +75,13 @@ import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { useProjectStore } from '../../stores/useProjectStore'
 import router from '../../router'
-import BasicInfo from "./components/BasicInfo.vue";
-import ProjectCoaches from "./components/ProjectCoaches.vue";
-import ProjectSkills from "./components/ProjectSkills.vue";
+import BasicInfo from './components/BasicInfo.vue'
+import ProjectCoaches from './components/ProjectCoaches.vue'
+import ProjectSkills from './components/ProjectSkills.vue'
+import { TempProjectSkill } from '../../models/Skill'
 
 export default defineComponent({
-  components: {ProjectCoaches, BasicInfo, ProjectSkills},
+  components: { ProjectCoaches, BasicInfo, ProjectSkills },
   props: {
     id: {
       type: String,
@@ -89,11 +95,13 @@ export default defineComponent({
     const projectStore = useProjectStore()
 
     onMounted(() => {
-      projectStore.getAndSetProject(projectID.value, (skills) => {
-        skillStore.skills = skills
-      })
-      // SKILLSTORE GET AND SET SKILLS
-      // mss callback van projectstore da dan op skillstore wordt opgeroepen
+      coachStore.loadUsers()
+      projectStore.getAndSetProject(
+        projectID.value,
+        (skills: TempProjectSkill[]) => {
+          skillStore.setSkills(skills)
+        }
+      )
     })
 
     return {
@@ -116,9 +124,9 @@ export default defineComponent({
       this.projectStore.selectedCoaches = []
       this.skillStore.loadSkills()
     },
-    onDelete(){
+    onDelete() {
       // TODO implement
-    }
+    },
   },
 })
 </script>
