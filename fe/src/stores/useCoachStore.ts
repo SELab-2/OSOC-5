@@ -5,12 +5,14 @@ import {useAuthenticationStore} from "./useAuthenticationStore";
 
 interface State {
   users: Array<User>
+  filter: string
   isLoadingUsers: boolean
 }
 
 export const useCoachStore = defineStore('user/coach', {
   state: (): State => ({
     users: [],
+    filter: '',
     isLoadingUsers: false,
   }),
   actions: {
@@ -37,7 +39,11 @@ export const useCoachStore = defineStore('user/coach', {
     },
     async loadUsers() {
       this.isLoadingUsers = true
-      const { results } = (await instance.get<{results: UserInterface[]}>('coaches')).data
+
+      let url = ''
+      if (this.filter) url = `?search=${this.filter}`
+
+      const { results } = (await instance.get<{results: UserInterface[]}>(`coaches/${url}`)).data
       this.users = results.map((user) => new User(user))
       this.isLoadingUsers = false
     },

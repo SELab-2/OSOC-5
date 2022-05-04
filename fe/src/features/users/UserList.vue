@@ -44,12 +44,13 @@
             </q-card>
           </q-dialog>
           <q-input
-            v-model="filter"
+            v-model="coachStore.filter"
             outlined
             dense
             debounce="300"
             color="yellow-4"
             placeholder="Search"
+            @update:model-value="coachStore.loadUsers"
           >
             <template #append>
               <q-icon name="search" />
@@ -248,7 +249,6 @@ export default defineComponent({
       authenticationStore: useAuthenticationStore(),
       newUserDialog: ref(false),
       active: ref(true),
-      filter: ref(''),
       roleFilter: ref('all'),
       columns,
       roles,
