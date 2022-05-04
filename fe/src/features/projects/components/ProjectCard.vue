@@ -157,7 +157,7 @@ import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-import { Suggestion } from '../../../models/Suggestion'
+import router from "../../../router";
 
 export default defineComponent({
   props: {
