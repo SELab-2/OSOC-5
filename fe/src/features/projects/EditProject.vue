@@ -7,7 +7,7 @@
       <div>
         <div class="row justify-between items-center q-gutter-sm">
           <div class="text-bold text-h4 projectcol">
-            Edit project
+            Edit project "{{ projectStore.projectName }}"
           </div>
           <div>
             <div>
@@ -20,7 +20,7 @@
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
                 shadow-strength="2"
-                @click="onCancel"
+                @click="cancelEditProject"
               />
               <btn
                 elevated
@@ -31,7 +31,7 @@
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
                 shadow-strength="2"
-                @click="onDelete"
+                @click="deleteProject"
               />
               <btn
                 elevated
@@ -47,15 +47,15 @@
           </div>
         </div>
         <div class="row">
-          <p>
-            id: {{ id }}<br>
-            Name: {{ projectStore.projectName }}<br>
-            Partner name: {{ projectStore.projectPartnerName }}<br>
-            Link: {{ projectStore.projectLink }}<br>
-            Coachfilter: {{ projectStore.filterCoaches }}<br>
-            Coaches: {{ projectStore.selectedCoaches }}<br>
-            Skillstore skills: {{ skillStore.skills }}<br>
-          </p>
+<!--          <p>-->
+<!--            id: {{ id }}<br>-->
+<!--            Name: {{ projectStore.projectName }}<br>-->
+<!--            Partner name: {{ projectStore.projectPartnerName }}<br>-->
+<!--            Link: {{ projectStore.projectLink }}<br>-->
+<!--            Coachfilter: {{ projectStore.filterCoaches }}<br>-->
+<!--            Coaches: {{ projectStore.selectedCoaches }}<br>-->
+<!--            Skillstore skills: {{ skillStore.skills }}<br>-->
+<!--          </p>-->
 
           <BasicInfo />
 
@@ -115,7 +115,7 @@ export default defineComponent({
       // TODO implement
       // this.projectStore.updateProject()
     },
-    onCancel() {
+    cancelEditProject() {
       router.push('/projects')
       this.projectStore.projectName = ''
       this.projectStore.projectPartnerName = ''
@@ -124,7 +124,7 @@ export default defineComponent({
       this.projectStore.selectedCoaches = []
       this.skillStore.loadSkills()
     },
-    onDelete() {
+    deleteProject() {
       // TODO implement
     },
   },
