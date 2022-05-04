@@ -143,7 +143,7 @@ export const useSkillStore = defineStore('skills', {
       for (const projectSkill of projectSkills){
         for(const skill of this.skills){
           if (skill.url === projectSkill.skill){ // this means u found match
-            console.log("match " + skill.url)
+            // console.log("match " + skill.url)
             skill.amount = projectSkill.amount
             skill.comment = projectSkill.comment
           }

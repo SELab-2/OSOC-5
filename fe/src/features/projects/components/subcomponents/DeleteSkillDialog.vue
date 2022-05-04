@@ -13,8 +13,8 @@
           Are you sure you want to delete "{{ deleteSkillName }}"?
         </div>
         <div class="text text-grey">
-          This skill will be deleted immediately from all projects. You can't
-          undo this action.
+          This skill will be deleted immediately from all projects.
+          You cannot undo this action.
         </div>
       </q-card-section>
     </q-card-section>
@@ -44,6 +44,7 @@
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {useSkillStore} from "../../../../stores/useSkillStore";
+import router from "../../../../router";
 
 export default defineComponent ({
   props: {
@@ -69,6 +70,7 @@ export default defineComponent ({
         this.skillStore.deleteSkill(id, // callback
           (success: boolean) => {
             if (success) {
+              router.push('/projects')
               this.$q.notify({
                 icon: 'done',
                 color: 'positive',

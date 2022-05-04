@@ -1,9 +1,6 @@
 <template>
   <div style="align-items: center; justify-content: center">
-    <q-form
-      class="createProjectForm q-py-lg"
-      @submit="onSubmit"
-    >
+    <q-form class="createProjectForm q-py-lg" @submit="onSubmit">
       <div>
         <div class="row justify-between items-center q-gutter-sm">
           <div class="text-bold text-h4 projectcol">
@@ -42,20 +39,21 @@
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
                 shadow-strength="2"
+                @click="updateProject"
               />
             </div>
           </div>
         </div>
         <div class="row">
-<!--          <p>-->
-<!--            id: {{ id }}<br>-->
-<!--            Name: {{ projectStore.projectName }}<br>-->
-<!--            Partner name: {{ projectStore.projectPartnerName }}<br>-->
-<!--            Link: {{ projectStore.projectLink }}<br>-->
-<!--            Coachfilter: {{ projectStore.filterCoaches }}<br>-->
-<!--            Coaches: {{ projectStore.selectedCoaches }}<br>-->
-<!--            Skillstore skills: {{ skillStore.skills }}<br>-->
-<!--          </p>-->
+          <!--          <p>-->
+          <!--            id: {{ id }}<br>-->
+          <!--            Name: {{ projectStore.projectName }}<br>-->
+          <!--            Partner name: {{ projectStore.projectPartnerName }}<br>-->
+          <!--            Link: {{ projectStore.projectLink }}<br>-->
+          <!--            Coachfilter: {{ projectStore.filterCoaches }}<br>-->
+          <!--            Coaches: {{ projectStore.selectedCoaches }}<br>-->
+          <!--            Skillstore skills: {{ skillStore.skills }}<br>-->
+          <!--          </p>-->
 
           <BasicInfo />
 
@@ -64,6 +62,18 @@
           <ProjectSkills />
         </div>
       </div>
+
+      <q-dialog
+        class="full-width"
+        :model-value="deleteProjectID !== -1"
+        persistent
+        @update:model-value="deleteProjectID = -1"
+      >
+        <DeleteProjectDialog
+          :delete-project-id="deleteProjectID"
+          :delete-project-name="deleteProjectName"
+        />
+      </q-dialog>
     </q-form>
   </div>
 </template>
@@ -79,9 +89,10 @@ import BasicInfo from './components/BasicInfo.vue'
 import ProjectCoaches from './components/ProjectCoaches.vue'
 import ProjectSkills from './components/ProjectSkills.vue'
 import { TempProjectSkill } from '../../models/Skill'
+import DeleteProjectDialog from './components/subcomponents/DeleteProjectDialog.vue'
 
 export default defineComponent({
-  components: { ProjectCoaches, BasicInfo, ProjectSkills },
+  components: { ProjectCoaches, BasicInfo, ProjectSkills, DeleteProjectDialog },
   props: {
     id: {
       type: String,
@@ -94,25 +105,33 @@ export default defineComponent({
     const coachStore = useCoachStore()
     const projectStore = useProjectStore()
 
+    const deleteProjectID = ref(-1)
+    const deleteProjectName = ref('')
+
     onMounted(() => {
       coachStore.loadUsers()
-      projectStore.getAndSetProject(
-        projectID.value,
-        (skills: TempProjectSkill[]) => {
+      projectStore
+        .getAndSetProject(projectID.value, (skills: TempProjectSkill[]) => {
           skillStore.setSkills(skills)
-        }
-      )
+        })
+        // this happens when user requests invalid project id
+        .catch(() => router.push('/projects'))
     })
 
     return {
+      projectID,
       skillStore,
       coachStore,
       projectStore,
+      deleteProjectID,
+      deleteProjectName,
     }
   },
   methods: {
-    onSubmit() {
+    updateProject() {
+      console.log('updateProject') //TODO REMOVE
       // TODO implement
+      // CHECK IF ALLE VELDEN GOED ZIJN of stuur patch die enkel velden update die goed zin
       // this.projectStore.updateProject()
       this.$q.notify({
         icon: 'close',
@@ -130,12 +149,11 @@ export default defineComponent({
       this.skillStore.loadSkills()
     },
     deleteProject() {
-      // TODO implement
-      this.$q.notify({
-        icon: 'close',
-        color: 'negative',
-        message: 'Not yet implemented!',
-      })
+      this.deleteProjectID = +this.projectID
+      this.deleteProjectName = this.projectStore.projectName
+    },
+    onSubmit() {
+      // do nothing, but we need to catch this since otherwise the url changes
     },
   },
 })

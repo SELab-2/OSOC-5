@@ -18,7 +18,7 @@ import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
 import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
-import ProjectCoaches from "../features/projects/components/ProjectCoaches.vue";
+import ProjectCoaches from '../features/projects/components/ProjectCoaches.vue'
 
 interface State {
   projects: Array<Project>
@@ -286,19 +286,33 @@ export const useProjectStore = defineStore('project', {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getAndSetProject(id: string, callback: any) {
-      console.log(id)
-      instance.get('projects/' + id).then(
-        (data) => {
-          console.log(data);
+      // console.log(id)
+      return instance
+        .get('projects/' + id)
+        .then((data) => {
+          console.log(data)
           const project = data.data
-          this.projectName= project.name
-          this.projectPartnerName= project.partnerName
-          this.projectLink= project.extraInfo
-          this.selectedCoaches= project.coaches
+          this.projectName = project.name
+          this.projectPartnerName = project.partnerName
+          this.projectLink = project.extraInfo
+          this.selectedCoaches = project.coaches
           // skills
           callback(project.requiredSkills)
-        }
-      ).catch((error) => console.log(error))
+        })
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async deleteProject(id: number, callback: any) {
+      console.log('DELETED ' + id)
+
+      await instance
+        .delete(`projects/${id}/`)
+        .then(() => {
+          callback(true)
+        })
+        .catch((error) => {
+          console.log(error)
+          callback(false)
+        })
     },
   },
 })
