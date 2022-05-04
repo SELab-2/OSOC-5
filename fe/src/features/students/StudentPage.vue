@@ -2,7 +2,7 @@
   <SideBar
     :key="sideBarKey"
     color="bg-grey-3"
-    :select-student="selectStudent"
+    :clickable="true"
     :draggable="false"
     :must-hover="false"
     @update="update"
@@ -12,6 +12,7 @@
     class="justify-between row q-px-lg q-pt-lg studentcol">
     <div class="row q-px-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ student ? student.fullName : '' }}</h>
+      <DecisionIcon v-if="student !== null" :student="student" />
       <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
       <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
     </div>
@@ -205,9 +206,11 @@ import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
+import DecisionIcon from "../../components/DecisionIcon.vue";
 
 export default defineComponent ({
   components: {
+    DecisionIcon,
     InfoDiv,
     LanguageCard,
     ExtraInfoCard,
@@ -224,7 +227,6 @@ export default defineComponent ({
     },
   },
   setup() {
-    
     const baseURL =
     process.env.NODE_ENV == 'development'
       ? 'ws://localhost:8000/ws/socket_server/'
@@ -252,12 +254,15 @@ export default defineComponent ({
     }
   },
   computed: {
+    /**
+     * Retrieve the current selected student from the store
+     */
     student(): Student | null {
       return this.studentStore.currentStudent
     },
-    possibleSuggestion(): string {
-      return this.studentStore.possibleSuggestion.toString()
-    },
+    /**
+     * Retrieve the possible suggestion from the store
+     */
     gender(): string {
       let gender = ''
       switch (this.student?.gender) {
@@ -276,10 +281,18 @@ export default defineComponent ({
       }
       return this.student?.pronouns ? gender + `: ${this.student.pronouns}` : gender
     },
+    /**
+     * Get the employment agreement of this student
+     */
     employment(): string {
       const string = this.student?.employmentAgreement
+
+      // return uppercase agreement or an empty string
       return string ? string.charAt(0).toUpperCase() + string.slice(1) : '';
     },
+    /**
+     * Get gender icon of this student
+     */
     genderIcon(): string {
       switch (this.student?.gender) {
         case 0:
@@ -292,30 +305,22 @@ export default defineComponent ({
           return 'person'
       }
     },
-    bestSkillColor(): string | null {
-      if (this.student) {
-        for (const skill of this.student.skills) {
-          if (typeof(skill) === 'string') {
-            return null
-          } else {
-            if (skill.name === this.student?.bestSkill) {
-              return skill.color
-            }
-          }
-        }
-      }
-      return null
-    },
+    /**
+     * Get my suggestion if I suggested on this student or if the store is loading, return the possible suggestion
+     */
     mySuggestion(): string {
       if (! this.studentStore.isLoading && this.student) {
         const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach.id === this.authenticationStore.loggedInUser?.id)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion.toString() : (-1).toString()
       } else {
-        return this.possibleSuggestion.toString()
+        return this.studentStore.possibleSuggestion.toString()
       }
 
     },
+    /**
+     * Get the color for my suggestion
+     */
     mySuggestionColor(): string {
       let mySuggestion = this.mySuggestion
       switch (mySuggestion) {
@@ -329,8 +334,11 @@ export default defineComponent ({
           return "grey"
       }
     },
+    /**
+     * Get the name of the possible suggestion
+     */
     suggestionName(): string {
-      switch (this.possibleSuggestion) {
+      switch (this.studentStore.possibleSuggestion) {
         case "0":
           return "yes"
         case "1":
@@ -341,8 +349,11 @@ export default defineComponent ({
           return "not decided"
       }
     },
+    /**
+     * Get the background color of the possible suggestion
+     */
     suggestionColor(): string {
-      switch (this.possibleSuggestion) {
+      switch (this.studentStore.possibleSuggestion) {
         case "0":
           return "bg-green"
         case "1":
@@ -390,6 +401,9 @@ export default defineComponent ({
     }, {immediate: true})
   },
   methods: {
+    /**
+     * Make a suggestion on this student
+     */
     makeSuggestion: async function () {
       if (this.student) {
         await this.studentStore.updateSuggestion(this.student.id, this.reason)
@@ -398,13 +412,17 @@ export default defineComponent ({
 
       this.update()
     },
-    selectStudent: function (selected_student: Student) {
-      this.$router.push(`/students/${selected_student.id}`)
-    },
-    showDialog: function (value: number) {
+    /**
+     * Set possible suggestion and show dialog
+     * @param value
+     */
+    showDialog: function (value: string) {
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
     },
+    /**
+     * Make a final decision
+     */
     finalDecision: async function () {
       if (this.student) {
         await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
@@ -412,6 +430,9 @@ export default defineComponent ({
 
       this.update()
     },
+    /**
+     * Update components to show new suggestion/decision
+     */
     update() {
       // Make components update
       this.sideBarKey += 1

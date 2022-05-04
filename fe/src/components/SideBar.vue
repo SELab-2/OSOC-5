@@ -220,9 +220,10 @@ export default defineComponent({
     SegmentedControl,
   },
   props: {
-    selectStudent: {
-      type: Function,
-      required: true
+    clickable: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     color: {
       type: String,
@@ -239,14 +240,14 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
-    const $q = useQuasar()
-
     const skillStore = useSkillStore()
+
+    const $q = useQuasar()
 
     return {
       studentStore,
-      $q,
       skillStore,
+      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -264,7 +265,7 @@ export default defineComponent({
     }
   },
   created() {
-    //this.skillStore.loadSkills()
+    // load all students
     this.studentStore.loadStudents()
   },   
   methods: {
@@ -280,14 +281,28 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
       e.dataTransfer.effectAllowed = 'copy'
     },
+    /**
+     * Clicking a student sets the selected student of the sidebar
+     * @param student the clicked student in the sidebar
+     */
     clickStudent(student: Student) {
       this.selectStudent(student)
     },
+    /**
+     * Load all students and make the infinite scroll reload
+     */
     loadStudents(scroll: any) {
       scroll.resume()
       this.studentStore.loadStudents()
       this.scrollKey += 1
-    }
+    },
+    /**
+     * Route to the correct details page of selected_student
+     * @param selected_student student to be displayed
+     */
+    selectStudent: function (selected_student: Student) {
+      this.$router.push(`/students/${selected_student.id}`)
+    },
   }
 })
 </script>

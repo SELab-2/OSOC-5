@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SideBar :must-hover="false" :selectStudent="selectStudent" color="bg-grey-3" :draggable="false"/>
+    <SideBar :must-hover="false" :clickable="true" color="bg-grey-3" :draggable="false"/>
     <div class="q-pa-lg full-height flex-center">
       <label>Select a student from the sidebar to get started</label>
     </div>
@@ -23,11 +23,6 @@ export default defineComponent({
     return {
       student,
     }
-  },
-  methods: {
-    selectStudent: function (selected_student: Student) {
-      this.$router.push(`/students/${selected_student.id}`)
-    },
   }
 })
 </script>
