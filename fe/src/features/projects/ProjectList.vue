@@ -22,7 +22,8 @@
         <q-space />
         <div>
           <q-input
-            v-model="filter"
+            v-model="projectStore.projectFilter"
+            debounce="300"
             dense
             outlined
             label="Search Projects"
@@ -108,7 +109,6 @@ export default defineComponent({
   },
   data() {
     return {
-      filter: ref(''),
       showShadow: ref(false),
       sideBarKey: 0,
     }
@@ -127,6 +127,13 @@ export default defineComponent({
             p.selectedRoles[r] = newValue
           }
         })
+      }
+    }
+  },
+  watch: {
+    'projectStore.projectFilter': {
+      handler() {
+        this.projectStore.loadProjects()
       }
     }
   },
