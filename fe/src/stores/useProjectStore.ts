@@ -7,7 +7,8 @@ import {
   Skill,
   ProjectSkillInterface,
   ProjectSkill,
-  TempProjectSkill, ProjectTableSkill,
+  TempProjectSkill,
+  ProjectTableSkill,
 } from '../models/Skill'
 import {
   ProjectSuggestionInterface,
@@ -17,7 +18,7 @@ import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
-import { convertObjectKeysToSnakeCase } from "../utils/case-conversion";
+import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
@@ -37,9 +38,14 @@ export const useProjectStore = defineStore('project', {
     projectPartnerName: '',
     projectLink: '',
     filterCoaches: '',
-    selectedCoaches: []
+    selectedCoaches: [],
   }),
   actions: {
+    /**
+     * Fetches the suggested students
+     * @param students the students to fetch
+     * @returns the fetched students
+     */
     async fetchSuggestedStudents(
       students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
@@ -55,6 +61,12 @@ export const useProjectStore = defineStore('project', {
       }
       return newStudents
     },
+    /**
+     * Removes a suggestion from a project
+     * @param project the associated project
+     * @param suggestion the suggestion which needs to be removed
+     * @returns data returned by the back-end
+     */
     async removeSuggestion(
       project: Project,
       suggestion: ProjectSuggestionInterface
@@ -65,6 +77,14 @@ export const useProjectStore = defineStore('project', {
         coach: suggestion.coach.url,
       })
     },
+    /**
+     * Adds a suggestion to a project
+     * @param projectId the id of the project for which a suggestion is added
+     * @param studentUrl url of the student
+     * @param skillUrl url of the skill
+     * @param reason the reason why we made this suggestion
+     * @returns data returned by the back-end
+     */
     async addSuggestion(
       projectId: number,
       studentUrl: string,
@@ -77,12 +97,21 @@ export const useProjectStore = defineStore('project', {
         reason: reason,
       })
     },
+    /**
+     * Gets a skill
+     * @param skill the skill which we want to get
+     * @returns the fetched skill
+     */
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
-    },
-    
+    }, 
     // NOTE: this may be broken.
+
+    /**
+     * Gets a project
+     * @param project the project to get
+     */
     async getProject(project: TempProject) {
       console.log("Loading")
       const coaches: Array<User> = await Promise.all(
@@ -111,6 +140,9 @@ export const useProjectStore = defineStore('project', {
         ),
       ])
     },
+    /**
+     * Loads the projects
+     */
     async loadProjects() {
       this.isLoadingProjects = true
       try {
@@ -152,6 +184,10 @@ export const useProjectStore = defineStore('project', {
         this.isLoadingProjects = false
       }
     },
+    /**
+     * Called when we recieve a suggestion from the websocket
+     * @param param0 object received from the websocket
+     */
     async receiveSuggestion({
       project_id,
       reason,
@@ -190,6 +226,10 @@ export const useProjectStore = defineStore('project', {
         })
       }
     },
+    /**
+     * Called when we receive a remove suggestion from the websocket
+     * @param param0 object received from the websocket
+     */
     removeReceivedSuggestion({
       skill,
       student,
@@ -217,10 +257,15 @@ export const useProjectStore = defineStore('project', {
           project.suggestedStudents?.splice(suggestionIndex, 1)
       }
     },
+    /**
+     * TODO
+     * @param skills 
+     * @param callback 
+     */
     submitProject(
-        skills: Array<ProjectTableSkill>,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        callback: any
+      skills: Array<ProjectTableSkill>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      callback: any
     ) {
       const skillsList: Array<TempProjectSkill> = []
 
@@ -250,35 +295,24 @@ export const useProjectStore = defineStore('project', {
 
       // POST request to make a project
       instance
-          .post('projects/', convertObjectKeysToSnakeCase(data))
-          .then((response) => {
-            console.log(response);
-            this.loadProjects()
+        .post('projects/', convertObjectKeysToSnakeCase(data))
+        .then((response) => {
+          this.loadProjects()
+        
+          // clear fields when project is made successfully
+          this.isLoadingProjects=  false
+          this.projectName= ''
+          this.projectPartnerName= ''
+          this.projectLink= ''
+          this.filterCoaches=''
+          this.selectedCoaches= []
+          useSkillStore().loadSkills()
 
-            // clear fields when project is made successfully
-            this.isLoadingProjects=  false
-            this.projectName= ''
-            this.projectPartnerName= ''
-            this.projectLink= ''
-            this.filterCoaches=''
-            this.selectedCoaches= []
-            useSkillStore().loadSkills()
-
-            // this.projects.push({
-            //   name: response['data']['name'],
-            //   id:  response['data']['id'],
-            //   partnerName: response['data']['partner_name'],
-            //   extraInfo: response['data']['extra_info'],
-            //   requiredSkills: response['data']['required_skills'],
-            //   coaches: response['data']['coaches'],
-            // });
-
-            callback(true);
-          })
-          .catch(function (error) {
-            console.log(error)
-            callback(false)
-          })
+          callback(true)
+        })
+        .catch(function (error) {
+          callback(false)
+        })
     },
     editProject(project: Project){
       this.projectName= project.name
