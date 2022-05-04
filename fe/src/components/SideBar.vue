@@ -276,9 +276,9 @@ export default defineComponent({
     clickStudent(student: Student) {
       this.selectStudent(student)
     },
-    loadStudents(scroll: any) {
+    async loadStudents(scroll: any) {
       scroll.resume()
-      this.studentStore.loadStudents()
+      await this.studentStore.loadStudents()
       this.scrollKey += 1
     }
   }
