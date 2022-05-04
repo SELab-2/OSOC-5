@@ -114,6 +114,11 @@ export default defineComponent({
     onSubmit() {
       // TODO implement
       // this.projectStore.updateProject()
+      this.$q.notify({
+        icon: 'close',
+        color: 'negative',
+        message: 'Not yet implemented!',
+      })
     },
     cancelEditProject() {
       router.push('/projects')
@@ -126,6 +131,11 @@ export default defineComponent({
     },
     deleteProject() {
       // TODO implement
+      this.$q.notify({
+        icon: 'close',
+        color: 'negative',
+        message: 'Not yet implemented!',
+      })
     },
   },
 })
