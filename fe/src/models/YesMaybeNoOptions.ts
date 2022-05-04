@@ -8,20 +8,20 @@ const yesMaybeNoOptions = [
         icon: 'mdi-check'
     },
     {
-        name: 1,
-        label: 'Maybe',
-        value: 1,
-        color: 'red',
-        background: 'bg-red',
-        icon: 'mdi-help'
-    },
-    {
         name: 2,
-        label: 'No',
+        label: 'Maybe',
         value: 2,
         color: 'yellow',
         background: 'bg-yellow',
         icon: 'mdi-close'
+    },
+    {
+        name: 1,
+        label: 'No',
+        value: 1,
+        color: 'red',
+        background: 'bg-red',
+        icon: 'mdi-help'
     },
     {
         name: -1,

@@ -16,7 +16,7 @@ interface State {
   coaches: Map<string, User>
   students: Array<Student>
   isLoading: boolean
-  possibleSuggestion: string
+  possibleSuggestion: number
   currentStudent: Student | null
   nextPage: string | null
 }
@@ -34,7 +34,7 @@ export const useStudentStore = defineStore('user/student', {
     coaches: new Map(),
     students: [],
     isLoading: false,
-    possibleSuggestion: "-1",
+    possibleSuggestion: -1,
     currentStudent: null,
     nextPage: ''
   }),
@@ -185,7 +185,7 @@ export const useStudentStore = defineStore('user/student', {
      */
     async updateSuggestion(studentId: number, reason: string) {
       // check if -1 is selected to delete suggestion
-      if (this.possibleSuggestion === "-1") {
+      if (this.possibleSuggestion === -1) {
         await instance.delete(`students/${studentId}/remove_suggestion/`)
       } else {
         await instance.post(`students/${studentId}/make_suggestion/`, {
@@ -203,20 +203,20 @@ export const useStudentStore = defineStore('user/student', {
      */
     async updateFinalDecision(
       studentId: number,
-      possibleFinalDecision: string
+      possibleFinalDecision: number
     ) {
       let reason = ''
 
       // keep reason if reason is given in suggestion
       if (
-        this.currentStudent?.finalDecision?.suggestion.toString() ==
+        this.currentStudent?.finalDecision?.suggestion ==
         possibleFinalDecision
       ) {
         reason = this.currentStudent.finalDecision.reason
       }
 
       // check if -1 is selected to delete decision
-      if (possibleFinalDecision == '-1') {
+      if (possibleFinalDecision === -1) {
         await instance.delete(`students/${studentId}/remove_final_decision/`)
       } else {
         await instance.post(`students/${studentId}/make_final_decision/`, {
