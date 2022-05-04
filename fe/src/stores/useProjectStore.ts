@@ -27,6 +27,7 @@ interface State {
   projectLink: string
   filterCoaches: string
   selectedCoaches: Array<User>
+  projectFilter: string
 }
 
 export const useProjectStore = defineStore('project', {
@@ -37,7 +38,8 @@ export const useProjectStore = defineStore('project', {
     projectPartnerName: '',
     projectLink: '',
     filterCoaches: '',
-    selectedCoaches: []
+    selectedCoaches: [],
+    projectFilter: '',
   }),
   actions: {
     async fetchSuggestedStudents(
@@ -113,7 +115,7 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       this.isLoadingProjects = true
       try {
-        const { results } = (await instance.get<{results: TempProject[]}>('projects/')).data
+        const { results } = (await instance.get<{results: TempProject[]}>(`projects/?search=${this.projectFilter}`)).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )

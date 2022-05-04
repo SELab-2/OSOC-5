@@ -19,23 +19,6 @@
         />
         <q-space />
         <div>
-          <btn 
-            v-if="anyNew.length > 0" 
-            icon="r_warning" 
-            color="yellow"
-            flat
-            round
-            size="12px"
-            glow-color="amber-3"
-            @click="expand(anyNew)"
-            >
-            <q-tooltip class="shadow-4 bg-amber-7">
-            <div class="text-subtitle2">
-              There are still draft suggestions open.
-            </div>
-          </q-tooltip>
-          </btn>
-          <btn flat round size="12px" color="primary" icon="mail" />
           <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
           <btn flat round size="12px" color="primary" icon="edit" @click="triggerEditProject"/>
         </div>
@@ -128,7 +111,7 @@
           <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
           <project-card-suggestion
             
-            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as any).fromWebsocket"
+            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as any).fromWebsocket || (suggestion as any).fromLocal"
             :confirmSuggestion="confirmSuggestion"
             :removeSuggestion="removeSuggestion"
             :suggestion="suggestion"
@@ -308,6 +291,7 @@ export default defineComponent({
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
       // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
       const i = this.project.suggestedStudents!.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
+      setTimeout(() => (this.project.suggestedStudents![i] as NewProjectSuggestion).fromLocal = false, 500) // This is needed, because JS will otherwise somehow report true, even when the object doesn't exist anymore? Don't know why.
       this.project.suggestedStudents![i] = new ProjectSuggestion(suggestion)
 
       await this.projectStore.addSuggestion(
@@ -327,12 +311,6 @@ export default defineComponent({
     
   },
   computed: {
-    anyNew() {
-      return (this.project.requiredSkills ?? []).filter(s => {
-        return !this.selectedRoles[s.skill.id] && (this.project.suggestedStudents ?? []).filter(student => student.skill.id === s.skill.id).some(student => (student as NewProjectSuggestion)?.fromLocal)
-      })
-      // return this.project.suggestedStudents?.some(s => s instanceof NewProjectSuggestion )
-    },
     me() {
       return this.authenticationStore.loggedInUser as User
     },
