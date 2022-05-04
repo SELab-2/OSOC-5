@@ -55,6 +55,7 @@ import { useCoachStore } from '../../stores/useCoachStore'
 import BasicInfo from "./components/BasicInfo.vue";
 import {useProjectStore} from "../../stores/useProjectStore";
 import ProjectCoaches from "./components/ProjectCoaches.vue";
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import ProjectSkills from "./components/ProjectSkills.vue";
 
 export default defineComponent({
@@ -64,23 +65,30 @@ export default defineComponent({
     const coachStore = useCoachStore()
     const projectStore = useProjectStore()
 
-    onMounted(() => {
-      skillStore.loadSkills()
-      coachStore.loadUsers()
-      // makes sure the fields are empty
-      projectStore.projectName = ''
-      projectStore.projectPartnerName = ''
-      projectStore.projectLink = ''
-      projectStore.filterCoaches = ''
-      projectStore.selectedCoaches = []
-    })
+
 
     return {
       skillStore,
       coachStore,
       projectStore,
+      authenticationStore: useAuthenticationStore(),
 
     }
+  },
+  beforeMount() {
+  if (!this.authenticationStore.loggedInUser?.isAdmin) {
+    router.replace('/projects')
+  }
+  },
+  mounted(){
+    this.skillStore.loadSkills()
+    this.coachStore.loadUsers()
+  // makes sure the fields are empty
+    this.projectStore.projectName = ''
+    this.projectStore.projectPartnerName = ''
+    this.projectStore.projectLink = ''
+    this.projectStore.filterCoaches = ''
+    this.projectStore.selectedCoaches = []
   },
   methods: {
     onSubmit() {

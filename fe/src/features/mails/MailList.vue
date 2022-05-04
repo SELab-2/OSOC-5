@@ -111,6 +111,8 @@ import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
+import router from "../../router";
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 
 const columns = [
   {
@@ -151,12 +153,19 @@ export default defineComponent({
   setup() {
     const mailStore = useMailStore()
     const q = useQuasar()
+
     return {
       mailStore,
+      authenticationStore: useAuthenticationStore(),
       filter: ref(''),
       columns,
       status,
       q
+    }
+  },
+  beforeMount() {
+    if (!this.authenticationStore.loggedInUser?.isAdmin) {
+      router.replace('/projects')
     }
   },
   mounted() {

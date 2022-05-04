@@ -42,12 +42,6 @@ export default defineComponent({
       type: String,
       required: true
     }
-  },
-  computed: {
-    test() : string {
-      console.log(this.title)
-      return ""
-    }
   }
 })
 </script>

@@ -1,11 +1,10 @@
 import { Skill } from './Skill'
 import { Suggestion } from './Suggestion'
+import { User } from './User'
 
 export interface TempStudent {
   student: string
-  coach:
-    | { id: number; firstName: string; lastName: string; url: string }
-    | string
+  coach: User
   skill: string
   reason: string
 }

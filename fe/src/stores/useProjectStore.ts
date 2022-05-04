@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
-import { Student, TempStudent } from '../models/Student'
+import { Student } from '../models/Student'
+import { TempProjectSuggestion, NewProjectSuggestion } from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   ProjectSkill,
@@ -10,8 +11,8 @@ import {
   TempProjectSkill,
 } from '../models/Skill'
 import {
-  ProjectSuggestion,
   ProjectSuggestionInterface,
+  ProjectSuggestion,
 } from '../models/ProjectSuggestion'
 import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
@@ -41,17 +42,13 @@ export const useProjectStore = defineStore('project', {
   }),
   actions: {
     async fetchSuggestedStudents(
-      students: TempStudent[]
+      students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
       const newStudents: ProjectSuggestionInterface[] = []
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (
-            await instance.get(
-              (student.coach as unknown as { url: string }).url
-            )
-          ).data as User,
+          coach: (await useCoachStore().getUser(student.coach)),
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
@@ -85,10 +82,12 @@ export const useProjectStore = defineStore('project', {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
+
+    // NOTE: this may be broken.
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) =>
-          useCoachStore().getUser(coach as unknown as string)
+          useCoachStore().getUser(coach)
         )
       )
 
@@ -124,7 +123,7 @@ export const useProjectStore = defineStore('project', {
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) =>
-              useCoachStore().getUser((coach as unknown as { url: string }).url)
+              useCoachStore().getUser(coach)
             )
           )
 
@@ -182,15 +181,22 @@ export const useProjectStore = defineStore('project', {
         const skillStore = useSkillStore()
 
         const studentObj = await studentStore.getStudent(student)
-        const coachObj = await coachStore.getUser(coach.url)
+        const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
+        project.suggestedStudents?.push(new NewProjectSuggestion({
+            student: studentObj,
+            coach: coachObj,
+            skill: skillObj,
+            reason,
+          }, true))
 
-        project.suggestedStudents?.push({
-          student: studentObj,
-          coach: coachObj,
-          skill: skillObj,
-          reason,
-        })
+        // Remove the "New" badge from the new suggestion after a short period.
+        setTimeout(() =>
+        (project.suggestedStudents?.find(s =>
+          s.student.url === studentObj.url &&
+          s.coach.url === coachObj.url &&
+          s.skill.url === skillObj.url) as NewProjectSuggestion).fromWebsocket = false,
+           5000)
       }
     },
     removeReceivedSuggestion({
@@ -209,9 +215,8 @@ export const useProjectStore = defineStore('project', {
         const suggestionIndex = project.suggestedStudents?.findIndex(
           (s) => s.student.url === student && s.skill.url === skill
         )
-
         if (
-          suggestionIndex &&
+          suggestionIndex !== undefined && // !== undefined must be written here, otherwise suggestionIndex === 0 will fail.
           suggestionIndex !== -1 &&
           project.suggestedStudents &&
           suggestionIndex < project.suggestedStudents.length &&

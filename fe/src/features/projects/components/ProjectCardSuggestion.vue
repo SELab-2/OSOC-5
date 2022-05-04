@@ -1,5 +1,6 @@
 <template>
-  <q-slide-transition :appear="isNew && !suggestion.reason">
+  <!-- appear only when a new entry is added. Otherwise, the suggestions may be glitchy when removing suggestions. -->
+  <q-slide-transition :appear="(fromLocal || fromWebsocket) && !suggestion.reason">
     <div v-if="show" style="margin-left: 10px">
       <div class="column full-width">
         <div :lines="1" tabindex="-1" class="row flex-center no-wrap" style="height: 30px">
@@ -10,7 +11,7 @@
             {{ suggestion.student.firstName }}
             {{ suggestion.student.lastName }}
           </div>
-          <q-badge v-if="isNew" rounded :color="suggestion.skill.color" label="Draft" class="q-ml-xs" />
+          <q-badge v-if="fromWebsocket || fromLocal" rounded :color="suggestion.skill.color" :label="fromWebsocket ? 'New' : 'Draft'" class="q-ml-xs" />
           
           <q-space/>
           <div v-if="!removed" style="flex-wrap: nowrap; display: block; min-width: 72px">
@@ -29,7 +30,7 @@
               icon="delete"
               @click="() => {
                 removed = true
-                isNew ? remove() : prepareRemove()
+                fromLocal ? remove() : prepareRemove()
               }"
             />
           </div>
@@ -39,7 +40,7 @@
           <q-input
             :autofocus="progress !== 3"
             :color="suggestion.skill.color"
-            v-if="isNew || progress !== 0"
+            v-if="fromLocal || progress !== 0"
             v-model="suggestion.reason"
             dense
             outlined
@@ -124,18 +125,22 @@ export default defineComponent({
       clearTimeout(this.timeout)
       this.timeout = null
     },
+    
+    // This shows the undo button for a short period of time, and will call the actual remove method after a short period of time.
     prepareRemove() {
       this.timeout = setTimeout(() => {
         this.remove()
         this.timeout = null
       }, 2000)
     },
+    
+    // Actually removes the suggestion from the server. If the suggestion is a draft, it only gets removed locally.
     remove() {
       this.show = false
+      // A short timeout is added to play the remove animation.
       setTimeout(() => {
         this.removeSuggestion(this.suggestion)
       }, 500)
-      return
     },
     async confirm() {
       this.progress = 1
@@ -151,6 +156,12 @@ export default defineComponent({
   computed: {
     isNew() {
       return this.suggestion instanceof NewProjectSuggestion
+    },
+    fromLocal() {
+      return this.isNew && (this.suggestion as NewProjectSuggestion).fromLocal
+    },
+    fromWebsocket() {
+      return this.isNew && (this.suggestion as NewProjectSuggestion).fromWebsocket
     }
   }
 })
