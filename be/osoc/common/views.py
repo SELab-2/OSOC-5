@@ -413,10 +413,10 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
 
         serializer = ConflictSerializer(conflicts, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=['post'], serializer_class=ResolveConflictSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive])
-    def resolve_conflicts(self, request):
+    def resolve_conflicts(self, request): # pylint: disable=no-self-use
         """
         let a coach resolve conflicts
         exptects a list of objects with a student, project, coach and skill,
@@ -438,7 +438,7 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
                         .filter(student=projectsuggestion['student'])\
                         .exclude(**projectsuggestion)\
                         .delete()
-                
+
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response({"detail": "students must be unique"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

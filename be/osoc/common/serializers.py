@@ -187,7 +187,7 @@ class ProjectGetSerializer(ProjectSerializer):
     coaches = CoachPartialSerializer(many=True)
 
 
-class Conflict():
+class Conflict(): # pylint: disable=too-few-public-methods
     """
     conflict class, only used to initialize ConflictSerializer
     a conflict has a student which is assigned to more than 1 project
@@ -196,7 +196,7 @@ class Conflict():
         self.student = student
         self.projects = projects
 
-class ConflictSerializer(serializers.Serializer):
+class ConflictSerializer(serializers.Serializer): # pylint: disable=abstract-method
     """
     serializer class for conflicts
     """
@@ -207,6 +207,9 @@ class ConflictSerializer(serializers.Serializer):
 
 
 class ResolveConflictSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for resolving conflicts
+    """
     class Meta:
         model = ProjectSuggestion
         fields = ['project', 'student', 'coach', 'skill']
