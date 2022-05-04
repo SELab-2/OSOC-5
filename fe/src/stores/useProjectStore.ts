@@ -75,21 +75,11 @@ export const useProjectStore = defineStore('project', {
       skillUrl: string,
       reason: string
     ) {
-      const response = await instance.post(
-        `projects/${projectId}/suggest_student/`,
-        {
-          student: studentUrl,
-          skill: skillUrl,
-          reason: reason,
-        }
-      )
-
-      const studentStore = useStudentStore()
-      studentStore.students = studentStore.students.filter(
-        ({ url }) => url !== studentUrl
-      )
-
-      return response
+      return await instance.post(`projects/${projectId}/suggest_student/`, {
+        student: studentUrl,
+        skill: skillUrl,
+        reason: reason,
+      })
     },
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
@@ -204,6 +194,14 @@ export const useProjectStore = defineStore('project', {
           )
         )
 
+        if (
+          studentStore.onProject === 'maybe' ||
+          studentStore.onProject === 'no'
+        )
+          studentStore.students = studentStore.students.filter(
+            ({ url }) => url !== student
+          )
+
         // Remove the "New" badge from the new suggestion after a short period.
         setTimeout(
           () =>
@@ -241,8 +239,15 @@ export const useProjectStore = defineStore('project', {
           project.suggestedStudents &&
           suggestionIndex < project.suggestedStudents.length &&
           project.suggestedStudents[suggestionIndex].student.url === student
-        )
+        ) {
+          const studentStore = useStudentStore()
+          if (studentStore.onProject === 'true')
+            studentStore.students = studentStore.students.filter(
+              ({ url }) => url !== student
+            )
+
           project.suggestedStudents?.splice(suggestionIndex, 1)
+        }
       }
     },
     submitProject(
