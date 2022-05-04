@@ -87,19 +87,19 @@
             :style="`height: 25px; width:25px; border-radius: 50%`"
           />
         </q-td>
-        <q-td
-          key="remove"
-          style="width: 10px"
-        >
-          <btn
-            flat
-            round
-            style="color: #3d3d3d"
-            icon="mdi-pencil-outline"
-            glow-color="grey-5"
-            @click="editSkill(props.row)"
-          />
-        </q-td>
+<!--        <q-td-->
+<!--          key="edit"-->
+<!--          style="width: 10px"-->
+<!--        >-->
+<!--          <btn-->
+<!--            flat-->
+<!--            round-->
+<!--            style="color: #3d3d3d"-->
+<!--            icon="mdi-pencil-outline"-->
+<!--            glow-color="grey-5"-->
+<!--            @click="editSkill(props.row)"-->
+<!--          />-->
+<!--        </q-td>-->
         <q-td
           key="remove"
           style="width: 10px"
@@ -123,7 +123,6 @@
     persistent
   >
     <NewSkillDialog
-      :reset-new-skill-prompt="() => editSkillDialog.value = false"
       dialog-title="Edit skill"
     />
   </q-dialog>

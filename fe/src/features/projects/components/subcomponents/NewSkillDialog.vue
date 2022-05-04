@@ -156,7 +156,6 @@ export default defineComponent({
       this.skillStore.popupColor = ''
       this.skillStore.popupID = -1
     }
-
   },
 })
 </script>

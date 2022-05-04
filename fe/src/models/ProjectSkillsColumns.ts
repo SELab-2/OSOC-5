@@ -27,13 +27,13 @@ const columnsSkills = [
     field: "color",
     sortable: false
   },
-  {
-    name: "edit",
-    align: "center" as const,
-    label: "",
-    field: "",
-    sortable: false
-  },
+  // {
+  //   name: "edit",
+  //   align: "center" as const,
+  //   label: "",
+  //   field: "",
+  //   sortable: false
+  // },
   {
     name: "action",
     align: "center" as const,

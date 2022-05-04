@@ -1,8 +1,5 @@
 <template>
   <div style="align-items: center; justify-content: center">
-    {{ skillStore.popupName }}
-    {{ skillStore.popupColor }}
-    {{ skillStore.popupID }}
     <q-form
       class="createProjectForm q-py-lg"
       @submit="onSubmit"

@@ -19,9 +19,9 @@
         />
         <q-space />
         <div>
-          <btn 
-            v-if="anyNew.length > 0" 
-            icon="r_warning" 
+          <btn
+            v-if="anyNew.length > 0"
+            icon="r_warning"
             color="yellow"
             flat
             round
@@ -77,22 +77,22 @@
             <div v-if="(project.requiredSkills ?? []).length > 0" class="row flex-center">
               <div class="text-caption text-grey">Skills:</div>
               <btn
-                
+
                 flat
                 round
                 size="sm"
                 @click="expanded = !expanded"
               >
-              <q-icon 
+              <q-icon
                 size="2em"
-                name="expand_more" 
-                :class="expanded ? 'rotate180' : ''" 
+                name="expand_more"
+                :class="expanded ? 'rotate180' : ''"
                 style="transition: transform ease 500ms !important; align-self: center; justify-self: center;"
                 />
               </btn>
             </div>
             <div v-else>There are no skills assigned to this project.</div>
-            
+
           </div>
           <div v-if="project.requiredSkills !== undefined">
             <project-role-chip
@@ -238,7 +238,7 @@ export default defineComponent({
         return ''
       return this.amountLeft(skill) > 0 ? this.onDragOver(e, skill) : ''
     },
-   
+
     // Show the students assigned to a role when dragging over the chip of that role.
     onDragOver(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
@@ -310,10 +310,9 @@ export default defineComponent({
       // this.projectStore
       // this.project
       // todo wss gwn url redirecten voor edit naar juiste url en dan project store, skill store setten
-      // this.projectStore.editProject(this.project)
-      // router.push('/projects/create')
+      router.push('/projects/' + this.project.id)
     }
-    
+
   },
   computed: {
     anyNew() {
