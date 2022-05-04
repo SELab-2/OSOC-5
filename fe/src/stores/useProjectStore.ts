@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
-import { TempProjectSuggestion } from '../models/ProjectSuggestion'
+import { TempProjectSuggestion, NewProjectSuggestion } from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   Skill,
@@ -84,7 +84,6 @@ export const useProjectStore = defineStore('project', {
     
     // NOTE: this may be broken.
     async getProject(project: TempProject) {
-      console.log("Loading")
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) =>
           useCoachStore().getUser(coach)
@@ -172,7 +171,7 @@ export const useProjectStore = defineStore('project', {
         (suggestion) =>
           suggestion.skill.url === skill && suggestion.student.url === student
       )
-
+      
       if (!alreadyExists) {
         const studentStore = useStudentStore()
         const coachStore = useCoachStore()
@@ -181,13 +180,20 @@ export const useProjectStore = defineStore('project', {
         const studentObj = await studentStore.getStudent(student)
         const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
-
-        project.suggestedStudents?.push({
-          student: studentObj,
-          coach: coachObj,
-          skill: skillObj,
-          reason,
-        })
+        project.suggestedStudents?.push(new NewProjectSuggestion({
+            student: studentObj,
+            coach: coachObj,
+            skill: skillObj,
+            reason,
+          }, true))
+          
+        // Remove the "New" badge from the new suggestion after a short period.
+        setTimeout(() => 
+        (project.suggestedStudents?.find(s => 
+          s.student.url === studentObj.url && 
+          s.coach.url === coachObj.url && 
+          s.skill.url === skillObj.url) as NewProjectSuggestion).fromWebsocket = false,
+           5000)
       }
     },
     removeReceivedSuggestion({
@@ -206,9 +212,8 @@ export const useProjectStore = defineStore('project', {
         const suggestionIndex = project.suggestedStudents?.findIndex(
           (s) => s.student.url === student && s.skill.url === skill
         )
-
         if (
-          suggestionIndex &&
+          suggestionIndex !== undefined && // !== undefined must be written here, otherwise suggestionIndex === 0 will fail.
           suggestionIndex !== -1 &&
           project.suggestedStudents &&
           suggestionIndex < project.suggestedStudents.length &&
@@ -252,7 +257,6 @@ export const useProjectStore = defineStore('project', {
       instance
           .post('projects/', convertObjectKeysToSnakeCase(data))
           .then((response) => {
-            console.log(response);
             this.loadProjects()
 
             // clear fields when project is made successfully

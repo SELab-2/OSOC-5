@@ -41,7 +41,6 @@ export const useSkillStore = defineStore('skills', {
       // start the loading animation
       this.isLoadingSkills = true
       this.skills = []
-      // console.log('LOAD SKILLS')
       instance
         .get('skills/?page_size=500')
         .then(({ data }) => {
