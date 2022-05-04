@@ -31,20 +31,17 @@
           <div
             class="bg-red"
             style="height: 4px"
-            :style="noStyle"
-            label="Test"
+            :style="getStyle(1)"
           />
           <div
             class="bg-yellow"
             style="height: 4px"
-            :style="maybeStyle"
-            label="Test"
+            :style="getStyle(2)"
           />
           <div
             class="bg-green"
             style="height: 4px"
-            :style="yesStyle"
-            label="Test"
+            :style="getStyle(0)"
           />
         </div>
       </q-card-section>
@@ -77,7 +74,7 @@ import { Suggestion } from "../models/Suggestion";
 import {Student} from "../models/Student";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 import DecisionIcon from "./DecisionIcon.vue";
-import yesMaybeNo from "../models/YesMaybeNo";
+import yesMaybeNoOptions from "../models/YesMaybeNoOptions";
 
 export default defineComponent({
   components: {
@@ -115,27 +112,6 @@ export default defineComponent({
       return this.student.suggestions.length
     },
     /**
-     * Get the style for the yes part of the bar with yes/maybe/no
-     */
-    yesStyle(): { width: string } {
-      const widthYes = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === yesMaybeNo.YES.value).length / this.total
-      return { width: (widthYes + '%')}
-    },
-    /**
-     * Get the style for the maybe part of the bar with yes/maybe/no
-     */
-    maybeStyle(): { width: string } {
-      const widthMaybe = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === yesMaybeNo.MAYBE.value).length / this.total
-      return { width: (widthMaybe + '%')}
-    },
-    /**
-     * Get the style for the no part of the bar with yes/maybe/no
-     */
-    noStyle(): { width: string } {
-      const widthNo = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === yesMaybeNo.NO.value).length / this.total
-      return { width: (widthNo + '%')}
-    },
-    /**
      * Get my own suggestion or -1 if I did not do any suggestion yet
      */
     mySuggestion(): number {
@@ -151,7 +127,18 @@ export default defineComponent({
      * Get the background color for the given suggestion
      */
     mySuggestionColor: function () {
-      return this.mySuggestion === yesMaybeNo.YES.value ? "bg-green" : (this.mySuggestion === yesMaybeNo.MAYBE.value ? "bg-yellow" : (this.mySuggestion === yesMaybeNo.NO.value ? "bg-red" : "bg-grey"))
+      return yesMaybeNoOptions.find(element => element.value === this.mySuggestion)?.background
+    },
+  },
+  methods: {
+    /**
+     * Get the width for a div depending on suggestion
+     * @param value of suggestion
+     */
+    getStyle(value: number): { width: string } {
+      const width = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === value).length / this.total
+
+      return { width: (width + '%')}
     },
   }
 })
