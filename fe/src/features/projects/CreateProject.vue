@@ -49,7 +49,6 @@
 
 <script lang="ts">
 import router from '../../router'
-import { ref } from 'vue'
 import { defineComponent, onMounted } from '@vue/runtime-core'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
@@ -68,6 +67,12 @@ export default defineComponent({
     onMounted(() => {
       skillStore.loadSkills()
       coachStore.loadUsers()
+      // makes sure the fields are empty
+      projectStore.projectName = ''
+      projectStore.projectPartnerName = ''
+      projectStore.projectLink = ''
+      projectStore.filterCoaches = ''
+      projectStore.selectedCoaches = []
     })
 
     return {

@@ -141,12 +141,6 @@ export default defineComponent({
     },
     cancelEditProject() {
       router.push('/projects')
-      this.projectStore.projectName = ''
-      this.projectStore.projectPartnerName = ''
-      this.projectStore.projectLink = ''
-      this.projectStore.filterCoaches = ''
-      this.projectStore.selectedCoaches = []
-      this.skillStore.loadSkills()
     },
     deleteProject() {
       this.deleteProjectID = +this.projectID
