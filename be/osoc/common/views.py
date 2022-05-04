@@ -41,7 +41,7 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         * ?suggested_by_user=[true, false]
         * ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
     - Use a specific page size with ?page_size=[1-500] query parameter.
-    - Sort students with the ?ordering=last_name query parameter.
+    - Sort students with the ?ordering=[first_name, last_name, email, status] query parameter.
         * Use ?ordering=-... to sort in descending order
 
     Example queries:
@@ -62,7 +62,7 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',
                         'student_coach', 'english_rating', 'status']
-    ordering_fields = ['last_name']
+    ordering_fields = ['first_name', 'last_name', 'email', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -226,7 +226,7 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
         * ?is_admin=[true, false]
         * ?is_active=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
-    - Sort coaches with the ?ordering=last_name query parameter.
+    - Sort coaches with the ?ordering=[first_name, last_name, email, is_admin, is_active] query parameter.
         * Use ?ordering=-... to sort in descending order
 
     Example queries:
@@ -243,7 +243,7 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
-    ordering_fields = ['last_name']
+    ordering_fields = ['first_name', 'last_name', 'email', 'is_admin', 'is_active']
 
     # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
