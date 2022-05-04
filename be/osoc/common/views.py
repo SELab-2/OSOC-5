@@ -11,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_auth.registration.views import SocialLoginView
-from django.db.models import RestrictedError
+from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .pagination import StandardPagination
@@ -48,7 +48,12 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         /api/students/?alum=true&status=0&skills=1&suggestion=yes&on_project=true&language=Dutch
         /api/students/?page_size=2
     """
-    queryset = Student.objects.all().order_by('id')
+    # filter final decision out of suggestions
+    queryset = Student.objects.prefetch_related(
+        Prefetch('suggestion_set',
+                 queryset=Suggestion.objects.filter(final=False),
+                 to_attr='filtered_suggestions')
+    ).order_by('id')
     pagination_class = StandardPagination
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]

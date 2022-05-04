@@ -50,7 +50,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     suggestions and final_decision are read-only
     """
     suggestions = SuggestionSerializer(
-        many=True, source='suggestion_set', read_only=True)
+        many=True, source='filtered_suggestions', read_only=True)
     final_decision = SuggestionSerializer(read_only=True)
 
     class Meta:
