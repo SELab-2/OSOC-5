@@ -30,7 +30,7 @@
               color="green"
               bg-color="white"
               label="Search"
-              @update:modelValue="() => loadStudents($refs.infiniteScroll)"
+              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
             >
               <template #append>
                 <q-icon name="search" />
@@ -46,7 +46,7 @@
                 { name: 'alumni', label: 'Alumni' },
                 { name: 'student coaches', label: 'Student Coaches'}
               ]"
-              @click="() => loadStudents($refs.infiniteScroll)"
+              @click="async () => await loadStudents($refs.infiniteScroll)"
             />
 
             <label>Suggestion:</label>
@@ -59,7 +59,7 @@
                 { name: 'no', label: 'No' },
                 { name: 'none', label: 'None' },
               ]"
-              @click="() => loadStudents($refs.infiniteScroll)"
+              @click="async () => await loadStudents($refs.infiniteScroll)"
             />
 
             <q-select
@@ -74,7 +74,7 @@
               :option-label="opt => opt.name"
               :option-value="opt => opt.id"
               label="Skills"
-              @update:model-value="() => loadStudents($refs.infiniteScroll)"
+              @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
             >
               <template #selected>
                 <div
@@ -106,7 +106,7 @@
               label="Status"
               emit-value
               map-options
-              @update:model-value="() => loadStudents($refs.infiniteScroll)"
+              @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
             />
 
             <div class="row q-gutter-x-md">
@@ -119,7 +119,7 @@
                 color="primary"
                 label="Suggested by you"
                 right-label
-                @click="() => loadStudents($refs.infiniteScroll)"
+                @click="async () => await loadStudents($refs.infiniteScroll)"
               />
               <q-checkbox
                 v-model="studentStore.onProject"
@@ -131,7 +131,7 @@
                 color="primary"
                 label="On project"
                 right-label
-                @click="() => loadStudents($refs.infiniteScroll)"
+                @click="async () => await loadStudents($refs.infiniteScroll)"
               />
             </div>
 
@@ -148,7 +148,7 @@
                 ref="infiniteScroll"
                 class="q-px-sm"
                 :offset="250"
-                @load="(index, done) => studentStore.loadNext(index, done)"
+                @load="async (index, done) => await loadNextStudents(index, done)"
               >
                 <StudentCard
                   v-for="student in studentStore.students"
@@ -175,6 +175,13 @@
             </q-scroll-area>
           </div>
         </div>
+
+        <q-inner-loading
+          :showing="studentStore.isLoading"
+          label="Please wait..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
       </div>
 
       <div
@@ -256,9 +263,9 @@ export default defineComponent({
       drawer: ref(true),
     }
   },
-  created() {
+  async mounted() {
     //this.skillStore.loadSkills()
-    this.studentStore.loadStudents()
+    await this.studentStore.loadStudents()
   },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
@@ -278,7 +285,12 @@ export default defineComponent({
     },
     async loadStudents(scroll: any) {
       scroll.resume()
+      this.studentStore.students = []
       await this.studentStore.loadStudents()
+      this.scrollKey += 1
+    },
+    async loadNextStudents(index: number, done: any) {
+      await this.studentStore.loadNext(index, done)
       this.scrollKey += 1
     }
   }

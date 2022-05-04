@@ -3,9 +3,6 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
-import { Mail } from '../models/Mail'
-import { useAuthenticationStore } from './useAuthenticationStore'
-import { useCoachStore } from './useCoachStore'
 
 interface State {
   search: string
@@ -126,8 +123,11 @@ export const useStudentStore = defineStore('user/student', {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadNext(index: number, done: any) {
-      if (this.nextPage === null) {
+      this.isLoading = true
+
+      if (this.nextPage == null) {
         done(true)
+        this.isLoading = false
         return
       }
 
@@ -145,6 +145,7 @@ export const useStudentStore = defineStore('user/student', {
             })
       }
       done()
+      this.isLoading = false
     },
     async loadStudent(studentId: number) {
       this.isLoading = true
