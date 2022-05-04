@@ -1,9 +1,9 @@
 <template>
   <q-tabs
-    v-model="value"
     class="bg-white text-black shadow-2"
     :indicator-color="color"
     style="border-radius: 10px;"
+    v-bind="$attrs"
   >
     <q-tab
       v-for="(option, index) in options"
@@ -22,28 +22,13 @@
 
   export default defineComponent({
     props: {
-      modelValue: {
-        type: String,
-        required: true
-      }, 
       options: {
-        type:  [Object] as PropType<{name: string, label: string}[]>, 
+        type:  [Object] as PropType<{name: string|number, label: string}[]>, 
         required: true
       },
       color: {
         type: String,
         default: "yellow-4"
-      }
-    },
-    emits: ['update:modelValue'],
-    computed: {
-      value: {
-        get(): string {
-          return this.modelValue
-        },
-        set(value: string) {
-          this.$emit('update:modelValue', value)
-        }
       }
     }
   })

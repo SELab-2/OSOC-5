@@ -19,24 +19,7 @@
           :key="key"
         >
           <div class="row">
-            <q-icon
-              v-if="suggestion.suggestion === YES"
-              size="xs"
-              name="mdi-check"
-              color="green"
-            />
-            <q-icon
-              v-else-if="suggestion.suggestion === NO"
-              size="xs"
-              name="mdi-close"
-              color="red"
-            />
-            <q-icon
-              v-else
-              size="xs"
-              name="mdi-help"
-              color="yellow"
-            />
+            <DecisionIcon v-if="studentStore.currentStudent" :decision="suggestion.suggestion" />
             <label class="q-pl-xs">
               {{ `${suggestion.coach.firstName} ${suggestion.coach.lastName}` }}
             </label>
@@ -63,9 +46,10 @@
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import {defineComponent} from "@vue/runtime-core";
+import DecisionIcon from "../../../components/DecisionIcon.vue";
 
 export default defineComponent( {
-  components: {LoadingSpinner},
+  components: {DecisionIcon, LoadingSpinner},
   props: {
     title: {
       type: String,
@@ -78,12 +62,6 @@ export default defineComponent( {
     return {
       studentStore,
     }
-  },
-   data: function() {
-    return {
-      YES : 0,
-      NO : 1,
-    };
   },
 })
 </script>

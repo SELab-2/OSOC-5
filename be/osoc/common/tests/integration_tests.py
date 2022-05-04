@@ -34,7 +34,7 @@ class StudentTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), Student.objects.count())
+        self.assertEqual(response.data['count'], Student.objects.count())
 
     def test_get_student_instance(self):
         """
@@ -401,7 +401,7 @@ class CoachTestsAdmin(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), Coach.objects.count())
+        self.assertEqual(response.data['count'], Coach.objects.count())
 
     def test_get_coach_instance(self):
         """
@@ -525,7 +525,7 @@ class ProjectTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), Project.objects.count())
+        self.assertEqual(response.data['count'], Project.objects.count())
 
     def test_get_project_instance(self):
         """
@@ -800,7 +800,7 @@ class SkillTestsCoach(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), Skill.objects.count())
+        self.assertEqual(response.data['count'], Skill.objects.count())
 
     def test_get_skill_instance(self):
         """
@@ -954,7 +954,7 @@ class SentEmailTests(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), SentEmail.objects.count())
+        self.assertEqual(response.data['count'], SentEmail.objects.count())
 
     def test_get_email_instance(self):
         """

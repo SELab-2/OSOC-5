@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
+import { TempProjectSuggestion } from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   Skill,
@@ -46,17 +47,13 @@ export const useProjectStore = defineStore('project', {
      * @returns the fetched students
      */
     async fetchSuggestedStudents(
-      students: TempStudent[]
+      students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
       const newStudents: ProjectSuggestionInterface[] = []
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (
-            await instance.get(
-              (student.coach as unknown as { url: string }).url
-            )
-          ).data as User,
+          coach: (await useCoachStore().getUser(student.coach)),
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
@@ -108,15 +105,18 @@ export const useProjectStore = defineStore('project', {
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
-    },
+    }, 
+    // NOTE: this may be broken.
+
     /**
      * Gets a project
      * @param project the project to get
      */
     async getProject(project: TempProject) {
+      console.log("Loading")
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) =>
-          useCoachStore().getUser(coach as unknown as string)
+          useCoachStore().getUser(coach)
         )
       )
 
@@ -146,14 +146,14 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       this.isLoadingProjects = true
       try {
-        const { data } = await instance.get<TempProject[]>('projects/')
-        this.projects = data.map(
+        const { results } = (await instance.get<{results: TempProject[]}>('projects/')).data
+        this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
-        data.forEach(async (project, i) => {
+        results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) =>
-              useCoachStore().getUser((coach as unknown as { url: string }).url)
+              useCoachStore().getUser(coach)
             )
           )
 
@@ -215,7 +215,7 @@ export const useProjectStore = defineStore('project', {
         const skillStore = useSkillStore()
 
         const studentObj = await studentStore.getStudent(student)
-        const coachObj = await coachStore.getUser(coach.url)
+        const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
 
         project.suggestedStudents?.push({
@@ -297,24 +297,29 @@ export const useProjectStore = defineStore('project', {
       instance
         .post('projects/', convertObjectKeysToSnakeCase(data))
         .then((response) => {
-          console.log(response)
           this.loadProjects()
-
-          // this.projects.push({
-          //   name: response['data']['name'],
-          //   id:  response['data']['id'],
-          //   partnerName: response['data']['partner_name'],
-          //   extraInfo: response['data']['extra_info'],
-          //   requiredSkills: response['data']['required_skills'],
-          //   coaches: response['data']['coaches'],
-          // });
+        
+          // clear fields when project is made successfully
+          this.isLoadingProjects=  false
+          this.projectName= ''
+          this.projectPartnerName= ''
+          this.projectLink= ''
+          this.filterCoaches=''
+          this.selectedCoaches= []
+          useSkillStore().loadSkills()
 
           callback(true)
         })
         .catch(function (error) {
-          console.log(error)
           callback(false)
         })
     },
+    editProject(project: Project){
+      this.projectName= project.name
+      this.projectPartnerName= project.partnerName
+      this.projectLink= project.extraInfo
+      this.selectedCoaches= []
+      // skills
+    }
   },
 })

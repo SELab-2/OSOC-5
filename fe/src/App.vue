@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar, QNotifyAction } from 'quasar'
+import { useQuasar } from 'quasar'
 
 (useQuasar().notify as any).setDefaults({
   position: 'bottom-right',

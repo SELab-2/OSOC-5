@@ -5,7 +5,7 @@
       show-if-above
       :mini="!drawer || miniState"
       :mini-width="30"
-      :width="350"
+      :width="370"
       :breakpoint="100"
       bordered
       class="full-height"
@@ -30,7 +30,7 @@
               color="green"
               bg-color="white"
               label="Search"
-              @update:modelValue="studentStore.loadStudents"
+              @update:modelValue="() => loadStudents($refs.infiniteScroll)"
             >
               <template #append>
                 <q-icon name="search" />
@@ -41,25 +41,16 @@
               v-model="studentStore.alumni"
               color="primary"
               text-color="white"
-              :options="[
-                { name: 'all', label: 'All' },
-                { name: 'alumni', label: 'Alumni' },
-                { name: 'student coaches', label: 'Student Coaches'}
-              ]"
-              @click="studentStore.loadStudents"
+              :options="rolesOptions"
+              @click="() => loadStudents($refs.infiniteScroll)"
             />
 
             <label>Suggestion:</label>
             <SegmentedControl
-              v-model="studentStore.decision"
+              v-model="studentStore.suggestion"
               color="primary"
-              :options="[
-                { name: 'yes', label: 'Yes' },
-                { name: 'maybe', label: 'Maybe' },
-                { name: 'no', label: 'No' },
-                { name: 'none', label: 'None' },
-              ]"
-              @click="studentStore.loadStudents"
+              :options="yesMaybeNoOptions"
+              @click="() => loadStudents($refs.infiniteScroll)"
             />
 
             <q-select
@@ -74,7 +65,7 @@
               :option-label="opt => opt.name"
               :option-value="opt => opt.id"
               label="Skills"
-              @update:model-value="studentStore.loadStudents"
+              @update:model-value="() => loadStudents($refs.infiniteScroll)"
             >
               <template #selected>
                 <div
@@ -106,23 +97,39 @@
               label="Status"
               emit-value
               map-options
-              @update:model-value="studentStore.loadStudents"
+              @update:model-value="() => loadStudents($refs.infiniteScroll)"
             />
 
             <div class="row q-gutter-x-md">
               <q-checkbox
                 v-model="studentStore.byMe"
+                toggle-indeterminate
+                checked-icon="mdi-check"
+                true-value="true"
+                unchecked-icon="mdi-minus-thick"
+                false-value="false"
+                indeterminate-icon="mdi-help"
+                indeterminate-value="maybe"
+                toggle-order="tf"
                 color="primary"
                 label="Suggested by you"
                 right-label
-                @click="studentStore.loadStudents"
+                @click="() => loadStudents($refs.infiniteScroll)"
               />
               <q-checkbox
                 v-model="studentStore.onProject"
+                toggle-indeterminate
+                checked-icon="mdi-check"
+                true-value="true"
+                unchecked-icon="mdi-minus-thick"
+                false-value="false"
+                indeterminate-icon="mdi-help"
+                indeterminate-value="maybe"
+                toggle-order="tf"
                 color="primary"
                 label="On project"
                 right-label
-                @click="studentStore.loadStudents"
+                @click="() => loadStudents($refs.infiniteScroll)"
               />
             </div>
 
@@ -134,23 +141,35 @@
               :thumb-style="thumbStyle"
               style="flex: 1 1 auto"
             >
-              <q-list>
-                <q-item
+              <q-infinite-scroll
+                :key="scrollKey"
+                ref="infiniteScroll"
+                class="q-px-sm"
+                :offset="250"
+                @load="(index, done) => studentStore.loadNext(index, done)"
+              >
+                <StudentCard
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
+                  v-ripple
+                  class="q-ma-sm"
                   :draggable="draggable ?? false"
+                  :must-hover="mustHover"
+                  :student="student"
+                  :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
+                  @click="clickStudent(student)"
                   @dragstart="onDragStart($event, student)"
-                >
-                  <StudentCard
-                    v-ripple
-                    :must-hover="mustHover"
-                    :student="student"
-                    :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
-                    @click="clickStudent(student)"
-                  />
-                </q-item>
-              </q-list>
+                />
+                <template #loading>
+                  <div class="row justify-center q-my-md">
+                    <q-spinner-dots
+                      color="primary"
+                      size="40px"
+                    />
+                  </div>
+                </template>
+              </q-infinite-scroll>
             </q-scroll-area>
           </div>
         </div>
@@ -184,6 +203,8 @@ import {useQuasar} from "quasar";
 import { Student } from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
+import rolesOptions from "../models/RolesOptions";
+import yesMaybeNoOptions from "../models/YesMaybeNoOptions";
 
 export default defineComponent({
   components: {
@@ -192,9 +213,10 @@ export default defineComponent({
     SegmentedControl,
   },
   props: {
-    selectStudent: {
-      type: Function,
-      required: true
+    clickable: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     color: {
       type: String,
@@ -211,32 +233,35 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
-    const $q = useQuasar()
-
     const skillStore = useSkillStore()
+
+    const $q = useQuasar()
 
     return {
       studentStore,
-      $q,
       skillStore,
+      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
         backgroundColor: 'black',
         width: '4px',
       },
-      status
+      status,
+      scrollKey: 0,
+      rolesOptions,
+      yesMaybeNoOptions
     }
-  },
-  created() {
-    this.skillStore.loadSkills()
-    this.studentStore.loadStudents()
   },
   data() {
     return {
       miniState: ref(false),
       drawer: ref(true),
     }
+  },
+  created() {
+    // load all students
+    this.studentStore.loadStudents()
   },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
@@ -251,8 +276,27 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
       e.dataTransfer.effectAllowed = 'copy'
     },
+    /**
+     * Clicking a student sets the selected student of the sidebar
+     * @param student the clicked student in the sidebar
+     */
     clickStudent(student: Student) {
       this.selectStudent(student)
+    },
+    /**
+     * Load all students and make the infinite scroll reload
+     */
+    async loadStudents(scroll: any) {
+      scroll.resume()
+      await this.studentStore.loadStudents()
+      this.scrollKey += 1
+    },
+    /**
+     * Route to the correct details page of selected_student
+     * @param selected_student student to be displayed
+     */
+    selectStudent: function (selected_student: Student) {
+      this.$router.push(`/students/${selected_student.id}`)
     },
   }
 })
