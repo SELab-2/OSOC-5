@@ -140,6 +140,7 @@
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 @click="coachStore.removeUser(props.row.id)"
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 glow-color="red-2"
               />
             </q-td>
