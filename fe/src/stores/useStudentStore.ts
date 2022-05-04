@@ -6,6 +6,7 @@ import { Skill } from '../models/Skill'
 import { Mail } from '../models/Mail'
 import { useAuthenticationStore } from './useAuthenticationStore'
 import { useCoachStore } from './useCoachStore'
+import { baseUrl } from '../utils/baseUrl'
 
 interface State {
   search: string
@@ -39,7 +40,7 @@ export const useStudentStore = defineStore('user/student', {
     isLoading: false,
     possibleSuggestion: -1,
     currentStudent: null,
-    nextPage: ''
+    nextPage: '',
   }),
   actions: {
     async getStudent(url: string): Promise<Student> {
@@ -98,7 +99,8 @@ export const useStudentStore = defineStore('user/student', {
       if (this.alumni === 'student coaches') filters.push('student_coach=true')
       if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
       if (this.byMe !== 'maybe') filters.push(`suggested_by_user=${this.byMe}`)
-      if (this.onProject !== 'maybe') filters.push(`on_project=${this.onProject}`)
+      if (this.onProject !== 'maybe')
+        filters.push(`on_project=${this.onProject}`)
       if (this.status) filters.push(`status=${this.status}`)
 
       for (const skill of this.skills) {
@@ -111,7 +113,7 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       await instance
-        .get<{results: Student[], next: string}>(`students/?page=1${url}`)
+        .get<{ results: Student[]; next: string }>(`students/?page=1${url}`)
         .then(async ({ data }) => {
           this.nextPage = data.next
 
@@ -132,17 +134,17 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       if (this.nextPage !== '') {
-        await instance
-            .get(this.nextPage)
-            .then(async ({data}) => {
-              this.nextPage = data.next
+        await instance.get(this.nextPage).then(async ({ data }) => {
+          this.nextPage = data.next
 
-              for (const student of data.results) {
-                await this.transformStudent(student)
-              }
+          for (const student of data.results) {
+            await this.transformStudent(student)
+          }
 
-              this.students.push(...data.results.map((student: Student) => new Student(student)))
-            })
+          this.students.push(
+            ...data.results.map((student: Student) => new Student(student))
+          )
+        })
       }
       done()
     },
@@ -266,7 +268,7 @@ export const useStudentStore = defineStore('user/student', {
           this.currentStudent = matchingStudent
       }
     },
-    receiveFinalDecision({
+    async receiveFinalDecision({
       student_id,
       suggestion,
       coach,
@@ -281,18 +283,25 @@ export const useStudentStore = defineStore('user/student', {
       const studentId = Number.parseInt(student_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
+      const finalDecision = {
+        student: studentId,
+        coach: coach,
+        suggestion,
+        reason,
+      }
 
       // We found the corresponding student
       if (student) {
-        const finalDecision = {
-          student: studentId,
-          coach: coach,
-          suggestion,
-          reason,
-        }
         student.finalDecision = finalDecision
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
+      } else {
+        const newStudent = await this.getStudent(
+          `${baseUrl}/students/${studentId}`
+        )
+
+        newStudent.finalDecision = finalDecision
+        this.students.push(newStudent)
       }
     },
     removeFinalDecision({ student_id }: { student_id: string }) {

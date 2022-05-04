@@ -46,7 +46,9 @@
           shadow-strength="2.5"
           no-wrap
         >
-        <div class="ellipsis">Conflicts</div>
+          <div class="ellipsis">
+            Conflicts
+          </div>
         </btn>
       </q-toolbar>
 
@@ -70,8 +72,8 @@
       :offset="[18, 18]"
     >
       <btn
-        fab
         v-if="authenticationStore.loggedInUser?.isAdmin"
+        fab
         padding="10px"
         icon="add"
         color="yellow"
@@ -89,21 +91,18 @@ import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from "../../stores/useStudentStore";
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
+import { wsBaseUrl } from '../../utils/baseUrl';
 
 
 export default defineComponent({
   name: 'ProjectList',
   components: { SideBar, ProjectCard },
   setup() {
-  const baseURL =
-    process.env.NODE_ENV == 'development'
-      ? 'ws://localhost:8000/ws/socket_server/'
-      : 'wss://sel2-5.ugent.be/ws/socket_server/'
     return {
       projectStore: useProjectStore(),
       studentStore: useStudentStore(),
       authenticationStore: useAuthenticationStore(),
-      socket: new WebSocket(baseURL)
+      socket: new WebSocket(wsBaseUrl)
     }
   },
   data() {

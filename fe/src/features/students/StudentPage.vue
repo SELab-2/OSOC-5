@@ -8,12 +8,32 @@
     @update="update"
   />
 
-  <div :key="studentKey"
-    class="justify-between row q-px-lg q-pt-lg studentcol">
+  <div
+    :key="studentKey"
+    class="justify-between row q-px-lg q-pt-lg studentcol"
+  >
     <div class="row q-px-sm q-gutter-sm items-center">
-      <h class="text-bold text-h4">{{ student ? student.fullName : '' }}</h>
-      <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
+      <h class="text-bold text-h4">
+        {{ student ? student.fullName : '' }}
+      </h>
+      <q-btn
+        :href="student ? student.cv.toString() : ''"
+        target="_blank"
+        size="12px"
+        rounded
+        outline
+        color="black"
+        label="CV"
+      />
+      <q-btn
+        :href="student ? student.portfolio.toString() : ''"
+        target="_blank"
+        size="12px"
+        rounded
+        outline
+        color="black"
+        label="Portfolio"
+      />
     </div>
     <div
       v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
@@ -205,6 +225,7 @@ import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
+import { wsBaseUrl } from "../../utils/baseUrl";
 
 export default defineComponent ({
   components: {
@@ -224,14 +245,9 @@ export default defineComponent ({
     },
   },
   setup() {
-    
-    const baseURL =
-    process.env.NODE_ENV == 'development'
-      ? 'ws://localhost:8000/ws/socket_server/'
-      : 'wss://sel2-5.ugent.be/ws/socket_server/'
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
-    const socket = new WebSocket(baseURL)
+    const socket = new WebSocket(wsBaseUrl)
 
     return {
       authenticationStore,
