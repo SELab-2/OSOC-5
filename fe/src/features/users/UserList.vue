@@ -40,7 +40,7 @@
           <q-space/>
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser />
+              <AddUser :created="async () => await coachStore.loadUsersCoaches(pagination, (count) => pagination.rowsNumber = count)" />
             </q-card>
           </q-dialog>
           <q-input
@@ -141,7 +141,7 @@
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
-                @click="coachStore.removeUser(props.row.id)"
+                @click="removeUser(props.row.id)"
                 glow-color="red-2"
               />
             </q-td>
@@ -269,6 +269,16 @@ export default defineComponent({
     async onRequest(props: any) {
       this.pagination = props.pagination
       await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
+    async removeUser(id: number) {
+      await this.coachStore.removeUser(id)
+
+      if (this.coachStore.users.length === 1) {
+        this.pagination.page -= 1
+      }
+      this.pagination.rowsNumber -= 1
+
+      this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
     },
     // Method for searching the table.
     // Terms is equal to roleFilter.

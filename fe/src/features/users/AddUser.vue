@@ -109,6 +109,12 @@ import roles from '../../models/UserRoles'
 import { useCoachStore } from '../../stores/useCoachStore'
 
 export default defineComponent({
+  props: {
+    created: {
+      type: Function,
+      required: true
+    }
+  },
   setup() {
     const q = useQuasar()
     const password = ref('')
@@ -146,7 +152,7 @@ export default defineComponent({
           is_active: this.role ? this.role != 'inactive' : true,
           is_admin: this.role ? this.role == 'admin' : false
       }).then(() => {
-        this.coachStore.loadUsers()
+        this.created()
 
         this.q.notify({
           icon: 'done',

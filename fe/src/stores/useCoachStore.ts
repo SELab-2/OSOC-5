@@ -62,9 +62,6 @@ export const useCoachStore = defineStore('user/coach', {
       await instance
         .delete(`coaches/${userId}/`)
         .catch(() => console.log('Failed to delete'))
-
-      const index = this.users.findIndex((user) => user.id === userId)
-      this.users.splice(index, 1)
     },
     clearUsers() {
       this.$reset()
