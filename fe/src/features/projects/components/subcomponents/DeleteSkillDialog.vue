@@ -34,8 +34,8 @@
         flat
         color="red"
         label="Delete"
-        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
         glow-color="red-2"
+        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
       />
     </q-card-actions>
   </q-card>
@@ -44,7 +44,6 @@
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import {useSkillStore} from "../../../../stores/useSkillStore";
-import router from "../../../../router";
 
 export default defineComponent ({
   props: {
@@ -70,7 +69,6 @@ export default defineComponent ({
         this.skillStore.deleteSkill(id, // callback
           (success: boolean) => {
             if (success) {
-              router.push('/projects')
               this.$q.notify({
                 icon: 'done',
                 color: 'positive',
