@@ -9,7 +9,7 @@ from osoc.common.models import Coach
 @receiver(pre_save, sender=Coach)
 def set_new_user_inactive(sender, instance, **kwargs):
     """
-    when creating a new coach set it's is_active field to False by default
+    when creating a new coach set the is_active field to False by default
     """
-    if instance._state.adding is True and not sender.is_admin:  # pylint: disable=protected-access
+    if instance._state.adding is True and not instance.is_admin:  # pylint: disable=protected-access
         instance.is_active = False

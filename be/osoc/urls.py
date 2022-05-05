@@ -19,7 +19,6 @@ from django.urls import include, path, re_path
 from django.contrib import admin
 from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView
 from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
-from osoc.common.views import CustomRegisterView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -51,7 +50,7 @@ urlpatterns = [
         'api/auth/register/account-confirm-email/<str:key>/',
         ConfirmEmailView.as_view(),
     ), # Needs to be defined before the registration path
-    path('api/auth/register/', CustomRegisterView.as_view()),
+    path('api/auth/register/', views.CustomRegisterView.as_view()),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path(

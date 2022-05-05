@@ -26,6 +26,7 @@ from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, Proje
 from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
+
 class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
     API endpoint that allows students to be viewed, edited or searched.
@@ -523,6 +524,7 @@ class GithubLogin(SocialLoginView):
     callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"
     client_class = OAuth2Client
 
+
 class CustomRegisterView(RegisterView):
     """
     This class overrides the registerview of rest_auth so users that get registered don't automatically
@@ -535,7 +537,7 @@ class CustomRegisterView(RegisterView):
         if allauth_settings.EMAIL_VERIFICATION != \
                 allauth_settings.EmailVerificationMethod.NONE:
             return {'detail': ('Verification e-mail sent.')}
-        return {'detail' : ('Use has been created.')}
+        return {'detail' : ('User has been created.')}
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
