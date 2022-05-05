@@ -1,4 +1,4 @@
-# OSOC-5 ![coverage](https://img.shields.io/badge/Front%20End%20Coverage-69-green) ![coverage](https://img.shields.io/badge/Backend%20Coverage-88-green)
+# OSOC-5 [![codecov](https://codecov.io/gh/SELab-2/OSOC-5/branch/main/graph/badge.svg?token=OUoDEEMq2C)](https://codecov.io/gh/SELab-2/OSOC-5)
 
 Please refer to the [project wiki](https://github.com/SELab-2/OSOC-5/wiki) to read the documentation and diagrams for this project.
 
