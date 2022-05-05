@@ -294,10 +294,7 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
     username = None
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-    is_admin = serializers.BooleanField()
-    is_active = serializers.BooleanField()
-    is_admin = serializers.BooleanField()
-    is_active = serializers.BooleanField()
+
     def get_cleaned_data(self):
         super().get_cleaned_data()
         fields = ['password1', 'password2', 'email', 'first_name', 'last_name']
