@@ -130,7 +130,7 @@ export default defineComponent({
         sortBy: 'desc',
         descending: false,
         page: 1,
-        rowsPerPage: 5,
+        rowsPerPage: 10,
         rowsNumber: 10 // if getting data from a server
       })
 
