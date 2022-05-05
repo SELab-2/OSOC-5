@@ -40,7 +40,7 @@
           <q-space/>
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser :created="async () => await coachStore.loadUsersCoaches(pagination, (count) => pagination.rowsNumber = count)" />
+              <AddUser :created="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)" />
             </q-card>
           </q-dialog>
           <q-input
@@ -50,7 +50,7 @@
             debounce="300"
             color="yellow-4"
             placeholder="Search"
-            @update:modelValue="async () => await coachStore.loadUsersCoaches(pagination, (count) => pagination.rowsNumber = count)"
+            @update:modelValue="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
           >
             <template #append>
               <q-icon name="search" />

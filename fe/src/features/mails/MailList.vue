@@ -19,7 +19,7 @@
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count) => pagination.rowsNumber = count)"
+          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
         >
           <template #append>
             <q-icon name="search" />
