@@ -41,12 +41,15 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         * ?suggested_by_user=[true, false]
         * ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort students with the ?ordering=[first_name, last_name, email, status] query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/students/?search=Jan
         /api/students/?alum=true&status=0&skills=1&suggestion=yes&on_project=true&language=Dutch
         /api/students/?page_size=2
+        /api/students/?ordering=last_name
     """
     # filter final decision out of suggestions
     queryset = Student.objects.prefetch_related(
@@ -57,12 +60,14 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
     pagination_class = StandardPagination
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter,
-                       StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
+                       StudentOnProjectFilter, StudentSuggestedByUserFilter,
+                       StudentFinalDecisionFilter,]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',
                         'student_coach', 'english_rating', 'status']
+    ordering_fields = ['first_name', 'last_name', 'email', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -226,21 +231,24 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
         * ?is_admin=[true, false]
         * ?is_active=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort coaches with the ?ordering=[first_name, last_name, email, is_admin, is_active] query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/coaches/?is_admin=false&is_active=true
         /api/coaches/?search=Cattoire
         /api/coaches/?page_size=10
+        /api/coaches/?ordering=last_name
     """
     queryset = Coach.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = CoachSerializer
-    permission_classes = [
-        permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
+    ordering_fields = ['first_name', 'last_name', 'email', 'is_admin', 'is_active']
 
     # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
@@ -295,18 +303,22 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         * ?coaches=:id:,
         * ?suggested_students=:id:
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort projects with the ?ordering=[name, partner_name] query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/projects/?required_skills=1&coaches=2&suggested_students=1
+        /api/projects/?ordering=name,-partner_name
     """
     queryset = Project.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
+    ordering_fields = ['name', 'partner_name']
 
     def get_serializer_class(self):
         """
@@ -455,17 +467,21 @@ class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
 
     - Search skills with ?search=string query parameter.
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort skills with the ?ordering=name query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/skills/?search=Back-end Developer
+        /api/skills/?ordering=name
     """
     queryset = Skill.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = SkillSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
+    ordering_fields = ['name']
 
     # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
@@ -491,19 +507,24 @@ class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancest
         * ?before=yyyy-mm-ddThh:mm:ss,
         * ?after=yyyy-mm-ddThh:mm:ss
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort emails with the ?ordering=[time, sender, receiver] query parameter.
+        * Use ?ordering=-... to sort in descending order
+        * sender and receiver are sorted using id
 
     Example queries:
 
         /api/emails/?sender=1&after=2022-04-03
+        /api/emails/?ordering=time,-sender
     """
     queryset = SentEmail.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter,
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter,
                        DjangoFilterBackend, EmailDateTimeFilter]
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
+    ordering_fields = ['time', 'sender', 'receiver']
 
     # pylint: disable=arguments-differ
     def create(self, request):
