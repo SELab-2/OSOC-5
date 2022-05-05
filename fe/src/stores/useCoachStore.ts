@@ -41,6 +41,9 @@ export const useCoachStore = defineStore('user/coach', {
 
       const filters = []
       if (this.filter) filters.push(`search=${this.filter}`)
+      if (this.filterRole === 'inactive') filters.push('is_active=false')
+      if (this.filterRole === 'admin') filters.push('is_active=true&is_admin=true')
+      if (this.filterRole === 'coach') filters.push('is_active=true&is_admin=false')
 
       let url = ''
       if (filters) url = `&${filters.join('&')}`

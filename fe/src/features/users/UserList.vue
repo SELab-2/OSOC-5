@@ -30,6 +30,7 @@
             { name: 'coach', label: 'Coaches' },
             { name: 'inactive', label: 'Inactive' },
           ]"
+          @click="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
         />
 
         <q-space />
