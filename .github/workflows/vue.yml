@@ -4,10 +4,10 @@ on:
   push:
     # branches:
     #   - main
-    # paths:
-    #   - 'fe/src/**/*.js'
-    #   - 'fe/src/**/*.ts'
-    #   - 'fe/src/**/*.vue'
+    paths:
+      - 'fe/src/**/*.js'
+      - 'fe/src/**/*.ts'
+      - 'fe/src/**/*.vue'
 
 jobs:
   vue:
@@ -29,10 +29,4 @@ jobs:
     - name: Run tests
       working-directory: ./fe
       run: |
-        npm run report
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
-      with:
-        files: ./fe/coverage.xml
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
+        npm run coverage
