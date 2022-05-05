@@ -25,6 +25,9 @@
           :props="props"
           auto-width
         >
+          <q-tooltip anchor="center middle">
+            Click to edit
+          </q-tooltip>
           {{ props.row.amount }}
           <q-popup-edit
             v-slot="scope"
@@ -51,6 +54,9 @@
           key="comment"
           :props="props"
         >
+          <q-tooltip anchor="center middle">
+            Click to edit
+          </q-tooltip>
           <div v-if="props.row.comment.length !== 0">
             {{ props.row.comment }}
           </div>
@@ -125,7 +131,7 @@
     <NewSkillDialog
       dialog-title="Edit skill"
       submit-text="Update skill"
-      :callback="() => editSkillDialog = false"
+      :callback="() => (editSkillDialog = false)"
     />
   </q-dialog>
   <q-dialog
@@ -147,7 +153,7 @@ import { ProjectTableSkill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import columnsSkills from '../../../../models/ProjectSkillsColumns'
 import DeleteSkillDialog from './DeleteSkillDialog.vue'
-import NewSkillDialog from "./NewSkillDialog.vue";
+import NewSkillDialog from './NewSkillDialog.vue'
 
 export default defineComponent({
   components: { DeleteSkillDialog, NewSkillDialog },
@@ -201,12 +207,12 @@ export default defineComponent({
       this.errorMessageSkillAmount = ''
       return true
     },
-    filterSkillsMethod(){
-      return this.skillStore.skills.filter(row => row.name.toLowerCase().startsWith(this.filterSkills))
+    filterSkillsMethod() {
+      return this.skillStore.skills.filter((row) =>
+        row.name.toLowerCase().startsWith(this.filterSkills)
+      )
     },
-  }
+  },
 })
 </script>
-<style scoped lang="sass">
-
-</style>
+<style scoped lang="sass"></style>
