@@ -31,7 +31,9 @@ jobs:
       run: |
         npm run report
     - name: Upload coverage to Codecov
+      working-directory: ./fe
       uses: codecov/codecov-action@v2
       with:
+        files: ./coverage.xml
         fail_ci_if_error: true
         token: ${{ secrets.CODECOV_TOKEN }}
