@@ -7,8 +7,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "report": "vitest run --coverage --reporter=junit --outputFile=coverage.xml",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "report": "vitest run --coverage --reporter=junit --outputFile=coverage.xml"
   },
   "dependencies": {
     "@babel/types": "^7.17.10",
