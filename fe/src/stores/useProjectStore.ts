@@ -294,8 +294,6 @@ export const useProjectStore = defineStore('project', {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async deleteProject(id: number, callback: any) {
-      console.log('DELETED ' + id)
-
       await instance
         .delete(`projects/${id}/`)
         .then(() => {
