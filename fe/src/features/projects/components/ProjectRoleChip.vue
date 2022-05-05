@@ -62,7 +62,7 @@ export default defineComponent({
     },
     occupied: {
       type: Number,
-      required: false
+      required: true
     },
     modelValue: {
       type: Boolean,
