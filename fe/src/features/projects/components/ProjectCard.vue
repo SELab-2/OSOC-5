@@ -19,22 +19,22 @@
         />
         <q-space />
         <div>
-          <btn
-            v-if="anyNew.length > 0"
-            icon="r_warning"
-            color="yellow"
-            flat
-            round
-            size="12px"
-            glow-color="amber-3"
-            @click="expand(anyNew)"
-            >
-            <q-tooltip class="shadow-4 bg-amber-7">
-            <div class="text-subtitle2">
-              There are still draft suggestions open.
-            </div>
-          </q-tooltip>
-          </btn>
+<!--          <btn-->
+<!--            v-if="anyNew.length > 0"-->
+<!--            icon="r_warning"-->
+<!--            color="yellow"-->
+<!--            flat-->
+<!--            round-->
+<!--            size="12px"-->
+<!--            glow-color="amber-3"-->
+<!--            @click="expand(anyNew)"-->
+<!--            >-->
+<!--            <q-tooltip class="shadow-4 bg-amber-7">-->
+<!--            <div class="text-subtitle2">-->
+<!--              There are still draft suggestions open.-->
+<!--            </div>-->
+<!--          </q-tooltip>-->
+<!--          </btn>-->
           <btn flat round size="12px" color="primary" icon="mail" />
           <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
           <btn flat round size="12px" color="primary" icon="edit" :to="`/projects/${project.id}`"/>
