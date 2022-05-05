@@ -9,7 +9,10 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from rest_auth.registration.views import SocialLoginView
+from rest_auth.registration.views import RegisterView, SocialLoginView
+from allauth.account.utils import complete_signup
+from allauth.account import app_settings as allauth_settings
+from django.conf import settings
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -23,7 +26,9 @@ from .serializers import Conflict, ConflictSerializer, ResolveConflictSerializer
 from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
 from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
-
+from dj_rest_auth.app_settings import (
+    JWTSerializer, TokenSerializer, create_token,
+)
 
 class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
     """
@@ -521,3 +526,25 @@ class GithubLogin(SocialLoginView):
     adapter_class = GitHubOAuth2Adapter
     callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"
     client_class = OAuth2Client
+
+class CustomRegisterView(RegisterView):
+    
+    permission_classes = [permissions.IsAuthenticated, IsActive, IsAdmin]
+
+    def get_response_data(self, user):
+
+        if allauth_settings.EMAIL_VERIFICATION != \
+                allauth_settings.EmailVerificationMethod.NONE:
+            return {'detail': ('Verification e-mail sent.')}
+        return {'detail' : ('Use has been created.')}
+
+    def perform_create(self, serializer):
+        user = serializer.save(self.request)
+        if allauth_settings.EMAIL_VERIFICATION != \
+                allauth_settings.EmailVerificationMethod.NONE:
+            complete_signup(
+                self.request._request, user,
+                allauth_settings.EMAIL_VERIFICATION,
+                None,
+            )
+        return user

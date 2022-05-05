@@ -13,7 +13,7 @@ RUN pip install --upgrade pip && \
 CMD \
     chmod 755 ./docker/wait-for-it.sh && \
     ./docker/wait-for-it.sh -t 0 db:5432 --strict -- && \
-    # python manage.py makemigrations && \
+    python manage.py makemigrations && \
     python manage.py migrate && \
     python scripts/create_data_fixtures.py && \
     python scripts/create_superuser.py \

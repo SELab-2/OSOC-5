@@ -296,7 +296,9 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
     last_name = serializers.CharField()
     is_admin = serializers.BooleanField()
     is_active = serializers.BooleanField()
+    is_admin = serializers.BooleanField()
+    is_active = serializers.BooleanField()
     def get_cleaned_data(self):
         super().get_cleaned_data()
-        fields = ['password1', 'password2', 'email', 'first_name', 'last_name', 'is_admin', 'is_active']
+        fields = ['password1', 'password2', 'email', 'first_name', 'last_name']
         return {field: self.validated_data.get(field, '') for field in fields} # pylint: disable=no-member
