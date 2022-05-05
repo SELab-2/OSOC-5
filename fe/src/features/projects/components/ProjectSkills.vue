@@ -1,6 +1,6 @@
 <template>
   <div
-    class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-5 col-xl-6"
+    class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6"
   >
     <div class="text-h4 q-my-md">
       Project Skills

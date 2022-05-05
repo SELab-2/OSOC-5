@@ -2,7 +2,7 @@
   <div style="align-items: center; justify-content: center">
     <q-form class="createProjectForm q-py-lg" @submit="onSubmit">
       <div>
-        <div class="row justify-between items-center q-gutter-sm">
+        <div class="row justify-center justify-between items-center q-gutter-sm">
           <div class="text-bold text-h4 projectcol">
             Edit project "{{ projectStore.projectName }}"
           </div>
@@ -171,8 +171,8 @@ thead {
   margin-top: 10px
 
 .createProjectForm
-  margin-left: 10%
-  margin-right: 10%
+  margin-left: 5%
+  margin-right: 5%
 
 .appPageTitle
   text-align: center

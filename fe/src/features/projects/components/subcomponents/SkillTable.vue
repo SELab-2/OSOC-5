@@ -204,3 +204,18 @@ export default defineComponent({
   }
 })
 </script>
+<style scoped lang="sass">
+thead tr:first-child th:first-child
+//  /* bg color is important for th; just specify one */
+//  background-color: #fff
+//
+//td:first-child
+//  background-color: #f5f5dc
+//
+//th:first-child,
+//td:first-child,
+//th:second-child,
+//  position: sticky
+//  left: 0
+//  z-index: 1
+</style>
