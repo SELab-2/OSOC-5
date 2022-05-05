@@ -10,8 +10,8 @@ on:
       - 'fe/src/**/*.vue'
 
 jobs:
-  build:
-    runs-on: self-hosted
+  vue:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up node

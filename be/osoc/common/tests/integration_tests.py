@@ -688,7 +688,7 @@ class ProjectTestsCoach(APITestCase):
         url = reverse("project-get-conflicting-projects")
         response = self.client.get(url, format="json")
 
-        self.assertEqual(len(response.data["conflicts"]), 1)
+        self.assertEqual(len(response.data), 1)
 
 
 class ProjectTestsAdmin(APITestCase):

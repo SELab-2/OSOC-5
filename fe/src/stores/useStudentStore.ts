@@ -8,7 +8,7 @@ interface State {
   search: string
   status: string
   alumni: string
-  suggestion: number
+  decision: string
   byMe: string
   onProject: string
   skills: Array<Skill>
@@ -26,7 +26,7 @@ export const useStudentStore = defineStore('user/student', {
     search: '',
     status: '',
     alumni: 'all',
-    suggestion: -1,
+    decision: 'none',
     byMe: 'maybe',
     onProject: 'maybe',
     skills: [],
@@ -36,7 +36,7 @@ export const useStudentStore = defineStore('user/student', {
     isLoading: false,
     possibleSuggestion: -1,
     currentStudent: null,
-    nextPage: ''
+    nextPage: '',
   }),
   actions: {
     /**
@@ -104,9 +104,10 @@ export const useStudentStore = defineStore('user/student', {
       if (this.search) filters.push(`search=${this.search}`)
       if (this.alumni === 'alumni') filters.push('alum=true')
       if (this.alumni === 'student coaches') filters.push('student_coach=true')
-      if (this.suggestion !== -1) filters.push(`suggestion=${this.suggestion}`)
+      if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
       if (this.byMe !== 'maybe') filters.push(`suggested_by_user=${this.byMe}`)
-      if (this.onProject !== 'maybe') filters.push(`on_project=${this.onProject}`)
+      if (this.onProject !== 'maybe')
+        filters.push(`on_project=${this.onProject}`)
       if (this.status) filters.push(`status=${this.status}`)
 
       for (const skill of this.skills) {
@@ -119,7 +120,7 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       await instance
-        .get<{results: Student[], next: string}>(`students/?page=1${url}`)
+        .get<{ results: Student[]; next: string }>(`students/?page=1${url}`)
         .then(async ({ data }) => {
           this.nextPage = data.next
 
@@ -141,24 +142,24 @@ export const useStudentStore = defineStore('user/student', {
     async loadNext(index: number, done: any) {
       this.isLoading = true
 
-      if (this.nextPage === null) {
-        this.isLoading = false
+      if (this.nextPage == null) {
         done(true)
+        this.isLoading = false
         return
       }
 
       if (this.nextPage !== '') {
-        await instance
-            .get(this.nextPage)
-            .then(async ({data}) => {
-              this.nextPage = data.next
+        await instance.get(this.nextPage).then(async ({ data }) => {
+          this.nextPage = data.next
 
-              for (const student of data.results) {
-                await this.transformStudent(student)
-              }
+          for (const student of data.results) {
+            await this.transformStudent(student)
+          }
 
-              this.students.push(...data.results.map((student: Student) => new Student(student)))
-            })
+          this.students.push(
+            ...data.results.map((student: Student) => new Student(student))
+          )
+        })
       }
       done()
       this.isLoading = false
@@ -209,8 +210,7 @@ export const useStudentStore = defineStore('user/student', {
 
       // keep reason if reason is given in suggestion
       if (
-        this.currentStudent?.finalDecision?.suggestion ==
-        possibleFinalDecision
+        this.currentStudent?.finalDecision?.suggestion == possibleFinalDecision
       ) {
         reason = this.currentStudent.finalDecision.reason
       }

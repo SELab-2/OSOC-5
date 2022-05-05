@@ -7,7 +7,11 @@
     :must-hover="false"
     @update="update"
   />
-
+  
+  <div
+    class="fit"
+    style=" overflow: auto;"
+  >
   <div :key="studentKey"
     class="justify-between row q-px-lg q-pt-lg studentcol">
     <div class="row q-px-sm q-gutter-sm items-center">
@@ -181,6 +185,7 @@
         />
       </div>
     </div>
+  </div>
   </div>
 </template>
 

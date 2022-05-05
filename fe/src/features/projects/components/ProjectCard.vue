@@ -19,23 +19,6 @@
         />
         <q-space />
         <div>
-          <btn 
-            v-if="anyNew.length > 0" 
-            icon="r_warning" 
-            color="yellow"
-            flat
-            round
-            size="12px"
-            glow-color="amber-3"
-            @click="expand(anyNew)"
-            >
-            <q-tooltip class="shadow-4 bg-amber-7">
-            <div class="text-subtitle2">
-              There are still draft suggestions open.
-            </div>
-          </q-tooltip>
-          </btn>
-          <btn flat round size="12px" color="primary" icon="mail" />
           <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
           <btn flat round size="12px" color="primary" icon="edit" @click="triggerEditProject"/>
         </div>
@@ -111,26 +94,32 @@
         </div>
       </q-slide-transition>
 
-      <q-slide-transition
+      <div
         v-for="(role, index) in project.requiredSkills ?? []"
         :key="index"
       >
-        <div v-show="selectedRoles[role.skill.id] || hovered === role.skill.id">
+      
+        <q-slide-transition v-show="selectedRoles[role.skill.id] || hovered === role.skill.id">
           <q-item-label
             class="text-subtitle1 text-bold"
             :class="'text-' + role.skill.color + '-8'"
           >
             {{ role.skill.name }}
           </q-item-label>
+          </q-slide-transition>
+          
+          <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
           <project-card-suggestion
+            
+            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as any).fromWebsocket || (suggestion as any).fromLocal"
             :confirmSuggestion="confirmSuggestion"
             :removeSuggestion="removeSuggestion"
             :suggestion="suggestion"
-            v-for="suggestion in groupedStudents[role.skill.id] ?? []"
+            
             :key="suggestion.student.id"
           />
         </div>
-      </q-slide-transition>
+      </div>
     </q-card-section>
   </q-card>
 </template>
@@ -151,8 +140,6 @@ import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-import router from "../../../router";
-
 
 export default defineComponent({
   props: {
@@ -193,12 +180,15 @@ export default defineComponent({
 
   methods: {
 
-    async removeSuggestion(suggestion: ProjectSuggestion) {
+    async removeSuggestion(suggestion: ProjectSuggestionInterface) {
       try {
         // If the suggestion has not yet been posted to the server, don't make the POST call.
-        if (!(suggestion instanceof NewProjectSuggestion)) {
+        // A suggestion has not yet been posted if it's an instance of NPS and the var fromLocal is enabled.
+        if (!(suggestion instanceof NewProjectSuggestion && (suggestion as NewProjectSuggestion)?.fromLocal)) {
+          // Remove from the server.
           await this.projectStore.removeSuggestion(this.project, suggestion)
         } else {
+          // Only remove locally, this suggestion does not exist on the server yet.
           const index = this.project.suggestedStudents!.findIndex(
             (s) =>
               s.student.id === suggestion.student.id &&
@@ -215,6 +205,7 @@ export default defineComponent({
         })
       }
     },
+    
     expand(skills: ProjectSkillInterface[]) {
       const indexes = skills.map(s => s.skill.id);
       for (let i in this.selectedRoles) {
@@ -286,7 +277,7 @@ export default defineComponent({
           reason: '',
           skill: skill.skill,
           student: data.student,
-        })
+        }, false)
       )
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
@@ -294,9 +285,12 @@ export default defineComponent({
         // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
       }
     },
+    
+    
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
       // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
       const i = this.project.suggestedStudents!.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
+      setTimeout(() => (this.project.suggestedStudents![i] as NewProjectSuggestion).fromLocal = false, 500) // This is needed, because JS will otherwise somehow report true, even when the object doesn't exist anymore? Don't know why.
       this.project.suggestedStudents![i] = new ProjectSuggestion(suggestion)
 
       await this.projectStore.addSuggestion(
@@ -316,12 +310,6 @@ export default defineComponent({
     
   },
   computed: {
-    anyNew() {
-      return (this.project.requiredSkills ?? []).filter(s => {
-        return !this.selectedRoles[s.skill.id] && (this.project.suggestedStudents ?? []).filter(student => student.skill.id === s.skill.id).some(student => student instanceof NewProjectSuggestion)
-      })
-      // return this.project.suggestedStudents?.some(s => s instanceof NewProjectSuggestion )
-    },
     me() {
       return this.authenticationStore.loggedInUser as User
     },

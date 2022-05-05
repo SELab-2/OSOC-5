@@ -22,7 +22,8 @@
         <q-space />
         <div>
           <q-input
-            v-model="filter"
+            v-model="projectStore.projectFilter"
+            debounce="300"
             dense
             outlined
             label="Search Projects"
@@ -99,7 +100,6 @@ export default defineComponent({
     process.env.NODE_ENV == 'development'
       ? 'ws://localhost:8000/ws/socket_server/'
       : 'wss://sel2-5.ugent.be/ws/socket_server/'
-    console.log(baseURL)
     return {
       projectStore: useProjectStore(),
       studentStore: useStudentStore(),
@@ -109,7 +109,6 @@ export default defineComponent({
   },
   data() {
     return {
-      filter: ref(''),
       showShadow: ref(false),
       sideBarKey: 0,
     }
@@ -128,6 +127,13 @@ export default defineComponent({
             p.selectedRoles[r] = newValue
           }
         })
+      }
+    }
+  },
+  watch: {
+    'projectStore.projectFilter': {
+      handler() {
+        this.projectStore.loadProjects()
       }
     }
   },

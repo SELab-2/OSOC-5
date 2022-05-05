@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { User, UserInterface } from '../models/User'
 import { instance } from '../utils/axios'
-import {useAuthenticationStore} from "./useAuthenticationStore";
+import { useAuthenticationStore } from './useAuthenticationStore'
 
 interface State {
   users: Array<User>
@@ -20,7 +20,7 @@ export const useCoachStore = defineStore('user/coach', {
      * @returns the requested user
      */
     async getUser(newUser: UserInterface): Promise<User> {
-      const user = this.users.find((user) => user.url === url)
+      const user = this.users.find((user) => user.url === newUser.url)
 
       if (user) return user
       let fetchedUser: User
@@ -32,12 +32,11 @@ export const useCoachStore = defineStore('user/coach', {
         // Logged in user is coach and cannot fetch users.
         fetchedUser = new User(newUser)
       }
-      
+
       // Check again if not present, it could be added in the meantime.
       const user2 = this.users.find((user) => user.url === newUser.url)
       if (user2) return user2
 
-      
       this.users.push(fetchedUser)
       return fetchedUser
     },
@@ -46,7 +45,9 @@ export const useCoachStore = defineStore('user/coach', {
      */
     async loadUsers() {
       this.isLoadingUsers = true
-      const { results } = (await instance.get<{results: UserInterface[]}>('coaches')).data
+      const { results } = (
+        await instance.get<{ results: UserInterface[] }>('coaches')
+      ).data
       this.users = results.map((user) => new User(user))
       this.isLoadingUsers = false
     },

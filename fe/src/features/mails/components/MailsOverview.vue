@@ -1,9 +1,9 @@
 <template>
   <q-stepper
-    flat
-    v-model="currentStep"
-    header-nav
     ref="stepper"
+    v-model="currentStep"
+    flat
+    header-nav
     active-color="yellow"
     active-icon="none"
     class="text-weight-medium"
@@ -16,35 +16,63 @@
       :title="step.name"
       :icon="step.icon"
       :done="currentstepids.includes(step.state)"
-      >
+    >
       <q-input
         v-if="!currentsteps.find(s => parseInt(s.info) === step.state)"
+        v-model="date" 
         outlined 
-        style="width: fit-content" 
-        v-model="date"
+        style="width: fit-content"
         :disable="currentstepids.includes(step.state)"
-        >
-        <template v-slot:prepend>
-          <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+      >
+        <template #prepend>
+          <q-icon
+            name="event"
+            class="cursor-pointer"
+          >
+            <q-popup-proxy
+              cover
+              transition-show="scale"
+              transition-hide="scale"
+            >
               <q-date 
                 v-model="date"
                 mask="YYYY-MM-DD HH:mm"
-                >
+              >
                 <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Close" color="primary" flat />
+                  <q-btn
+                    v-close-popup
+                    label="Close"
+                    color="primary"
+                    flat
+                  />
                 </div>
               </q-date>
             </q-popup-proxy>
           </q-icon>
         </template>
       
-        <template v-slot:append>
-          <q-icon name="access_time" class="cursor-pointer">
-            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-              <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+        <template #append>
+          <q-icon
+            name="access_time"
+            class="cursor-pointer"
+          >
+            <q-popup-proxy
+              cover
+              transition-show="scale"
+              transition-hide="scale"
+            >
+              <q-time
+                v-model="date"
+                mask="YYYY-MM-DD HH:mm"
+                format24h
+              >
                 <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Close" color="primary" flat />
+                  <q-btn
+                    v-close-popup
+                    label="Close"
+                    color="primary"
+                    flat
+                  />
                 </div>
               </q-time>
             </q-popup-proxy>
@@ -53,9 +81,8 @@
       </q-input>
       <div v-else>
         <!-- <div> -->
-        Sent at {{currentsteps.find(s => parseInt(s.info) === step.state)?.time ?? 'unknown time'}}
+        Sent at {{ currentsteps.find(s => parseInt(s.info) === step.state)?.time ?? 'unknown time' }}
         <!-- </div> -->
-        
       </div>
       <!-- <q-input
         label="Email"
@@ -69,10 +96,10 @@
         <btn
           :disable="currentstepids.includes(step.state)"
           color="yellow"
-          @click="onclickmail(step.state)"
           label="Mark as sent"
           shadow-color="orange"
           shadow-strength="2"
+          @click="onclickmail(step.state)"
         />
         <btn
           v-if="currentsteps.find(s => parseInt(s.info) === step.state)"
@@ -163,7 +190,6 @@ export default defineComponent({
   computed: {
     currentsteps() {
       const mails = this.mailStore.mails
-      console.log(mails)
       if (!this.mailStore.mails.has(this.student.id)) return []
       const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => {
         return this.statuses.includes(parseInt(mail.info))
@@ -207,7 +233,6 @@ export default defineComponent({
       this.timeout = null
     },
     prepareRemove(mail: Mail) {
-      console.log(mail)
       this.timeout = setTimeout(() => {
         this.remove(mail)
         this.timeout = null
