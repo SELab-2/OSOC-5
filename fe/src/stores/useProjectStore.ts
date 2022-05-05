@@ -31,6 +31,7 @@ interface State {
   projectLink: string
   filterCoaches: string
   selectedCoaches: Array<User>
+  projectFilter: string
 }
 
 export const useProjectStore = defineStore('project', {
@@ -42,6 +43,7 @@ export const useProjectStore = defineStore('project', {
     projectLink: '',
     filterCoaches: '',
     selectedCoaches: [],
+    projectFilter: '',
   }),
   actions: {
     async fetchSuggestedStudents(
@@ -116,7 +118,7 @@ export const useProjectStore = defineStore('project', {
       this.isLoadingProjects = true
       try {
         const { results } = (
-          await instance.get<{ results: TempProject[] }>('projects/')
+          await instance.get<{ results: TempProject[] }>(`projects/?search=${this.projectFilter}`)
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
@@ -275,10 +277,7 @@ export const useProjectStore = defineStore('project', {
           this.loadProjects()
           callback(true)
         })
-        .catch(function (error) {
-          // console.log(error)
-          callback(false)
-        })
+        .catch(() => {callback(false)})
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getAndSetProject(id: string, callback: any) {

@@ -128,7 +128,7 @@
           <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
           <project-card-suggestion
             
-            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as any).fromWebsocket"
+            v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as any).fromWebsocket || (suggestion as any).fromLocal"
             :confirmSuggestion="confirmSuggestion"
             :removeSuggestion="removeSuggestion"
             :suggestion="suggestion"
@@ -157,7 +157,6 @@ import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-import router from "../../../router";
 
 export default defineComponent({
   props: {
@@ -308,6 +307,7 @@ export default defineComponent({
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
       // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
       const i = this.project.suggestedStudents!.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
+      setTimeout(() => (this.project.suggestedStudents![i] as NewProjectSuggestion).fromLocal = false, 500) // This is needed, because JS will otherwise somehow report true, even when the object doesn't exist anymore? Don't know why.
       this.project.suggestedStudents![i] = new ProjectSuggestion(suggestion)
 
       await this.projectStore.addSuggestion(
@@ -319,12 +319,6 @@ export default defineComponent({
     },
   },
   computed: {
-    anyNew() {
-      return (this.project.requiredSkills ?? []).filter(s => {
-        return !this.selectedRoles[s.skill.id] && (this.project.suggestedStudents ?? []).filter(student => student.skill.id === s.skill.id).some(student => (student as NewProjectSuggestion)?.fromLocal)
-      })
-      // return this.project.suggestedStudents?.some(s => s instanceof NewProjectSuggestion )
-    },
     me() {
       return this.authenticationStore.loggedInUser as User
     },
