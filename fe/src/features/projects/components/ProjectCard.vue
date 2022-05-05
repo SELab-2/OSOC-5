@@ -37,7 +37,7 @@
           </btn>
           <btn flat round size="12px" color="primary" icon="mail" />
           <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
-          <btn flat round size="12px" color="primary" icon="edit" @click="triggerEditProject"/>
+          <btn flat round size="12px" color="primary" icon="edit" :to="`/projects/${project.id}`"/>
         </div>
       </div>
 
@@ -317,10 +317,6 @@ export default defineComponent({
         suggestion.reason
       )
     },
-    triggerEditProject(){
-      router.push('/projects/' + this.project.id)
-    }
-
   },
   computed: {
     anyNew() {

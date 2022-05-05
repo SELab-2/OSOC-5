@@ -15,9 +15,8 @@
                 type="cancel"
                 size="md"
                 class="q-mx-md cornered"
-                glow-color="#00F1AF"
                 shadow-strength="2"
-                @click="cancelEditProject"
+                :to="`/projects`"
               />
               <btn
                 elevated
@@ -26,7 +25,6 @@
                 type="delete"
                 size="md"
                 class="q-mx-md cornered"
-                glow-color="#00F1AF"
                 shadow-strength="2"
                 @click="deleteProject"
               />
@@ -37,7 +35,6 @@
                 type="submit"
                 size="md"
                 class="q-mx-md cornered"
-                glow-color="#00F1AF"
                 shadow-strength="2"
                 @click="updateProject"
               />
@@ -116,9 +113,10 @@ export default defineComponent({
     }
   },
   methods: {
+    // this function updates a project given the ID and the current selected skills
     updateProject() {
-      console.log('updateProject')
       this.projectStore.updateProject(this.projectID, this.skillStore.skills, (positive: boolean) => {
+        // if the call is a success, we give a positive notification
         if (positive) {
           router.push('/projects')
           this.$q.notify({
@@ -126,7 +124,7 @@ export default defineComponent({
             color: 'positive',
             message: 'Successfully updated project!',
           })
-        } else {
+        } else { // otherwise we tell the user it failed
           this.$q.notify({
             icon: 'close',
             color: 'negative',
@@ -135,9 +133,7 @@ export default defineComponent({
         }
       })
     },
-    cancelEditProject() {
-      router.push('/projects')
-    },
+    // to delete a project, we set the id, and the DeleteDialog will open
     deleteProject() {
       this.deleteProjectID = +this.projectID
       this.deleteProjectName = this.projectStore.projectName

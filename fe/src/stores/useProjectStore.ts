@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student } from '../models/Student'
-import { TempProjectSuggestion, NewProjectSuggestion } from '../models/ProjectSuggestion'
+import {
+  TempProjectSuggestion,
+  NewProjectSuggestion,
+} from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   ProjectSkill,
@@ -48,7 +51,7 @@ export const useProjectStore = defineStore('project', {
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (await useCoachStore().getUser(student.coach)),
+          coach: await useCoachStore().getUser(student.coach),
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
@@ -86,9 +89,7 @@ export const useProjectStore = defineStore('project', {
     // NOTE: this may be broken.
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(
-        project.coaches.map((coach) =>
-          useCoachStore().getUser(coach)
-        )
+        project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
 
       const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -122,9 +123,7 @@ export const useProjectStore = defineStore('project', {
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) =>
-              useCoachStore().getUser(coach)
-            )
+            project.coaches.map((coach) => useCoachStore().getUser(coach))
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -149,7 +148,7 @@ export const useProjectStore = defineStore('project', {
         // this.projects = this.projects.slice(1)
         // data.forEach(p => this.getProject(p))
       } catch (error) {
-        console.log(error)
+        // console.log(error)
       } finally {
         this.isLoadingProjects = false
       }
@@ -183,20 +182,31 @@ export const useProjectStore = defineStore('project', {
         const studentObj = await studentStore.getStudent(student)
         const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
-        project.suggestedStudents?.push(new NewProjectSuggestion({
-            student: studentObj,
-            coach: coachObj,
-            skill: skillObj,
-            reason,
-          }, true))
+        project.suggestedStudents?.push(
+          new NewProjectSuggestion(
+            {
+              student: studentObj,
+              coach: coachObj,
+              skill: skillObj,
+              reason,
+            },
+            true
+          )
+        )
 
         // Remove the "New" badge from the new suggestion after a short period.
-        setTimeout(() =>
-        (project.suggestedStudents?.find(s =>
-          s.student.url === studentObj.url &&
-          s.coach.url === coachObj.url &&
-          s.skill.url === skillObj.url) as NewProjectSuggestion).fromWebsocket = false,
-           5000)
+        setTimeout(
+          () =>
+            ((
+              project.suggestedStudents?.find(
+                (s) =>
+                  s.student.url === studentObj.url &&
+                  s.coach.url === coachObj.url &&
+                  s.skill.url === skillObj.url
+              ) as NewProjectSuggestion
+            ).fromWebsocket = false),
+          5000
+        )
       }
     },
     removeReceivedSuggestion({
@@ -266,15 +276,13 @@ export const useProjectStore = defineStore('project', {
           callback(true)
         })
         .catch(function (error) {
-          console.log(error)
+          // console.log(error)
           callback(false)
         })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getAndSetProject(id: string, callback: any) {
-      // console.log(id)
       return instance.get('projects/' + id).then((data) => {
-        console.log(data)
         const project = data.data
         this.projectName = project.name
         this.projectPartnerName = project.partnerName
@@ -293,8 +301,7 @@ export const useProjectStore = defineStore('project', {
         .then(() => {
           callback(true)
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(() => {
           callback(false)
         })
     },
@@ -313,8 +320,7 @@ export const useProjectStore = defineStore('project', {
           this.loadProjects()
           callback(true)
         })
-        .catch(function (error) {
-          console.log(error)
+        .catch(() => {
           callback(false)
         })
     },
