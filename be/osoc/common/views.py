@@ -528,7 +528,10 @@ class GithubLogin(SocialLoginView):
     client_class = OAuth2Client
 
 class CustomRegisterView(RegisterView):
-    
+    """
+    This class overrides the registerview of rest_auth so users that get registered don't automatically
+    get logged in.
+    """
     permission_classes = [permissions.IsAuthenticated, IsActive, IsAdmin]
 
     def get_response_data(self, user):
