@@ -73,7 +73,6 @@ export const useSkillStore = defineStore('skills', {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async addSkill(callback: any) {
       // Process the new skill
-      console.log(`Adding new skill: ${this.popupName}.`)
       if (
         this.popupName &&
         this.popupName.length > 0 &&
@@ -105,8 +104,6 @@ export const useSkillStore = defineStore('skills', {
               color: this.popupColor,
             })
             .then((response) => {
-              console.log(response['data'])
-
               // ON SUCCESS ADD THIS TO THE LOCAL STORE
               this.skills.push({
                 name: response['data']['name'],
@@ -119,9 +116,8 @@ export const useSkillStore = defineStore('skills', {
               // When finished run the callback so the popup closes.
               callback(0)
             })
-            .catch((error) => {
+            .catch(() => {
               this.isLoadingSkills = false
-              console.log(error)
               callback(1)
             })
         }
