@@ -14,6 +14,10 @@ services:
     build:
       context: ../
       dockerfile: ./docker/${DOCKERFILE:-Dockerfile}
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
     user: ${DOCKER_AS_USER}
     volumes:
       - ../:/src
