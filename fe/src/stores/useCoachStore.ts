@@ -4,12 +4,16 @@ import { instance } from '../utils/axios'
 
 interface State {
   users: Array<User>
+  filter: string
+  filterRole: string
   isLoadingUsers: boolean
 }
 
 export const useCoachStore = defineStore('user/coach', {
   state: (): State => ({
     users: [],
+    filter: '',
+    filterRole: 'all',
     isLoadingUsers: false,
   }),
   actions: {
@@ -30,6 +34,22 @@ export const useCoachStore = defineStore('user/coach', {
       this.isLoadingUsers = true
       const { results } = (await instance.get<{results: UserInterface[]}>('coaches')).data
       this.users = results.map((user) => new User(user))
+      this.isLoadingUsers = false
+    },
+    async loadUsersCoaches(pagination: any, setNumberOfRows: any) {
+      this.isLoadingUsers = true
+
+      const filters = []
+      if (this.filter) filters.push(`search=${this.filter}`)
+
+      let url = ''
+      if (filters) url = `&${filters.join('&')}`
+
+      const { results, count } = (await instance.get<{results: UserInterface[], count: number}>(`coaches/?page_size=${pagination.rowsPerPage}&page=${pagination.page}${url}`)).data
+
+      setNumberOfRows(count)
+      this.users = results.map((user) => new User(user))
+
       this.isLoadingUsers = false
     },
     async updateRole(user: User) {

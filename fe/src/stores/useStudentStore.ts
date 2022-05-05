@@ -3,8 +3,6 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
-import { Mail } from '../models/Mail'
-import { useAuthenticationStore } from './useAuthenticationStore'
 import { useCoachStore } from './useCoachStore'
 
 interface State {

@@ -28,13 +28,12 @@
       </div>
 
       <q-table
+        v-model:pagination="pagination"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
         :columns="columnsMails"
         row-key="id"
         separator="horizontal"
-        :filter="filter"
-        v-model:pagination="pagination"
         :loading="mailStore.isLoading"
         @request="onRequest"
       >
@@ -113,7 +112,6 @@
 import {defineComponent} from "@vue/runtime-core";
 import {ref} from 'vue'
 import {Student} from "../../models/Student";
-import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";

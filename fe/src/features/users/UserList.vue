@@ -23,7 +23,7 @@
       </div>
       <div class="row q-mb-md vertical-middle">
         <SegmentedControl
-          v-model="roleFilter"
+          v-model="coachStore.filterRole"
           :options="[
             { name: 'all', label: 'All' },
             { name: 'admin', label: 'Admins' },
@@ -44,12 +44,13 @@
             </q-card>
           </q-dialog>
           <q-input
-            v-model="filter"
+            v-model="coachStore.filter"
             outlined
             dense
             debounce="300"
             color="yellow-4"
             placeholder="Search"
+            @update:modelValue="async () => await coachStore.loadUsersCoaches(pagination, (count) => pagination.rowsNumber = count)"
           >
             <template #append>
               <q-icon name="search" />
@@ -61,14 +62,15 @@
       <!-- filter cannot be empty, since this won't trigger the table filter function call.
              This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
       <q-table
+        v-model:pagination="pagination"
         class="my-table user-table shadow-4"
         table-header-style="user-table"
         :rows="coachStore.users"
         :columns="columns"
         row-key="id"
-        :filter="roleFilter"
-        :filter-method="useTableFilter"
         separator="horizontal"
+        :loading="coachStore.isLoadingUsers"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -239,9 +241,14 @@ export default defineComponent({
   setup() {
     const coachStore = useCoachStore()
     const q = useQuasar()
-    
-    coachStore.loadUsers();
 
+    const pagination = ref({
+      sortBy: 'desc',
+      descending: false,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 10 // if getting data from a server
+    })
 
     return {
       newUserDialog: ref(false),
@@ -251,10 +258,18 @@ export default defineComponent({
       columns,
       roles,
       coachStore,
+      pagination,
       q
     }
   },
+  async mounted() {
+    await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+  },
   methods: {
+    async onRequest(props: any) {
+      this.pagination = props.pagination
+      await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
     // Method for searching the table.
     // Terms is equal to roleFilter.
     // The method filter to the elements which pass both filters.
