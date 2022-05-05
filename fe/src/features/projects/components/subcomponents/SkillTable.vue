@@ -87,19 +87,19 @@
             :style="`height: 25px; width:25px; border-radius: 50%`"
           />
         </q-td>
-<!--        <q-td-->
-<!--          key="edit"-->
-<!--          style="width: 10px"-->
-<!--        >-->
-<!--          <btn-->
-<!--            flat-->
-<!--            round-->
-<!--            style="color: #3d3d3d"-->
-<!--            icon="mdi-pencil-outline"-->
-<!--            glow-color="grey-5"-->
-<!--            @click="editSkill(props.row)"-->
-<!--          />-->
-<!--        </q-td>-->
+        <q-td
+          key="edit"
+          style="width: 10px"
+        >
+          <btn
+            flat
+            round
+            style="color: #3d3d3d"
+            icon="mdi-pencil-outline"
+            glow-color="grey-5"
+            @click="editSkill(props.row)"
+          />
+        </q-td>
         <q-td
           key="remove"
           style="width: 10px"
@@ -124,6 +124,8 @@
   >
     <NewSkillDialog
       dialog-title="Edit skill"
+      submit-text="Update skill"
+      :callback="() => editSkillDialog = false"
     />
   </q-dialog>
   <q-dialog
@@ -145,9 +147,10 @@ import { ProjectTableSkill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import columnsSkills from '../../../../models/ProjectSkillsColumns'
 import DeleteSkillDialog from './DeleteSkillDialog.vue'
+import NewSkillDialog from "./NewSkillDialog.vue";
 
 export default defineComponent({
-  components: { DeleteSkillDialog },
+  components: { DeleteSkillDialog, NewSkillDialog },
   props: {
     filterSkills: {
       type: String,
@@ -205,17 +208,5 @@ export default defineComponent({
 })
 </script>
 <style scoped lang="sass">
-thead tr:first-child th:first-child
-//  /* bg color is important for th; just specify one */
-//  background-color: #fff
-//
-//td:first-child
-//  background-color: #f5f5dc
-//
-//th:first-child,
-//td:first-child,
-//th:second-child,
-//  position: sticky
-//  left: 0
-//  z-index: 1
+
 </style>

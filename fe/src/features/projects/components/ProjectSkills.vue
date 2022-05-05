@@ -48,6 +48,8 @@
     >
       <NewSkillDialog
         dialog-title="Create a new skill"
+        submit-text="Add skill"
+        :callback="() => newSkillPrompt = false"
       />
     </q-dialog>
 

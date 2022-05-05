@@ -46,12 +46,17 @@
         </template>
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey"> No results </q-item-section>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
           </q-item>
         </template>
       </q-select>
     </q-card-section>
-    <q-card-actions align="right" class="text-primary">
+    <q-card-actions
+      align="right"
+      class="text-primary"
+    >
       <btn
         v-close-popup
         flat
@@ -62,7 +67,7 @@
       <btn
         v-close-popup
         flat
-        label="Add skill"
+        :label="submitText"
         glow-color="#C0FFF4"
         @click="newSkillConfirm"
       />
@@ -82,6 +87,14 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    submitText: {
+      type: String,
+      required: true,
+    },
+    callback: {
+      type: Function,
+      required: true,
+    },
   },
   setup() {
     const skillStore = useSkillStore()
@@ -95,6 +108,7 @@ export default defineComponent({
 
       quasarColors,
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filterFn(val: string, update: any) {
         if (val === '') {
           update(() => {
@@ -123,7 +137,7 @@ export default defineComponent({
               this.$q.notify({
                 icon: 'close',
                 color: 'negative',
-                message: 'Failed to add skill!',
+                message: 'Failed!',
               })
               break
             }
@@ -131,7 +145,7 @@ export default defineComponent({
               this.$q.notify({
                 icon: 'close',
                 color: 'negative',
-                message: 'Invalid name/color!',
+                message: 'Invalid skill-name and/or color!',
               })
               break
             }
@@ -139,7 +153,7 @@ export default defineComponent({
               this.$q.notify({
                 icon: 'done',
                 color: 'positive',
-                message: `Added new project skill: ${this.skillStore.popupName}.`,
+                message: `Success!.`,
                 textColor: 'black',
               })
               this.skillStore.popupName = ''
@@ -148,14 +162,16 @@ export default defineComponent({
               break
             }
           }
+          this.callback()
         }
       )
     },
-    newSkillCancel(){
+    newSkillCancel() {
       this.skillStore.popupName = ''
       this.skillStore.popupColor = ''
       this.skillStore.popupID = -1
-    }
+      this.callback()
+    },
   },
 })
 </script>

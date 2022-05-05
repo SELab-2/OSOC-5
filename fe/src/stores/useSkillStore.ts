@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
-import { ProjectTableSkill, Skill, TempProjectSkill } from "../models/Skill";
+import { ProjectTableSkill, Skill, TempProjectSkill } from '../models/Skill'
 import { User } from '../models/User'
 
 interface State {
@@ -82,8 +82,20 @@ export const useSkillStore = defineStore('skills', {
         if (this.popupID >= 0) {
           // skill already exists so we update it
           instance
-            .put(`skills/${this.popupID}/`, { color: this.popupColor })
-            .then(() => callback(0))
+            .patch(`skills/${this.popupID}/`, {
+              name: this.popupName,
+              color: this.popupColor,
+            })
+            .then(() => {
+              for (const skill of this.skills) {
+                if (skill.id === this.popupID) {
+                  skill.color = this.popupColor
+                  skill.name = this.popupName
+                }
+              }
+
+              return callback(0)
+            })
             .catch(() => callback(1))
         } else {
           // make new skill
@@ -135,14 +147,15 @@ export const useSkillStore = defineStore('skills', {
           callback(false)
         })
     },
-    async setSkills(projectSkills:TempProjectSkill[]){
+    async setSkills(projectSkills: TempProjectSkill[]) {
       // first load all the existing skills back into the store
       await this.loadSkills()
       // now go over each of the skills that the project contains and
       // fill in the amount and comment
-      for (const projectSkill of projectSkills){
-        for(const skill of this.skills){
-          if (skill.url === projectSkill.skill){ // this means u found match
+      for (const projectSkill of projectSkills) {
+        for (const skill of this.skills) {
+          if (skill.url === projectSkill.skill) {
+            // this means u found match
             // console.log("match " + skill.url)
             skill.amount = projectSkill.amount
             skill.comment = projectSkill.comment
