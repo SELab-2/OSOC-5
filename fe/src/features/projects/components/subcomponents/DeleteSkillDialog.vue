@@ -34,8 +34,8 @@
         flat
         color="red"
         label="Delete"
-        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
         glow-color="red-2"
+        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
       />
     </q-card-actions>
   </q-card>

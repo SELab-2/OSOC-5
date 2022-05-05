@@ -251,7 +251,7 @@ export default defineComponent({
       this.selectedRoles[skill.skill.id] = true
       const target = <HTMLDivElement>e.target
       // don't drop on other draggables
-      if ((<HTMLDivElement>e.target).draggable === true) {
+      if (target.draggable === true) {
         return
       }
       // TODO: additional checks that datatransfer is valid and not null
@@ -260,7 +260,6 @@ export default defineComponent({
       )
 
       // Add a student to the project.
-      const reason = 'mimimi'
       let coach = this.authenticationStore.loggedInUser as User
       if (!coach) {
         this.q.notify({

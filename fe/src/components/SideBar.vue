@@ -212,8 +212,6 @@ import {useQuasar} from "quasar";
 import { Student } from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
-import rolesOptions from "../models/RolesOptions";
-import yesMaybeNoOptions from "../models/YesMaybeNoOptions";
 
 export default defineComponent({
   components: {
@@ -271,8 +269,11 @@ export default defineComponent({
     await this.studentStore.loadStudents()
   },   
   methods: {
-    // Saves the component id and user name in the dataTransfer.
-    // TODO: send id of user instead of name.
+    /**
+     * Saves the component id and user name in the dataTransfer.
+     * @param e drag event
+     * @param item item being dragged
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDragStart(e: any, item: any) {
       const data = {

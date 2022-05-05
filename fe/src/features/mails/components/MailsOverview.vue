@@ -117,7 +117,6 @@
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import {useStudentStore} from "../../../stores/useStudentStore";
 import {Student} from "../../../models/Student";
 import {Mail} from "../../../models/Mail";
 import {ref, Ref} from "vue";
@@ -147,6 +146,7 @@ export default defineComponent({
     }
   },
   data() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let timeout: any | null = null
     const today = new Date();
     const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
@@ -189,7 +189,6 @@ export default defineComponent({
   },
   computed: {
     currentsteps() {
-      const mails = this.mailStore.mails
       if (!this.mailStore.mails.has(this.student.id)) return []
       const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => {
         return this.statuses.includes(parseInt(mail.info))

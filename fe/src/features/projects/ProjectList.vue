@@ -47,7 +47,9 @@
           shadow-strength="2.5"
           no-wrap
         >
-        <div class="ellipsis">Conflicts</div>
+          <div class="ellipsis">
+            Conflicts
+          </div>
         </btn>
       </q-toolbar>
 
@@ -71,8 +73,8 @@
       :offset="[18, 18]"
     >
       <btn
-        fab
         v-if="authenticationStore.loggedInUser?.isAdmin"
+        fab
         padding="10px"
         icon="add"
         color="yellow"

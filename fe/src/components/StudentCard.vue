@@ -13,7 +13,10 @@
         <div class="row justify-between">
           <div>
             <label class="text-bold q-pr-xs">{{ student.fullName }}</label>
-            <DecisionIcon v-if="student !== null && student.finalDecision !== null" :decision="student.finalDecision.suggestion"/>
+            <DecisionIcon
+              v-if="student !== null && student.finalDecision !== null"
+              :decision="student.finalDecision.suggestion"
+            />
             <q-chip
               v-if="student.alum"
               size="8px"

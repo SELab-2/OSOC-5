@@ -31,62 +31,65 @@
       <div class="row">
         <div class="q-pr-xs col-6">
           <q-input
-            outlined
             v-model="firstName"
+            outlined
             label="First Name"
             lazy-rules
             :rules="[
-                  (val) => (val && val.length > 0) || 'This field cannot be empty',
-                ]"
+              (val) => (val && val.length > 0) || 'This field cannot be empty',
+            ]"
           />
         </div>
         <div class="q-pr-xs col-6">
           <q-input
-            outlined
             v-model="lastName"
+            outlined
             label="Last Name"
             lazy-rules
             :rules="[
-                  (val) => (val && val.length > 0) || 'This field cannot be empty',
-                ]"
+              (val) => (val && val.length > 0) || 'This field cannot be empty',
+            ]"
           />
         </div>
       </div>
       <q-input
-        outlined
         v-model="email"
+        outlined
         label="E-mail"
         type="email"
         lazy-rules
         :rules="[
-              (val) => (val && val.length > 0) || 'This field cannot be empty',
-            ]"
+          (val) => (val && val.length > 0) || 'This field cannot be empty',
+        ]"
       />
       <div :class="generate ? 'q-pb-xl' : ''">
         <q-input
-          outlined
           v-model="password"
+          outlined
           label="Password"
           class="inputfield"
           clearable
           clear-icon="close"
           lazy-rules
-          @update:model-value="generate = false"
           :rules="[
-                (val) => (val && val.length > 0) || 'This field cannot be empty',
-                (val) => (val.length >= 8) || 'Passwords must be longer then 7 characters',
-              ]"
+            (val) => (val && val.length > 0) || 'This field cannot be empty',
+            (val) => (val.length >= 8) || 'Passwords must be longer then 7 characters',
+          ]"
+          @update:model-value="generate = false"
         >
-          <template v-slot:append>
+          <template #append>
             <q-icon
-              @click="onGeneratePasswordToggle"
               name="mdi-cached"
               class="cursor-pointer"
+              @click="onGeneratePasswordToggle"
             />
           </template>
 
-          <template v-slot:hint>
-            <div class="warning" v-if="generate">
+          <template #hint>
+            <div
+              v-if="generate"
+              class="warning"
+            >
               This password will not be shown again after the user is created,
               so please make sure that you remember it or write it down.
             </div>
@@ -96,9 +99,22 @@
     </q-form>
   </q-card-section>
   <q-card-actions align="right">
-    <btn flat label="Cancel" @click="onReset" color="yellow" v-close-popup />
-    <btn flat v-model="password" :label="'Create ' + role" @click="onSubmit" color="yellow" v-close-popup
-    :disabled="password.length <= 8"/>
+    <btn
+      v-close-popup
+      flat
+      label="Cancel"
+      color="yellow"
+      @click="onReset"
+    />
+    <btn
+      v-model="password"
+      v-close-popup
+      flat
+      :label="'Create ' + role"
+      color="yellow"
+      :disabled="password.length <= 8"
+      @click="onSubmit"
+    />
   </q-card-actions>
 </template>
 

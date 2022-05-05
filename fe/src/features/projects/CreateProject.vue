@@ -19,7 +19,7 @@
                 size="md"
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
-                shadow-strength=2
+                shadow-strength="2"
                 @click="onCancel"
               />
               <btn
@@ -30,7 +30,7 @@
                 size="md"
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
-                shadow-strength=2
+                shadow-strength="2"
               />
             </div>
           </div>

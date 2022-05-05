@@ -19,7 +19,10 @@
           :key="key"
         >
           <div class="row">
-            <DecisionIcon v-if="studentStore.currentStudent" :decision="suggestion.suggestion" />
+            <DecisionIcon
+              v-if="studentStore.currentStudent"
+              :decision="suggestion.suggestion"
+            />
             <label class="q-pl-xs">
               {{ `${suggestion.coach.firstName} ${suggestion.coach.lastName}` }}
             </label>

@@ -12,10 +12,10 @@
       lazy-rules
       class="inputfield"
       :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the name of the project.',
-              ]"
+        (val) =>
+          (val && val.length > 0) ||
+          'Please enter the name of the project.',
+      ]"
     />
     <q-input
       v-model="projectStore.projectPartnerName"
@@ -24,10 +24,10 @@
       lazy-rules
       class="inputfield"
       :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the name of the partner.',
-              ]"
+        (val) =>
+          (val && val.length > 0) ||
+          'Please enter the name of the partner.',
+      ]"
     />
     <q-input
       v-model="projectStore.projectLink"
@@ -36,10 +36,10 @@
       lazy-rules
       class="inputfield"
       :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the URL of the project.',
-              ]"
+        (val) =>
+          (val && val.length > 0) ||
+          'Please enter the URL of the project.',
+      ]"
     />
   </div>
 </template>
