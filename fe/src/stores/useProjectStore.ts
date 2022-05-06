@@ -75,11 +75,21 @@ export const useProjectStore = defineStore('project', {
       skillUrl: string,
       reason: string
     ) {
-      return await instance.post(`projects/${projectId}/suggest_student/`, {
-        student: studentUrl,
-        skill: skillUrl,
-        reason: reason,
-      })
+      const response = await instance.post(
+        `projects/${projectId}/suggest_student/`,
+        {
+          student: studentUrl,
+          skill: skillUrl,
+          reason: reason,
+        }
+      )
+
+      const studentStore = useStudentStore()
+      studentStore.students = studentStore.students.filter(
+        ({ url }) => url !== studentUrl
+      )
+
+      return response
     },
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
