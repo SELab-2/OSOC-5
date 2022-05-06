@@ -28,10 +28,11 @@ export const useMailStore = defineStore('user/mail', {
 
             const filters = []
             if (this.searchMails) filters.push(`search=${this.searchMails}`)
+            const order = pagination.descending ? '-' : '+'
             if (pagination.sortBy === 'name') {
-                filters.push('ordering=first_name,last_name')
+                filters.push(`ordering=${order}first_name,${order}last_name`)
             } else if (pagination.sortBy !== null) {
-                filters.push(`ordering=${pagination.sortBy}`)
+                filters.push(`ordering=${order}${pagination.sortBy}`)
             }
 
             let url = ''

@@ -53,12 +53,14 @@ export const useCoachStore = defineStore('user/coach', {
       if (this.filterRole === 'inactive') filters.push('is_active=false')
       if (this.filterRole === 'admin') filters.push('is_active=true&is_admin=true')
       if (this.filterRole === 'coach') filters.push('is_active=true&is_admin=false')
+      const order = pagination.descending ? '-' : '+'
       if (pagination.sortBy === 'name') {
-        filters.push('ordering=first_name,last_name')
+        filters.push(`ordering=${order}first_name,${order}last_name`)
       } else if (pagination.sortBy === 'role') {
-        filters.push('ordering=is_admin,is_active')
+        const order = pagination.descending ? '+' : '-'
+        filters.push(`ordering=${order}is_admin,${order}is_active`)
       } else if (pagination.sortBy !== null) {
-        filters.push(`ordering=${pagination.sortBy}`)
+        filters.push(`ordering=${order}${pagination.sortBy}`)
       }
 
 
