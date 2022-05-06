@@ -48,7 +48,6 @@ export const useCoachStore = defineStore('user/coach', {
     async loadUsersCoaches(pagination: any, setNumberOfRows: any) {
       this.isLoadingUsers = true
 
-      console.log(pagination)
       const filters = []
       if (this.filter) filters.push(`search=${this.filter}`)
       if (this.filterRole === 'inactive') filters.push('is_active=false')
