@@ -1,5 +1,6 @@
 <template>
-  <q-slide-transition :appear="isNew && !suggestion.reason">
+  <!-- appear only when a new entry is added. Otherwise, the suggestions may be glitchy when removing suggestions. -->
+  <q-slide-transition :appear="(fromLocal || fromWebsocket) && !suggestion.reason">
     <div v-if="show" style="margin-left: 10px">
       <div class="column full-width">
         <div :lines="1" tabindex="-1" class="row flex-center no-wrap" style="height: 30px">
@@ -10,16 +11,16 @@
             {{ suggestion.student.firstName }}
             {{ suggestion.student.lastName }}
           </div>
-          <q-badge v-if="isNew" rounded :color="suggestion.skill.color" label="Draft" class="q-ml-xs" />
+          <q-badge v-if="fromWebsocket || fromLocal" rounded :color="suggestion.skill.color" :label="fromWebsocket ? 'New' : 'Draft'" class="q-ml-xs" />
           
           <q-space/>
-          <div v-if="!removed" style="flex-wrap: nowrap; display: block; min-width: 72px">
-            <btn tabindex="-1" class="gt-xs" size="sm" @mouseover="() => {
+          <div v-if="!removed" style="flex-wrap: nowrap; display: block; min-width: 48px">
+            <btn tabindex="-1" class="gt-xs" size="sm" flat dense round icon="r_person" :to="`/students/${suggestion.student.id}`" />
+            <btn tabindex="-1" v-if="!fromLocal" class="gt-xs" size="sm" @mouseover="() => {
               if (progress === 0) progress = 3
             }" @mouseleave="() => {
               if (progress === 3) progress = 0
-            }" flat dense round icon="r_comment" />
-            <btn tabindex="-1" class="gt-xs" size="sm" flat dense round icon="info" />
+            }" @click="disableHover = !disableHover" flat dense round icon="r_info" />
             <btn tabindex="-1"
               class="gt-xs"
               size="sm"
@@ -29,25 +30,34 @@
               icon="delete"
               @click="() => {
                 removed = true
-                isNew ? remove() : prepareRemove()
+                fromLocal ? remove() : prepareRemove()
               }"
             />
           </div>
           <btn v-else label="undo" @click="stop" dense style="justify-content: center; height: 30px"/>
         </div>
+        <q-slide-transition>
+          <div style="margin-left: 10px" v-if="progress === 3 || disableHover">
+            <div>Assigned by {{ suggestion.coach.fullName }}</div>
+            <div v-if="suggestion.reason">
+            <div class="text-bold">Comment</div>
+            {{ suggestion.reason }}
+            </div>
+            <div v-else>No comment provided</div>
+          </div>
+        </q-slide-transition>
         <q-slide-transition v-if="progress >= 0">
           <q-input
-            :autofocus="progress !== 3"
+            autofocus
             :color="suggestion.skill.color"
-            v-if="isNew || progress !== 0"
+            v-if="fromLocal || (progress !== 0 && progress !== 3)"
             v-model="suggestion.reason"
             dense
             outlined
             autogrow
             label="Comment (Optional)"
-            :disabled="progress === 3"
           >
-            <template v-slot:after v-if="progress !== 3">
+            <template v-slot:after>
               <btn
                 :color="progress === 2 ? 'positive' : suggestion.skill.color"
                 dense
@@ -108,6 +118,7 @@ export default defineComponent({
       show: ref(true),
       progress: ref(0),
       removed: ref(false),
+      disableHover: ref(false),
       timeout
     }
   },
@@ -124,18 +135,22 @@ export default defineComponent({
       clearTimeout(this.timeout)
       this.timeout = null
     },
+    
+    // This shows the undo button for a short period of time, and will call the actual remove method after a short period of time.
     prepareRemove() {
       this.timeout = setTimeout(() => {
         this.remove()
         this.timeout = null
       }, 2000)
     },
+    
+    // Actually removes the suggestion from the server. If the suggestion is a draft, it only gets removed locally.
     remove() {
       this.show = false
+      // A short timeout is added to play the remove animation.
       setTimeout(() => {
         this.removeSuggestion(this.suggestion)
       }, 500)
-      return
     },
     async confirm() {
       this.progress = 1
@@ -151,6 +166,12 @@ export default defineComponent({
   computed: {
     isNew() {
       return this.suggestion instanceof NewProjectSuggestion
+    },
+    fromLocal() {
+      return this.isNew && (this.suggestion as NewProjectSuggestion).fromLocal
+    },
+    fromWebsocket() {
+      return this.isNew && (this.suggestion as NewProjectSuggestion).fromWebsocket
     }
   }
 })

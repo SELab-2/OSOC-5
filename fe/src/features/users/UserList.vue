@@ -99,6 +99,7 @@
                 behavior="menu"
                 map-options
                 emit-value
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
               >
                 <template #option="scope">
                   <q-item
@@ -140,6 +141,7 @@
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 @click="coachStore.removeUser(props.row.id)"
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 glow-color="red-2"
               />
             </q-td>
@@ -158,6 +160,8 @@ import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import { User } from '../../models/User'
 import AddUser from "./AddUser.vue";
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
+import router from "../../router";
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
@@ -242,8 +246,8 @@ export default defineComponent({
     
     coachStore.loadUsers();
 
-
     return {
+      authenticationStore: useAuthenticationStore(),
       newUserDialog: ref(false),
       active: ref(true),
       filter: ref(''),
@@ -252,6 +256,11 @@ export default defineComponent({
       roles,
       coachStore,
       q
+    }
+  },
+  beforeMount() {
+    if (!this.authenticationStore.loggedInUser?.isAdmin) {
+      router.replace('/projects')
     }
   },
   methods: {

@@ -6,18 +6,18 @@ from rest_framework import viewsets, mixins, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import PermissionDenied
 from rest_framework.decorators import action
-from rest_framework.reverse import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_auth.registration.views import SocialLoginView
-from django.db.models import RestrictedError
+from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .pagination import StandardPagination
 from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
-from .serializers import StudentSerializer, CoachSerializer, ProjectSerializer, \
+from .serializers import Conflict, ConflictSerializer, ResolveConflictSerializer, \
+    StudentSerializer, CoachSerializer, ProjectSerializer, \
     ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
 from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
@@ -41,23 +41,33 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         * ?suggested_by_user=[true, false]
         * ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort students with the ?ordering=[first_name, last_name, email, status] query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/students/?search=Jan
         /api/students/?alum=true&status=0&skills=1&suggestion=yes&on_project=true&language=Dutch
         /api/students/?page_size=2
+        /api/students/?ordering=last_name
     """
-    queryset = Student.objects.all().order_by('id')
+    # filter final decision out of suggestions
+    queryset = Student.objects.prefetch_related(
+        Prefetch('suggestion_set',
+                 queryset=Suggestion.objects.filter(final=False),
+                 to_attr='filtered_suggestions')
+    ).order_by('id')
     pagination_class = StandardPagination
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, StudentOnProjectFilter,
-                       StudentSuggestedByUserFilter, StudentFinalDecisionFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
+                       StudentOnProjectFilter, StudentSuggestedByUserFilter,
+                       StudentFinalDecisionFilter,]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',
                         'student_coach', 'english_rating', 'status']
+    ordering_fields = ['first_name', 'last_name', 'email', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
     def make_suggestion(self, request, pk=None):
@@ -221,21 +231,24 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
         * ?is_admin=[true, false]
         * ?is_active=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort coaches with the ?ordering=[first_name, last_name, email, is_admin, is_active] query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/coaches/?is_admin=false&is_active=true
         /api/coaches/?search=Cattoire
         /api/coaches/?page_size=10
+        /api/coaches/?ordering=last_name
     """
     queryset = Coach.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = CoachSerializer
-    permission_classes = [
-        permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
+    ordering_fields = ['first_name', 'last_name', 'email', 'is_admin', 'is_active']
 
     # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
@@ -290,18 +303,22 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         * ?coaches=:id:,
         * ?suggested_students=:id:
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort projects with the ?ordering=[name, partner_name] query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/projects/?required_skills=1&coaches=2&suggested_students=1
+        /api/projects/?ordering=name,-partner_name
     """
     queryset = Project.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
+    ordering_fields = ['name', 'partner_name']
 
     def get_serializer_class(self):
         """
@@ -394,18 +411,54 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         """
         get a list of conflicting projects;
         two projects are conflicting if one student has been suggested/assigned to both of them
+        returns HTTP response:
+            200 OK: a list of conflicts was returned
         """
         students = Student.objects.all()
-        conflicts = {}
+        conflicts = []
+        # loop over students
         for student in students:
-            projects = ProjectSuggestion.objects.filter(student=student)
-            if projects.count() > 1:
-                student_url = request.build_absolute_uri(
-                    reverse("student-detail", args=(student.id,)))
-                project_urls = [request.build_absolute_uri(reverse("project-detail", args=(project_sug.project.id,)))
-                                for project_sug in projects]
-                conflicts[student_url] = set(project_urls)
-        return Response({"conflicts": conflicts}, status=status.HTTP_200_OK)
+            # get all projectsuggestions with current student
+            projectsuggestions = ProjectSuggestion.objects.filter(student=student)
+            # check if student is suggested/assigned to more than 1 project
+            if projectsuggestions.count() > 1:
+                # get projects out of projectsuggestions
+                projects = Project.objects.filter(
+                    id__in=projectsuggestions.values_list('project', flat=True))
+                # create Conflict object and add it to the list
+                conflicts.append(Conflict(student, projects))
+
+        serializer = ConflictSerializer(conflicts, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], serializer_class=ResolveConflictSerializer,
+            permission_classes=[permissions.IsAuthenticated, IsActive])
+    def resolve_conflicts(self, request): # pylint: disable=no-self-use
+        """
+        let a coach resolve conflicts
+        exptects a list of objects with a student, project, coach and skill,
+        this will remove all projectsuggestions that conflict with the given objects
+        returns HTTP response:
+            204 NO CONTENT: all conflicting projectsuggestions have been deleted
+            400 BAD REQUEST: there was required data missing or the students were not unique
+        """
+        serializer = ResolveConflictSerializer(
+            data=request.data, many=True, context={'request': request})
+        if serializer.is_valid():
+            # check if all students are unique
+            students = [ps['student'] for ps in serializer.validated_data]
+            if len(students) == len(set(students)):
+                # loop over projectsuggestions
+                for projectsuggestion in serializer.validated_data:
+                    # delete all projectsuggestions with the current student, except the one given
+                    ProjectSuggestion.objects\
+                        .filter(student=projectsuggestion['student'])\
+                        .exclude(**projectsuggestion)\
+                        .delete()
+
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail": "students must be unique"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
@@ -414,17 +467,21 @@ class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
 
     - Search skills with ?search=string query parameter.
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort skills with the ?ordering=name query parameter.
+        * Use ?ordering=-... to sort in descending order
 
     Example queries:
 
         /api/skills/?search=Back-end Developer
+        /api/skills/?ordering=name
     """
     queryset = Skill.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = SkillSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
+    ordering_fields = ['name']
 
     # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
@@ -450,19 +507,24 @@ class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancest
         * ?before=yyyy-mm-ddThh:mm:ss,
         * ?after=yyyy-mm-ddThh:mm:ss
     - Use a specific page size with ?page_size=[1-500] query parameter.
+    - Sort emails with the ?ordering=[time, sender, receiver] query parameter.
+        * Use ?ordering=-... to sort in descending order
+        * sender and receiver are sorted using id
 
     Example queries:
 
         /api/emails/?sender=1&after=2022-04-03
+        /api/emails/?ordering=time,-sender
     """
     queryset = SentEmail.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = SentEmailSerializer
     permission_classes = [permissions.IsAuthenticated, IsActive]
-    filter_backends = [filters.SearchFilter,
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter,
                        DjangoFilterBackend, EmailDateTimeFilter]
     search_fields = ['info']
     filterset_fields = ['sender', 'receiver']
+    ordering_fields = ['time', 'sender', 'receiver']
 
     # pylint: disable=arguments-differ
     def create(self, request):

@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 import { Student, TempStudent } from '../models/Student'
+import {
+  TempProjectSuggestion,
+  NewProjectSuggestion,
+} from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
   Skill,
@@ -27,6 +31,7 @@ interface State {
   projectLink: string
   filterCoaches: string
   selectedCoaches: Array<User>
+  projectFilter: string
 }
 
 export const useProjectStore = defineStore('project', {
@@ -38,6 +43,7 @@ export const useProjectStore = defineStore('project', {
     projectLink: '',
     filterCoaches: '',
     selectedCoaches: [],
+    projectFilter: '',
   }),
   actions: {
     async getConflictingProjects() {
@@ -58,17 +64,13 @@ export const useProjectStore = defineStore('project', {
       return conflicts
     },
     async fetchSuggestedStudents(
-      students: TempStudent[]
+      students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
       const newStudents: ProjectSuggestionInterface[] = []
       for (const student of students) {
         const newStudent = new ProjectSuggestion({
           student: (await instance.get(student.student)).data as Student,
-          coach: (
-            await instance.get(
-              (student.coach as unknown as { url: string }).url
-            )
-          ).data as User,
+          coach: await useCoachStore().getUser(student.coach),
           skill: (await instance.get(student.skill)).data as Skill,
           reason: student.reason,
         })
@@ -118,7 +120,7 @@ export const useProjectStore = defineStore('project', {
       if (data.coaches)
         data.coaches = await Promise.all(
           data.coaches.map(
-            async (url) => await coachStore.getUser(url as unknown as string)
+            async (url) => await coachStore.loadUser(url as unknown as string)
           )
         )
 
@@ -126,9 +128,7 @@ export const useProjectStore = defineStore('project', {
     },
     async getProject(project: TempProject) {
       const coaches: Array<User> = await Promise.all(
-        project.coaches.map((coach) =>
-          useCoachStore().getUser(coach as unknown as string)
-        )
+        project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
 
       const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -155,16 +155,16 @@ export const useProjectStore = defineStore('project', {
       this.isLoadingProjects = true
       try {
         const { results } = (
-          await instance.get<{ results: TempProject[] }>('projects/')
+          await instance.get<{ results: TempProject[] }>(
+            `projects/?search=${this.projectFilter}`
+          )
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) =>
-              useCoachStore().getUser((coach as unknown as { url: string }).url)
-            )
+            project.coaches.map((coach) => useCoachStore().getUser(coach))
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -221,15 +221,33 @@ export const useProjectStore = defineStore('project', {
         const skillStore = useSkillStore()
 
         const studentObj = await studentStore.getStudent(student)
-        const coachObj = await coachStore.getUser(coach.url)
+        const coachObj = await coachStore.getUser(coach)
         const skillObj = await skillStore.getSkill(skill)
+        project.suggestedStudents?.push(
+          new NewProjectSuggestion(
+            {
+              student: studentObj,
+              coach: coachObj,
+              skill: skillObj,
+              reason,
+            },
+            true
+          )
+        )
 
-        project.suggestedStudents?.push({
-          student: studentObj,
-          coach: coachObj,
-          skill: skillObj,
-          reason,
-        })
+        // Remove the "New" badge from the new suggestion after a short period.
+        setTimeout(
+          () =>
+            ((
+              project.suggestedStudents?.find(
+                (s) =>
+                  s.student.url === studentObj.url &&
+                  s.coach.url === coachObj.url &&
+                  s.skill.url === skillObj.url
+              ) as NewProjectSuggestion
+            ).fromWebsocket = false),
+          5000
+        )
       }
     },
     removeReceivedSuggestion({
@@ -248,9 +266,8 @@ export const useProjectStore = defineStore('project', {
         const suggestionIndex = project.suggestedStudents?.findIndex(
           (s) => s.student.url === student && s.skill.url === skill
         )
-
         if (
-          suggestionIndex &&
+          suggestionIndex !== undefined && // !== undefined must be written here, otherwise suggestionIndex === 0 will fail.
           suggestionIndex !== -1 &&
           project.suggestedStudents &&
           suggestionIndex < project.suggestedStudents.length &&
@@ -294,8 +311,16 @@ export const useProjectStore = defineStore('project', {
       instance
         .post('projects/', convertObjectKeysToSnakeCase(data))
         .then((response) => {
-          console.log(response)
           this.loadProjects()
+
+          // clear fields when project is made successfully
+          this.isLoadingProjects = false
+          this.projectName = ''
+          this.projectPartnerName = ''
+          this.projectLink = ''
+          this.filterCoaches = ''
+          this.selectedCoaches = []
+          useSkillStore().loadSkills()
 
           // this.projects.push({
           //   name: response['data']['name'],
@@ -314,5 +339,12 @@ export const useProjectStore = defineStore('project', {
         })
     },
     resolveConflict() {},
+    editProject(project: Project) {
+      this.projectName = project.name
+      this.projectPartnerName = project.partnerName
+      this.projectLink = project.extraInfo
+      this.selectedCoaches = []
+      // skills
+    },
   },
 })

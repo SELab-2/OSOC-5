@@ -1,7 +1,7 @@
 """
 common Django settings
 """
-import os
+from os import getenv, path
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -78,7 +78,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('osoc-redis', 6379)],
+            "hosts": [(getenv('REDIS_HOST', 'osoc-redis'), 6379)],
         },
     },
 }
@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Static files
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = path.join(BASE_DIR, 'static/')
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

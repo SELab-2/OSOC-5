@@ -10,7 +10,7 @@
       </q-card-section>
       <q-card-section class="q-pt-xs">
         <div class="text-h6 q-mt-sm q-mb-xs">
-          Are you sure you want to delete "{{ deleteRoleName }}"?
+          Are you sure you want to delete "{{ deleteSkillName }}"?
         </div>
         <div class="text text-grey">
           This skill will be deleted immediately from all projects. You can't
@@ -34,7 +34,7 @@
         flat
         color="red"
         label="Delete"
-        @click="deleteRoleConfirm(deleteRoleId ?? -1)"
+        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
         glow-color="red-2"
       />
     </q-card-actions>
@@ -47,11 +47,11 @@ import {useSkillStore} from "../../../../stores/useSkillStore";
 
 export default defineComponent ({
   props: {
-    deleteRoleId: {
+    deleteSkillId: {
       type: Number,
       required: true
     },
-    deleteRoleName: {
+    deleteSkillName: {
       type: String,
       required: true
     },
@@ -64,17 +64,25 @@ export default defineComponent ({
     }
   },
   methods: {
-    deleteRoleConfirm(id: number) {
+    deleteSkillConfirm(id: number) {
       if (id !== -1) {
-        this.skillStore.deleteSkill(id).then(() => {
-
-          // TODO: when skill cannot be deleted change the notification
-          this.$q.notify({
-            icon: 'done',
-            color: 'positive',
-            message: 'Successfully deleted!',
-          })
-        })
+        this.skillStore.deleteSkill(id, // callback
+          (success: boolean) => {
+            if (success) {
+              this.$q.notify({
+                icon: 'done',
+                color: 'positive',
+                message: 'Successfully deleted!',
+              })
+            } else {
+              this.$q.notify({
+                icon: "close",
+                color: "negative",
+                message: "Failed to delete, skill is in use!"
+              });
+            }
+          }
+        )
       }
     },
   }

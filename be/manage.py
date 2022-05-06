@@ -32,6 +32,7 @@ def main():
     if is_testing:
         cov.stop()
         cov.save()
+        cov.xml_report()
         cov.report()
 
 
