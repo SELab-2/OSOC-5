@@ -106,7 +106,6 @@
 import {defineComponent} from "@vue/runtime-core";
 import {ref} from 'vue'
 import {Student} from "../../models/Student";
-import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
