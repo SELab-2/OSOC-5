@@ -50,7 +50,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     suggestions and final_decision are read-only
     """
     suggestions = SuggestionSerializer(
-        many=True, source='suggestion_set', read_only=True)
+        many=True, source='filtered_suggestions', read_only=True)
     final_decision = SuggestionSerializer(read_only=True)
 
     class Meta:
@@ -185,6 +185,34 @@ class ProjectGetSerializer(ProjectSerializer):
     serializer class to show coach info in project list and project instance, but not in post, put, etc
     """
     coaches = CoachPartialSerializer(many=True)
+
+
+class Conflict(): # pylint: disable=too-few-public-methods
+    """
+    conflict class, only used to initialize ConflictSerializer
+    a conflict has a student which is assigned to more than 1 project
+    """
+    def __init__(self, student, projects):
+        self.student = student
+        self.projects = projects
+
+class ConflictSerializer(serializers.Serializer): # pylint: disable=abstract-method
+    """
+    serializer class for conflicts
+    """
+    student = serializers.HyperlinkedRelatedField(
+        view_name='student-detail', queryset=Student.objects.all())
+    projects = serializers.HyperlinkedRelatedField(
+        view_name='project-detail', queryset=Project.objects.all(), many=True)
+
+
+class ResolveConflictSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for resolving conflicts
+    """
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['project', 'student', 'coach', 'skill']
 
 
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):

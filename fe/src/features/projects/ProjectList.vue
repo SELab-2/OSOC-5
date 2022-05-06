@@ -22,7 +22,8 @@
         <q-space />
         <div>
           <q-input
-            v-model="filter"
+            v-model="projectStore.projectFilter"
+            debounce="300"
             dense
             outlined
             label="Search Projects"
@@ -71,6 +72,7 @@
     >
       <btn
         fab
+        v-if="authenticationStore.loggedInUser?.isAdmin"
         padding="10px"
         icon="add"
         color="yellow"
@@ -86,8 +88,8 @@ import { ref, defineComponent } from 'vue'
 import SideBar from '../../components/SideBar.vue'
 import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
-import {useStudentStore} from "../../stores/useStudentStore";
-
+import { useStudentStore } from "../../stores/useStudentStore";
+import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 
 
 export default defineComponent({
@@ -98,16 +100,15 @@ export default defineComponent({
     process.env.NODE_ENV == 'development'
       ? 'ws://localhost:8000/ws/socket_server/'
       : 'wss://sel2-5.ugent.be/ws/socket_server/'
-    console.log(baseURL)
     return {
       projectStore: useProjectStore(),
       studentStore: useStudentStore(),
+      authenticationStore: useAuthenticationStore(),
       socket: new WebSocket(baseURL)
     }
   },
   data() {
     return {
-      filter: ref(''),
       showShadow: ref(false),
       sideBarKey: 0,
     }
@@ -126,6 +127,13 @@ export default defineComponent({
             p.selectedRoles[r] = newValue
           }
         })
+      }
+    }
+  },
+  watch: {
+    'projectStore.projectFilter': {
+      handler() {
+        this.projectStore.loadProjects()
       }
     }
   },

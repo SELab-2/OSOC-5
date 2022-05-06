@@ -134,11 +134,17 @@ export default defineComponent({
 
     return {
       mailStore,
+      authenticationStore: useAuthenticationStore(),
       filter: ref(''),
       columnsMails,
       status,
       q,
       pagination,
+    }
+  },
+  beforeMount() {
+    if (!this.authenticationStore.loggedInUser?.isAdmin) {
+      router.replace('/projects')
     }
   },
   async mounted() {

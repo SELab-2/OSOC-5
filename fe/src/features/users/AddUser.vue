@@ -74,6 +74,7 @@
           @update:model-value="generate = false"
           :rules="[
                 (val) => (val && val.length > 0) || 'This field cannot be empty',
+                (val) => (val.length >= 8) || 'Passwords must be longer then 7 characters',
               ]"
         >
           <template v-slot:append>
@@ -96,7 +97,8 @@
   </q-card-section>
   <q-card-actions align="right">
     <btn flat label="Cancel" @click="onReset" color="yellow" v-close-popup />
-    <btn flat :label="'Create ' + role" @click="onSubmit" color="yellow" v-close-popup />
+    <btn flat v-model="password" :label="'Create ' + role" @click="onSubmit" color="yellow" v-close-popup
+    :disabled="password.length <= 8"/>
   </q-card-actions>
 </template>
 

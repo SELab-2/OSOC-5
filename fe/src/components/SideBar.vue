@@ -30,7 +30,7 @@
               color="green"
               bg-color="white"
               label="Search"
-              @update:modelValue="studentStore.loadStudents"
+              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
             >
               <template #append>
                 <q-icon name="search" />
@@ -46,7 +46,7 @@
                 { name: 'alumni', label: 'Alumni' },
                 { name: 'student coaches', label: 'Student Coaches'}
               ]"
-              @click="studentStore.loadStudents"
+              @click="async () => await loadStudents($refs.infiniteScroll)"
             />
 
             <label>Suggestion:</label>
@@ -59,7 +59,7 @@
                 { name: 'no', label: 'No' },
                 { name: 'none', label: 'None' },
               ]"
-              @click="studentStore.loadStudents"
+              @click="async () => await loadStudents($refs.infiniteScroll)"
             />
 
             <q-select
@@ -74,7 +74,7 @@
               :option-label="opt => opt.name"
               :option-value="opt => opt.id"
               label="Skills"
-              @update:model-value="studentStore.loadStudents"
+              @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
             >
               <template #selected>
                 <div
@@ -106,23 +106,32 @@
               label="Status"
               emit-value
               map-options
-              @update:model-value="studentStore.loadStudents"
+              @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
             />
 
             <div class="row q-gutter-x-md">
               <q-checkbox
                 v-model="studentStore.byMe"
+                toggle-indeterminate
+                false-value="maybe"
+                indeterminate-value="false"
+                toggle-order="tf"
                 color="primary"
                 label="Suggested by you"
                 right-label
-                @click="studentStore.loadStudents"
+                @click="async () => await loadStudents($refs.infiniteScroll)"
               />
               <q-checkbox
                 v-model="studentStore.onProject"
+                toggle-indeterminate
+                true-value="true"
+                false-value="maybe"
+                indeterminate-value="false"
+                toggle-order="tf"
                 color="primary"
                 label="On project"
                 right-label
-                @click="studentStore.loadStudents"
+                @click="async () => await loadStudents($refs.infiniteScroll)"
               />
             </div>
 
@@ -134,26 +143,45 @@
               :thumb-style="thumbStyle"
               style="flex: 1 1 auto"
             >
-              <q-list>
-                <q-item
+              <q-infinite-scroll
+                :key="scrollKey"
+                ref="infiniteScroll"
+                class="q-px-sm"
+                :offset="250"
+                @load="async (index, done) => await loadNextStudents(index, done)"
+              >
+                <StudentCard
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
+                  v-ripple
+                  class="q-ma-sm"
                   :draggable="draggable ?? false"
+                  :must-hover="mustHover"
+                  :student="student"
+                  :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
+                  @click="clickStudent(student)"
                   @dragstart="onDragStart($event, student)"
-                >
-                  <StudentCard
-                    v-ripple
-                    :must-hover="mustHover"
-                    :student="student"
-                    :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
-                    @click="clickStudent(student)"
-                  />
-                </q-item>
-              </q-list>
+                />
+                <template #loading>
+                  <div class="row justify-center q-my-md">
+                    <q-spinner-dots
+                      color="primary"
+                      size="40px"
+                    />
+                  </div>
+                </template>
+              </q-infinite-scroll>
             </q-scroll-area>
           </div>
         </div>
+
+        <q-inner-loading
+          :showing="studentStore.isLoading"
+          label="Please wait..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
       </div>
 
       <div
@@ -225,18 +253,19 @@ export default defineComponent({
         backgroundColor: 'black',
         width: '4px',
       },
-      status
+      status,
+      scrollKey: 0
     }
-  },
-  created() {
-    this.skillStore.loadSkills()
-    this.studentStore.loadStudents()
   },
   data() {
     return {
       miniState: ref(false),
       drawer: ref(true),
     }
+  },
+  async mounted() {
+    //this.skillStore.loadSkills()
+    await this.studentStore.loadStudents()
   },   
   methods: {
     // Saves the component id and user name in the dataTransfer.
@@ -254,6 +283,16 @@ export default defineComponent({
     clickStudent(student: Student) {
       this.selectStudent(student)
     },
+    async loadStudents(scroll: any) {
+      scroll.resume()
+      this.studentStore.students = []
+      await this.studentStore.loadStudents()
+      this.scrollKey += 1
+    },
+    async loadNextStudents(index: number, done: any) {
+      await this.studentStore.loadNext(index, done)
+      this.scrollKey += 1
+    }
   }
 })
 </script>
