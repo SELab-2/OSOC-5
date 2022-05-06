@@ -105,10 +105,12 @@
       />
       <q-dialog v-model="deleteDialog">
         <DeleteStudentDialog
-          :name="student.fullName" 
+          :name="student?.fullName ?? ''"
           :delete="async () => {
-            await studentStore.deleteStudent(student.url)
-            await router.push(`/students`)
+            if (student) {
+              await studentStore.deleteStudent(student.url)
+              await router.push(`/students`)
+            }
           }" 
         />
       </q-dialog>
