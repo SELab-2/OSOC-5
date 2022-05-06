@@ -118,6 +118,7 @@ import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
 import columnsMails from "../../models/MailStudentColumns";
 import { useAuthenticationStore } from "../../stores/useAuthenticationStore";
+import router from "../../router";
 
 export default defineComponent({
   components: {MailsOverview},
