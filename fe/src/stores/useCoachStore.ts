@@ -48,11 +48,20 @@ export const useCoachStore = defineStore('user/coach', {
     async loadUsersCoaches(pagination: any, setNumberOfRows: any) {
       this.isLoadingUsers = true
 
+      console.log(pagination)
       const filters = []
       if (this.filter) filters.push(`search=${this.filter}`)
       if (this.filterRole === 'inactive') filters.push('is_active=false')
       if (this.filterRole === 'admin') filters.push('is_active=true&is_admin=true')
       if (this.filterRole === 'coach') filters.push('is_active=true&is_admin=false')
+      if (pagination.sortBy === 'name') {
+        filters.push('ordering=first_name,last_name')
+      } else if (pagination.sortBy === 'role') {
+        filters.push('ordering=is_admin,is_active')
+      } else if (pagination.sortBy !== null) {
+        filters.push(`ordering=${pagination.sortBy}`)
+      }
+
 
       let url = ''
       if (filters) url = `&${filters.join('&')}`

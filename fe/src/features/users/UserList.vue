@@ -248,7 +248,7 @@ export default defineComponent({
     const q = useQuasar()
 
     const pagination = ref({
-      sortBy: 'desc',
+      sortBy: 'name',
       descending: false,
       page: 1,
       rowsPerPage: 10,
@@ -275,7 +275,7 @@ export default defineComponent({
   },
   async mounted() {
     await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
-  }
+  },
   methods: {
     async onRequest(props: any) {
       this.pagination = props.pagination

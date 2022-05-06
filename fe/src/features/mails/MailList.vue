@@ -117,6 +117,7 @@ import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
 import columnsMails from "../../models/MailStudentColumns";
+import { useAuthenticationStore } from "../../stores/useAuthenticationStore";
 
 export default defineComponent({
   components: {MailsOverview},
@@ -125,7 +126,7 @@ export default defineComponent({
     const q = useQuasar()
 
     const pagination = ref({
-        sortBy: 'desc',
+        sortBy: 'name',
         descending: false,
         page: 1,
         rowsPerPage: 10,
