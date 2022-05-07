@@ -7,7 +7,7 @@ from osoc.common.models import Coach
 
 
 @receiver(pre_save, sender=Coach)
-def set_new_user_inactive(sender, instance, **kwargs):
+def set_new_user_inactive(sender, instance, **kwargs): # pylint: disable=unused-argument
     """
     when creating a new coach set the is_active field to False by default
     """

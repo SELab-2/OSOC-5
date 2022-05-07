@@ -9,8 +9,6 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from allauth.account.utils import complete_signup
-from allauth.account import app_settings as allauth_settings
 from rest_auth.registration.views import RegisterView, SocialLoginView
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
@@ -534,18 +532,8 @@ class CustomRegisterView(RegisterView):
 
     def get_response_data(self, user):
 
-        if allauth_settings.EMAIL_VERIFICATION != \
-                allauth_settings.EmailVerificationMethod.NONE:
-            return {'detail': ('Verification e-mail sent.')}
         return {'detail' : ('User has been created.')}
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
-        if allauth_settings.EMAIL_VERIFICATION != \
-                allauth_settings.EmailVerificationMethod.NONE:
-            complete_signup(
-                self.request._request, user,
-                allauth_settings.EMAIL_VERIFICATION,
-                None,
-            )
         return user
