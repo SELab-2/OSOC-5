@@ -17,6 +17,8 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = ['sel2-5.ugent.be']
 
+SESSION_COOKIE_DOMAIN = 'sel2-5.ugent.be/api'
+
 # Database
 DATABASES = {
     'default': {
