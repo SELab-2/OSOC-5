@@ -85,6 +85,7 @@ export const useStudentStore = defineStore('user/student', {
       student.gender = parseInt(student.gender)
       student.language = parseInt(student.language)
       student.englishRating = parseInt(student.englishRating)
+      student.status = parseInt(student.status)
     },
     async loadStudents() {
       this.isLoading = true

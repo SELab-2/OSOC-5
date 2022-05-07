@@ -26,11 +26,24 @@
           </template>
         </q-input>
       </div>
+      <div class="q-pl-md full-width">
+        <q-select
+          v-model="statusFilter"
+          rounded
+          outlined
+          dense
+          multiple
+          clearable
+          use-chips
+          label="Status"
+          :options="status"
+        />
+      </div>
       <q-table
         v-model:selected="mailStore.selectedStudents"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
-        :columns="columns"
+        :columns="mailsColumns"
         :loading="mailStore.isLoading"
         row-key="url"
         selection="multiple"
@@ -111,47 +124,13 @@
 import {defineComponent} from "@vue/runtime-core";
 import {ref} from 'vue'
 import {Student} from "../../models/Student";
-import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
 import router from "../../router";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
-
-const columns = [
-  {
-    name: 'visibility',
-    required: false,
-    label: '',
-    align: 'left' as const,
-    field: '',
-    sortable: false,
-  },
-  {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left' as const,
-    field: 'name',
-    sortable: true,
-  },
-  {
-    name: 'status',
-    required: true,
-    label: 'Status',
-    align: 'left' as const,
-    field: 'status',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    align: 'right' as const,
-    label: 'Email',
-    field: 'email',
-    sortable: true,
-  }
-]
+import mailsColumns from "../../models/MailsColumns";
 
 export default defineComponent({
   components: {MailsOverview},
@@ -163,7 +142,8 @@ export default defineComponent({
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
-      columns,
+      statusFilter: ref([]),
+      mailsColumns,
       status,
       q
     }

@@ -39,7 +39,7 @@ export interface StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
-  status: string
+  status: number
 }
 
 export class Student implements StudentInterface {
@@ -72,7 +72,7 @@ export class Student implements StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
-  status: string
+  status: number
 
   constructor(obj: StudentInterface)
   constructor(
@@ -105,7 +105,7 @@ export class Student implements StudentInterface {
     hinderWork: string,
     pronouns: string,
     studentCoach: boolean,
-    status: string)
+    status: number)
 
   constructor(...args: any[]) {
     if (args.length == 1) {
