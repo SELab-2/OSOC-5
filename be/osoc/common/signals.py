@@ -11,5 +11,8 @@ def set_new_user_inactive(sender, instance, **kwargs): # pylint: disable=unused-
     """
     when creating a new coach set the is_active field to False by default
     """
-    if instance._state.adding is True and not instance.is_admin:  # pylint: disable=protected-access
+    # set is_active to false only of the coach is not an admin, staff or superuser
+    if instance._state.adding and \
+        not (instance.is_admin or instance.is_staff or instance.is_superuser):  # pylint: disable=protected-access
+
         instance.is_active = False
