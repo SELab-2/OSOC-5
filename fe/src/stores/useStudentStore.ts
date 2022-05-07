@@ -3,6 +3,7 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
+import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 
 interface State {
   search: string
@@ -36,7 +37,7 @@ export const useStudentStore = defineStore('user/student', {
     isLoading: false,
     possibleSuggestion: -1,
     currentStudent: null,
-    nextPage: ''
+    nextPage: '',
   }),
   actions: {
     async getStudent(url: string): Promise<Student> {
@@ -95,7 +96,8 @@ export const useStudentStore = defineStore('user/student', {
       if (this.alumni === 'student coaches') filters.push('student_coach=true')
       if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
       if (this.byMe !== 'maybe') filters.push(`suggested_by_user=${this.byMe}`)
-      if (this.onProject !== 'maybe') filters.push(`on_project=${this.onProject}`)
+      if (this.onProject !== 'maybe')
+        filters.push(`on_project=${this.onProject}`)
       if (this.status) filters.push(`status=${this.status}`)
 
       for (const skill of this.skills) {
@@ -108,7 +110,7 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       await instance
-        .get<{results: Student[], next: string}>(`students/?page=1${url}`)
+        .get<{ results: Student[]; next: string }>(`students/?page=1${url}`)
         .then(async ({ data }) => {
           this.nextPage = data.next
 
@@ -132,17 +134,17 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       if (this.nextPage !== '') {
-        await instance
-            .get(this.nextPage)
-            .then(async ({data}) => {
-              this.nextPage = data.next
+        await instance.get(this.nextPage).then(async ({ data }) => {
+          this.nextPage = data.next
 
-              for (const student of data.results) {
-                await this.transformStudent(student)
-              }
+          for (const student of data.results) {
+            await this.transformStudent(student)
+          }
 
-              this.students.push(...data.results.map((student: Student) => new Student(student)))
-            })
+          this.students.push(
+            ...data.results.map((student: Student) => new Student(student))
+          )
+        })
       }
       done()
       this.isLoading = false
@@ -203,12 +205,18 @@ export const useStudentStore = defineStore('user/student', {
       reason,
     }: {
       student_id: number
-      coach: { id: number; firstName: string; lastName: string; url: string }
+      coach: { id: number; first_name: string; last_name: string; url: string }
       suggestion: string
       reason: string
     }) {
       this.isLoading = true
 
+      const convertedCoach = convertObjectKeysToCamelCase(coach) as {
+        id: number
+        firstName: string
+        lastName: string
+        url: string
+      }
       const studentId = Number(student_id)
       const coachId = coach.id
       const suggestionParsed = Number.parseInt(suggestion)
@@ -217,17 +225,15 @@ export const useStudentStore = defineStore('user/student', {
 
       // We found the corresponding student
       if (student) {
-        let ctr = 0
-        while (
-          ctr < student.suggestions.length &&
-          student.suggestions[ctr].coach.id !== coachId
+        const suggestionIndex = student.suggestions.findIndex(
+          ({ coach }) => coach.id === coachId
         )
-          ctr++
 
-        if (ctr < student.suggestions.length) {
+        if (suggestionIndex !== -1) {
           // Update suggestion
-          student.suggestions[ctr].suggestion = suggestionParsed
-          student.suggestions[ctr].reason = reason
+          student.suggestions[suggestionIndex].coach = convertedCoach
+          student.suggestions[suggestionIndex].suggestion = suggestionParsed
+          student.suggestions[suggestionIndex].reason = reason
         } else {
           // New suggestion
 
@@ -235,7 +241,7 @@ export const useStudentStore = defineStore('user/student', {
             student: studentId,
             suggestion: suggestionParsed,
             reason,
-            coach,
+            coach: convertedCoach,
           })
         }
 
@@ -245,16 +251,16 @@ export const useStudentStore = defineStore('user/student', {
       this.isLoading = false
     },
     removeSuggestion({
-      student,
-      coach,
+      student_id,
+      coach_id,
     }: {
-      student: string
-      coach: { id: number }
+      student_id: string
+      coach_id: number
     }) {
       this.isLoading = true
 
-      const studentId = Number.parseInt(student)
-      const coachId = coach.id
+      const studentId = Number.parseInt(student_id)
+      const coachId = coach_id
 
       const matchingStudent = this.students.filter(
         ({ id }) => id === studentId
