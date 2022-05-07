@@ -675,6 +675,7 @@ class ProjectTestsCoach(APITestCase):
         """
         test GET /projects/get_conflicting_projects
         """
+        # create conflict
         student = Student.objects.first()
         for project in Project.objects.all():
             url = reverse("project-suggest-student", args=(project.id,))
@@ -689,6 +690,77 @@ class ProjectTestsCoach(APITestCase):
         response = self.client.get(url, format="json")
 
         self.assertEqual(len(response.data), 1)
+
+    def test_project_resolve_conflicts(self):
+        """
+        test POST /projects/resolve_conflicts
+        """
+        # create conflict
+        student = Student.objects.first()
+        for project in Project.objects.all():
+            url = reverse("project-suggest-student", args=(project.id,))
+            skill = project.required_skills.first()
+            data = {
+                "student": reverse("student-detail", args=(student.id,)),
+                "skill": reverse("skill-detail", args=(skill.id,))
+            }
+            self.client.post(url, data, format="json")
+
+        # resolve conflict
+        url = reverse("project-resolve-conflicts")
+        project = Project.objects.first()
+        skill = project.required_skills.first()
+        data = [{
+            "project": reverse("project-detail", args=(project.id,)),
+            "student": reverse("student-detail", args=(student.id,)),
+            "skill": reverse("skill-detail", args=(skill.id,)),
+            "coach": reverse("coach-detail", args=(self.user.id,))
+        }]
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # check there are no conflicts
+        url = reverse("project-get-conflicting-projects")
+        response = self.client.get(url)
+
+        self.assertEqual(len(response.data), 0)
+
+    def test_project_resolve_conflicts_students_not_unique(self):
+        """
+        test POST /projects/resolve_conflicts with same students
+        """
+        url = reverse("project-resolve-conflicts")
+        student = Student.objects.first()
+        project = Project.objects.first()
+        skill = project.required_skills.first()
+        data = [{
+            "project": reverse("project-detail", args=(project.id,)),
+            "student": reverse("student-detail", args=(student.id,)),
+            "skill": reverse("skill-detail", args=(skill.id,)),
+            "coach": reverse("coach-detail", args=(self.user.id,))
+        },
+        {
+            "project": reverse("project-detail", args=(project.id,)),
+            "student": reverse("student-detail", args=(student.id,)),
+            "skill": reverse("skill-detail", args=(skill.id,)),
+            "coach": reverse("coach-detail", args=(self.user.id,))
+        }]
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_project_resolve_conflicts_bad_request(self):
+        """
+        test POST /projects/resolve_conflicts with same students
+        """
+        url = reverse("project-resolve-conflicts")
+        data = [{
+            "project": "not an url"
+        }]
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectTestsAdmin(APITestCase):
