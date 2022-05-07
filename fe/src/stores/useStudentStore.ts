@@ -207,6 +207,8 @@ export const useStudentStore = defineStore('user/student', {
       suggestion: string
       reason: string
     }) {
+      this.isLoading = true
+
       const studentId = Number(student_id)
       const coachId = coach.id
       const suggestionParsed = Number.parseInt(suggestion)
@@ -239,6 +241,8 @@ export const useStudentStore = defineStore('user/student', {
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
       }
+
+      this.isLoading = false
     },
     removeSuggestion({
       student,
@@ -247,6 +251,8 @@ export const useStudentStore = defineStore('user/student', {
       student: string
       coach: { id: number }
     }) {
+      this.isLoading = true
+
       const studentId = Number.parseInt(student)
       const coachId = coach.id
 
@@ -266,6 +272,8 @@ export const useStudentStore = defineStore('user/student', {
         if (this.currentStudent?.id === studentId)
           this.currentStudent = matchingStudent
       }
+
+      this.isLoading = false
     },
     receiveFinalDecision({
       student_id,
@@ -279,6 +287,8 @@ export const useStudentStore = defineStore('user/student', {
       coach: { id: number; firstName: string; lastName: string; url: string }
       reason: string
     }) {
+      this.isLoading = true
+
       const studentId = Number.parseInt(student_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
@@ -295,8 +305,12 @@ export const useStudentStore = defineStore('user/student', {
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
       }
+
+      this.isLoading = false
     },
     removeFinalDecision({ student_id }: { student_id: string }) {
+      this.isLoading = true
+
       const studentId = Number.parseInt(student_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
@@ -307,6 +321,8 @@ export const useStudentStore = defineStore('user/student', {
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
       }
+
+      this.isLoading = false
     },
   },
 })
