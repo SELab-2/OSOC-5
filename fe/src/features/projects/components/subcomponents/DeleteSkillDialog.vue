@@ -13,8 +13,8 @@
           Are you sure you want to delete "{{ deleteSkillName }}"?
         </div>
         <div class="text text-grey">
-          This skill will be deleted immediately from all projects. You can't
-          undo this action.
+          This skill will be deleted immediately from all projects.
+          You cannot undo this action.
         </div>
       </q-card-section>
     </q-card-section>
@@ -34,8 +34,8 @@
         flat
         color="red"
         label="Delete"
-        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
         glow-color="red-2"
+        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
       />
     </q-card-actions>
   </q-card>

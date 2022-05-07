@@ -37,7 +37,7 @@ export const useCoachStore = defineStore('user/coach', {
     },
     async loadUsers() {
       this.isLoadingUsers = true
-      const { results } = (await instance.get<{results: UserInterface[]}>('coaches')).data
+      const { results } = (await instance.get<{results: UserInterface[]}>('coaches/?page_size=500')).data
       this.users = results.map((user) => new User(user))
       this.isLoadingUsers = false
     },
