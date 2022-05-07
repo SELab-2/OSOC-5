@@ -14,4 +14,3 @@ django-cors-headers
 django-filter
 channels
 channels_redis
-djangorestframework_jwt

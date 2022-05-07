@@ -531,7 +531,6 @@ class CustomRegisterView(RegisterView):
     permission_classes = [permissions.IsAuthenticated, IsActive, IsAdmin]
 
     def get_response_data(self, user):
-
         return {'detail' : ('User has been created.')}
 
     def perform_create(self, serializer):

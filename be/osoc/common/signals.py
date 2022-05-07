@@ -13,4 +13,3 @@ def set_new_user_inactive(sender, instance, **kwargs): # pylint: disable=unused-
     """
     if instance._state.adding is True and not instance.is_admin:  # pylint: disable=protected-access
         instance.is_active = False
-        
