@@ -1177,3 +1177,84 @@ class RegisterTests(APITestCase):
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class LoginTests(APITestCase):
+    """
+    test class for testing login functionality
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        admin = AdminFactory()
+        self.client.force_authenticate(admin)
+        # create user with register endpoint so that the password is hashed and can be used to log in
+        self.user_data = {
+            "email": "test.user@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "password*&^%"
+        }
+        url = reverse("register")
+        self.client.post(url, self.user_data, format="json")
+        # set coach active to be able to log in
+        coach = Coach.objects.get(email=self.user_data["email"])
+        coach.is_active = True
+        coach.save()
+    
+    def test_login(self):
+        """
+        test POST /api-auth/login/
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": self.user_data["email"],
+            "password": self.user_data["password1"]
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_login_user_doenst_exist(self):
+        """
+        test POST /api-auth/login/ with a non-existing user
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": "non_existing_email",
+            "password": "password"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_wrong_password(self):
+        """
+        test POST /api-auth/login/ with a wrong password
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": self.user_data["email"],
+            "password": "wrong_password"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_bad_request(self):
+        """
+        test POST /api-auth/login/ with data missing
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": self.user_data["email"],
+            "password": ""
+        }
+        response = self.client.post(url, data, format="json")
+
+        print(response.content)
+        self.assertTrue(False)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
