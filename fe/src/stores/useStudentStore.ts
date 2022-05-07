@@ -159,6 +159,8 @@ export const useStudentStore = defineStore('user/student', {
       this.isLoading = false
     },
     async updateSuggestion(studentId: number, reason: string) {
+      this.isLoading = true
+
       // check if -1 is selected to delete suggestion
       if (this.possibleSuggestion == -1) {
         await instance.delete(`students/${studentId}/remove_suggestion/`)
@@ -170,6 +172,8 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       await this.loadStudent(studentId)
+
+      this.isLoading = false
     },
     async updateFinalDecision(
       studentId: number,
