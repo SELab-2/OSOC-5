@@ -173,16 +173,10 @@ export const useStudentStore = defineStore('user/student', {
     },
     async updateFinalDecision(
       studentId: number,
-      possibleFinalDecision: string
+      possibleFinalDecision: string,
+      reason: string
     ) {
-      let reason = ''
-
-      if (
-        this.currentStudent?.finalDecision?.suggestion.toString() ==
-        possibleFinalDecision
-      ) {
-        reason = this.currentStudent.finalDecision.reason
-      }
+      this.isLoading = true
 
       // check if -1 is selected to delete decision
       if (possibleFinalDecision == '-1') {
@@ -195,6 +189,8 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       await this.loadStudent(studentId)
+
+      this.isLoading = false
     },
     async receiveSuggestion({
       student_id,

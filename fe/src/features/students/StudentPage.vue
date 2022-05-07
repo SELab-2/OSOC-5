@@ -43,8 +43,17 @@
         class="cornered"
         outline
         label="Confirm"
-        @click="finalDecision"
+        @click="decisionDialog = true"
       />
+
+      <q-dialog v-model="decisionDialog">
+        <DecisionCard
+          :name="name"
+          :suggestion-name="suggestionName(this.possibleFinalDecision)"
+          :suggestion-color="suggestionColor(this.possibleFinalDecision)"
+          :make-suggestion="(reason) => finalDecision(reason)"
+        />
+      </q-dialog>
     </div>
   </div>
   <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
@@ -93,50 +102,12 @@
     />
 
     <q-dialog v-model="suggestionDialog">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">
-            Suggest
-            <btn
-              :label="suggestionName"
-              dense
-              rounded
-              class="text-h6"
-              :class="suggestionColor"
-            />
-            for {{ name }}
-          </div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          Why are you making this decision? (optional)
-          <q-input
-            v-model="reason"
-            filled
-            type="textarea"
-          />
-        </q-card-section>
-
-        <q-card-actions
-          align="right"
-          class="text-primary"
-        >
-          <btn
-            v-close-popup
-            flat
-            color="grey"
-            label="Cancel"
-            glow-color="grey-4"
-          />
-          <btn
-            v-close-popup
-            flat
-            label="Suggest"
-            glow-color="teal-1"
-            @click="makeSuggestion"
-          />
-        </q-card-actions>
-      </q-card>
+      <DecisionCard
+        :name="name"
+        :suggestion-name="suggestionName(this.possibleSuggestion)"
+        :suggestion-color="suggestionColor(this.possibleSuggestion)"
+        :make-suggestion="makeSuggestion"
+      />
     </q-dialog>
   </div>
 
@@ -210,9 +181,11 @@ import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
+import DecisionCard from "./components/DecisionCard.vue";
 
 export default defineComponent ({
   components: {
+    DecisionCard,
     InfoDiv,
     LanguageCard,
     ExtraInfoCard,
@@ -247,13 +220,13 @@ export default defineComponent ({
   },
   data() {
     const suggestionDialog = ref(false)
-    const reason = ref("")
- 
+    const decisionDialog = ref(false)
+
     return {
       sideBarKey: 0,
       studentKey: 0,
       suggestionDialog,
-      reason
+      decisionDialog
     }
   },
   computed: {
@@ -334,30 +307,6 @@ export default defineComponent ({
           return "grey"
       }
     },
-    suggestionName(): string {
-      switch (this.possibleSuggestion) {
-        case "0":
-          return "yes"
-        case "1":
-          return "no"
-        case "2":
-          return "maybe"
-        default:
-          return "not decided"
-      }
-    },
-    suggestionColor(): string {
-      switch (this.possibleSuggestion) {
-        case "0":
-          return "bg-green"
-        case "1":
-          return "bg-red"
-        case "2":
-          return "bg-yellow"
-        default:
-          return "bg-grey"
-      }
-    }
   },
   mounted() {
       this.socket.onmessage = async (event: { data: string }) => {
@@ -395,10 +344,33 @@ export default defineComponent ({
     }, {immediate: true})
   },
   methods: {
-    makeSuggestion: async function () {
+    suggestionName(suggestion: string): string {
+      switch (suggestion) {
+        case "0":
+          return "yes"
+        case "1":
+          return "no"
+        case "2":
+          return "maybe"
+        default:
+          return "not decided"
+      }
+    },
+    suggestionColor(suggestion: string): string {
+      switch (suggestion) {
+        case "0":
+          return "bg-green"
+        case "1":
+          return "bg-red"
+        case "2":
+          return "bg-yellow"
+        default:
+          return "bg-grey"
+      }
+    },
+    makeSuggestion: async function (reason: string) {
       if (this.student) {
-        await this.studentStore.updateSuggestion(this.student.id, this.reason)
-        this.reason = ""
+        await this.studentStore.updateSuggestion(this.student.id, reason)
       }
 
       this.update()
@@ -410,9 +382,9 @@ export default defineComponent ({
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
     },
-    finalDecision: async function () {
+    finalDecision: async function (reason: string) {
       if (this.student) {
-        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
+        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision, reason)
       }
 
       this.update()
