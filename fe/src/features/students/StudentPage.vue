@@ -96,22 +96,18 @@
       />
       <q-space />
       <q-btn
+        v-if="authenticationStore.loggedInUser.isAdmin"
         class="cornered"
         outline
         color="red"
         icon-right="delete"
         label="Delete"
-        @click="showDeleteDialog"
+        @click="deleteDialog = true"
       />
       <q-dialog v-model="deleteDialog">
         <DeleteStudentDialog
           :name="student?.fullName ?? ''"
-          :delete="async () => {
-            if (student) {
-              await studentStore.deleteStudent(student.url)
-              await router.push(`/students`)
-            }
-          }" 
+          :delete="deleteStudent"
         />
       </q-dialog>
     </div>
@@ -456,8 +452,21 @@ export default defineComponent ({
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
     },
-    showDeleteDialog: function () {
-      this.deleteDialog = true
+    deleteStudent: async function () {
+      if (this.student) {
+        await this.studentStore.deleteStudent(this.student.url,
+          () => this.$q.notify({
+            icon: 'done',
+            color: 'positive',
+            message: 'Successfully deleted!',
+          }),
+          () => this.$q.notify({
+            icon: "close",
+            color: "negative",
+            message: "Failed to delete!"
+          }))
+        await router.push(`/students`)
+      }
     },
     finalDecision: async function () {
       if (this.student) {
