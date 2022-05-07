@@ -96,7 +96,7 @@
       />
       <q-space />
       <q-btn
-        v-if="authenticationStore.loggedInUser.isAdmin"
+        v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
         class="cornered"
         outline
         color="red"
