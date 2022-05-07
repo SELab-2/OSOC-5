@@ -1254,7 +1254,4 @@ class LoginTests(APITestCase):
         }
         response = self.client.post(url, data, format="json")
 
-        print(response.content)
-        self.assertTrue(False)
-
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
