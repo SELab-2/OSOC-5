@@ -50,7 +50,7 @@ urlpatterns = [
         'api/auth/register/account-confirm-email/<str:key>/',
         ConfirmEmailView.as_view(),
     ), # Needs to be defined before the registration path
-    path('api/auth/register/', views.CustomRegisterView.as_view()),
+    path('api/auth/register/', views.CustomRegisterView.as_view(), name='register'),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path(

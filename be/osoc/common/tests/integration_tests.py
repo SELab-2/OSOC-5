@@ -1045,3 +1045,63 @@ class SentEmailTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(email.info, data["info"])
+
+
+class RegisterTests(APITestCase):
+    """
+    test class for testing register functionality
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        self.admin = AdminFactory()
+        self.client.force_authenticate(self.admin)
+
+    def test_register(self):
+        """
+        test POST /auth/register
+        """
+        url = reverse("register")
+        data = {
+            "email": "test.user@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "password*&^%"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_register_passwords_dont_match(self):
+        """
+        test POST /auth/register with two different passwords
+        """
+        url = reverse("register")
+        data = {
+            "email": "test.user@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "wrong"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_register_email_exists(self):
+        """
+        test POST /auth/register with an existing email
+        """
+        url = reverse("register")
+        data = {
+            "email": self.admin.email,
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "password*&^%"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
