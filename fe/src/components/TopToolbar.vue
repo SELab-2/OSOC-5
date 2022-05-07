@@ -1,11 +1,11 @@
 <template>
   <q-header class="bg-white text-white" height-hint="98">
     <q-toolbar class="text-osoc-blue bg-white shadow-2">
-      <q-btn flat round>
+      <btn flat round href="https://www.osoc.be">
         <q-avatar size="42px">
           <img src="../assets/logo.svg">
         </q-avatar>
-      </q-btn>
+      </btn>
 
       <q-space/>
       <q-tabs
