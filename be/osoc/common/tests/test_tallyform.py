@@ -10,6 +10,7 @@ from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
 from osoc.common.tests import SkillFactory
 from osoc.common.tally.tally import TallyForm
+from osoc.common.models import Student
 
 
 class TallyFormTestCases(TestCase):
@@ -153,6 +154,9 @@ class TallyRegistrationTests(APITestCase):
         response = self.client.post(url, self.data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        student = Student.objects.get(email="henri@mail.com")
+        self.assertIsNotNone(student)
+        self.assertEqual(student.first_name, "Henri")
 
     def test_tally_registration_bad_request(self):
         """
