@@ -26,12 +26,14 @@
           </template>
         </q-input>
       </div>
-
       <q-table
+        v-model:selected="mailStore.selectedStudents"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
         :columns="columns"
-        row-key="id"
+        :loading="mailStore.isLoading"
+        row-key="url"
+        selection="multiple"
         separator="horizontal"
       >
         <template #body="props">
@@ -39,10 +41,14 @@
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
             :props="props"
           >
+            <q-td>
+              <q-checkbox v-model="props.selected" />
+            </q-td>
             <q-td auto-width>
               <q-icon
                 @click="() => clickRow(props, props.row)"
-                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              />
             </q-td>
             <q-td
               key="name"
@@ -81,7 +87,6 @@
                   </q-item>
                 </template>
               </q-select>
-              
             </q-td>
             <q-td
               key="email"
@@ -89,7 +94,7 @@
             >
               <a :href="'mailto:' + props.row.email" style="color: black">{{ props.row.email }}</a>
             </q-td>
-            
+
           </q-tr>
           <q-tr no-hover v-if="props.expand" :props="props">
             <q-td colspan="100%">

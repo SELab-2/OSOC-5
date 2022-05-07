@@ -11,6 +11,7 @@ interface State {
     searchMails: string
     mailStudents: Array<Student>
     mails: Map<number, Mail[]>
+    selectedStudents: Array<Student>
 }
 
 export const useMailStore = defineStore('user/mail', {
@@ -19,6 +20,7 @@ export const useMailStore = defineStore('user/mail', {
         searchMails: '',
         mailStudents: [],
         mails: new Map(),
+        selectedStudents: []
     }),
     actions: {
         async loadStudentsMails() {
