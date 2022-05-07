@@ -12,6 +12,10 @@
         <div class="text-h6 q-mt-sm q-mb-xs">
           Are you sure you want to delete "{{ name }}"?
         </div>
+        <div class="text text-grey">
+          This student will be permanently deleted. 
+          You cannot undo this action.
+        </div>
       </q-card-section>
     </q-card-section>
 
