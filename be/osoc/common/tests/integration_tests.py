@@ -1203,7 +1203,7 @@ class LoginTests(APITestCase):
         coach = Coach.objects.get(email=self.user_data["email"])
         coach.is_active = True
         coach.save()
-    
+
     def test_login(self):
         """
         test POST /api-auth/login/
