@@ -20,31 +20,42 @@
           Projects
         </div>
         <q-space />
-        <div>
+        
+          <!-- Do not remove the label attribute, otherwise the label slot does not work -->
           <q-input
             v-model="projectStore.projectFilter"
             debounce="300"
             dense
             outlined
-            label="Search Projects"
-            style="margin-right: 10px"
-          />
-        </div>
+            color="teal"
+            label=""
+            style="margin-top: 5px"
+            class="text-bold"
+            hide-bottom-space
+          >
+          <template v-slot:label>
+            <span class="text-weight-medium text-teal-3">Search Projects</span>
+          </template>
+          <template v-slot:append>
+            <q-icon name="search" color="teal-3" />
+          </template>
+          </q-input>
+        <q-space />
         <btn
           padding="7px"
           :icon="expanded ? 'unfold_less' : 'unfold_more'"
-          color="blue"
-          shadow-color="blue"
+          color="teal"
+          shadow-color="teal"
           shadow-strength="1.8"
           @click="expanded = !expanded"
         />
         <btn
           padding="7px"
           icon="r_warning"
-          color="red"
+          color="red-7"
           to="/projects/conflicts"
           shadow-color="red"
-          shadow-strength="2.5"
+          shadow-strength="2"
           no-wrap
         >
         <div class="ellipsis">Conflicts</div>
@@ -53,7 +64,7 @@
 
       <masonry-wall
         ref="scrol"
-        style="scroll-padding-top: 100px; overflow: auto; height: 92%"
+        style="overflow: auto; height: 92%"
         :items="projectStore.projects"
         :ssr-columns="1"
         :column-width="320"

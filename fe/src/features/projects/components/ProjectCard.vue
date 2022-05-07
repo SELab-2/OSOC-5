@@ -19,36 +19,37 @@
         />
         <q-space />
         <div>
-<!--          <btn-->
-<!--            v-if="anyNew.length > 0"-->
-<!--            icon="r_warning"-->
-<!--            color="yellow"-->
-<!--            flat-->
-<!--            round-->
-<!--            size="12px"-->
-<!--            glow-color="amber-3"-->
-<!--            @click="expand(anyNew)"-->
-<!--            >-->
-<!--            <q-tooltip class="shadow-4 bg-amber-7">-->
-<!--            <div class="text-subtitle2">-->
-<!--              There are still draft suggestions open.-->
-<!--            </div>-->
-<!--          </q-tooltip>-->
-<!--          </btn>-->
-          <btn flat round size="12px" color="primary" icon="mail" />
-          <btn flat round size="12px" color="primary" icon="info" @click="showInfo = !showInfo"/>
-          <btn flat round size="12px" color="primary" icon="edit" :to="`/projects/${project.id}`"/>
+          <btn
+            flat
+            round
+            size="12px"
+            color="teal"
+            icon="edit"
+            glow-color="teal-3"
+            :to="`/projects/${project.id}`"
+          />
+          <btn
+            round
+            size="12px"
+            glow-color="teal-3"
+            shadow-color="teal"
+            :shadow-strength="showInfo ? 2 : 5"
+            :color="showInfo ? 'teal' : 'white'"
+            :class="`text-${showInfo ? 'white' : 'teal'}`"
+            icon="info"
+            @click="showInfo = !showInfo"
+          />
         </div>
       </div>
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
         <div v-if="showInfo">
-        <div class="text-h6">Info</div>
-        <div class="text-body2" >
-        {{ project.extraInfo }}
-        </div>
-        <q-separator inset spaced="10px"/>
+          <div class="text-h6">Info</div>
+          <div class="text-body2">
+            {{ project.extraInfo }}
+          </div>
+          <q-separator inset spaced="10px" />
         </div>
       </q-slide-transition>
       <q-slide-transition>
@@ -74,30 +75,32 @@
             }}.
           </q-chip>
           <div class="row" style="display: flex; align-items: center">
-            <div v-if="(project.requiredSkills ?? []).length > 0" class="row flex-center">
+            <div
+              v-if="(project.requiredSkills ?? []).length > 0"
+              class="row flex-center"
+            >
               <div class="text-caption text-grey">Skills:</div>
-              <btn
-
-                flat
-                round
-                size="sm"
-                @click="expanded = !expanded"
-              >
-              <q-icon
-                size="2em"
-                name="expand_more"
-                :class="expanded ? 'rotate180' : ''"
-                style="transition: transform ease 500ms !important; align-self: center; justify-self: center;"
+              <btn flat round size="sm" @click="expanded = !expanded">
+                <q-icon
+                  size="2em"
+                  name="expand_more"
+                  :class="expanded ? 'rotate180' : ''"
+                  style="
+                    transition: transform ease 500ms !important;
+                    align-self: center;
+                    justify-self: center;
+                  "
                 />
               </btn>
             </div>
             <div v-else>There are no skills assigned to this project.</div>
-
           </div>
           <div v-if="project.requiredSkills !== undefined">
             <project-role-chip
               v-show="project.requiredSkills"
-              :modelValue="selectedRoles[skill.skill.id] || hovered === skill.skill.id"
+              :modelValue="
+                selectedRoles[skill.skill.id] || hovered === skill.skill.id
+              "
               @update:modelValue="selectedRoles[skill.skill.id] = $event"
               v-for="(skill, index) in project.requiredSkills"
               @dragleave="onDragLeave($event, skill)"
@@ -111,28 +114,24 @@
         </div>
       </q-slide-transition>
 
-      <div
-        v-for="(role, index) in project.requiredSkills ?? []"
-        :key="index"
-      >
-      
-        <q-slide-transition v-show="selectedRoles[role.skill.id] || hovered === role.skill.id">
+      <div v-for="(role, index) in project.requiredSkills ?? []" :key="index">
+        <q-slide-transition
+          v-show="selectedRoles[role.skill.id] || hovered === role.skill.id"
+        >
           <q-item-label
             class="text-subtitle1 text-bold"
             :class="'text-' + role.skill.color + '-8'"
           >
             {{ role.skill.name }}
           </q-item-label>
-          </q-slide-transition>
-          
-          <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
+        </q-slide-transition>
+
+        <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
           <project-card-suggestion
-            
             v-show="selectedRoles[role.skill.id] || hovered === role.skill.id || (suggestion as any).fromWebsocket || (suggestion as any).fromLocal"
             :confirmSuggestion="confirmSuggestion"
             :removeSuggestion="removeSuggestion"
             :suggestion="suggestion"
-            
             :key="suggestion.student.id"
           />
         </div>
@@ -149,7 +148,7 @@ import { useQuasar } from 'quasar'
 import {
   ProjectSuggestionInterface,
   ProjectSuggestion,
-  NewProjectSuggestion
+  NewProjectSuggestion,
 } from '../../../models/ProjectSuggestion'
 import { ProjectSkillInterface } from '../../../models/Skill'
 import { Project } from '../../../models/Project'
@@ -176,7 +175,7 @@ export default defineComponent({
   data() {
     return {
       hovered: ref(-1),
-      showInfo: ref(false)
+      showInfo: ref(false),
     }
   },
 
@@ -196,12 +195,16 @@ export default defineComponent({
   },
 
   methods: {
-
     async removeSuggestion(suggestion: ProjectSuggestionInterface) {
       try {
         // If the suggestion has not yet been posted to the server, don't make the POST call.
         // A suggestion has not yet been posted if it's an instance of NPS and the var fromLocal is enabled.
-        if (!(suggestion instanceof NewProjectSuggestion && (suggestion as NewProjectSuggestion)?.fromLocal)) {
+        if (
+          !(
+            suggestion instanceof NewProjectSuggestion &&
+            (suggestion as NewProjectSuggestion)?.fromLocal
+          )
+        ) {
           // Remove from the server.
           await this.projectStore.removeSuggestion(this.project, suggestion)
         } else {
@@ -222,9 +225,9 @@ export default defineComponent({
         })
       }
     },
-    
+
     expand(skills: ProjectSkillInterface[]) {
-      const indexes = skills.map(s => s.skill.id);
+      const indexes = skills.map((s) => s.skill.id)
       for (let i in this.selectedRoles) {
         this.selectedRoles[i] = indexes.includes(parseInt(i))
       }
@@ -258,7 +261,6 @@ export default defineComponent({
     // Hide the students assigned to a role when dragging away from the chip of that role.
     onDragLeave(e: DragEvent, skill: ProjectSkillInterface) {
       this.hovered = -1
-
     },
 
     // Assign a student to a role.
@@ -289,12 +291,15 @@ export default defineComponent({
         return
       }
       this.project.suggestedStudents?.push(
-        new NewProjectSuggestion({
-          coach: this.me,
-          reason: '',
-          skill: skill.skill,
-          student: data.student,
-        }, false)
+        new NewProjectSuggestion(
+          {
+            coach: this.me,
+            reason: '',
+            skill: skill.skill,
+            student: data.student,
+          },
+          false
+        )
       )
 
       // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
@@ -302,12 +307,21 @@ export default defineComponent({
         // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
       }
     },
-    
-    
+
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
       // Downcast the suggestion from NewProjectSuggestion to ProjectSuggestion to convert the suggestion draft to a real suggestion.
-      const i = this.project.suggestedStudents!.findIndex(s => s.skill.id === suggestion.skill.id && s.student.id === suggestion.student.id)
-      setTimeout(() => (this.project.suggestedStudents![i] as NewProjectSuggestion).fromLocal = false, 500) // This is needed, because JS will otherwise somehow report true, even when the object doesn't exist anymore? Don't know why.
+      const i = this.project.suggestedStudents!.findIndex(
+        (s) =>
+          s.skill.id === suggestion.skill.id &&
+          s.student.id === suggestion.student.id
+      )
+      setTimeout(
+        () =>
+          ((
+            this.project.suggestedStudents![i] as NewProjectSuggestion
+          ).fromLocal = false),
+        500
+      ) // This is needed, because JS will otherwise somehow report true, even when the object doesn't exist anymore? Don't know why.
       this.project.suggestedStudents![i] = new ProjectSuggestion(suggestion)
 
       await this.projectStore.addSuggestion(
@@ -325,13 +339,13 @@ export default defineComponent({
     expanded: {
       get() {
         const v = Object.values(this.selectedRoles)
-        return v.every(r => r) && v.length > 0
+        return v.every((r) => r) && v.length > 0
       },
       set(newValue: boolean) {
         for (let i in this.selectedRoles) {
           this.selectedRoles[i] = newValue
         }
-      }
+      },
     },
     // Selectedroles is stored in the project itself instead of in the component state.
     // This is due to a bug with state in masonry-wall.
@@ -339,9 +353,9 @@ export default defineComponent({
       get() {
         return (this.project as any).selectedRoles ?? {}
       },
-      set(newValue: Record<number,boolean>) {
-        (this.project as any).selectedRoles = newValue
-      }
+      set(newValue: Record<number, boolean>) {
+        ;(this.project as any).selectedRoles = newValue
+      },
     },
     // Groups the students by role.
     // Example: { 'backend' : [{student1}, {student2}] }
@@ -360,8 +374,7 @@ export default defineComponent({
 </script>
 
 <style>
-
 .rotate180 {
-  transform: rotate( 180deg ) !important;
+  transform: rotate(180deg) !important;
 }
 </style>
