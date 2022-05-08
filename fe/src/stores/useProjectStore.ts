@@ -46,26 +46,6 @@ export const useProjectStore = defineStore('project', {
     projectFilter: '',
   }),
   actions: {
-    async getConflictingProjects() {
-      const studentStore = useStudentStore()
-
-      const conflicts = (
-        await instance.get('projects/get_conflicting_projects')
-      ).data as Array<{ student: string; projects: Array<string> }>
-      const resConflicts = []
-      for (const conflict of conflicts) {
-        const student = await studentStore.getStudent(conflict.student)
-        const projects = await Promise.all(
-          conflict.projects.map(
-            async (project: string) => await this.getOrFetchProject(project)
-          )
-        )
-
-        resConflicts.push({ student, projects })
-      }
-
-      return resConflicts
-    },
     async fetchSuggestedStudents(
       students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {

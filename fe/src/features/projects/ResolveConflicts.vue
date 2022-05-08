@@ -20,7 +20,7 @@
             bordered
             padding
             separator
-            class="rounded-borders text-primary"
+            class="rounded-borders"
           >
             <q-item
               v-for="conflict in conflicts"
@@ -96,21 +96,27 @@
   </div>
 </template>
 <script lang="ts">
+import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
-import { useProjectStore } from '../../stores/useProjectStore'
+import { Project } from '../../models/Project'
+import { Student } from '../../models/Student'
+import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
 import ProjectConflictCard from "./components/ProjectConflictCard.vue"
 
 export default defineComponent({
     components: { ProjectConflictCard },
     async setup() {
-        const projectStore = useProjectStore()
-        const conflicts = await projectStore.getConflictingProjects()
+        const $q = useQuasar()
+        const projectConflictStore = useProjectConflictStore()
+        await projectConflictStore.getConflictingProjects()
 
         return {
-            projectStore,
-            conflicts,
+            q: $q,
+            projectConflictStore,
+            conflicts: projectConflictStore.conflicts,
             selectedConflict: ref({student: {}}),
             showShadow: ref(false),
+            selectedProject: ref({})
         }
     },
     methods: {
@@ -118,12 +124,21 @@ export default defineComponent({
         return `${user.firstName} ${user.lastName}`
       },
       resolveConflict() {
-        // this.projectStore.resolveConflict(this.selectedProject)
+        this.projectConflictStore.resolveConflict(this.selectedConflict as {
+        student: Student
+        projects: Array<Project>
+      }, this.selectedProject as Project).catch((error) => {
+        this.q.notify({
+            icon: 'warning',
+            color: 'red',
+            message: `${error}`,
+            textColor: 'black'
+          });
+      })
       },
-      onLoad(index, done) {
-      console.log("loading")
-      setTimeout(() => done(), 5000)
-    }
+      onLoad(index: never, done: () => unknown) {
+        this.projectConflictStore.loadMoreProjects().then(() => done())
+      }
     }
 })
 </script>

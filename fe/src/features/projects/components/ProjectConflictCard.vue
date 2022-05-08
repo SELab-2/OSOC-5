@@ -123,6 +123,7 @@
             v-for="suggestion in groupedStudents[role.skill.id] ?? []"
             :key="suggestion.student.id"
             :suggestion="suggestion"
+            :remove-suggestion="removeSuggestion"
           />
         </div>
       </q-slide-transition>
@@ -231,6 +232,22 @@ export default defineComponent({
   },
 
   methods: {
+    async removeSuggestion(suggestion: ProjectSuggestionInterface) {
+      try {
+        // If the suggestion has not yet been posted to the server, don't make the POST call.
+        // A suggestion has not yet been posted if it's an instance of NPS and the var fromLocal is enabled.
+
+        await this.projectStore.removeSuggestion(this.project, suggestion)
+      } catch (error: any) {
+        this.q.notify({
+          icon: 'warning',
+          color: 'warning',
+          message: `Error ${error.response.status} while removing ${suggestion.student.firstName} ${suggestion.student.lastName} as ${suggestion.skill.name}`,
+          textColor: 'black',
+        })
+      }
+    },
+
     expand(skills: ProjectSkillInterface[]) {
       const indexes = skills.map(s => s.skill.id);
       for (let i in this.selectedRoles) {
