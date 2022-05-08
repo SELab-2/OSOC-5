@@ -9,20 +9,22 @@
     />
     <!-- <div > -->
     <div
-      style="height: 100%"
-      class="fit"
+      style="height: 100%; overflow: hidden;"
+      class="fit column"
     >
+    <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms">
       <q-toolbar
-        style="height: 8%; overflow: visible; z-index: 1"
-        :class="`text-blue bg-white ${showShadow ? 'shadow-2' : ''}`"
+        style="overflow: visible; padding: 8px; "
+        class="text-blue bg-white"
       >
         <div class="text-bold text-h4 q-ml-md text-black">
           Projects
         </div>
         <q-space />
-        
+          
           <!-- Do not remove the label attribute, otherwise the label slot does not work -->
           <q-input
+          tabindex="-1"
             v-model="projectStore.projectFilter"
             debounce="300"
             dense
@@ -40,6 +42,19 @@
             <q-icon name="search" color="teal-3" />
           </template>
           </q-input>
+          <btn
+            round
+            style="margin-top: 9px"
+            size="0.95em"
+            glow-color="teal-3"
+            shadow-color="teal"
+            :shadow-strength="showFilters ? 2 : 5"
+            :color="showFilters ? 'teal' : 'white'"
+            :class="`text-${showFilters ? 'white' : 'teal'}`"
+            icon="tune"
+            @click="showFilters = !showFilters"
+          />
+         
         <q-space />
         <btn
           padding="7px"
@@ -61,10 +76,55 @@
         <div class="ellipsis">Conflicts</div>
         </btn>
       </q-toolbar>
-
+      
+      <q-slide-transition style="height: fit-content" >
+        <div v-if="showFilters">
+          <q-card-section>
+            <span class="text-h5 text-bold">Filters</span><br/>
+            <div class="row">
+            <div class="column">
+            <q-checkbox  label="My project"/>
+            <q-checkbox  label="Students needed"/>
+            </div>
+            <div>
+            <q-select
+              v-model="studentStore.skills"
+              rounded
+              outlined
+              dense
+              multiple
+              color="primary"
+              bg-color="white"
+              :options="skillStore.skills"
+              :option-label="opt => opt.name"
+              :option-value="opt => opt.id"
+              label="Skills"
+              style="width: 200px"
+            >
+              <template #selected>
+                <div
+                  class="full-width"
+                  style="max-height: 15vh; overflow-y: auto"
+                >
+                  <StudentSkillChip
+                    v-for="skill of studentStore.skills"
+                    :key="skill.id"
+                    :color="skill.color"
+                    :name="skill.name"
+                    best-skill=""
+                  />
+                </div>
+              </template>
+            </q-select>
+          </div>
+            </div>
+          </q-card-section>
+        </div>
+      </q-slide-transition>
+    </div>
+      
       <masonry-wall
-        ref="scrol"
-        style="overflow: auto; height: 92%"
+        style="flex:1; overflow: auto; "
         :items="projectStore.projects"
         :ssr-columns="1"
         :column-width="320"
@@ -101,7 +161,7 @@ import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from "../../stores/useStudentStore";
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
-
+import { useSkillStore } from '../../stores/useSkillStore';
 
 export default defineComponent({
   name: 'ProjectList',
@@ -115,12 +175,14 @@ export default defineComponent({
       projectStore: useProjectStore(),
       studentStore: useStudentStore(),
       authenticationStore: useAuthenticationStore(),
+      skillStore: useSkillStore(),
       socket: new WebSocket(baseURL)
     }
   },
   data() {
     return {
       showShadow: ref(false),
+      showFilters: ref(false),
       sideBarKey: 0,
     }
   },

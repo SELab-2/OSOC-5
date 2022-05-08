@@ -1,6 +1,6 @@
 <template>
   <q-card class="my-card shadow-4 q-ma-sm" flat bordered>
-    <q-card-section>
+    <q-card-section class="column">
       <div class="row">
         <h5 class="text-bold q-mt-none q-mb-none">
           {{ project.name }}
@@ -114,7 +114,7 @@
         </div>
       </q-slide-transition>
 
-      <div v-for="(role, index) in project.requiredSkills ?? []" :key="index">
+      <div class="column" v-for="(role, index) in project.requiredSkills ?? []" :key="index">
         <q-slide-transition
           v-show="selectedRoles[role.skill.id] || hovered === role.skill.id"
         >
