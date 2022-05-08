@@ -17,9 +17,10 @@
       >
         <div class="">
           <div class="absolute-full q-ma-sm column q-gutter-y-sm">
-            <div class="text-bold text-h5">
-              Filters
-            </div>
+            <span class="text-bold text-h5 q-ma-none">
+              Students
+            </span>
+            <span class="text-h7 q-ma-none text-bold">Filters</span>
 
             <q-input
               v-model="studentStore.search"
@@ -135,9 +136,6 @@
               />
             </div>
 
-            <div class="text-bold text-h5">
-              Students
-            </div>
             <q-scroll-area
               class=" fadeOut"
               :thumb-style="thumbStyle"
