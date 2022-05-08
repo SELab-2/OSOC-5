@@ -265,7 +265,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    //this.skillStore.loadSkills()
+    await this.skillStore.loadSkills()
     await this.studentStore.loadStudents()
   },   
   methods: {

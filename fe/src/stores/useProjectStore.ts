@@ -7,11 +7,11 @@ import {
 } from '../models/ProjectSuggestion'
 import { User } from '../models/User'
 import {
-  Skill,
-  ProjectSkillInterface,
   ProjectSkill,
-  TempProjectSkill,
+  ProjectSkillInterface,
   ProjectTableSkill,
+  Skill,
+  TempProjectSkill,
 } from '../models/Skill'
 import {
   ProjectSuggestionInterface,
@@ -111,8 +111,6 @@ export const useProjectStore = defineStore('project', {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
-    // NOTE: this may be broken.
-
     /**
      * Gets a project
      * @param project the project to get
@@ -184,7 +182,7 @@ export const useProjectStore = defineStore('project', {
         // this.projects = this.projects.slice(1)
         // data.forEach(p => this.getProject(p))
       } catch (error) {
-        console.log(error)
+        // console.log(error)
       } finally {
         this.isLoadingProjects = false
       }
@@ -279,16 +277,8 @@ export const useProjectStore = defineStore('project', {
           project.suggestedStudents?.splice(suggestionIndex, 1)
       }
     },
-    /**
-     * TODO
-     * @param skills
-     * @param callback
-     */
-    submitProject(
-      skills: Array<ProjectTableSkill>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      callback: any
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    formatProjectData(skills: any) {
       const skillsList: Array<TempProjectSkill> = []
 
       // filter out the used skills
@@ -307,41 +297,69 @@ export const useProjectStore = defineStore('project', {
       // add the selected coaches to data object
       this.selectedCoaches.forEach((coach: User) => coachList.push(coach.url))
 
-      const data = {
+      return {
         name: this.projectName,
         partnerName: this.projectPartnerName,
         extraInfo: this.projectLink,
         requiredSkills: skillsList,
         coaches: coachList,
       }
-
-      // POST request to make a project
+    },
+    submitProject(
+      skills: Array<ProjectTableSkill>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      callback: any
+    ) {
+      const projectData = this.formatProjectData(skills)
       instance
-        .post('projects/', convertObjectKeysToSnakeCase(data))
-        .then((response) => {
+        .post('projects/', convertObjectKeysToSnakeCase(projectData))
+        .then(() => {
           this.loadProjects()
-
-          // clear fields when project is made successfully
-          this.isLoadingProjects = false
-          this.projectName = ''
-          this.projectPartnerName = ''
-          this.projectLink = ''
-          this.filterCoaches = ''
-          this.selectedCoaches = []
-          useSkillStore().loadSkills()
-
-          // this.projects.push({
-          //   name: response['data']['name'],
-          //   id:  response['data']['id'],
-          //   partnerName: response['data']['partner_name'],
-          //   extraInfo: response['data']['extra_info'],
-          //   requiredSkills: response['data']['required_skills'],
-          //   coaches: response['data']['coaches'],
-          // });
-
           callback(true)
         })
-        .catch(function (error) {
+        .catch(() => {
+          callback(false)
+        })
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async getAndSetProject(id: string, callback: any) {
+      return instance.get('projects/' + id).then((data) => {
+        const project = data.data
+        this.projectName = project.name
+        this.projectPartnerName = project.partnerName
+        this.projectLink = project.extraInfo
+        this.selectedCoaches = project.coaches
+        // skills
+        callback(project.requiredSkills)
+      })
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async deleteProject(id: number, callback: any) {
+      await instance
+        .delete(`projects/${id}/`)
+        .then(() => {
+          callback(true)
+        })
+        .catch(() => {
+          callback(false)
+        })
+    },
+    async updateProject(
+      id: string,
+      skills: Array<ProjectTableSkill>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      callback: any
+    ) {
+      const projectData = this.formatProjectData(skills)
+
+      // POST request to make a project
+      return instance
+        .patch(`projects/${id}/`, convertObjectKeysToSnakeCase(projectData))
+        .then(() => {
+          this.loadProjects()
+          callback(true)
+        })
+        .catch(() => {
           callback(false)
         })
     },

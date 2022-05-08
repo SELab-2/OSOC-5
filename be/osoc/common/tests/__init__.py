@@ -2,8 +2,9 @@
 test module init file
 defines some factory classes to use in tests
 """
-from factory.django import DjangoModelFactory
+from factory.django import DjangoModelFactory, mute_signals
 from factory import SubFactory
+from django.db.models.signals import pre_save
 from osoc.common.models import Project, SentEmail, Skill, Student, Coach
 
 
@@ -64,6 +65,7 @@ class ProjectFactory(DjangoModelFactory):
     extra_info="extra info"
 
 
+@mute_signals(pre_save)
 class CoachFactory(DjangoModelFactory):
     """
     coach factory
