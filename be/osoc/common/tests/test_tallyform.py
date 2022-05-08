@@ -2,8 +2,15 @@
 Unit tests for tally.py
 """
 # pylint: disable=duplicate-code,too-many-lines
+import json
+from pathlib import Path
 from django.test import TestCase
+from rest_framework import status
+from rest_framework.test import APITestCase
+from rest_framework.reverse import reverse
+from osoc.common.tests import SkillFactory
 from osoc.common.tally.tally import TallyForm
+from osoc.common.models import Student
 
 
 class TallyFormTestCases(TestCase):
@@ -124,3 +131,38 @@ class TallyFormTestCases(TestCase):
             "student": True,
             "studies": [ "Backend development", "Business management", "Bioinformatics" ]
             })
+
+
+class TallyRegistrationTests(APITestCase):
+    """
+    tests class for testing the tally API endpoint used by the webhook
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        path = Path('osoc/common/tally/test_data.json')
+        with open(path, encoding="UTF-8") as file:
+            self.data = json.load(file)
+        SkillFactory(name="Backend development")
+
+    def test_tally_registration(self):
+        """
+        test POST /students/tallyregistration
+        """
+        url = reverse("student-tallyregistration")
+        response = self.client.post(url, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        student = Student.objects.get(email="henri@mail.com")
+        self.assertIsNotNone(student)
+        self.assertEqual(student.first_name, "Henri")
+
+    def test_tally_registration_bad_request(self):
+        """
+        test POST /students/tallyregistration with a bad request
+        """
+        url = reverse("student-tallyregistration")
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

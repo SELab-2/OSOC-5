@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3'"
-  >
+  <div class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
     <div class="text-h4 q-my-md">
       Basic Info
     </div>
@@ -45,8 +43,8 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "@vue/runtime-core";
-import {useProjectStore} from "../../../stores/useProjectStore";
+import { defineComponent } from '@vue/runtime-core'
+import { useProjectStore } from '../../../stores/useProjectStore'
 
 export default defineComponent({
   setup() {
@@ -55,6 +53,6 @@ export default defineComponent({
     return {
       projectStore,
     }
-  }
+  },
 })
 </script>

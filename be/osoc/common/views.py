@@ -9,7 +9,7 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from rest_auth.registration.views import SocialLoginView
+from rest_auth.registration.views import RegisterView, SocialLoginView
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -442,9 +442,11 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
                 # create Conflict object and add it to the list
                 conflicts.append(Conflict(student, projects))
 
+        # paginate response
+        page = self.paginate_queryset(conflicts)
         serializer = ConflictSerializer(
-            conflicts, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['post'], serializer_class=ResolveConflictSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive])
@@ -558,3 +560,18 @@ class GithubLogin(SocialLoginView):
     adapter_class = GitHubOAuth2Adapter
     callback_url = "http://0.0.0.0:8000/accounts/github/login/callback/"
     client_class = OAuth2Client
+
+
+class CustomRegisterView(RegisterView):
+    """
+    This class overrides the registerview of rest_auth so users that get registered don't automatically
+    get logged in.
+    """
+    permission_classes = [permissions.IsAuthenticated, IsActive, IsAdmin]
+
+    def get_response_data(self, user):
+        return {'detail': ('User has been created.')}
+
+    def perform_create(self, serializer):
+        user = serializer.save(self.request)
+        return user

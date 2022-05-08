@@ -25,6 +25,9 @@
           :props="props"
           auto-width
         >
+          <q-tooltip anchor="center middle">
+            Click to edit
+          </q-tooltip>
           {{ props.row.amount }}
           <q-popup-edit
             v-slot="scope"
@@ -51,6 +54,9 @@
           key="comment"
           :props="props"
         >
+          <q-tooltip anchor="center middle">
+            Click to edit
+          </q-tooltip>
           <div v-if="props.row.comment.length !== 0">
             {{ props.row.comment }}
           </div>
@@ -82,25 +88,23 @@
           auto-width
         >
           <q-chip
-            clickable
             :color="`${props.row.color}-8`"
             :class="`bg-${props.row.color}-4`"
             :style="`height: 25px; width:25px; border-radius: 50%`"
           />
-          <!--         TODO: edit color, same dropdown as make new skill -->
-          <!--          <q-popup-edit-->
-          <!--            v-slot="scope"-->
-          <!--            v-model="props.row.color"-->
-          <!--            buttons-->
-          <!--          >-->
-          <!--            <q-color-->
-          <!--              v-model="scope.value"-->
-          <!--              no-header-->
-          <!--              no-footer-->
-          <!--              class="color-picker"-->
-          <!--              @keyup.enter.stop-->
-          <!--            />-->
-          <!--          </q-popup-edit>-->
+        </q-td>
+        <q-td
+          key="edit"
+          style="width: 10px"
+        >
+          <btn
+            flat
+            round
+            style="color: #3d3d3d"
+            icon="mdi-pencil-outline"
+            glow-color="grey-5"
+            @click="editSkill(props.row)"
+          />
         </q-td>
         <q-td
           key="remove"
@@ -120,6 +124,17 @@
   </q-table>
 
   <q-dialog
+    :model-value="editSkillDialog"
+    class="full-width"
+    persistent
+  >
+    <NewSkillDialog
+      dialog-title="Edit skill"
+      submit-text="Update skill"
+      :callback="() => (editSkillDialog = false)"
+    />
+  </q-dialog>
+  <q-dialog
     class="full-width"
     :model-value="deleteSkill !== -1"
     @update:model-value="deleteSkill = -1"
@@ -138,9 +153,10 @@ import { ProjectTableSkill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import columnsSkills from '../../../../models/ProjectSkillsColumns'
 import DeleteSkillDialog from './DeleteSkillDialog.vue'
+import NewSkillDialog from './NewSkillDialog.vue'
 
 export default defineComponent({
-  components: { DeleteSkillDialog },
+  components: { DeleteSkillDialog, NewSkillDialog },
   props: {
     filterSkills: {
       type: String,
@@ -157,6 +173,9 @@ export default defineComponent({
     const errorSkillAmount = ref(false)
     const errorMessageSkillAmount = ref('')
 
+    // variables for the new skill dialog popup
+    const editSkillDialog = ref(false)
+
     return {
       skillStore,
       deleteSkill,
@@ -164,12 +183,19 @@ export default defineComponent({
       errorSkillAmount,
       errorMessageSkillAmount,
       deleteSkillName,
+      editSkillDialog,
     }
   },
   methods: {
     deleteSkillMethod(skill: ProjectTableSkill) {
       this.deleteSkill = skill.id
       this.deleteSkillName = skill.name
+    },
+    editSkill(skill: ProjectTableSkill) {
+      this.editSkillDialog = true
+      this.skillStore.popupID = skill.id
+      this.skillStore.popupName = skill.name
+      this.skillStore.popupColor = skill.color
     },
     amountRangeValidation(val: number) {
       if (val < 0) {
@@ -181,9 +207,12 @@ export default defineComponent({
       this.errorMessageSkillAmount = ''
       return true
     },
-    filterSkillsMethod(){
-      return this.skillStore.skills.filter(row => row.name.toLowerCase().startsWith(this.filterSkills))
+    filterSkillsMethod() {
+      return this.skillStore.skills.filter((row) =>
+        row.name.toLowerCase().startsWith(this.filterSkills)
+      )
     },
-  }
+  },
 })
 </script>
+<style scoped lang="sass"></style>

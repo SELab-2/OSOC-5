@@ -93,6 +93,22 @@
         content="Gender"
         :title="gender"
       />
+      <q-space />
+      <q-btn
+        v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
+        class="cornered"
+        outline
+        color="red"
+        icon-right="delete"
+        label="Delete"
+        @click="deleteDialog = true"
+      />
+      <q-dialog v-model="deleteDialog">
+        <DeleteStudentDialog
+          :name="student?.fullName ?? ''"
+          :delete="deleteStudent"
+        />
+      </q-dialog>
     </div>
 
     <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
@@ -227,6 +243,7 @@ import InfoDiv from "./components/InfoDiv.vue";
 import DecisionIcon from "../../components/DecisionIcon.vue";
 import yesMaybeNoOptions from "../../models/YesMaybeNoOptions";
 import genderOptions from "../../models/GenderOptions";
+import router from "../../router";
 
 export default defineComponent ({
   components: {
@@ -261,16 +278,19 @@ export default defineComponent ({
       possibleFinalDecision: ref(-1),
       socket,
       yesMaybeNoOptions,
-      genderOptions
+      genderOptions,
+      router,
     }
   },
   data() {
     const suggestionDialog = ref(false)
+    const deleteDialog = ref(false)
     const reason = ref("")
  
     return {
       sideBarKey: 0,
       studentKey: 0,
+      deleteDialog,
       suggestionDialog,
       reason
     }
@@ -390,6 +410,22 @@ export default defineComponent ({
     showDialog: function (value: number) {
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
+    },
+    deleteStudent: async function () {
+      if (this.student) {
+        await this.studentStore.deleteStudent(this.student.url,
+          () => this.$q.notify({
+            icon: 'done',
+            color: 'positive',
+            message: 'Successfully deleted!',
+          }),
+          () => this.$q.notify({
+            icon: "close",
+            color: "negative",
+            message: "Failed to delete!"
+          }))
+        await router.push(`/students`)
+      }
     },
     /**
      * Make a final decision

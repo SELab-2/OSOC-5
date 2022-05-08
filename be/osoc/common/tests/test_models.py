@@ -71,9 +71,10 @@ class CoachManagerTests(TestCase):
         coach = Coach.objects.get(email="email@example.com")
         self.assertIsNotNone(coach)
         self.assertEqual(coach.first_name, "john")
-        self.assertEqual(coach.is_staff, True)
-        self.assertEqual(coach.is_superuser, True)
-        self.assertEqual(coach.is_active, True)
+        self.assertTrue(coach.is_staff)
+        self.assertTrue(coach.is_superuser)
+        self.assertTrue(coach.is_admin)
+        self.assertTrue(coach.is_active)
 
 
 class CoachTests(TestCase):

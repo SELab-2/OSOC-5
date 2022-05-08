@@ -1104,5 +1104,95 @@
       "coach": 1,
       "skill_id": 3
     }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 1,
+    "fields": {
+      "sender": 1,
+      "receiver": 3,
+      "info": "confirmation",
+      "time": "2022-04-12T14:07:27.612Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 2,
+    "fields": {
+      "sender": 3,
+      "receiver": 4,
+      "info": "confirmation",
+      "time": "2022-03-05T18:04:30.03Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 3,
+    "fields": {
+      "sender": 2,
+      "receiver": 5,
+      "info": "confirmation",
+      "time": "2022-04-12T14:23:21Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 4,
+    "fields": {
+      "sender": 2,
+      "receiver": 5,
+      "info": "contract",
+      "time": "2022-05-01T21:45:31.13Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 5,
+    "fields": {
+      "sender": 6,
+      "receiver": 6,
+      "info": "rejection",
+      "time": "2022-05-01T21:56:12.456Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 6,
+    "fields": {
+      "sender": 1,
+      "receiver": 7,
+      "info": "approved",
+      "time": "2022-04-20T13:37:42.666Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 7,
+    "fields": {
+      "sender": 7,
+      "receiver": 8,
+      "info": "hold tight",
+      "time": "2022-04-21T09:55:00Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 7,
+    "fields": {
+      "sender": 4,
+      "receiver": 9,
+      "info": "confirmation",
+      "time": "2022-05-01T18:02:56.23Z"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 7,
+    "fields": {
+      "sender": 4,
+      "receiver": 9,
+      "info": "contract",
+      "time": "2022-05-02T19:17:22.21Z"
+    }
   }
 ]
