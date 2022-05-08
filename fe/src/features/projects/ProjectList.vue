@@ -20,8 +20,22 @@
         </div>
         <q-space />
           
+          
+          <btn
+            round
+            style="margin-top: 9px"
+            size="12px"
+            glow-color="teal-3"
+            shadow-color="teal"
+            :shadow-strength="showFilters ? 2 : 5"
+            :color="showFilters ? 'teal' : 'white'"
+            :class="`text-${showFilters ? 'white' : 'teal'}`"
+            icon="tune"
+            @click="showFilters = !showFilters"
+          />
           <!-- Do not remove the label attribute, otherwise the label slot does not work -->
           <q-input
+          
           tabindex="-1"
             v-model="projectStore.projectFilter"
             debounce="300"
@@ -42,25 +56,17 @@
           <btn
             round
             style="margin-top: 9px"
-            size="0.95em"
+            size="12px"
+            :icon="expanded ? 'unfold_less' : 'unfold_more'"
             glow-color="teal-3"
             shadow-color="teal"
-            :shadow-strength="showFilters ? 2 : 5"
-            :color="showFilters ? 'teal' : 'white'"
-            :class="`text-${showFilters ? 'white' : 'teal'}`"
-            icon="tune"
-            @click="showFilters = !showFilters"
+            :shadow-strength="expanded ? 2 : 5"
+            :color="expanded ? 'teal' : 'white'"
+            :class="`text-${expanded ? 'white' : 'teal'}`"
+            @click="expanded = !expanded"
           />
          
         <q-space />
-        <btn
-          padding="7px"
-          :icon="expanded ? 'unfold_less' : 'unfold_more'"
-          color="teal"
-          shadow-color="teal"
-          shadow-strength="1.8"
-          @click="expanded = !expanded"
-        />
         <btn
           padding="7px"
           icon="r_warning"
