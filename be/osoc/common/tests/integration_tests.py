@@ -689,7 +689,7 @@ class ProjectTestsCoach(APITestCase):
         url = reverse("project-get-conflicting-projects")
         response = self.client.get(url, format="json")
 
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data['count'], 1)
 
     def test_project_resolve_conflicts(self):
         """
@@ -724,7 +724,7 @@ class ProjectTestsCoach(APITestCase):
         url = reverse("project-get-conflicting-projects")
         response = self.client.get(url)
 
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(response.data['count'], 0)
 
     def test_project_resolve_conflicts_students_not_unique(self):
         """

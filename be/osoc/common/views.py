@@ -428,8 +428,10 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
                 # create Conflict object and add it to the list
                 conflicts.append(Conflict(student, projects))
 
-        serializer = ConflictSerializer(conflicts, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # paginate response
+        page = self.paginate_queryset(conflicts)
+        serializer = ConflictSerializer(page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['post'], serializer_class=ResolveConflictSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive])
