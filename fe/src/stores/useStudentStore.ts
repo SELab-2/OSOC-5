@@ -54,6 +54,12 @@ export const useStudentStore = defineStore('user/student', {
       this.students.push(newstudent)
       return newstudent
     },
+    async deleteStudent(url: string, success: any, fail: any) {
+      await instance
+          .delete(url)
+          .then(() => success())
+          .catch(() => fail())
+    },
     async transformStudent(student: any): Promise<void> {
       const skills = [] as Skill[]
 

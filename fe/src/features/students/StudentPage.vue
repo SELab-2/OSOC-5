@@ -12,158 +12,240 @@
     class="fit"
     style=" overflow: auto;"
   >
-  <div :key="studentKey"
-    class="justify-between row q-px-lg q-pt-lg studentcol">
-    <div class="row q-px-sm q-gutter-sm items-center">
-      <h class="text-bold text-h4">{{ student ? student.fullName : '' }}</h>
-      <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
-    </div>
     <div
-      v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
-      class="row q-gutter-sm items-center"
+      :key="studentKey"
+      class="justify-between row q-px-lg q-pt-lg studentcol"
     >
-      <q-select
-        v-model="possibleFinalDecision"
-        emit-value
-        map-options
-        rounded
-        outlined
-        dense
-        style="width: 200px"
-        :options="[
-          { value: '0', label: 'Yes' },
-          { value: '2', label: 'Maybe' },
-          { value: '1', label: 'No' },
-          { value: '-1', label: 'Not decided' },
-        ]"
-        label="Final decision"
+      <div class="row q-px-sm q-gutter-sm items-center">
+        <h class="text-bold text-h4">
+          {{ student ? student.fullName : '' }}
+        </h>
+        <q-btn
+          :href="student ? student.cv.toString() : ''"
+          target="_blank"
+          size="12px"
+          rounded
+          outline
+          color="black"
+          label="CV"
+        />
+        <q-btn
+          :href="student ? student.portfolio.toString() : ''"
+          target="_blank"
+          size="12px"
+          rounded
+          outline
+          color="black"
+          label="Portfolio"
+        />
+      </div>
+      <div
+        v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
+        class="row q-gutter-sm items-center"
+      >
+        <q-select
+          v-model="possibleFinalDecision"
+          emit-value
+          map-options
+          rounded
+          outlined
+          dense
+          style="width: 200px"
+          :options="[
+            { value: '0', label: 'Yes' },
+            { value: '2', label: 'Maybe' },
+            { value: '1', label: 'No' },
+            { value: '-1', label: 'Not decided' },
+          ]"
+          label="Final decision"
+        />
+        <q-btn
+          class="cornered"
+          outline
+          label="Confirm"
+          @click="decisionDialog = true"
+        />
+        <q-dialog v-model="decisionDialog">
+          <DecisionCard
+            :name="name"
+            :suggestion-name="suggestionName(this.possibleFinalDecision)"
+            :suggestion-color="suggestionColor(this.possibleFinalDecision)"
+            :make-suggestion="(reason) => finalDecision(reason)"
+          />
+        </q-dialog>
+      </div>
+    </div>
+    <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+      <InfoDiv
+        v-if="student?.alum"
+        use-icon="mdi-account-school"
+        color="blue"
+        title="Alumni"
       />
+      <InfoDiv
+        v-if="student?.studentCoach"
+        use-icon="mdi-account-group"
+        color="yellow"
+        title="Student coach"
+      />
+      <InfoDiv
+        v-if="student?.employmentAgreement"
+        use-icon="mdi-file-document-edit"
+        color="red"
+        content="Employment"
+        :title="employment"
+      />
+      <InfoDiv
+        v-if="student?.gender"
+        :use-icon="genderIcon"
+        color="green"
+        content="Gender"
+        :title="gender"
+      />
+      <q-space />
       <q-btn
+        v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
         class="cornered"
         outline
-        label="Confirm"
-        @click="decisionDialog = true"
+        color="red"
+        icon-right="delete"
+        label="Delete"
+        @click="deleteDialog = true"
       />
-
-      <q-dialog v-model="decisionDialog">
-        <DecisionCard
-          :name="name"
-          :suggestion-name="suggestionName(this.possibleFinalDecision)"
-          :suggestion-color="suggestionColor(this.possibleFinalDecision)"
-          :make-suggestion="(reason) => finalDecision(reason)"
+      <q-dialog v-model="deleteDialog">
+        <DeleteStudentDialog
+          :name="student?.fullName ?? ''"
+          :delete="deleteStudent"
         />
       </q-dialog>
     </div>
-  </div>
-  <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
-    <InfoDiv
-      v-if="student?.alum"
-      use-icon="mdi-account-school"
-      color="blue"
-      title="Alumni"
-    />
-    <InfoDiv
-      v-if="student?.studentCoach"
-      use-icon="mdi-account-group"
-      color="yellow"
-      title="Student coach"
-    />
-    <InfoDiv
-      v-if="student?.employmentAgreement"
-      use-icon="mdi-file-document-edit"
-      color="red"
-      content="Employment"
-      :title="employment"
-    />
-    <InfoDiv
-      v-if="student?.gender"
-      :use-icon="genderIcon"
-      color="green"
-      content="Gender"
-      :title="gender"
-    />
-  </div>
 
-  <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
-    <label>Suggest:</label>
-  </div>
-  <div class="row q-px-lg q-ml-sm items-center">
-    <SegmentedControl
-      v-model="mySuggestion"
-      :color="mySuggestionColor"
-      :options="[
-        { name: '0', label: 'Yes' },
-        { name: '2', label: 'Maybe' },
-        { name: '1', label: 'No' },
-        { name: '-1', label: 'Not decided' },
-      ]"
-      @update:modelValue="showDialog"
-    />
-
-    <q-dialog v-model="suggestionDialog">
-      <DecisionCard
-        :name="name"
-        :suggestion-name="suggestionName(this.possibleSuggestion)"
-        :suggestion-color="suggestionColor(this.possibleSuggestion)"
-        :make-suggestion="makeSuggestion"
+    <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+      <label>Suggest:</label>
+    </div>
+    <div class="row q-px-lg q-ml-sm items-center">
+      <SegmentedControl
+        v-model="mySuggestion"
+        :color="mySuggestionColor"
+        :options="[
+          { name: '0', label: 'Yes' },
+          { name: '2', label: 'Maybe' },
+          { name: '1', label: 'No' },
+          { name: '-1', label: 'Not decided' },
+        ]"
+        @update:modelValue="showDialog"
       />
-    </q-dialog>
-  </div>
 
-  <div class="q-gutter-sm q-pa-lg">
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SuggestionsCard
-          :index="studentKey"
-          title="Suggestions"
+      <q-dialog v-model="suggestionDialog">
+        <DecisionCard
+          :name="name"
+          :suggestion-name="suggestionName(this.possibleSuggestion)"
+          :suggestion-color="suggestionColor(this.possibleSuggestion)"
+          :make-suggestion="makeSuggestion"
         />
+      </q-dialog>
+
+      <q-dialog v-model="suggestionDialog">
+        <q-card>
+          <q-card-section>
+            <div class="text-h6">
+              Suggest
+              <btn
+                :label="suggestionName"
+                dense
+                rounded
+                class="text-h6"
+                :class="suggestionColor"
+              />
+              for {{ name }}
+            </div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            Why are you making this decision? (optional)
+            <q-input
+              v-model="reason"
+              filled
+              type="textarea"
+            />
+          </q-card-section>
+
+          <q-card-actions
+            align="right"
+            class="text-primary"
+          >
+            <btn
+              v-close-popup
+              flat
+              color="grey"
+              label="Cancel"
+              glow-color="grey-4"
+            />
+            <btn
+              v-close-popup
+              flat
+              label="Suggest"
+              glow-color="teal-1"
+              @click="makeSuggestion"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+    </div>
+    <div class="q-gutter-sm q-pa-lg">
+      <div class="row">
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <SuggestionsCard
+            :index="studentKey"
+            title="Suggestions"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <AcademiaCard
+            :index="studentKey"
+            title="Academia"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <SkillsCard
+            :index="studentKey"
+            title="Skills"
+          />
+        </div>
+
       </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <AcademiaCard
-          :index="studentKey"
-          title="Academia"
-        />
+      <div class="row">
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <LanguageCard
+            :index="studentKey"
+            title="Language"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <ExtraInfoCard
+            :index="studentKey"
+            title="Hinder for work"
+            :content="studentStore.currentStudent?.hinderWork ?? ''"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <ExtraInfoCard
+            :index="studentKey"
+            title="Fun fact"
+            :content="studentStore.currentStudent?.funFact ?? ''"
+          />
+        </div>
       </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SkillsCard
-          :index="studentKey"
-          title="Skills"
-        />
+      <div class="row">
+        <div class="studentcol col-12">
+          <ExtraInfoCard
+            :index="studentKey"
+            title="Motivation"
+            :content="studentStore.currentStudent?.motivation ?? ''"
+          />
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <LanguageCard
-          :index="studentKey"
-          title="Language"
-        />
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <ExtraInfoCard
-          :index="studentKey"
-          title="Hinder for work"
-          :content="studentStore.currentStudent?.hinderWork ?? ''"
-        />
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <ExtraInfoCard
-          :index="studentKey"
-          title="Fun fact"
-          :content="studentStore.currentStudent?.funFact ?? ''"
-        />
-      </div>
-    </div>
-    <div class="row">
-      <div class="studentcol col-12">
-        <ExtraInfoCard
-          :index="studentKey"
-          title="Motivation"
-          :content="studentStore.currentStudent?.motivation ?? ''"
-        />
-      </div>
-    </div>
-  </div>
   </div>
 </template>
 
@@ -181,10 +263,13 @@ import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
+import DeleteStudentDialog from "./components/DeleteStudentDialog.vue";
 import DecisionCard from "./components/DecisionCard.vue";
+import router from "../../router";
 
 export default defineComponent ({
   components: {
+    DeleteStudentDialog,
     DecisionCard,
     InfoDiv,
     LanguageCard,
@@ -216,15 +301,19 @@ export default defineComponent ({
       studentStore,
       possibleFinalDecision: ref("-1"),
       socket,
+      router,
     }
   },
   data() {
     const suggestionDialog = ref(false)
     const decisionDialog = ref(false)
-
+    const deleteDialog = ref(false)
+    const reason = ref("")
+ 
     return {
       sideBarKey: 0,
       studentKey: 0,
+      deleteDialog,
       suggestionDialog,
       decisionDialog
     }
@@ -381,6 +470,24 @@ export default defineComponent ({
     showDialog: function (value: number) {
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
+    },
+    deleteStudent: async function () {
+      if (this.student) {
+        await this.studentStore.deleteStudent(this.student.url,
+          () => {
+            this.$q.notify({
+              icon: 'done',
+              color: 'positive',
+              message: 'Successfully deleted!',
+            })
+            router.push(`/students`)
+          },
+          () => this.$q.notify({
+            icon: "close",
+            color: "negative",
+            message: "Failed to delete!"
+          }))
+      }
     },
     finalDecision: async function (reason: string) {
       if (this.student) {
