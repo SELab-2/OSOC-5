@@ -144,53 +144,6 @@
           :make-suggestion="makeSuggestion"
         />
       </q-dialog>
-
-      <q-dialog v-model="suggestionDialog">
-        <q-card>
-          <q-card-section>
-            <div class="text-h6">
-              Suggest
-              <btn
-                :label="suggestionName"
-                dense
-                rounded
-                class="text-h6"
-                :class="suggestionColor"
-              />
-              for {{ name }}
-            </div>
-          </q-card-section>
-
-          <q-card-section class="q-pt-none">
-            Why are you making this decision? (optional)
-            <q-input
-              v-model="reason"
-              filled
-              type="textarea"
-            />
-          </q-card-section>
-
-          <q-card-actions
-            align="right"
-            class="text-primary"
-          >
-            <btn
-              v-close-popup
-              flat
-              color="grey"
-              label="Cancel"
-              glow-color="grey-4"
-            />
-            <btn
-              v-close-popup
-              flat
-              label="Suggest"
-              glow-color="teal-1"
-              @click="makeSuggestion"
-            />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
     </div>
     <div class="q-gutter-sm q-pa-lg">
       <div class="row">
