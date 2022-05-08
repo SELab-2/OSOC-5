@@ -7,8 +7,8 @@
       :mini-width="30"
       :width="350"
       :breakpoint="100"
-      bordered
-      class="bg-light-grey"
+      
+      class="bg-grey-1 shadow-4"
     >
     <div
     :style="drawer && !miniState? '' : 'display: none'"
@@ -177,7 +177,7 @@
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
-                  v-ripple
+                  
                   class="q-ma-sm"
                   :draggable="draggable ?? false"
                   :must-hover="mustHover"
