@@ -128,7 +128,6 @@ export default defineComponent({
     const statuses = [ApprovalStates.Applied, ApprovalStates.Awaiting, ApprovalStates.Approved, ApprovalStates.ContractConfirmed, ApprovalStates.ContractDeclined, ApprovalStates.Rejected]
     const currentStep: Ref<ApprovalStates | undefined> = ref(undefined)
     return {
-      emailKey: 0,
       show: ref(true),
       removed: ref(false),
       date: ref(dateTime),
@@ -184,7 +183,6 @@ export default defineComponent({
       await this.mailStore.deleteMail(mail)
       await this.mailStore.getMails(this.student)
 
-      this.emailKey += 1
     },
     onclickmail(status: number) {
       this.info = status.toString();
@@ -197,7 +195,6 @@ export default defineComponent({
 
       this.info = ''
       this.resetDate()
-      this.emailKey += 1
     },
     stop() {
       this.removed = false

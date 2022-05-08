@@ -1,18 +1,15 @@
 <template>
   <SideBar
-    :key="sideBarKey"
-    color="bg-grey-3"
     :select-student="selectStudent"
     :draggable="false"
     :must-hover="false"
-    @update="update"
   />
   
   <div
     class="fit"
     style=" overflow: auto;"
   >
-  <div :key="studentKey"
+  <div
     class="justify-between row q-px-lg q-pt-lg studentcol">
     <div class="row q-px-sm q-gutter-sm items-center">
       <h class="text-bold text-h4">{{ student ? student.fullName : '' }}</h>
@@ -144,19 +141,16 @@
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SuggestionsCard
-          :index="studentKey"
           title="Suggestions"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <AcademiaCard
-          :index="studentKey"
           title="Academia"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SkillsCard
-          :index="studentKey"
           title="Skills"
         />
       </div>
@@ -164,20 +158,17 @@
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <LanguageCard
-          :index="studentKey"
           title="Language"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <ExtraInfoCard
-          :index="studentKey"
           title="Hinder for work"
           :content="studentStore.currentStudent?.hinderWork ?? ''"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <ExtraInfoCard
-          :index="studentKey"
           title="Fun fact"
           :content="studentStore.currentStudent?.funFact ?? ''"
         />
@@ -186,7 +177,6 @@
     <div class="row">
       <div class="studentcol col-12">
         <ExtraInfoCard
-          :index="studentKey"
           title="Motivation"
           :content="studentStore.currentStudent?.motivation ?? ''"
         />
@@ -250,8 +240,6 @@ export default defineComponent ({
     const reason = ref("")
  
     return {
-      sideBarKey: 0,
-      studentKey: 0,
       suggestionDialog,
       reason
     }
@@ -379,7 +367,6 @@ export default defineComponent ({
               this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
           }
 
-          this.update()
       }
    
 
@@ -401,7 +388,6 @@ export default defineComponent ({
         this.reason = ""
       }
 
-      this.update()
     },
     selectStudent: function (selected_student: Student) {
       this.$router.push(`/students/${selected_student.id}`)
@@ -415,13 +401,7 @@ export default defineComponent ({
         await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
       }
 
-      this.update()
     },
-    update() {
-      // Make components update
-      this.sideBarKey += 1
-      this.studentKey += 1
-    }
   },
 })
 </script>

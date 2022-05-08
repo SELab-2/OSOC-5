@@ -1,10 +1,8 @@
 <template>
   <div style="height: 100%">
     <SideBar
-      :key="sideBarKey"
       :select-student="() => {}"
       :must-hover="true"
-      color="bg-grey-3"
       draggable
     />
     <!-- <div > -->
@@ -32,7 +30,6 @@
             color="teal"
             label=""
             style="margin-top: 5px"
-            class="text-bold"
             hide-bottom-space
           >
           <template v-slot:label>
@@ -193,7 +190,6 @@ export default defineComponent({
     return {
       showShadow: ref(false),
       showFilters: ref(false),
-      sideBarKey: 0,
     }
   },
   methods: {
@@ -242,19 +238,15 @@ export default defineComponent({
 
           if(data.hasOwnProperty('suggestion')) {
             await this.studentStore.receiveSuggestion(data.suggestion)
-            this.sideBarKey += 1
           }
           else if(data.hasOwnProperty('remove_suggestion')) {
             this.studentStore.removeSuggestion(data.remove_suggestion)
-            this.sideBarKey += 1
           }
           else if(data.hasOwnProperty('final_decision')) {
             this.studentStore.receiveFinalDecision(data.final_decision)
-            this.sideBarKey += 1
           }
           else if(data.hasOwnProperty('remove_final_decision')) {
             this.studentStore.removeFinalDecision(data.remove_final_decision)
-            this.sideBarKey += 1
           }
           else if(data.hasOwnProperty('suggest_student'))
             this.projectStore.receiveSuggestion(data.suggest_student)

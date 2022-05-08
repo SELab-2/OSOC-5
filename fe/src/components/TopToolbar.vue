@@ -9,7 +9,6 @@
 
       <q-space/>
       <q-tabs
-        v-model="tab"
         class="centered-tabs"
         shrink
       >
@@ -170,7 +169,6 @@ export default defineComponent({
       password1,
       password2,
       display_popup,
-      tab: ref('students'),
       authenticationStore,
       on_dropdown_click() {
         display_popup.value = true

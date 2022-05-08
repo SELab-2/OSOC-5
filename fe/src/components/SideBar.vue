@@ -8,36 +8,55 @@
       :width="350"
       :breakpoint="100"
       bordered
-      class="full-height"
-      :class="color"
+      class="bg-light-grey"
     >
-      <div
-        :style="drawer && !miniState? '' : 'display: none'"
-        class="fit full-height"
-      >
-        <div class="">
-          <div class="absolute-full q-ma-sm column q-gutter-y-sm">
-            <span class="text-bold text-h5 q-ma-none">
+    <div
+    :style="drawer && !miniState? '' : 'display: none'"
+      style="height: 100%; overflow: hidden;"
+      class="fit column"
+    >
+        
+          <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms" class="q-px-sm">
+            <div class="text-bold text-h5 q-py-sm">
               Students
-            </span>
-            <span class="text-h7 q-ma-none text-bold">Filters</span>
-
+            </div>
+            <div class="row no-wrap q-pb-sm">
             <q-input
               v-model="studentStore.search"
-              outlined
-              dense
-              rounded
-              debounce="300"
-              color="green"
-              bg-color="white"
-              label="Search"
               @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
+              debounce="300"
+              class="fit q-mr-sm"
+              dense
+              outlined
+              color="teal"
+              label=""
+              hide-bottom-space
             >
-              <template #append>
-                <q-icon name="search" />
-              </template>
+            <template v-slot:label>
+              <span class="text-weight-medium text-teal-3">Search Students</span>
+            </template>
+            <template v-slot:append>
+              <q-icon name="search" color="teal-3" />
+            </template>
             </q-input>
-
+            <btn
+              round
+              size="0.95em"
+              glow-color="teal-2"
+              shadow-color="primary"
+              :shadow-strength="showFilters ? 2 : 5"
+              :color="showFilters ? 'primary' : 'light-grey'"
+              :class="`text-${showFilters ? 'white' : 'green'}`"
+              icon="tune"
+              @click="showFilters = !showFilters"
+            />
+            
+          </div>
+            <q-slide-transition>
+              <div v-if="showFilters" class="overflow">
+                <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
+                <div class="q-gutter-y-sm ">
+                
             <SegmentedControl
               v-model="studentStore.alumni"
               color="primary"
@@ -135,16 +154,22 @@
                 @click="async () => await loadStudents($refs.infiniteScroll)"
               />
             </div>
+          </div>
+              </div>
+            </q-slide-transition>
+          </div>
 
             <q-scroll-area
-              class=" fadeOut"
+              class="fadeOut q-px-sm"
               :thumb-style="thumbStyle"
-              style="flex: 1 1 auto"
+              style="flex: 1; overflow: auto;"
+              @scroll="onScroll"
+              
             >
               <q-infinite-scroll
-                :key="scrollKey"
                 ref="infiniteScroll"
-                class="q-px-sm"
+                class="q-pa-sm"
+                
                 :offset="250"
                 @load="async (index, done) => await loadNextStudents(index, done)"
               >
@@ -172,7 +197,8 @@
               </q-infinite-scroll>
             </q-scroll-area>
           </div>
-        </div>
+        
+      
 
         <q-inner-loading
           :showing="studentStore.isLoading"
@@ -180,11 +206,11 @@
           label-class="text-teal"
           label-style="font-size: 1.1em"
         />
-      </div>
+      
 
       <div
         class="absolute"
-        style="top: 15px; right: -17px"
+        style="top: 15px; right: -17px; z-index: 2;"
       >
         <btn
           dense
@@ -222,10 +248,6 @@ export default defineComponent({
       type: Function,
       required: true
     },
-    color: {
-      type: String,
-      required: true
-    },
     draggable: {
       type: Boolean,
       required: false
@@ -252,13 +274,14 @@ export default defineComponent({
         width: '4px',
       },
       status,
-      scrollKey: 0
     }
   },
   data() {
     return {
       miniState: ref(false),
       drawer: ref(true),
+      showFilters: ref(false),
+      showShadow: ref(false),
     }
   },
   async mounted() {
@@ -266,6 +289,10 @@ export default defineComponent({
     await this.studentStore.loadStudents()
   },   
   methods: {
+    onScroll(info) {
+      console.log(info.verticalPosition)
+      this.showShadow = info.verticalPosition > 5
+    },
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -285,11 +312,9 @@ export default defineComponent({
       scroll.resume()
       this.studentStore.students = []
       await this.studentStore.loadStudents()
-      this.scrollKey += 1
     },
     async loadNextStudents(index: number, done: any) {
       await this.studentStore.loadNext(index, done)
-      this.scrollKey += 1
     }
   }
 })
@@ -302,17 +327,5 @@ export default defineComponent({
   
 :deep(.q-item) {
   padding: 8px 8px !important;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  right: 0px;
-  background-color: darkgray;
-  border-radius: 7px;
-  width: 4px;
-  opacity: 0.75;
 }
 </style>
