@@ -67,10 +67,10 @@
         />
         <q-dialog v-model="decisionDialog">
           <DecisionCard
-            :name="name"
-            :suggestion-name="suggestionName(this.possibleFinalDecision)"
-            :suggestion-color="suggestionColor(this.possibleFinalDecision)"
-            :make-suggestion="(reason) => finalDecision(reason)"
+            :name="student?.fullName ?? ''"
+            :suggestion-name="suggestionName(possibleFinalDecision)"
+            :suggestion-color="suggestionColor(possibleFinalDecision)"
+            :make-suggestion="(reason: string) => finalDecision(reason)"
           />
         </q-dialog>
       </div>
@@ -138,10 +138,10 @@
 
       <q-dialog v-model="suggestionDialog">
         <DecisionCard
-          :name="name"
-          :suggestion-name="suggestionName(this.possibleSuggestion)"
-          :suggestion-color="suggestionColor(this.possibleSuggestion)"
-          :make-suggestion="makeSuggestion"
+          :name="student?.fullName ?? ''"
+          :suggestion-name="suggestionName(possibleSuggestion)"
+          :suggestion-color="suggestionColor(possibleSuggestion)"
+          :make-suggestion="(reason: string) => makeSuggestion(reason)"
         />
       </q-dialog>
     </div>
