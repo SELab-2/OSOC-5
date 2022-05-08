@@ -1,9 +1,6 @@
 <template>
-  <div style="height: 100%">
-    
-    <!-- <div > -->
     <div
-      style="height: 100%; overflow: hidden;"
+      style="overflow: hidden;"
       class="fit column"
     >
     <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms">
@@ -15,7 +12,6 @@
           Projects
         </div>
         <q-space />
-          
           
           <btn
             round
@@ -33,7 +29,7 @@
           <q-input
           
           tabindex="-1"
-            v-model="projectStore.projectFilter"
+            v-model="projectNameFilter"
             debounce="300"
             dense
             outlined
@@ -123,7 +119,7 @@
     </div>
     
     <div id="scroll-target-id" style="flex:1; overflow: auto; " @scroll="showShadow = $event.target.scrollTop > 5">
-      <q-infinite-scroll ref="infinite" @load="projectStore.loadNext" :offset="250"  scroll-target="#scroll-target-id" >
+      <q-infinite-scroll ref="infinite" @load="(i,done) => projectStore.loadNext(i, done, filters)" :offset="250"  scroll-target="#scroll-target-id" >
         
       <masonry-wall
         
@@ -160,7 +156,6 @@
         shadow-color="orange"
       />
     </q-page-sticky>
-  </div>
 </template>
 
 <script lang="ts">
@@ -192,9 +187,15 @@ export default defineComponent({
     return {
       showShadow: ref(false),
       showFilters: ref(false),
+      projectNameFilter: ref(''),
     }
   },
   computed: {
+    filters() {
+      return {
+        search: this.projectNameFilter
+      }
+    },
     expanded: {
       get() {
         if (this.projectStore.projects.length === 0) return false
@@ -212,18 +213,13 @@ export default defineComponent({
     }
   },
   watch: {
-    'projectStore.projectFilter': {
+    projectNameFilter: {
       handler() {
         this.$refs.infinite.reset()
         this.$refs.infinite.resume()
         this.$refs.infinite.trigger()
       }
     }
-  },
-  created() {
-    // Prevent a reload each time switched to the tab.
-    // if (this.projectStore.projects.length === 0)
-      // this.projectStore.loadProjects()
   },
   mounted() {
       this.socket.onmessage = async (event: { data: string }) => {

@@ -25,27 +25,21 @@ import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
-  isLoadingProjects: boolean
   projectName: string
   projectPartnerName: string
   projectLink: string
   filterCoaches: string
   selectedCoaches: Array<User>
-  projectFilter: string
-  nextPage: string
 }
 
 export const useProjectStore = defineStore('project', {
   state: (): State => ({
     projects: [],
-    isLoadingProjects: false,
     projectName: '',
     projectPartnerName: '',
     projectLink: '',
     filterCoaches: '',
     selectedCoaches: [],
-    projectFilter: '',
-    nextPage: '',
   }),
   actions: {
     async fetchSuggestedStudents(
@@ -117,17 +111,15 @@ export const useProjectStore = defineStore('project', {
       ])
     },
     async loadProjects() {
-      this.isLoadingProjects = true
       try {
-        const { results, next } = (
-          await instance.get<{ results: TempProject[]; next: string }>(
-            `projects/?search=${this.projectFilter}`
+        const { results } = (
+          await instance.get<{ results: TempProject[] }>(
+            `projects/`
           )
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
-        this.nextPage = next
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) => useCoachStore().getUser(coach))
@@ -156,45 +148,45 @@ export const useProjectStore = defineStore('project', {
         // data.forEach(p => this.getProject(p))
       } catch (error) {
         // console.log(error)
-      } finally {
-        this.isLoadingProjects = false
       }
     },
-    async loadNext(index: number, done: any) {
+    async loadNext(index: number, done: any, filters: Object) {
+      // Remove all the data when the first page is requested.
       if (index === 1) this.projects = []
-      console.log(`Loading page ${index}`)
-      try {
-        const { results } = (
-          await instance.get<{ results: TempProject[] }>(
-            `projects/?page=${index}&page_size=15&search=${this.projectFilter}`
-          )
-        ).data
-        let base = this.projects.length
-        this.projects = this.projects.concat(
-          results.map(
-            (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
-          )
+      
+      const { results, next } = (
+        await instance.get<{ results: TempProject[], next: string }>(
+          `projects/?page=${index}`, { params: filters }
         )
-        results.forEach(async (project, i) => {
-          const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) => useCoachStore().getUser(coach))
-          )
+      ).data
+      
+      let base = this.projects.length
+      
+      this.projects = this.projects.concat(
+        results.map(
+          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
+        )
+      )
+      
+      results.forEach(async (project, i) => {
+        const coaches: Array<User> = await Promise.all(
+          project.coaches.map((coach) => useCoachStore().getUser(coach))
+        )
 
-          const skills: Array<ProjectSkillInterface> = await Promise.all(
-            project.requiredSkills.map((skill) => this.getSkill(skill))
-          )
+        const skills: Array<ProjectSkillInterface> = await Promise.all(
+          project.requiredSkills.map((skill) => this.getSkill(skill))
+        )
 
-          const students: Array<ProjectSuggestionInterface> =
-            await this.fetchSuggestedStudents(project.suggestedStudents)
+        const students: Array<ProjectSuggestionInterface> =
+          await this.fetchSuggestedStudents(project.suggestedStudents)
 
-          this.projects[base + i].coaches = coaches
-          this.projects[base + i].requiredSkills = skills
-          this.projects[base + i].suggestedStudents = students
-        })
-        done()
-      } catch {
-        done(true)
-      }
+        this.projects[base + i].coaches = coaches
+        this.projects[base + i].requiredSkills = skills
+        this.projects[base + i].suggestedStudents = students
+      })
+      // If next is null, we are at the end of the results.
+      // We can signal this to q-infinite-scroll by returning done(true)
+      done(next === null)
     },
     async receiveSuggestion({
       project_id,

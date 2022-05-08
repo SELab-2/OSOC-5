@@ -19,9 +19,6 @@ interface State {
   possibleSuggestion: number
   currentStudent: Student | null
   nextPage: string | null
-  miniState: boolean
-  showFilters: boolean
-  showShadow: boolean
   selectedStudent: number | null
 }
 
@@ -41,9 +38,6 @@ export const useStudentStore = defineStore('user/student', {
     possibleSuggestion: -1,
     currentStudent: null,
     nextPage: '',
-    miniState: false,
-    showFilters: false,
-    showShadow: false,
     selectedStudent: null
   }),
   actions: {

@@ -1,21 +1,20 @@
 <template>
   <div>
     <q-drawer
-      v-model="currentRouteName"
-      :mini="studentStore.miniState"
+      v-model="showDrawer"
+      :mini="miniState"
       :mini-width="30"
       :width="350"
       :breakpoint="100"
-      
       class="bg-grey-1 shadow-4"
     >
     <div
-    :style="!studentStore.miniState? '' : 'display: none'"
+    :style="!miniState? '' : 'display: none'"
       style="height: 100%; overflow: hidden;"
       class="fit column"
     >
         
-          <div :class="`${studentStore.showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms" class="q-px-sm">
+          <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms" class="q-px-sm">
             <div class="text-bold text-h5 q-py-sm">
               Students
             </div>
@@ -43,16 +42,16 @@
               size="0.95em"
               glow-color="teal-2"
               shadow-color="osoc-red"
-              :shadow-strength="studentStore.showFilters ? 2 : 5"
-              :color="studentStore.showFilters ? 'primary' : 'light-grey'"
-              :class="`text-${studentStore.showFilters ? 'white' : 'green'}`"
+              :shadow-strength="showFilters ? 2 : 5"
+              :color="showFilters ? 'primary' : 'light-grey'"
+              :class="`text-${showFilters ? 'white' : 'green'}`"
               icon="tune"
-              @click="studentStore.showFilters = !studentStore.showFilters"
+              @click="showFilters = !showFilters"
             />
             
           </div>
             <q-slide-transition>
-              <div v-if="studentStore.showFilters" class="overflow-hidden">
+              <div v-if="showFilters" class="overflow-hidden">
                 <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
                 <div class="q-gutter-y-sm q-px-xs">
                 
@@ -179,7 +178,7 @@
                   :key="student.email"
                   
                   class="q-ma-sm"
-                  :draggable="draggable ?? false"
+                  :draggable="draggable"
                   :must-hover="mustHover"
                   :student="student"
                   :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
@@ -217,8 +216,8 @@
           shadow-color="yellow"
           shadow-strength = "1"
           color="yellow"
-          :icon="!studentStore.miniState? 'chevron_left' : 'chevron_right'"
-          @click="studentStore.miniState = !studentStore.miniState"
+          :icon="!miniState? 'chevron_left' : 'chevron_right'"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -250,7 +249,8 @@ export default defineComponent({
     },
     draggable: {
       type: Boolean,
-      required: false
+      required: false,
+      default: true
     },
     mustHover: {
       type: Boolean,
@@ -278,7 +278,9 @@ export default defineComponent({
   },
   data() {
     return {
-      drawer: ref(true),
+      miniState: ref(false),
+      showFilters: ref(false),
+      showShadow: ref(false),
     }
   },
   async mounted() {
@@ -286,7 +288,7 @@ export default defineComponent({
     await this.studentStore.loadStudents()
   }, 
   computed: {
-    currentRouteName() {
+    showDrawer() {
       console.log(this.$route.name)
         return this.$route.name === "Students" || this.$route.name === "Projects" || this.$route.name === "Student Page";
     }
@@ -294,7 +296,7 @@ export default defineComponent({
   methods: {
     onScroll(info) {
       console.log(info.verticalPosition)
-      this.studentStore.showShadow = info.verticalPosition > 5
+      this.showShadow = info.verticalPosition > 5
     },
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
