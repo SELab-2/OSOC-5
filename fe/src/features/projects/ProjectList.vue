@@ -122,19 +122,29 @@
         </div>
       </q-slide-transition>
     </div>
-      
+    
+    <div id="scroll-target-id" style="flex:1; overflow: auto; " @scroll="showShadow = $event.target.scrollTop > 5">
+      <q-infinite-scroll @load="onLoad" :offset="250"  scroll-target="#scroll-target-id" >
+        
       <masonry-wall
-        style="flex:1; overflow: auto; "
+        
         :items="projectStore.projects"
         :ssr-columns="1"
         :column-width="320"
         :gap="0"
-        @scroll="showShadow = $event.target.scrollTop > 5"
+        
       >
         <template #default="{ item }">
           <project-card :project="item" />
         </template>
       </masonry-wall>
+        <template v-slot:loading>
+          <div class="row justify-center q-my-md">
+            <q-spinner color="teal" size="40px" />
+          </div>
+        </template>
+      </q-infinite-scroll>
+      </div>
     </div>
 
     <q-page-sticky
@@ -184,6 +194,17 @@ export default defineComponent({
       showShadow: ref(false),
       showFilters: ref(false),
       sideBarKey: 0,
+    }
+  },
+  methods: {
+    onScroll(event: Event) {
+      console.log(event.target.scrollTopMax - event.target.scrollTop)
+      this.showShadow = event.target.scrollTop > 5
+      return false
+    },
+    onLoad(index, done) {
+      console.log("loading")
+      setTimeout(() => done(), 5000)
     }
   },
   computed: {
