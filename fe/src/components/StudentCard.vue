@@ -1,5 +1,5 @@
 <template>
-  <div class="relative-position cursor-pointer">
+  <div class="full-width relative-position cursor-pointer">
     <span
       class="dot"
       :class="mySuggestionColor"

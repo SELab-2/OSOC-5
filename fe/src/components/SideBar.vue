@@ -33,17 +33,17 @@
               hide-bottom-space
             >
             <template v-slot:label>
-              <span class="text-weight-medium text-teal-3">Search Students</span>
+              <span class="text-weight-medium text-teal-4">Search Students</span>
             </template>
             <template v-slot:append>
-              <q-icon name="search" color="teal-3" />
+              <q-icon name="search" color="teal-4" />
             </template>
             </q-input>
             <btn
               round
               size="0.95em"
               glow-color="teal-2"
-              shadow-color="primary"
+              shadow-color="osoc-red"
               :shadow-strength="showFilters ? 2 : 5"
               :color="showFilters ? 'primary' : 'light-grey'"
               :class="`text-${showFilters ? 'white' : 'green'}`"
@@ -53,14 +53,15 @@
             
           </div>
             <q-slide-transition>
-              <div v-if="showFilters" class="overflow">
+              <div v-if="showFilters" class="overflow-hidden">
                 <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
-                <div class="q-gutter-y-sm ">
+                <div class="q-gutter-y-sm q-px-xs">
                 
             <SegmentedControl
               v-model="studentStore.alumni"
               color="primary"
               text-color="white"
+              class="q-mt-md"
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
