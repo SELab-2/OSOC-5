@@ -215,9 +215,8 @@
       >
         <btn
           dense
-          round
-          style="border-radius: 30px;"
-          unelevated
+          shadow-color="yellow"
+          shadow-strength = "1"
           color="yellow"
           :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
           @click="miniState = !miniState"
