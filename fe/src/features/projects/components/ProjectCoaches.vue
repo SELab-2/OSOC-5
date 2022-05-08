@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
-  >
+  <div class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
     <div class="text-h4 q-my-md">
       Project Coaches
     </div>
