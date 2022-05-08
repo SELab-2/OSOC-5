@@ -194,8 +194,6 @@ export const useStudentStore = defineStore('user/student', {
         })
       }
 
-      await this.loadStudent(studentId)
-
       this.isLoading = false
     },
     async receiveSuggestion({
