@@ -118,12 +118,12 @@
         <q-slide-transition
           v-show="selectedRoles[role.skill.id] || hovered === role.skill.id"
         >
-          <q-item-label
-            class="text-subtitle1 text-bold"
+          <div
+            class="text-bold"
             :class="'text-' + role.skill.color + '-8'"
           >
             {{ role.skill.name }}
-          </q-item-label>
+          </div>
         </q-slide-transition>
 
         <div v-for="suggestion in groupedStudents[role.skill.id] ?? []">
