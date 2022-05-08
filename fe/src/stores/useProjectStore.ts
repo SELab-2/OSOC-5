@@ -113,9 +113,7 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       try {
         const { results } = (
-          await instance.get<{ results: TempProject[] }>(
-            `projects/`
-          )
+          await instance.get<{ results: TempProject[] }>(`projects/`)
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
@@ -153,21 +151,22 @@ export const useProjectStore = defineStore('project', {
     async loadNext(index: number, done: any, filters: Object) {
       // Remove all the data when the first page is requested.
       if (index === 1) this.projects = []
-      
+
       const { results, next } = (
-        await instance.get<{ results: TempProject[], next: string }>(
-          `projects/?page=${index}`, { params: filters }
+        await instance.get<{ results: TempProject[]; next: string }>(
+          `projects/?page=${index}`,
+          { params: filters }
         )
       ).data
-      
+
       let base = this.projects.length
-      
+
       this.projects = this.projects.concat(
         results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
       )
-      
+
       results.forEach(async (project, i) => {
         const coaches: Array<User> = await Promise.all(
           project.coaches.map((coach) => useCoachStore().getUser(coach))
