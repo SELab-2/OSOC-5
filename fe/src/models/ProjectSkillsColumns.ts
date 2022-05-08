@@ -28,8 +28,15 @@ const columnsSkills = [
     sortable: false
   },
   {
+    name: "edit",
+    align: "center" as const,
+    label: "",
+    field: "",
+    sortable: false
+  },
+  {
     name: "action",
-    align: "right" as const,
+    align: "center" as const,
     label: "",
     field: "",
     sortable: false

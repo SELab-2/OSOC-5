@@ -10,10 +10,10 @@
       </q-card-section>
       <q-card-section class="q-pt-xs">
         <div class="text-h6 q-mt-sm q-mb-xs">
-          Are you sure you want to delete "{{ deleteSkillName }}"?
+          Are you sure you want to delete "{{ name }}"?
         </div>
         <div class="text text-grey">
-          This skill will be deleted immediately from all projects.
+          This student will be permanently deleted. 
           You cannot undo this action.
         </div>
       </q-card-section>
@@ -34,8 +34,8 @@
         flat
         color="red"
         label="Delete"
+        @click="executeDelete"
         glow-color="red-2"
-        @click="deleteSkillConfirm(deleteSkillId ?? -1)"
       />
     </q-card-actions>
   </q-card>
@@ -43,47 +43,29 @@
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import {useSkillStore} from "../../../../stores/useSkillStore";
+import { useStudentStore } from "../../../stores/useStudentStore";
 
 export default defineComponent ({
   props: {
-    deleteSkillId: {
-      type: Number,
+    delete: {
+      type: Function,
       required: true
     },
-    deleteSkillName: {
+    name: {
       type: String,
       required: true
-    },
+    }
   },
   setup() {
-    const skillStore = useSkillStore()
+    const studentStore = useStudentStore()
 
     return {
-      skillStore
+      studentStore
     }
   },
   methods: {
-    deleteSkillConfirm(id: number) {
-      if (id !== -1) {
-        this.skillStore.deleteSkill(id, // callback
-          (success: boolean) => {
-            if (success) {
-              this.$q.notify({
-                icon: 'done',
-                color: 'positive',
-                message: 'Successfully deleted!',
-              })
-            } else {
-              this.$q.notify({
-                icon: "close",
-                color: "negative",
-                message: "Failed to delete, skill is in use!"
-              });
-            }
-          }
-        )
-      }
+    executeDelete: async function () {
+      await this.delete()
     },
   }
 })
