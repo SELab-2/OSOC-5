@@ -3,6 +3,7 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
+import { useCoachStore } from './useCoachStore'
 
 interface State {
   search: string
@@ -94,27 +95,22 @@ export const useStudentStore = defineStore('user/student', {
     },
     async loadStudents() {
       this.isLoading = true
-      const filters = []
 
-      if (this.search) filters.push(`search=${this.search}`)
-      if (this.alumni === 'alumni') filters.push('alum=true')
-      if (this.alumni === 'student coaches') filters.push('student_coach=true')
-      if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
-      if (this.byMe !== 'maybe') filters.push(`suggested_by_user=${this.byMe}`)
-      if (this.onProject !== 'maybe') filters.push(`on_project=${this.onProject}`)
-      if (this.status) filters.push(`status=${this.status}`)
+      const params = {
+        page: 1
+      } as {page: number, search: string, alum: boolean, student_coach: boolean, suggestion: string, suggested_by_user: string, on_project: string, status: string, skills: string}
 
-      for (const skill of this.skills) {
-        filters.push(`skills=${skill.id}`)
-      }
-
-      let url = ''
-      if (filters.length > 0) {
-        url = `&${filters.join('&')}`
-      }
+      if (this.search) params.search = this.search
+      if (this.alumni === 'alumni') params.alum = true
+      if (this.alumni === 'student coaches') params.student_coach = true
+      if (this.decision !== 'none') params.suggestion = this.decision
+      if (this.byMe !== 'maybe') params.suggested_by_user = this.byMe
+      if (this.onProject !== 'maybe') params.on_project = this.onProject
+      if (this.status) params.status = this.status
+      if (this.skills.length > 0) this.skills.join('&')
 
       await instance
-        .get<{results: Student[], next: string}>(`students/?page=1${url}`)
+        .get<{results: Student[], next: string}>('students/', {params: params})
         .then(async ({ data }) => {
           this.nextPage = data.next
 

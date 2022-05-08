@@ -19,7 +19,7 @@
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="mailStore.loadStudentsMails"
+          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
         >
           <template #append>
             <q-icon name="search" />
@@ -28,11 +28,14 @@
       </div>
 
       <q-table
+        v-model:pagination="pagination"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
-        :columns="columns"
+        :columns="columnsMails"
         row-key="id"
         separator="horizontal"
+        :loading="mailStore.isLoading"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -42,7 +45,10 @@
             <q-td auto-width>
               <q-icon
                 @click="() => clickRow(props, props.row)"
-                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+                size="sm"
+                color="yellow"
+                :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              />
             </q-td>
             <q-td
               key="name"
@@ -110,42 +116,9 @@ import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
+import columnsMails from "../../models/MailStudentColumns";
+import { useAuthenticationStore } from "../../stores/useAuthenticationStore";
 import router from "../../router";
-import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
-
-const columns = [
-  {
-    name: 'visibility',
-    required: false,
-    label: '',
-    align: 'left' as const,
-    field: '',
-    sortable: false,
-  },
-  {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left' as const,
-    field: 'name',
-    sortable: true,
-  },
-  {
-    name: 'status',
-    required: true,
-    label: 'Status',
-    align: 'left' as const,
-    field: 'status',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    align: 'right' as const,
-    label: 'Email',
-    field: 'email',
-    sortable: true,
-  }
-]
 
 export default defineComponent({
   components: {MailsOverview},
@@ -153,13 +126,22 @@ export default defineComponent({
     const mailStore = useMailStore()
     const q = useQuasar()
 
+    const pagination = ref({
+        sortBy: 'name',
+        descending: false,
+        page: 1,
+        rowsPerPage: 10,
+        rowsNumber: 10 // if getting data from a server
+      })
+
     return {
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
-      columns,
+      columnsMails,
       status,
-      q
+      q,
+      pagination,
     }
   },
   beforeMount() {
@@ -167,12 +149,16 @@ export default defineComponent({
       router.replace('/projects')
     }
   },
-  mounted() {
-    this.mailStore.loadStudentsMails()
+  async mounted() {
+    await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
+    async onRequest(props: any) {
+      this.pagination = props.pagination
+      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
     updateStatus(student: Student, oldStatus: string) {
-      this!.$nextTick(() => {
+      this?.$nextTick(() => {
         this.mailStore
           .updateStatus(student)
           .catch((error) => {
