@@ -26,20 +26,22 @@ export const useMailStore = defineStore('user/mail', {
             this.isLoading = true
             const studentStore = useStudentStore()
 
-            const filters = []
-            if (this.searchMails) filters.push(`search=${this.searchMails}`)
+            const params = {
+                page_size: pagination.rowsPerPage,
+                page: pagination.page
+            } as {page_size: number, page: number, search: string, ordering: string}
+
+            // const filters = []
+            if (this.searchMails) params.search = this.searchMails // filters.push(`search=${this.searchMails}`)
             const order = pagination.descending ? '-' : '+'
             if (pagination.sortBy === 'name') {
-                filters.push(`ordering=${order}first_name,${order}last_name`)
+                params.ordering = `${order}first_name,${order}last_name`
             } else if (pagination.sortBy !== null) {
-                filters.push(`ordering=${order}${pagination.sortBy}`)
+                params.ordering = `${order}${pagination.sortBy}`
             }
 
-            let url = ''
-            if (filters) url = `&${filters.join('&')}`
-
             await instance
-                .get<{ results: Student[], count: number }>(`students/?page_size=${pagination.rowsPerPage}&page=${pagination.page}${url}`)
+                .get<{ results: Student[], count: number }>(`students/`, {params: params})
                 .then(async ({ data }) => {
                     setNumberOfRows(data.count)
 
@@ -57,8 +59,12 @@ export const useMailStore = defineStore('user/mail', {
 
             const studentStore = useStudentStore()
 
+            const params = {
+                receiver: student.id
+            }
+
             await instance
-                .get<{ results: Mail[] }>(`emails/?receiver=${student.id}`)
+                .get<{ results: Mail[] }>(`emails/`, {params: params})
                 .then(async ({ data }) => {
                     for (const mail of data.results) {
                         mail.time = new Date(mail.time).toLocaleString()
