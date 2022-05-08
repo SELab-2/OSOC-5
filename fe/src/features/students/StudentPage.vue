@@ -1,13 +1,4 @@
 <template>
-  <q-page-container style="height: 100%">
-
-  <div>
-  <SideBar
-    :select-student="selectStudent"
-    :draggable="false"
-    :must-hover="false"
-  />
-  
   <div
     class="fit"
     style=" overflow: auto;"
@@ -145,6 +136,7 @@
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SuggestionsCard
           title="Suggestions"
+          :suggestions="student?.suggestions"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -167,13 +159,13 @@
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <ExtraInfoCard
           title="Hinder for work"
-          :content="studentStore.currentStudent?.hinderWork ?? ''"
+          :content="student?.hinderWork ?? ''"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <ExtraInfoCard
           title="Fun fact"
-          :content="studentStore.currentStudent?.funFact ?? ''"
+          :content="student?.funFact ?? ''"
         />
       </div>
     </div>
@@ -181,14 +173,12 @@
       <div class="studentcol col-12">
         <ExtraInfoCard
           title="Motivation"
-          :content="studentStore.currentStudent?.motivation ?? ''"
+          :content="student?.motivation ?? ''"
         />
       </div>
     </div>
   </div>
   </div>
-</div>
-  </q-page-container>
 </template>
 
 <script lang="ts">
@@ -251,7 +241,7 @@ export default defineComponent ({
   },
   computed: {
     student(): Student | null {
-      return this.studentStore.currentStudent
+      return this.studentStore.students.find(s => s.id === this.studentStore.selectedStudent)
     },
     possibleSuggestion(): string {
       return this.studentStore.possibleSuggestion.toString()

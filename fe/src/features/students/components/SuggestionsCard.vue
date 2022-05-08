@@ -15,7 +15,7 @@
         class="column"
       >
         <div
-          v-for="(suggestion, key) in studentStore.currentStudent?.suggestions"
+          v-for="(suggestion, key) in suggestions"
           :key="key"
         >
           <div class="row">
@@ -63,7 +63,7 @@
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import {defineComponent} from "@vue/runtime-core";
-
+import {Suggestion} from "../../../models/Suggestion"
 export default defineComponent( {
   components: {LoadingSpinner},
   props: {
@@ -71,6 +71,10 @@ export default defineComponent( {
       type: String,
         required: true
     },
+    suggestions: {
+      type: Array<Suggestion>,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()

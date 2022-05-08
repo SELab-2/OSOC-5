@@ -1,11 +1,6 @@
 <template>
-  <q-page-container style="height: 100%">
   <div style="height: 100%">
-    <SideBar
-      :select-student="() => {}"
-      :must-hover="true"
-      draggable
-    />
+    
     <!-- <div > -->
     <div
       style="height: 100%; overflow: hidden;"
@@ -166,7 +161,6 @@
       />
     </q-page-sticky>
   </div>
-  </q-page-container>
 </template>
 
 <script lang="ts">

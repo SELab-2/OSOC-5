@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-drawer
-      v-model="drawer"
+      v-model="currentRouteName"
       :mini="studentStore.miniState"
       :mini-width="30"
       :width="350"
@@ -284,7 +284,13 @@ export default defineComponent({
   async mounted() {
     //this.skillStore.loadSkills()
     await this.studentStore.loadStudents()
-  },   
+  }, 
+  computed: {
+    currentRouteName() {
+      console.log(this.$route.name)
+        return this.$route.name === "Students" || this.$route.name === "Projects" || this.$route.name === "Student Page";
+    }
+  },
   methods: {
     onScroll(info) {
       console.log(info.verticalPosition)
@@ -303,7 +309,8 @@ export default defineComponent({
       e.dataTransfer.effectAllowed = 'copy'
     },
     clickStudent(student: Student) {
-      this.selectStudent(student)
+      this.studentStore.selectedStudent = student.id
+      this.$router.push(`/students/${student.id}`)
     },
     async loadStudents(scroll: any) {
       scroll.resume()

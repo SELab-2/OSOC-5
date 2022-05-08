@@ -15,7 +15,7 @@
         <q-route-tab
           name="students"
           label="Select Students"
-          to="/students"
+          :to="`/students/${studentStore.selectedStudent ?? ''}`"
         />
         <q-route-tab
           name="projects"
@@ -141,7 +141,7 @@
 import {defineComponent, ref} from 'vue'
 import { useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
-
+import { useStudentStore } from '../stores/useStudentStore'
 export default defineComponent({
   data() {
     return {
@@ -164,6 +164,7 @@ export default defineComponent({
     const password2 = ref('')
     const display_popup = ref(false)
     return {
+      studentStore: useStudentStore(),
       isPwd1: ref(true),
       isPwd2: ref(true),
       password1,

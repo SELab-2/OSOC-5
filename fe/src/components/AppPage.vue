@@ -1,18 +1,24 @@
 <template>
   <TopToolbar/>
+  <SideBar/>
+  <q-page-container style="height: 100%">
+
   <router-view style="height: 100%" v-slot="{ Component }">
     <keep-alive>
       <component :is="Component" />
     </keep-alive>
   </router-view>
+  </q-page-container>
+
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
 import TopToolbar from "./TopToolbar.vue"
+import SideBar from "./SideBar.vue"
 
 export default defineComponent({
-  components: {TopToolbar},
+  components: {TopToolbar, SideBar},
 })
 </script>
 

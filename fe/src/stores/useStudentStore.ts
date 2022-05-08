@@ -22,6 +22,7 @@ interface State {
   miniState: boolean
   showFilters: boolean
   showShadow: boolean
+  selectedStudent: number | null
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -42,7 +43,8 @@ export const useStudentStore = defineStore('user/student', {
     nextPage: '',
     miniState: false,
     showFilters: false,
-    showShadow: false
+    showShadow: false,
+    selectedStudent: null
   }),
   actions: {
     async getStudent(url: string): Promise<Student> {
