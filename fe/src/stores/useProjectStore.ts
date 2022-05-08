@@ -148,7 +148,7 @@ export const useProjectStore = defineStore('project', {
         // console.log(error)
       }
     },
-    async loadNext(index: number, done: any, filters: Object) {
+    async loadNext(index: number, done: Function, filters: Object) {
       // Remove all the data when the first page is requested.
       if (index === 1) this.projects = []
 
