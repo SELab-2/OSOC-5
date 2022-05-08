@@ -127,7 +127,7 @@
     </div>
     
     <div id="scroll-target-id" style="flex:1; overflow: auto; " @scroll="showShadow = $event.target.scrollTop > 5">
-      <q-infinite-scroll @load="onLoad" :offset="250"  scroll-target="#scroll-target-id" >
+      <q-infinite-scroll @load="projectStore.loadNext" :offset="250"  scroll-target="#scroll-target-id" >
         
       <masonry-wall
         
@@ -198,17 +198,6 @@ export default defineComponent({
       showFilters: ref(false),
     }
   },
-  methods: {
-    onScroll(event: Event) {
-      console.log(event.target.scrollTopMax - event.target.scrollTop)
-      this.showShadow = event.target.scrollTop > 5
-      return false
-    },
-    onLoad(index, done) {
-      console.log("loading")
-      setTimeout(() => done(), 5000)
-    }
-  },
   computed: {
     expanded: {
       get() {
@@ -235,8 +224,8 @@ export default defineComponent({
   },
   created() {
     // Prevent a reload each time switched to the tab.
-    if (this.projectStore.projects.length === 0)
-      this.projectStore.loadProjects()
+    // if (this.projectStore.projects.length === 0)
+      // this.projectStore.loadProjects()
   },
   mounted() {
       this.socket.onmessage = async (event: { data: string }) => {

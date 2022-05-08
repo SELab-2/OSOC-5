@@ -32,6 +32,7 @@ interface State {
   filterCoaches: string
   selectedCoaches: Array<User>
   projectFilter: string
+  nextPage: string
 }
 
 export const useProjectStore = defineStore('project', {
@@ -44,6 +45,7 @@ export const useProjectStore = defineStore('project', {
     filterCoaches: '',
     selectedCoaches: [],
     projectFilter: '',
+    nextPage: '',
   }),
   actions: {
     async fetchSuggestedStudents(
@@ -117,12 +119,15 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       this.isLoadingProjects = true
       try {
-        const { results } = (
-          await instance.get<{ results: TempProject[] }>(`projects/?search=${this.projectFilter}`)
+        const { results, next } = (
+          await instance.get<{ results: TempProject[]; next: string }>(
+            `projects/?search=${this.projectFilter}`
+          )
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
         )
+        this.nextPage = next
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
             project.coaches.map((coach) => useCoachStore().getUser(coach))
@@ -153,6 +158,42 @@ export const useProjectStore = defineStore('project', {
         // console.log(error)
       } finally {
         this.isLoadingProjects = false
+      }
+    },
+    async loadNext(index: number, done: any) {
+      if (index === 1) this.projects = []
+      console.log(`Loading page ${index}`)
+      try {
+        const { results } = (
+          await instance.get<{ results: TempProject[] }>(
+            `projects/?page=${index}&page_size=15&search=${this.projectFilter}`
+          )
+        ).data
+        let base = this.projects.length
+        this.projects = this.projects.concat(
+          results.map(
+            (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
+          )
+        )
+        results.forEach(async (project, i) => {
+          const coaches: Array<User> = await Promise.all(
+            project.coaches.map((coach) => useCoachStore().getUser(coach))
+          )
+
+          const skills: Array<ProjectSkillInterface> = await Promise.all(
+            project.requiredSkills.map((skill) => this.getSkill(skill))
+          )
+
+          const students: Array<ProjectSuggestionInterface> =
+            await this.fetchSuggestedStudents(project.suggestedStudents)
+
+          this.projects[base + i].coaches = coaches
+          this.projects[base + i].requiredSkills = skills
+          this.projects[base + i].suggestedStudents = students
+        })
+        done()
+      } catch {
+        done(true)
       }
     },
     async receiveSuggestion({
@@ -277,7 +318,9 @@ export const useProjectStore = defineStore('project', {
           this.loadProjects()
           callback(true)
         })
-        .catch(() => {callback(false)})
+        .catch(() => {
+          callback(false)
+        })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getAndSetProject(id: string, callback: any) {
