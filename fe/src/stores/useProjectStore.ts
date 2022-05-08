@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
-import { Student, TempStudent } from '../models/Student'
+import { Student } from '../models/Student'
 import {
   TempProjectSuggestion,
   NewProjectSuggestion,
@@ -49,19 +49,22 @@ export const useProjectStore = defineStore('project', {
     async getConflictingProjects() {
       const studentStore = useStudentStore()
 
-      const { data } = await instance.get('projects/get_conflicting_projects')
-      const conflicts = new Map()
-      for (const conflict of Object.entries(data.conflicts)) {
-        const student = await studentStore.getStudent(conflict[0])
+      const conflicts = (
+        await instance.get('projects/get_conflicting_projects')
+      ).data as Array<{ student: string; projects: Array<string> }>
+      const resConflicts = []
+      for (const conflict of conflicts) {
+        const student = await studentStore.getStudent(conflict.student)
         const projects = await Promise.all(
-          (conflict[1] as string[]).map(
+          conflict.projects.map(
             async (project: string) => await this.getOrFetchProject(project)
           )
         )
-        conflicts.set(student, projects)
+
+        resConflicts.push({ student, projects })
       }
 
-      return conflicts
+      return resConflicts
     },
     async fetchSuggestedStudents(
       students: TempProjectSuggestion[]

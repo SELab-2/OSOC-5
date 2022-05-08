@@ -23,46 +23,66 @@
             class="rounded-borders text-primary"
           >
             <q-item
-              v-for="conflict in conflicts.entries()"
-              :key="conflict[0]"
+              v-for="conflict in conflicts"
+              :key="conflict.student"
               v-ripple
               clickable
-              :class="conflict[0].id === selectedStudent.id ? 'bg-teal-1' : ''"
-              @click="selectedStudent = conflict[0]; studentProjects = conflict[1]"
+              :class="conflict.student.id === selectedConflict.student.id ? 'bg-teal-1' : ''"
+              @click="selectedConflict = conflict"
             >
               <q-item-section>
-                {{ fullName(conflict[0]) }}
+                {{ fullName(conflict.student) }}
               </q-item-section>
             </q-item>
           </q-list>
         </div>
         <div class="col">
-          <div v-if="studentProjects.length !== 0">
-            <masonry-wall
-              ref="scrol"
-              style="scroll-padding-top: 100px; overflow: auto; height: 92%"
-              :items="studentProjects"
-              :ssr-columns="1"
-              :column-width="320"
-              :gap="0"
+          <div v-if="selectedConflict.projects && selectedConflict.projects.length !== 0">
+            <div
+              id="scroll-target-id"
+              style="flex:1; overflow: auto; "
               @scroll="showShadow = $event.target.scrollTop > 5"
             >
-              <template #default="{ item }">
-                <q-radio
-                  v-model="selectedProject"
-                  :val="item"
-                  label="Select this project "
-                />
-                <ProjectConflictCard :project="item" />
-              </template>
-            </masonry-wall>
+              <q-infinite-scroll
+                :offset="250"
+                scroll-target="#scroll-target-id"
+                @load="onLoad"
+              >
+                <masonry-wall
+                  ref="scrol"
+                  style="scroll-padding-top: 100px; overflow: auto; height: 92%"
+                  :items="selectedConflict.projects"
+                  :ssr-columns="1"
+                  :column-width="320"
+                  :gap="0"
+                  @scroll="showShadow = $event.target.scrollTop > 5"
+                >
+                  <template #default="{ item }">
+                    <q-radio
+                      v-model="selectedProject"
+                      :val="item"
+                      label="Select this project "
+                    />
+                    <ProjectConflictCard :project="item" />
+                  </template>
+                </masonry-wall>
+                <template #loading>
+                  <div class="row justify-center q-my-md">
+                    <q-spinner
+                      color="teal"
+                      size="40px"
+                    />
+                  </div>
+                </template>
+              </q-infinite-scroll>
+            </div>
           </div>
           <div v-else>
             Please select a student
           </div>
         </div>
         <div
-          v-if="studentProjects.length !== 0"
+          v-if="selectedConflict.projects && selectedConflict.projects.length !== 0"
           class="col-2"
         >
           <q-btn
@@ -85,16 +105,12 @@ export default defineComponent({
     async setup() {
         const projectStore = useProjectStore()
         const conflicts = await projectStore.getConflictingProjects()
-        const selectedStudent = ref({})
-        const studentProjects = ref([])
 
         return {
             projectStore,
             conflicts,
-            selectedStudent,
+            selectedConflict: ref({student: {}}),
             showShadow: ref(false),
-            selectedProject: ref({}),
-            studentProjects
         }
     },
     methods: {
@@ -102,8 +118,12 @@ export default defineComponent({
         return `${user.firstName} ${user.lastName}`
       },
       resolveConflict() {
-        this.projectStore.resolveConflict(this.selectedProject)
-      }
+        // this.projectStore.resolveConflict(this.selectedProject)
+      },
+      onLoad(index, done) {
+      console.log("loading")
+      setTimeout(() => done(), 5000)
+    }
     }
 })
 </script>
