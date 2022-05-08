@@ -1,6 +1,10 @@
 <template>
   <TopToolbar/>
-  <router-view style="height: 100%"/>
+  <router-view style="height: 100%" v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 </template>
 
 <script lang="ts">

@@ -1,10 +1,13 @@
 <template>
+  <q-page-container style="height: 100%">
+
   <div>
     <SideBar :must-hover="false" :selectStudent="selectStudent" color="bg-grey-3" :draggable="false"/>
     <div class="q-pa-lg full-height flex-center">
       <label>Select a student from the sidebar to get started</label>
     </div>
   </div>
+  </q-page-container>
 </template>
 
 <script lang="ts">

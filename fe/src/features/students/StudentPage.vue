@@ -1,4 +1,7 @@
 <template>
+  <q-page-container style="height: 100%">
+
+  <div>
   <SideBar
     :select-student="selectStudent"
     :draggable="false"
@@ -184,6 +187,8 @@
     </div>
   </div>
   </div>
+</div>
+  </q-page-container>
 </template>
 
 <script lang="ts">

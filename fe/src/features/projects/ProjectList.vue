@@ -1,4 +1,5 @@
 <template>
+  <q-page-container style="height: 100%">
   <div style="height: 100%">
     <SideBar
       :select-student="() => {}"
@@ -127,7 +128,7 @@
     </div>
     
     <div id="scroll-target-id" style="flex:1; overflow: auto; " @scroll="showShadow = $event.target.scrollTop > 5">
-      <q-infinite-scroll @load="projectStore.loadNext" :offset="250"  scroll-target="#scroll-target-id" >
+      <q-infinite-scroll ref="infinite" @load="projectStore.loadNext" :offset="250"  scroll-target="#scroll-target-id" >
         
       <masonry-wall
         
@@ -165,6 +166,7 @@
       />
     </q-page-sticky>
   </div>
+  </q-page-container>
 </template>
 
 <script lang="ts">
@@ -218,7 +220,9 @@ export default defineComponent({
   watch: {
     'projectStore.projectFilter': {
       handler() {
-        this.projectStore.loadProjects()
+        this.$refs.infinite.reset()
+        this.$refs.infinite.resume()
+        this.$refs.infinite.trigger()
       }
     }
   },

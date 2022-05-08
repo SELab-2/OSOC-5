@@ -2,8 +2,7 @@
   <div>
     <q-drawer
       v-model="drawer"
-      show-if-above
-      :mini="!drawer || miniState"
+      :mini="studentStore.miniState"
       :mini-width="30"
       :width="350"
       :breakpoint="100"
@@ -11,12 +10,12 @@
       class="bg-grey-1 shadow-4"
     >
     <div
-    :style="drawer && !miniState? '' : 'display: none'"
+    :style="!studentStore.miniState? '' : 'display: none'"
       style="height: 100%; overflow: hidden;"
       class="fit column"
     >
         
-          <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms" class="q-px-sm">
+          <div :class="`${studentStore.showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms" class="q-px-sm">
             <div class="text-bold text-h5 q-py-sm">
               Students
             </div>
@@ -44,16 +43,16 @@
               size="0.95em"
               glow-color="teal-2"
               shadow-color="osoc-red"
-              :shadow-strength="showFilters ? 2 : 5"
-              :color="showFilters ? 'primary' : 'light-grey'"
-              :class="`text-${showFilters ? 'white' : 'green'}`"
+              :shadow-strength="studentStore.showFilters ? 2 : 5"
+              :color="studentStore.showFilters ? 'primary' : 'light-grey'"
+              :class="`text-${studentStore.showFilters ? 'white' : 'green'}`"
               icon="tune"
-              @click="showFilters = !showFilters"
+              @click="studentStore.showFilters = !studentStore.showFilters"
             />
             
           </div>
             <q-slide-transition>
-              <div v-if="showFilters" class="overflow-hidden">
+              <div v-if="studentStore.showFilters" class="overflow-hidden">
                 <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
                 <div class="q-gutter-y-sm q-px-xs">
                 
@@ -218,8 +217,8 @@
           shadow-color="yellow"
           shadow-strength = "1"
           color="yellow"
-          :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = !miniState"
+          :icon="!studentStore.miniState? 'chevron_left' : 'chevron_right'"
+          @click="studentStore.miniState = !studentStore.miniState"
         />
       </div>
     </q-drawer>
@@ -243,6 +242,7 @@ export default defineComponent({
     StudentCard,
     SegmentedControl,
   },
+  name: 'SideBar',
   props: {
     selectStudent: {
       type: Function,
@@ -278,10 +278,7 @@ export default defineComponent({
   },
   data() {
     return {
-      miniState: ref(false),
       drawer: ref(true),
-      showFilters: ref(false),
-      showShadow: ref(false),
     }
   },
   async mounted() {
@@ -291,7 +288,7 @@ export default defineComponent({
   methods: {
     onScroll(info) {
       console.log(info.verticalPosition)
-      this.showShadow = info.verticalPosition > 5
+      this.studentStore.showShadow = info.verticalPosition > 5
     },
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
