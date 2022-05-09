@@ -90,7 +90,6 @@ export const useStudentStore = defineStore('user/student', {
 
       if (student.finalDecision) {
         student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
-        console.log("got here")
       }
 
       for (const suggestion of student.suggestions) {
@@ -186,8 +185,6 @@ export const useStudentStore = defineStore('user/student', {
 
       await instance.get(`students/${studentId}/`).then(async ({ data }) => {
         await this.transformStudent(data)
-        console.log(data.finalDecision?.suggestion ?? 'is null')
-        console.log(typeof (data.finalDecision?.suggestion))
 
         this.currentStudent = new Student(data as Student)
       })
@@ -354,7 +351,6 @@ export const useStudentStore = defineStore('user/student', {
       coach: { id: number; firstName: string; lastName: string; url: string }
       reason: string
     }) {
-      console.log('receive final decision')
       this.isLoading = true
 
       const studentId = Number.parseInt(student_id)

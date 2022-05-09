@@ -47,7 +47,6 @@
         v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
         class="row q-gutter-sm items-center"
       >
-        {{typeof (possibleFinalDecision)}}
         <q-select
           v-model="possibleFinalDecision"
           emit-value
@@ -134,8 +133,8 @@
       <q-dialog v-model="suggestionDialog">
         <DecisionCard
           :name="student?.fullName ?? ''"
-          :suggestion-name="suggestionName(possibleSuggestion)"
-          :suggestion-color="suggestionColor(possibleSuggestion)"
+          :suggestion-name="suggestionName(studentStore.possibleSuggestion)"
+          :suggestion-color="suggestionColor(studentStore.possibleSuggestion)"
           :make-suggestion="(reason: string) => makeSuggestion(reason)"
         />
       </q-dialog>
