@@ -239,6 +239,7 @@ import { Student } from "../../models/Student";
 import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
+import DeleteStudentDialog from "./components/DeleteStudentDialog.vue";
 import InfoDiv from "./components/InfoDiv.vue";
 import DecisionIcon from "../../components/DecisionIcon.vue";
 import yesMaybeNoOptions from "../../models/YesMaybeNoOptions";
@@ -256,6 +257,7 @@ export default defineComponent ({
     SkillsCard,
     SegmentedControl,
     SideBar,
+    DeleteStudentDialog
   },
   props: {
     id: {
