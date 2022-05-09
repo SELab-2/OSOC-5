@@ -156,7 +156,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             async_to_sync(channel_layer.group_send)(
                 "suggestion",
                 {
-                    'type': 'suggestion',
+                    'type': 'final_decision',
                     'data': socket_data
                 }
             )
@@ -182,7 +182,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         async_to_sync(channel_layer.group_send)(
             "suggestion",
             {
-                'type': 'final_decision',
+                'type': 'remove_final_decision',
                 'data': {
                     'student_id': pk
                 }

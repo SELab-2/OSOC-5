@@ -5,7 +5,6 @@
     :clickable="true"
     :draggable="false"
     :must-hover="false"
-    @update="update"
   />
   
   <div
@@ -62,8 +61,16 @@
           class="cornered"
           outline
           label="Confirm"
-          @click="finalDecision"
+          @click="decisionDialog = true"
         />
+        <q-dialog v-model="decisionDialog">
+          <DecisionCard
+            :name="student?.fullName ?? ''"
+            :suggestion-name="suggestionName(possibleFinalDecision)"
+            :suggestion-color="suggestionColor(possibleFinalDecision)"
+            :make-suggestion="(reason: string) => finalDecision(reason)"
+          />
+        </q-dialog>
       </div>
     </div>
     <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
@@ -123,53 +130,14 @@
       />
 
       <q-dialog v-model="suggestionDialog">
-        <q-card>
-          <q-card-section>
-            <div class="text-h6">
-              Suggest
-              <btn
-                :label="suggestionName"
-                dense
-                rounded
-                class="text-h6"
-                :class="suggestionColor"
-              />
-              for {{ name }}
-            </div>
-          </q-card-section>
-
-          <q-card-section class="q-pt-none">
-            Why are you making this decision? (optional)
-            <q-input
-              v-model="reason"
-              filled
-              type="textarea"
-            />
-          </q-card-section>
-
-          <q-card-actions
-            align="right"
-            class="text-primary"
-          >
-            <btn
-              v-close-popup
-              flat
-              color="grey"
-              label="Cancel"
-              glow-color="grey-4"
-            />
-            <btn
-              v-close-popup
-              flat
-              label="Suggest"
-              glow-color="teal-1"
-              @click="makeSuggestion"
-            />
-          </q-card-actions>
-        </q-card>
+        <DecisionCard
+          :name="student?.fullName ?? ''"
+          :suggestion-name="suggestionName(studentStore.possibleSuggestion)"
+          :suggestion-color="suggestionColor(studentStore.possibleSuggestion)"
+          :make-suggestion="(reason: string) => makeSuggestion(reason)"
+        />
       </q-dialog>
     </div>
-
     <div class="q-gutter-sm q-pa-lg">
       <div class="row">
         <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -190,6 +158,7 @@
             title="Skills"
           />
         </div>
+
       </div>
       <div class="row">
         <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -240,6 +209,7 @@ import {defineComponent} from "@vue/runtime-core";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
 import DeleteStudentDialog from "./components/DeleteStudentDialog.vue";
+import DecisionCard from "./components/DecisionCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
 import DecisionIcon from "../../components/DecisionIcon.vue";
 import yesMaybeNoOptions from "../../models/YesMaybeNoOptions";
@@ -248,6 +218,8 @@ import router from "../../router";
 
 export default defineComponent ({
   components: {
+    DeleteStudentDialog,
+    DecisionCard,
     DecisionIcon,
     InfoDiv,
     LanguageCard,
@@ -257,7 +229,6 @@ export default defineComponent ({
     SkillsCard,
     SegmentedControl,
     SideBar,
-    DeleteStudentDialog
   },
   props: {
     id: {
@@ -286,6 +257,7 @@ export default defineComponent ({
   },
   data() {
     const suggestionDialog = ref(false)
+    const decisionDialog = ref(false)
     const deleteDialog = ref(false)
     const reason = ref("")
  
@@ -294,7 +266,7 @@ export default defineComponent ({
       studentKey: 0,
       deleteDialog,
       suggestionDialog,
-      reason
+      decisionDialog
     }
   },
   computed: {
@@ -346,18 +318,6 @@ export default defineComponent ({
     mySuggestionColor(): string {
       return yesMaybeNoOptions.find(element => element.value == this.mySuggestion)?.color ?? ''
     },
-    /**
-     * Get the name of the possible suggestion
-     */
-    suggestionName(): string {
-      return yesMaybeNoOptions.find(element => element.value == this.studentStore.possibleSuggestion)?.label ?? ''
-    },
-    /**
-     * Get the background color of the possible suggestion
-     */
-    suggestionColor(): string {
-      return yesMaybeNoOptions.find(element => element.value == this.studentStore.possibleSuggestion)?.background ?? ''
-    }
   },
   mounted() {
       this.socket.onmessage = async (event: { data: string }) => {
@@ -375,11 +335,10 @@ export default defineComponent ({
           } else if(data.hasOwnProperty('remove_final_decision')) {
             this.studentStore.removeFinalDecision(data.remove_final_decision)
 
-            if(this.student && this.student.finalDecision)
+            if(this.student && this.student.finalDecision) {
               this.possibleFinalDecision = this.student.finalDecision.suggestion
+            }
           }
-
-          this.update()
       }
 
     // Reload when new student is selected
@@ -397,13 +356,10 @@ export default defineComponent ({
     /**
      * Make a suggestion on this student
      */
-    makeSuggestion: async function () {
+    makeSuggestion: async function (reason: string) {
       if (this.student) {
-        await this.studentStore.updateSuggestion(this.student.id, this.reason)
-        this.reason = ""
+        await this.studentStore.updateSuggestion(this.student.id, reason)
       }
-
-      this.update()
     },
     /**
      * Set possible suggestion and show dialog
@@ -416,36 +372,37 @@ export default defineComponent ({
     deleteStudent: async function () {
       if (this.student) {
         await this.studentStore.deleteStudent(this.student.url,
-          () => this.$q.notify({
-            icon: 'done',
-            color: 'positive',
-            message: 'Successfully deleted!',
-          }),
+          () => {
+            this.$q.notify({
+              icon: 'done',
+              color: 'positive',
+              message: 'Successfully deleted!',
+            })
+            router.push(`/students`)
+          },
           () => this.$q.notify({
             icon: "close",
             color: "negative",
             message: "Failed to delete!"
           }))
-        await router.push(`/students`)
       }
     },
-    /**
-     * Make a final decision
-     */
-    finalDecision: async function () {
+    finalDecision: async function (reason: string) {
       if (this.student) {
-        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
+        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision, reason)
       }
-
-      this.update()
     },
     /**
-     * Update components to show new suggestion/decision
+     * Get the name of the possible suggestion
      */
-    update() {
-      // Make components update
-      this.sideBarKey += 1
-      this.studentKey += 1
+    suggestionName(suggestion: number): string {
+      return yesMaybeNoOptions.find(element => element.value == suggestion)?.label ?? ''
+    },
+    /**
+     * Get the background color of the possible suggestion
+     */
+    suggestionColor(suggestion: number): string {
+      return yesMaybeNoOptions.find(element => element.value == suggestion)?.background ?? ''
     }
   },
 })
