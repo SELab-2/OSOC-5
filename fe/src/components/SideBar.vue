@@ -5,7 +5,7 @@
       show-if-above
       :mini="!drawer || miniState"
       :mini-width="30"
-      :width="350"
+      :width="370"
       :breakpoint="100"
       bordered
       class="full-height"
@@ -220,9 +220,10 @@ export default defineComponent({
     SegmentedControl,
   },
   props: {
-    selectStudent: {
-      type: Function,
-      required: true
+    clickable: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     color: {
       type: String,
@@ -239,14 +240,14 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
-    const $q = useQuasar()
-
     const skillStore = useSkillStore()
+
+    const $q = useQuasar()
 
     return {
       studentStore,
-      $q,
       skillStore,
+      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -268,8 +269,11 @@ export default defineComponent({
     await this.studentStore.loadStudents()
   },   
   methods: {
-    // Saves the component id and user name in the dataTransfer.
-    // TODO: send id of user instead of name.
+    /**
+     * Saves the component id and user name in the dataTransfer.
+     * @param e drag event
+     * @param item item being dragged
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDragStart(e: any, item: any) {
       const data = {
@@ -280,15 +284,31 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
       e.dataTransfer.effectAllowed = 'copy'
     },
+    /**
+     * Clicking a student sets the selected student of the sidebar
+     * @param student the clicked student in the sidebar
+     */
     clickStudent(student: Student) {
       this.selectStudent(student)
     },
+    /**
+     * Load all students and make the infinite scroll reload
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadStudents(scroll: any) {
       scroll.resume()
       this.studentStore.students = []
       await this.studentStore.loadStudents()
       this.scrollKey += 1
     },
+    /**
+     * Route to the correct details page of selected_student
+     * @param selected_student student to be displayed
+     */
+    selectStudent: function (selected_student: Student) {
+      this.$router.push(`/students/${selected_student.id}`)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadNextStudents(index: number, done: any) {
       await this.studentStore.loadNext(index, done)
       this.scrollKey += 1

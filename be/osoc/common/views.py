@@ -444,7 +444,8 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
 
         # paginate response
         page = self.paginate_queryset(conflicts)
-        serializer = ConflictSerializer(page, many=True, context={'request': request})
+        serializer = ConflictSerializer(
+            page, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['post'], serializer_class=ResolveConflictSerializer,
@@ -569,7 +570,7 @@ class CustomRegisterView(RegisterView):
     permission_classes = [permissions.IsAuthenticated, IsActive, IsAdmin]
 
     def get_response_data(self, user):
-        return {'detail' : ('User has been created.')}
+        return {'detail': ('User has been created.')}
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)

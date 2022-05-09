@@ -44,10 +44,10 @@
           >
             <q-td auto-width>
               <q-icon
-                @click="() => clickRow(props, props.row)"
                 size="sm"
                 color="yellow"
                 :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                @click="() => clickRow(props, props.row)"
               />
             </q-td>
             <q-td
@@ -77,9 +77,9 @@
               >
                 <template #option="scope">
                   <q-item
-                    @click="() => updateStatus(props.row, props.row.status)"
                     class="items-center"
                     v-bind="scope.itemProps"
+                    @click="() => updateStatus(props.row, props.row.status)"
                   >
                     <q-item-section>
                       <q-item-label>{{ scope.opt.label }}</q-item-label>
@@ -87,17 +87,22 @@
                   </q-item>
                 </template>
               </q-select>
-              
             </q-td>
             <q-td
               key="email"
               :props="props"
             >
-              <a :href="'mailto:' + props.row.email" style="color: black">{{ props.row.email }}</a>
+              <a
+                :href="'mailto:' + props.row.email"
+                style="color: black"
+              >{{ props.row.email }}</a>
             </q-td>
-            
           </q-tr>
-          <q-tr no-hover v-if="props.expand" :props="props">
+          <q-tr
+            v-if="props.expand"
+            no-hover
+            :props="props"
+          >
             <q-td colspan="100%">
               <MailsOverview :student="props.row" />
             </q-td>
@@ -153,6 +158,7 @@ export default defineComponent({
     await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async onRequest(props: any) {
       this.pagination = props.pagination
       await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
@@ -168,10 +174,13 @@ export default defineComponent({
               message: error.detail,
               textColor: 'black'
             });
-            this.mailStore.mailStudents.find((s: Student) => s.id === student.id)!.status = oldStatus
+            const student = this.mailStore.mailStudents.find((s: Student) => s.id === student.id) as Student
+            if(student)
+              student.status = oldStatus
           })
       })
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clickRow(props: any, student: Student) {
       props.expand = !props.expand
       if (props.expand) this.mailStore.getMails(student)

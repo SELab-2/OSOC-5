@@ -10,8 +10,11 @@
         <LoadingSpinner />
       </div>
 
-      <div class="column" v-else>
-        <div v-if="language" >
+      <div
+        v-else
+        class="column"
+      >
+        <div v-if="language">
           Language: {{ language }}
         </div>
         <div>
