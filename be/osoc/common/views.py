@@ -25,7 +25,7 @@ from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
 
-class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
+class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
     API endpoint that allows students to be viewed, edited or searched.
 
@@ -62,7 +62,7 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
                        StudentOnProjectFilter, StudentSuggestedByUserFilter,
-                       StudentFinalDecisionFilter,]
+                       StudentFinalDecisionFilter, ]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',
@@ -78,10 +78,12 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
             400 BAD REQUEST: there was required data missing or the data could not be serialized
             201 CREATED:     a new suggestion was created or updated
         """
-        serializer = SuggestionSerializer(data=request.data, context={'request': request})
+        serializer = SuggestionSerializer(
+            data=request.data, context={'request': request})
         if serializer.is_valid():
             # save suggestion
-            serializer.save(student=self.get_object(), coach=request.user, final=False)
+            serializer.save(student=self.get_object(),
+                            coach=request.user, final=False)
 
             # send data to websocket
             socket_data = serializer.data
@@ -136,11 +138,13 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
             400 BAD REQUEST: there was required data missing or the data could not be serialized
             201 CREATED:     the final decision was created or updated
         """
-        serializer = SuggestionSerializer(data=request.data, context={'request': request})
+        serializer = SuggestionSerializer(
+            data=request.data, context={'request': request})
         if serializer.is_valid():
             student = self.get_object()
             # save suggestion
-            suggestion = serializer.save(student=student, coach=request.user, final=True)
+            suggestion = serializer.save(
+                student=student, coach=request.user, final=True)
             # set final_decision in student
             student.final_decision = suggestion
             student.save()
@@ -188,7 +192,7 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         return Response(status=(status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND))
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
-    def tallyregistration(self, request, pk=None): # pylint: disable=no-self-use,unused-argument
+    def tallyregistration(self, request, pk=None):  # pylint: disable=no-self-use,unused-argument
         """
         Endpoint to which Tally's webhook can connect to register students.
         returns HTTP response:
@@ -204,19 +208,21 @@ class StudentViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
             for skill_name in skill_names:
                 existing_skill = Skill.objects.filter(name=skill_name).first()
                 if existing_skill is None:
-                    skills.append(Skill.objects.create(name=skill_name, color="grey"))
+                    skills.append(Skill.objects.create(
+                        name=skill_name, color="grey"))
                 else:
                     skills.append(existing_skill)
             student.skills.set(skills)
-        except Exception as exc: # pylint: disable=broad-except
+        except Exception as exc:  # pylint: disable=broad-except
             return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
 
-class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
+
+class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin): # No create, this is handled in RegisterView
+                   mixins.DestroyModelMixin):  # No create, this is handled in RegisterView
     """
     API endpoint that allows coaches to be viewed, edited or searched.
 
@@ -244,11 +250,14 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
     queryset = Coach.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = CoachSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    permission_classes = [
+        permissions.IsAuthenticated, IsOwnerOrAdmin, IsActive]
+    filter_backends = [filters.SearchFilter,
+                       filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['first_name', 'last_name', 'email']
     filterset_fields = ['is_admin', 'is_active']
-    ordering_fields = ['first_name', 'last_name', 'email', 'is_admin', 'is_active']
+    ordering_fields = ['first_name', 'last_name',
+                       'email', 'is_admin', 'is_active']
 
     # pylint: disable=unused-argument,arguments-differ
     def destroy(self, request, pk=None):
@@ -264,7 +273,7 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
 
     @action(detail=True, methods=['put'], serializer_class=UpdateCoachSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def update_status(self, request, pk=None): # pylint: disable=unused-argument
+    def update_status(self, request, pk=None):  # pylint: disable=unused-argument
         """
         let an admin update admin rights of another user
         returns HTTP response:
@@ -279,8 +288,10 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
             coach = self.get_object()
             # check if coach is not current user
             if coach != request.user:
-                coach.is_admin = serializer.data.get('is_admin', coach.is_admin)
-                coach.is_active = serializer.data.get('is_active', coach.is_active)
+                coach.is_admin = serializer.data.get(
+                    'is_admin', coach.is_admin)
+                coach.is_active = serializer.data.get(
+                    'is_active', coach.is_active)
                 coach.save()
 
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -288,7 +299,7 @@ class CoachViewSet(viewsets.GenericViewSet, # pylint: disable=too-many-ancestors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
+class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
     API endpoint that allows projects to be viewed, edited or searched.
 
@@ -315,7 +326,8 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter,
+                       filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
     ordering_fields = ['name', 'partner_name']
@@ -342,7 +354,8 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
             200 OK:          an existing projectsuggestion was found for this student and project from the current user,
                              the found projectsuggestion was updated
         """
-        serializer = ProjectSuggestionSerializer(data=request.data, context={'request': request})
+        serializer = ProjectSuggestionSerializer(
+            data=request.data, context={'request': request})
         if serializer.is_valid():
             project = self.get_object()
 
@@ -407,7 +420,7 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive])
-    def get_conflicting_projects(self, request): # pylint: disable=no-self-use
+    def get_conflicting_projects(self, request):  # pylint: disable=no-self-use
         """
         get a list of conflicting projects;
         two projects are conflicting if one student has been suggested/assigned to both of them
@@ -419,7 +432,8 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         # loop over students
         for student in students:
             # get all projectsuggestions with current student
-            projectsuggestions = ProjectSuggestion.objects.filter(student=student)
+            projectsuggestions = ProjectSuggestion.objects.filter(
+                student=student)
             # check if student is suggested/assigned to more than 1 project
             if projectsuggestions.count() > 1:
                 # get projects out of projectsuggestions
@@ -430,12 +444,13 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
 
         # paginate response
         page = self.paginate_queryset(conflicts)
-        serializer = ConflictSerializer(page, many=True, context={'request': request})
+        serializer = ConflictSerializer(
+            page, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['post'], serializer_class=ResolveConflictSerializer,
             permission_classes=[permissions.IsAuthenticated, IsActive])
-    def resolve_conflicts(self, request): # pylint: disable=no-self-use
+    def resolve_conflicts(self, request):  # pylint: disable=no-self-use
         """
         let a coach resolve conflicts
         exptects a list of objects with a student, project, coach and skill,
@@ -463,7 +478,7 @@ class ProjectViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestor
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
+class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
     API endpoint that allows skills to be viewed, edited or searched.
 
@@ -497,7 +512,7 @@ class SkillViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
         raise PermissionDenied()
 
 
-class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancestors
+class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
     API endpoint that allows sent emails to be viewed, edited or searched.
 
@@ -530,7 +545,8 @@ class SentEmailViewSet(viewsets.ModelViewSet): # pylint: disable=too-many-ancest
 
     # pylint: disable=arguments-differ
     def create(self, request):
-        serializer = SentEmailSerializer(data=request.data, context={'request': request})
+        serializer = SentEmailSerializer(
+            data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(sender=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -554,7 +570,7 @@ class CustomRegisterView(RegisterView):
     permission_classes = [permissions.IsAuthenticated, IsActive, IsAdmin]
 
     def get_response_data(self, user):
-        return {'detail' : ('User has been created.')}
+        return {'detail': ('User has been created.')}
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)

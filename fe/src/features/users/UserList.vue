@@ -35,10 +35,18 @@
 
         <q-space />
         <div class="row q-px-sm">
-          <btn color="yellow" icon-right="add" class="text-black" label="Add User" @click="newUserDialog = true" shadow-color="orange" shadow-strength="2"/>
+          <btn
+            color="yellow"
+            icon-right="add"
+            class="text-black"
+            label="Add User"
+            shadow-color="orange"
+            shadow-strength="2"
+            @click="newUserDialog = true"
+          />
         </div>
         <div class="row q-px-sm">
-          <q-space/>
+          <q-space />
           <q-dialog v-model="newUserDialog">
             <q-card>
               <AddUser :created="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)" />
@@ -91,6 +99,7 @@
               <q-select
                 v-model="props.row.role"
                 v-ripple
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 color="yellow"
                 borderless
                 dense
@@ -102,13 +111,12 @@
                 behavior="menu"
                 map-options
                 emit-value
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
               >
                 <template #option="scope">
                   <q-item
-                    @click="() => updateRole(props.row, props.row.role)"
                     class="items-center"
                     v-bind="scope.itemProps"
+                    @click="() => updateRole(props.row, props.row.role)"
                   >
                     <q-icon
                       class="q-mr-md icon"
@@ -139,13 +147,13 @@
               style="width: 10px"
             >
               <btn
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 flat
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
-                @click="coachStore.removeUser(props.row.id)"
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 glow-color="red-2"
+                @click="coachStore.removeUser(props.row.id)"
               />
             </q-td>
           </q-tr>
