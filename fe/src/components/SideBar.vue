@@ -308,7 +308,8 @@ export default defineComponent({
     selectStudent: function (selected_student: Student) {
       this.$router.push(`/students/${selected_student.id}`)
     },
-    async loadNextStudents(index: number, done: never) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async loadNextStudents(index: number, done: any) {
       await this.studentStore.loadNext(index, done)
       this.scrollKey += 1
     }
