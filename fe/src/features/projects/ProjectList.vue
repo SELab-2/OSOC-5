@@ -2,7 +2,7 @@
   <div style="overflow: hidden" class="fit column">
     <div
       :class="`${showShadow ? 'shadow-2' : ''}`"
-      style="z-index: 1; transition: box-shadow ease 500ms"
+      style="z-index: 1; transition: box-shadow ease 500ms;"
     >
       <q-toolbar
         style="overflow: visible; padding: 8px"

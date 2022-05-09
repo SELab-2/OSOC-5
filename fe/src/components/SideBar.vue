@@ -27,12 +27,9 @@
               dense
               outlined
               color="teal"
-              label=""
+              label="Search Students"
               hide-bottom-space
             >
-            <template v-slot:label>
-              <span class="text-weight-medium text-teal-4">Search Students</span>
-            </template>
             <template v-slot:append>
               <q-icon name="search" color="teal-4" />
             </template>
