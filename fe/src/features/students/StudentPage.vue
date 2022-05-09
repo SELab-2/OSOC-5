@@ -5,7 +5,6 @@
     :clickable="true"
     :draggable="false"
     :must-hover="false"
-    @update="update"
   />
   
   <div
