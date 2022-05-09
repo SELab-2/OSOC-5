@@ -51,7 +51,7 @@
 
             <label>Suggestion:</label>
             <SegmentedControl
-              v-model="studentStore.suggestion"
+              v-model="studentStore.decision"
               color="primary"
               :options="[
                 { name: 'yes', label: 'Yes' },
