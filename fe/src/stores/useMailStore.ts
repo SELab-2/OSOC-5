@@ -12,7 +12,6 @@ interface State {
     mailStudents: Array<Student>
     statusFilter: Array<number>
     mails: Map<number, Mail[]>
-    selectedStudents: Array<Student>
 }
 
 export const useMailStore = defineStore('user/mail', {
@@ -22,7 +21,6 @@ export const useMailStore = defineStore('user/mail', {
         mailStudents: [],
         statusFilter: [],
         mails: new Map(),
-        selectedStudents: []
     }),
     actions: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,6 +58,14 @@ export const useMailStore = defineStore('user/mail', {
 
                     this.isLoading = false
                 })
+        },
+        async updateStatusStudents(updateValue: number, students: Array<Student>) {
+          if (students.length > 0) {
+              await instance.post('students/bulk_status/', {
+                  status: updateValue,
+                  students: students.map(student => student.url)
+              })
+          }
         },
         async getMails(student: Student) {
             this.isLoading = true

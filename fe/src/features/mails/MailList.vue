@@ -43,7 +43,7 @@
         />
       </div>
       <q-table
-        v-model:selected="mailStore.selectedStudents"
+        v-model:selected="selectedStudents"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
         :columns="mailsColumns"
@@ -149,6 +149,7 @@
             color="yellow"
             shadow-strength="2.5"
             no-wrap
+            @click="updateStatusStudents"
           >
             Bulk update status
           </btn>
@@ -190,6 +191,7 @@ export default defineComponent({
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
       statusUpdate: ref(0),
+      selectedStudents: ref([]),
       mailsColumns,
       columnsMails,
       status,
@@ -209,6 +211,11 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async onRequest(props: any) {
       this.pagination = props.pagination
+      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
+    async updateStatusStudents() {
+      await this.mailStore.updateStatusStudents(this.statusUpdate, this.selectedStudents)
+      this.selectedStudents = []
       await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
     },
     updateStatus(student: Student, oldStatus: number) {
