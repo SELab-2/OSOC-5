@@ -156,7 +156,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue'
+import {defineComponent, ref, Ref} from 'vue'
 import { useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 import { useStudentStore } from '../stores/useStudentStore'
@@ -206,7 +206,7 @@ export default defineComponent({
     } 
   },
   data() {
-    let lastStudent: string | null = ref(null)
+    let lastStudent: Ref<string | null> = ref(null)
     return {
       lastStudent,
       dropdownitems: [

@@ -47,7 +47,7 @@ export default defineComponent( {
       required: true
     },
     isLoading: {
-      type: String,
+      type: Boolean,
       required: true
     },
     language: {

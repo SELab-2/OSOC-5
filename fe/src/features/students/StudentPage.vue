@@ -152,7 +152,7 @@
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SkillsCard
           :is-loading="studentStore.isLoading"
-          :skills="student?.skills"
+          :skills="student?.skills as any"
           :best-skill="student?.bestSkill"
           title="Skills"
         />
@@ -201,7 +201,8 @@ import SkillsCard from "./components/SkillsCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
-import {defineComponent} from "@vue/runtime-core";
+import { Skill } from "../../models/Skill";
+import {defineComponent} from "vue";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
 import DeleteStudentDialog from "./components/DeleteStudentDialog.vue";
@@ -266,7 +267,7 @@ export default defineComponent ({
     /**
      * Retrieve the current selected student from the store
      */
-    student(): Student | null {
+    student(): Student | undefined {
       return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
     /**

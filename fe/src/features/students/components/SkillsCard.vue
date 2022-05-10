@@ -17,7 +17,7 @@
             :key="index"
             :best-skill="bestSkill ?? ''"
             :color="skill.color as string"
-            :name="typeof(skill) !== 'string' ? skill.name : ''"
+            :name="skill.name as string"
           />
         </ul>
       </div>
@@ -29,7 +29,8 @@
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import StudentSkillChip from "./StudentSkillChip.vue";
-import {defineComponent} from "@vue/runtime-core";
+import {defineComponent, PropType} from "vue";
+import {Skill} from "../../../models/Skill"
 
 export default defineComponent( {
   components: {StudentSkillChip, LoadingSpinner},
@@ -43,7 +44,7 @@ export default defineComponent( {
       required: true
     },
     skills: {
-      type: Array,
+      type: [Object] as PropType<Skill[]>,
       required: true
     },
     bestSkill: {

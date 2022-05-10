@@ -77,8 +77,8 @@
             <span class="text-h5 text-bold">Filters</span><br />
             <div class="row">
               <div class="column">
-                <q-checkbox label="My project" />
-                <q-checkbox label="Students needed" />
+                <!-- <q-checkbox label="My project" /> -->
+                <!-- <q-checkbox label="Students needed" /> -->
               </div>
               <div>
                 <q-select
@@ -120,7 +120,7 @@
     <div
       id="scroll-target-id"
       style="flex: 1; overflow: auto"
-      @scroll="showShadow = $event.target.scrollTop > 5"
+      @scroll="showShadow = ($event.target as HTMLElement)?.scrollTop > 5"
     >
       <q-infinite-scroll
         ref="infinite"
@@ -193,7 +193,7 @@ export default defineComponent({
     }
   },
   computed: {
-    filters() {
+    filters(): Object {
       return {
         search: this.projectNameFilter,
       }

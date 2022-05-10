@@ -48,7 +48,7 @@
 <script lang="ts">
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
-import {defineComponent} from "@vue/runtime-core";
+import {defineComponent, PropType} from "vue";
 import {Suggestion} from "../../../models/Suggestion"
 import DecisionIcon from "../../../components/DecisionIcon.vue";
 
@@ -60,7 +60,7 @@ export default defineComponent( {
         required: true
     },
     suggestions: {
-      type: Array,
+      type: [Object] as PropType<Suggestion[]>,
       required: true
     }
   },
