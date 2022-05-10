@@ -6,16 +6,16 @@
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <div v-if="studentStore.isLoading">
+      <div v-if="isLoading">
         <LoadingSpinner />
       </div>
 
       <div v-else>
-        <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 0px;">
+        <ul style="margin: 0px; padding-left: 0px;">
           <StudentSkillChip
-            v-for="(skill, index) in studentStore.currentStudent.skills"
+            v-for="(skill, index) in skills"
             :key="index"
-            :best-skill="studentStore.currentStudent.bestSkill ?? ''"
+            :best-skill="bestSkill ?? ''"
             :color="typeof(skill) !== 'string' ? skill.color : ''"
             :name="typeof(skill) !== 'string' ? skill.name : ''"
           />
@@ -39,6 +39,18 @@ export default defineComponent( {
       type: String,
       required: true
     },
+    isLoading: {
+      type: Boolean,
+      required: true
+    },
+    skills: {
+      type: Array<Skill>,
+      required: true
+    },
+    bestSkill: {
+      type: String,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()

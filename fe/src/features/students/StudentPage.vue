@@ -131,7 +131,7 @@
     </q-dialog>
   </div>
 
-  <div class="q-gutter-sm q-pa-lg">
+  <div v-if="student" class="q-gutter-sm q-pa-lg">
     <div class="row">
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SuggestionsCard
@@ -141,11 +141,20 @@
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <AcademiaCard
+          :is-loading="studentStore.isLoading"
+          :school-name="student?.schoolName"
+          :studies="student?.studies"
+          :degree="student?.degree"
+          :degree-duration="student?.degreeDuration"
+          :degree-current-year="student?.degreeCurrentYear"
           title="Academia"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SkillsCard
+          :is-loading="studentStore.isLoading"
+          :skills="student?.skills"
+          :best-skill="student?.bestSkill"
           title="Skills"
         />
       </div>
@@ -154,6 +163,9 @@
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <LanguageCard
           title="Language"
+          :is-loading="studentStore.isLoading"
+          :language="student?.language"
+          :english-rating="student?.englishRating"
         />
       </div>
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -185,7 +197,6 @@
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import {useStudentStore} from "../../stores/useStudentStore";
 import {ref} from "vue";
-import SideBar from "../../components/SideBar.vue"
 import AcademiaCard from "./components/AcademiaCard.vue";
 import SkillsCard from "./components/SkillsCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
@@ -205,7 +216,6 @@ export default defineComponent ({
     SuggestionsCard,
     SkillsCard,
     SegmentedControl,
-    SideBar,
   },
   props: {
     id: {
