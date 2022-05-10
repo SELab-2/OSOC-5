@@ -179,7 +179,7 @@
                   :must-hover="mustHover"
                   :student="student"
                   :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
-                  @click="clickStudent(student)"
+                  @click="$router.push(`/students/${student.id}`)"
                   @dragstart="onDragStart($event, student)"
                 />
                 <template #loading>
@@ -306,9 +306,6 @@ export default defineComponent({
       e.dataTransfer.setData(data.student.id, JSON.stringify(data))
       e.dataTransfer.dropEffect = 'copy'
       e.dataTransfer.effectAllowed = 'copy'
-    },
-    clickStudent(student: Student) {
-      this.$router.push(`/students/${student.id}`)
     },
     async loadStudents(scroll: any) {
       scroll.resume()
