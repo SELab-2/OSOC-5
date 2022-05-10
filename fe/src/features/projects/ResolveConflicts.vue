@@ -100,44 +100,108 @@ import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
 import { Project } from '../../models/Project'
 import { Student } from '../../models/Student'
-import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
+import { useProjectStore } from '../../stores/useProjectStore'
+import { useStudentStore } from '../../stores/useStudentStore'
+import { instance } from '../../utils/axios'
 import ProjectConflictCard from "./components/ProjectConflictCard.vue"
 
 export default defineComponent({
     components: { ProjectConflictCard },
     async setup() {
-        const $q = useQuasar()
-        const projectConflictStore = useProjectConflictStore()
-        await projectConflictStore.getConflictingProjects()
+      const $q = useQuasar()
 
-        return {
-            q: $q,
-            projectConflictStore,
-            conflicts: projectConflictStore.conflicts,
-            selectedConflict: ref({student: {}}),
-            showShadow: ref(false),
-            selectedProject: ref({})
-        }
+      return {
+          q: $q,
+          selectedConflict: ref({student: {}} as { student: Student; projects: Project[] } | { student: Record<string, unknown> }),
+          showShadow: ref(false),
+          selectedProject: ref({} as Project | Record<string, never>),
+          conflicts: ref([] as { student: Student; projects: Project[]; }[]),
+          nextPage: ref("")
+      }
+    },
+    async mounted() {
+     await this.loadConflicts()
     },
     methods: {
+    async loadConflicts() {
+      this.selectedConflict = {student: {}}
+      this.selectedProject = {}
+      const projects = await this.getConflictingProjects()
+      this.conflicts = projects.conflicts
+      this.nextPage = projects.nextPage
+    },
+     async getConflictingProjects(url?: string) {
+      const studentStore = useStudentStore()
+      const projectStore = useProjectStore()
+
+      const { data } = await instance.get(
+        url ?? 'projects/get_conflicting_projects'
+      )
+
+      const conflicts = data.results as Array<{
+        student: string
+        projects: Array<string>
+      }>
+
+      const resConflicts = []
+      for (const conflict of conflicts) {
+        const student = await studentStore.getStudent(conflict.student)
+        const projects = await Promise.all(
+          conflict.projects.map(
+            async (project: string) =>
+              await projectStore.getOrFetchProject(project)
+          )
+        )
+
+        resConflicts.push({ student, projects })
+      }
+
+      return {conflicts: resConflicts, nextPage: data.next}
+      },
       fullName(user: { firstName: string; lastName: string }) {
         return `${user.firstName} ${user.lastName}`
       },
-      resolveConflict() {
-        this.projectConflictStore.resolveConflict(this.selectedConflict as {
-        student: Student
-        projects: Array<Project>
-      }, this.selectedProject as Project).catch((error) => {
-        this.q.notify({
-            icon: 'warning',
-            color: 'red',
-            message: `${error}`,
-            textColor: 'black'
+      async resolveConflict() {
+        try {
+          const suggestions = this.selectedProject.suggestedStudents?.filter(
+            ({ student }) => student.id === this.selectedConflict.student.id
+           )
+
+          if (!suggestions) throw new Error('An unexpected error has occured')
+
+          if (suggestions?.length > 1)
+            throw new Error(
+              'Please delete the assignment to skills until only 1 is left'
+            )
+
+          const suggestion = suggestions[0]
+
+          await instance.post('/projects/resolve_conflicts/', [
+            {
+              project: this.selectedProject.url,
+              student: this.selectedConflict.student.url,
+              coach: suggestion.coach.url,
+              skill: suggestion.skill.url,
+          },
+        ])
+
+        const projectStore = useProjectStore()
+        await projectStore.loadProjects() 
+        await this.loadConflicts()
+        } catch(error) {
+          this.q.notify({
+              icon: 'warning',
+              color: 'red',
+              message: `${error}`,
+              textColor: 'black'
           });
-      })
+        }
       },
-      onLoad(index: never, done: () => unknown) {
-        this.projectConflictStore.loadMoreProjects().then(() => done())
+      async onLoad(index: never, done: () => unknown) {
+        if (this.nextPage !== null)
+          await this.getConflictingProjects(this.nextPage)
+        
+        done()
       }
     }
 })

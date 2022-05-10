@@ -6,6 +6,7 @@ import {
 } from './ProjectSuggestion'
 
 export interface ProjectInterface {
+  url: string
   name: string
   id: number
   partnerName: string
@@ -16,6 +17,7 @@ export interface ProjectInterface {
 }
 
 export interface TempProject {
+  url: string
   name: string
   id: number
   partnerName: string
@@ -33,16 +35,19 @@ export class Project implements ProjectInterface {
   coaches?: Array<User>
   suggestedStudents?: ProjectSuggestionInterface[]
   id: number
+  url: string
 
   constructor(
     name: string,
     partnerName: string,
     extraInfo: string,
     id: number,
+    url: string,
     requiredSkills?: { amount: number; comment: string; skill: Skill }[],
     coaches?: Array<User>,
     suggested_students?: ProjectSuggestionInterface[]
   ) {
+    this.url = url
     this.id = id
     this.name = name
     this.partnerName = partnerName

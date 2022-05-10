@@ -128,6 +128,7 @@ export const useProjectStore = defineStore('project', {
           project.partnerName,
           project.extraInfo,
           project.id,
+          project.url,
           skills,
           coaches,
           students
@@ -143,7 +144,7 @@ export const useProjectStore = defineStore('project', {
           )
         ).data
         this.projects = results.map(
-          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
+          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id, p.url)
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
