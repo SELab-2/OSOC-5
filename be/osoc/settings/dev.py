@@ -17,10 +17,10 @@ DEBUG = True
 ALLOWED_HOSTS = ['192.168.99.100', 'localhost', 'localhost:8000',
                  '0.0.0.0', '127.0.0.1', 'sel2-5.ugent.be']
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000', 'https://sel2-5.ugent.be',
-]
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000', 'https://sel2-5.ugent.be',
+# ]
+# CORS_ALLOW_CREDENTIALS = True
 
 
 DATABASES = {
