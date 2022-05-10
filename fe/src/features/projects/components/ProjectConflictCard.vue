@@ -124,6 +124,7 @@
             :key="suggestion.student.id"
             :suggestion="suggestion"
             :remove-suggestion="removeSuggestion"
+            :confirm-suggestion="() => {}"
           />
         </div>
       </q-slide-transition>

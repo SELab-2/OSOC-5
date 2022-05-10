@@ -24,7 +24,7 @@
           >
             <q-item
               v-for="conflict in conflicts"
-              :key="conflict.student"
+              :key="conflict.student.url"
               v-ripple
               clickable
               :class="conflict.student.id === selectedConflict.student.id ? 'bg-teal-1' : ''"
@@ -41,7 +41,6 @@
             <div
               id="scroll-target-id"
               style="flex:1; overflow: auto; "
-              @scroll="showShadow = $event.target.scrollTop > 5"
             >
               <q-infinite-scroll
                 :offset="250"
@@ -112,9 +111,9 @@ export default defineComponent({
 
       return {
           q: $q,
-          selectedConflict: ref({student: {}} as { student: Student; projects: Project[] } | { student: Record<string, unknown> }),
+          selectedConflict: ref({student: {}} as { student: Student; projects: Project[] }),
           showShadow: ref(false),
-          selectedProject: ref({} as Project | Record<string, never>),
+          selectedProject: ref({} as Project),
           conflicts: ref([] as { student: Student; projects: Project[]; }[]),
           nextPage: ref("")
       }
@@ -124,8 +123,8 @@ export default defineComponent({
     },
     methods: {
     async loadConflicts() {
-      this.selectedConflict = {student: {}}
-      this.selectedProject = {}
+      this.selectedConflict = {student: {}} as { student: Student; projects: Project[] }
+      this.selectedProject = {} as Project
       const projects = await this.getConflictingProjects()
       this.conflicts = projects.conflicts
       this.nextPage = projects.nextPage
@@ -197,7 +196,7 @@ export default defineComponent({
           });
         }
       },
-      async onLoad(index: never, done: () => unknown) {
+      async onLoad(index: number, done: () => unknown) {
         if (this.nextPage !== null)
           await this.getConflictingProjects(this.nextPage)
         
