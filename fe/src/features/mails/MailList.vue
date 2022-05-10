@@ -48,7 +48,6 @@
         row-key="url"
         selection="multiple"
         separator="horizontal"
-        :loading="mailStore.isLoading"
         @request="onRequest"
       >
         <template #body="props">
@@ -65,7 +64,6 @@
                 color="yellow"
                 :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                 @click="() => clickRow(props, props.row)"
-                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               />
             </q-td>
             <q-td
@@ -122,11 +120,37 @@
             :props="props"
           >
             <q-td colspan="100%">
-              <MailsOverview :student="props.row" />
+              <MailsOverview
+                :student="props.row"
+              />
             </q-td>
           </q-tr>
         </template>
       </q-table>
+      <div class="row q-gutter-sm items-center justify-end">
+        <q-select
+          v-model="statusUpdate"
+          style="width: 220px"
+          rounded
+          outlined
+          dense
+          use-chips
+          emit-value
+          map-options
+          label="New status"
+          :options="status"
+        />
+        <q-button>
+          <btn
+            padding="7px"
+            color="yellow"
+            shadow-strength="2.5"
+            no-wrap
+          >
+            Bulk update status
+          </btn>
+        </q-button>
+      </div>
     </div>
   </div>
 </template>
@@ -140,7 +164,6 @@ import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
 import columnsMails from "../../models/MailStudentColumns";
-import { useAuthenticationStore } from "../../stores/useAuthenticationStore";
 import router from "../../router";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import mailsColumns from "../../models/MailsColumns";
@@ -164,6 +187,7 @@ export default defineComponent({
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
       statusFilter: ref([]),
+      statusUpdate: ref(0),
       mailsColumns,
       columnsMails,
       status,
@@ -185,7 +209,7 @@ export default defineComponent({
       this.pagination = props.pagination
       await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
     },
-    updateStatus(student: Student, oldStatus: string) {
+    updateStatus(student: Student, oldStatus: number) {
       this?.$nextTick(() => {
         this.mailStore
           .updateStatus(student)
