@@ -470,6 +470,13 @@ class SentEmail(models.Model):
     """
     Information about which emails have been sent to which students
     """
+    class EmailType(models.TextChoices):
+        CONFIRMATION = '0', _('Confirmation')
+        REJECTION = '1', _('Rejection')
+        HOLD_TIGHT = '2', _('Hold on tight')
+        CONTRACT = '3', _('Contract')
+        OTHER = '4', _('Other')
+
     sender = models.ForeignKey(
         Coach,
         on_delete=models.CASCADE
@@ -488,6 +495,13 @@ class SentEmail(models.Model):
         max_length=255,
         blank=True,
         default=""
+    )
+    type = models.CharField(
+        _("type"),
+        max_length=1,
+        choices=EmailType.choices,
+        null=True, 
+        blank=True
     )
 
     def __str__(self):
