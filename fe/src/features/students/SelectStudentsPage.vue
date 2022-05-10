@@ -13,7 +13,6 @@
 import {ref} from "vue"
 import SideBar from "../../components/SideBar.vue"
 import {defineComponent} from "@vue/runtime-core";
-import { Student } from "../../models/Student";
 
 export default defineComponent({
   components: {
@@ -25,11 +24,6 @@ export default defineComponent({
     return {
       student,
     }
-  },
-  methods: {
-    selectStudent: function (selected_student: Student) {
-      this.$router.push(`/students/${selected_student.id}`)
-    },
   }
 })
 </script>

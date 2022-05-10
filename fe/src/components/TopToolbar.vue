@@ -1,5 +1,8 @@
 <template>
-  <q-header class="bg-white text-white" height-hint="98">
+  <q-header
+    class="bg-white text-white"
+    height-hint="98"
+  >
     <q-toolbar class="text-osoc-blue bg-white shadow-2">
       <btn flat round href="https://www.osoc.be">
         <q-avatar size="42px">
@@ -7,7 +10,7 @@
         </q-avatar>
       </btn>
 
-      <q-space/>
+      <q-space />
       <q-tabs
         class="centered-tabs"
         shrink
@@ -38,21 +41,21 @@
           exact
         />
       </q-tabs>
-      <q-space/>
+      <q-space />
       <q-btn-dropdown
         flat
         rounded
         icon="mdi-account"
         :label="fullName"
       >
-        <q-separator/>
+        <q-separator />
 
         <q-list separator>
           <q-item
             v-close-popup
             clickable
-            @click=on_dropdown_click()
             tabindex="0"
+            @click="on_dropdown_click()"
           >
             <q-item-section avatar>
               <q-icon
@@ -71,8 +74,8 @@
           <q-item
             v-close-popup
             clickable
-            @click="authenticationStore.logout()"
             tabindex="0"
+            @click="authenticationStore.logout()"
           >
             <q-item-section avatar>
               <q-icon
@@ -91,16 +94,21 @@
       </q-btn-dropdown>
     </q-toolbar>
   </q-header>
-  <q-dialog v-model="display_popup" persistent>
+  <q-dialog
+    v-model="display_popup"
+    persistent
+  >
     <q-card style="min-width: 350px">
       <q-card-section>
-        <div class="text-h6">Change Password</div>
+        <div class="text-h6">
+          Change Password
+        </div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-input
+          v-model="password1"
           outlined
           autofocus
-          v-model="password1"
           :type="isPwd1 ? 'password' : 'text'"
           class="inputfield"
           label="New Password 1"
@@ -115,9 +123,9 @@
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-input
+          v-model="password2"
           outlined
           autofocus
-          v-model="password2"
           :type="isPwd2 ? 'password' : 'text'"
           class="inputfield"
           label="New Password 2"
@@ -128,13 +136,23 @@
           @click="isPwd2 = !isPwd2"
         />
       </q-card-section>
-      <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" v-close-popup />
-        <q-btn flat label="Submit Password Change" @click="change_password_confirm" />
+      <q-card-actions
+        align="right"
+        class="text-primary"
+      >
+        <q-btn
+          v-close-popup
+          flat
+          label="Cancel"
+        />
+        <q-btn
+          flat
+          label="Submit Password Change"
+          @click="change_password_confirm"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
-
 </template>
 
 <script lang="ts">
@@ -143,32 +161,7 @@ import { useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 import { useStudentStore } from '../stores/useStudentStore'
 export default defineComponent({
-  data() {
-    let lastStudent: string | null = ref(null)
-    return {
-      lastStudent,
-      dropdownitems: [
-        {
-          name: 'Change Password',
-          icon: 'key',
-        },
-        {
-          name: 'Sign Out',
-          icon: 'key',
-        },
-      ],
-    }
-  },
-  watch: {
-    $route: {
-      handler(newValue) {
-      if (newValue.name === 'Student Page') {
-        this.lastStudent = newValue.path
-      }
-    },
-    immediate: true
-    }
-  },
+
   setup() {
     const $q = useQuasar()
     const authenticationStore = useAuthenticationStore()
@@ -211,6 +204,32 @@ export default defineComponent({
           })
         }
       },
+    } 
+  },
+  data() {
+    let lastStudent: string | null = ref(null)
+    return {
+      lastStudent,
+      dropdownitems: [
+        {
+          name: 'Change Password',
+          icon: 'key',
+        },
+        {
+          name: 'Sign Out',
+          icon: 'key',
+        },
+      ],
+    }
+  },
+  watch: {
+    $route: {
+      handler(newValue) {
+      if (newValue.name === 'Student Page') {
+        this.lastStudent = newValue.path
+      }
+    },
+    immediate: true
     }
   },
   computed: {

@@ -4,7 +4,7 @@
       v-model="showDrawer"
       :mini="miniState"
       :mini-width="30"
-      :width="350"
+      :width="370"
       :breakpoint="100"
       class="bg-grey-1 shadow-4"
     >
@@ -240,9 +240,10 @@ export default defineComponent({
   },
   name: 'SideBar',
   props: {
-    selectStudent: {
-      type: Function,
-      required: true
+    clickable: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     draggable: {
       type: Boolean,
@@ -256,14 +257,14 @@ export default defineComponent({
   },
   setup() {
     const studentStore = useStudentStore()
-    const $q = useQuasar()
-
     const skillStore = useSkillStore()
+
+    const $q = useQuasar()
 
     return {
       studentStore,
-      $q,
       skillStore,
+      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -281,7 +282,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    //this.skillStore.loadSkills()
+    await this.skillStore.loadSkills()
     await this.studentStore.loadStudents()
   }, 
   computed: {
@@ -297,6 +298,11 @@ export default defineComponent({
     },
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
+    /**
+     * Saves the component id and user name in the dataTransfer.
+     * @param e drag event
+     * @param item item being dragged
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDragStart(e: any, item: any) {
       const data = {
@@ -307,11 +313,16 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
       e.dataTransfer.effectAllowed = 'copy'
     },
+    /**
+     * Load all students and make the infinite scroll reload
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadStudents(scroll: any) {
       scroll.resume()
       this.studentStore.students = []
       await this.studentStore.loadStudents()
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadNextStudents(index: number, done: any) {
       await this.studentStore.loadNext(index, done)
     }

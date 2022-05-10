@@ -1,7 +1,7 @@
 <template>
   <q-route-tab
-    style="padding: 0px 0px"
     ref="glowbutton"
+    style="padding: 0px 0px"
   >
     <template #default>
       <btn 
@@ -17,9 +17,12 @@
 <script lang="ts">
   import { defineComponent } from 'vue'
   export default defineComponent({
-    name: 'tab',
+    name: 'OsocTab',
     props: {
-      'label': String,
+      'label': {
+        type: String,
+        required: true
+      }
     },
     mounted() {
       const button = this.$refs.glowbutton as any

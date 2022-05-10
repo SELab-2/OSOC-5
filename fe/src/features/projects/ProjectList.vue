@@ -65,7 +65,9 @@
           shadow-strength="2"
           no-wrap
         >
-          <div class="ellipsis">Conflicts</div>
+          <div class="ellipsis">
+            Conflicts
+          </div>
         </btn>
       </q-toolbar>
 

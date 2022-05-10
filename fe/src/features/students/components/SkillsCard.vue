@@ -30,7 +30,6 @@ import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import StudentSkillChip from "./StudentSkillChip.vue";
 import {defineComponent} from "@vue/runtime-core";
-import {Skill} from "../../../models/Skill";
 
 export default defineComponent( {
   components: {StudentSkillChip, LoadingSpinner},
