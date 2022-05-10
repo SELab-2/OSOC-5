@@ -69,6 +69,16 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         return expanded_fields
 
 
+class BulkStatusSerializer(serializers.HyperlinkedModelSerializer):
+
+    students = serializers.HyperlinkedRelatedField(
+        view_name='student-detail', queryset=Student.objects.all(), many=True)
+
+    class Meta:
+        model = Student
+        fields = ['status', 'students']
+
+
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the coach model

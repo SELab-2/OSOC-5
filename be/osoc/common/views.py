@@ -16,8 +16,8 @@ from channels.layers import get_channel_layer
 from .pagination import StandardPagination
 from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
-from .serializers import Conflict, ConflictSerializer, ResolveConflictSerializer, \
-    StudentSerializer, CoachSerializer, ProjectSerializer, \
+from .serializers import BulkStatusSerializer, Conflict, ConflictSerializer, \
+    ResolveConflictSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, \
     ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
 from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
@@ -216,6 +216,17 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         except Exception as exc:  # pylint: disable=broad-except
             return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'], serializer_class=BulkStatusSerializer)
+    def bulk_status(self, request):
+        serializer = BulkStatusSerializer(
+            data=request.data, context={'request': request})
+        if serializer.is_valid():
+            for student in serializer.validated_data['students']:
+                student.status = serializer.validated_data['status']
+                student.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestors
