@@ -58,8 +58,8 @@
                 >
                   <template #default="{ item }">
                     <q-radio
-                      v-model="selectedProject"
-                      :val="item"
+                      v-model="selectedProjectUrl"
+                      :val="item.url"
                       label="Select this project "
                     />
                     <ProjectConflictCard :project="item" />
@@ -113,7 +113,7 @@ export default defineComponent({
           q: $q,
           selectedConflict: ref({student: {}} as { student: Student; projects: Project[] }),
           showShadow: ref(false),
-          selectedProject: ref({} as Project),
+          selectedProjectUrl: ref(""),
           conflicts: ref([] as { student: Student; projects: Project[]; }[]),
           nextPage: ref("")
       }
@@ -122,13 +122,16 @@ export default defineComponent({
      await this.loadConflicts()
     },
     methods: {
-    async loadConflicts() {
-      this.selectedConflict = {student: {}} as { student: Student; projects: Project[] }
-      this.selectedProject = {} as Project
-      const projects = await this.getConflictingProjects()
-      this.conflicts = projects.conflicts
-      this.nextPage = projects.nextPage
-    },
+     selectedProject() {
+        return this.selectedConflict.projects.filter(({url}) => url === this.selectedProjectUrl)[0]
+     },
+     async loadConflicts() {
+       this.selectedConflict = {student: {}} as { student: Student; projects: Project[] }
+       this.selectedProjectUrl = ""
+       const projects = await this.getConflictingProjects()
+       this.conflicts = projects.conflicts
+       this.nextPage = projects.nextPage
+     },
      async getConflictingProjects(url?: string) {
       const studentStore = useStudentStore()
       const projectStore = useProjectStore()
@@ -162,7 +165,7 @@ export default defineComponent({
       },
       async resolveConflict() {
         try {
-          const suggestions = this.selectedProject.suggestedStudents?.filter(
+          const suggestions = this.selectedProject().suggestedStudents?.filter(
             ({ student }) => student.id === this.selectedConflict.student.id
            )
 
@@ -177,7 +180,7 @@ export default defineComponent({
 
           await instance.post('/projects/resolve_conflicts/', [
             {
-              project: this.selectedProject.url,
+              project: this.selectedProject().url,
               student: this.selectedConflict.student.url,
               coach: suggestion.coach.url,
               skill: suggestion.skill.url,
