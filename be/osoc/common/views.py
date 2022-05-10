@@ -14,7 +14,7 @@ from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .pagination import StandardPagination
-from .filters import MutltipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
+from .filters import MultipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
 from .serializers import Conflict, ConflictSerializer, ResolveConflictSerializer, \
     StudentSerializer, CoachSerializer, ProjectSerializer, \
@@ -62,7 +62,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
                        StudentOnProjectFilter, StudentSuggestedByUserFilter,
-                       StudentFinalDecisionFilter, MutltipleStatusFilter]
+                       StudentFinalDecisionFilter, MultipleStatusFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',

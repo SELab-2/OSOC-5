@@ -10,7 +10,7 @@ true_strings = ['true', '1', 'yes', 't', 'y']
 false_strings = ['false', '0', 'no', 'f', 'n']
 
 
-class MutltipleStatusFilter(filters.BaseFilterBackend):
+class MultipleStatusFilter(filters.BaseFilterBackend):
     """
     a filter class to be abe to filter on multiple statuses of students
     i dont know how to implement this in a more generic way, but this will do for now
