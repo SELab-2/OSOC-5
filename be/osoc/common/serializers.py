@@ -70,7 +70,10 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class BulkStatusSerializer(serializers.HyperlinkedModelSerializer):
-
+    """
+    serializer for the bulk_status endpoint
+    expects a status and a list of students
+    """
     students = serializers.HyperlinkedRelatedField(
         view_name='student-detail', queryset=Student.objects.all(), many=True)
 

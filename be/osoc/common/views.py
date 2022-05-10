@@ -218,7 +218,14 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         return Response(status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'], serializer_class=BulkStatusSerializer)
-    def bulk_status(self, request):
+    def bulk_status(self, request):  # pylint: disable=no-self-use
+        """
+        endpoint to change the status of multiple students at once (in bulk)
+        expects a status and a list of students
+        returns HTTP response:
+            400 BAD REQUEST:    there was required data missing or the data could not be serialized
+            200 OK              the status of all given students was changed
+        """
         serializer = BulkStatusSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
