@@ -15,7 +15,7 @@
         <q-route-tab
           name="students"
           label="Select Students"
-          :to="`/students/${studentStore.selectedStudent ?? ''}`"
+          :to="lastStudent ?? '/students'"
         />
         <q-route-tab
           name="projects"
@@ -144,7 +144,9 @@ import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 import { useStudentStore } from '../stores/useStudentStore'
 export default defineComponent({
   data() {
+    let lastStudent: string | null = ref(null)
     return {
+      lastStudent,
       dropdownitems: [
         {
           name: 'Change Password',
@@ -155,6 +157,16 @@ export default defineComponent({
           icon: 'key',
         },
       ],
+    }
+  },
+  watch: {
+    $route: {
+      handler(newValue) {
+      if (newValue.name === 'Student Page') {
+        this.lastStudent = newValue.path
+      }
+    },
+    immediate: true
     }
   },
   setup() {

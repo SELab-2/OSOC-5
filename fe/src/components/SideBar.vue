@@ -308,7 +308,6 @@ export default defineComponent({
       e.dataTransfer.effectAllowed = 'copy'
     },
     clickStudent(student: Student) {
-      this.studentStore.selectedStudent = student.id
       this.$router.push(`/students/${student.id}`)
     },
     async loadStudents(scroll: any) {

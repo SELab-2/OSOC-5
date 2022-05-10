@@ -19,7 +19,6 @@ interface State {
   possibleSuggestion: number
   currentStudent: Student | null
   nextPage: string | null
-  selectedStudent: number | null
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -38,7 +37,6 @@ export const useStudentStore = defineStore('user/student', {
     possibleSuggestion: -1,
     currentStudent: null,
     nextPage: '',
-    selectedStudent: null
   }),
   actions: {
     async getStudent(url: string): Promise<Student> {
