@@ -251,7 +251,7 @@ export default defineComponent ({
   },
   computed: {
     student(): Student | null {
-      return this.studentStore.students.find(s => s.id === this.studentStore.selectedStudent)
+      return this.studentStore.students.find(s => s.id === (this.studentStore.selectedStudent ?? parseInt(this.id)))
     },
     possibleSuggestion(): string {
       return this.studentStore.possibleSuggestion.toString()
