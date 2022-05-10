@@ -190,7 +190,7 @@ export default defineComponent({
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
-      statusUpdate: ref(0),
+      statusUpdate: ref(null),
       selectedStudents: ref([]),
       mailsColumns,
       columnsMails,
