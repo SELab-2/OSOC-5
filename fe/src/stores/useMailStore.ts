@@ -1,6 +1,7 @@
 import {Student} from "../models/Student";
 import {Mail} from "../models/Mail";
 import {defineStore} from "pinia";
+import qs from "qs";
 import {instance} from "../utils/axios";
 import {User} from "../models/User";
 import {useStudentStore} from "./useStudentStore";
@@ -31,22 +32,24 @@ export const useMailStore = defineStore('user/mail', {
             const params = {
                 page_size: pagination.rowsPerPage,
                 page: pagination.page
-            } as {page_size: number, page: number, search: string, ordering: string, status: string}
+            } as {page_size: number, page: number, search: string, ordering: string, status: number[]}
 
-            // const filters = []
-            if (this.searchMails) params.search = this.searchMails // filters.push(`search=${this.searchMails}`)
+            if (this.searchMails) params.search = this.searchMails
             const order = pagination.descending ? '-' : '+'
             if (pagination.sortBy === 'name') {
                 params.ordering = `${order}first_name,${order}last_name`
             } else if (pagination.sortBy !== null) {
                 params.ordering = `${order}${pagination.sortBy}`
             }
-            console.log(this.statusFilter)
-            console.log(this.statusFilter.join('&'))
-            if (this.statusFilter.length > 0) params.status = this.statusFilter.join(',')
+            if (this.statusFilter.length > 0) params.status = this.statusFilter
 
             await instance
-                .get<{ results: Student[], count: number }>(`students/`, {params: params})
+                .get<{ results: Student[], count: number }>(`students/`, {
+                    params: params,
+                    paramsSerializer: params => {
+                        return qs.stringify(params, {arrayFormat: "repeat"})
+                    }
+                })
                 .then(async ({ data }) => {
                     setNumberOfRows(data.count)
 

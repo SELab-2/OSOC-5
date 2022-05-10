@@ -4,7 +4,7 @@ import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
-import { useCoachStore } from './useCoachStore'
+import qs from "qs";
 
 interface State {
   search: string
@@ -118,7 +118,7 @@ export const useStudentStore = defineStore('user/student', {
         suggested_by_user: string
         on_project: string
         status: string
-        skills: string
+        skills: Array<number>
       }
 
       if (this.search) params.search = this.search
@@ -128,11 +128,14 @@ export const useStudentStore = defineStore('user/student', {
       if (this.byMe !== 'maybe') params.suggested_by_user = this.byMe
       if (this.onProject !== 'maybe') params.on_project = this.onProject
       if (this.status) params.status = this.status
-      if (this.skills.length > 0) params.skills = this.skills.join('&')
+      if (this.skills.length > 0) params.skills = this.skills.map(skill => skill.id)
 
       await instance
         .get<{ results: Student[]; next: string }>('students/', {
           params: params,
+          paramsSerializer: params => {
+            return qs.stringify(params, {arrayFormat: "repeat"})
+          }
         })
         .then(async ({ data }) => {
           this.nextPage = data.next

@@ -214,9 +214,12 @@ export default defineComponent({
       await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
     },
     async updateStatusStudents() {
-      await this.mailStore.updateStatusStudents(this.statusUpdate, this.selectedStudents)
-      this.selectedStudents = []
-      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      if (this.statusUpdate !== null) {
+        await this.mailStore.updateStatusStudents(this.statusUpdate, this.selectedStudents)
+        this.selectedStudents = []
+        this.statusUpdate = null
+        await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      }
     },
     updateStatus(student: Student, oldStatus: number) {
       this?.$nextTick(() => {
