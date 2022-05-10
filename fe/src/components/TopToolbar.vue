@@ -161,7 +161,6 @@ import { useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 import { useStudentStore } from '../stores/useStudentStore'
 export default defineComponent({
-
   setup() {
     const $q = useQuasar()
     const authenticationStore = useAuthenticationStore()

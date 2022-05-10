@@ -245,6 +245,10 @@ export default defineComponent({
       required: false,
       default: false
     },
+    color: {
+      type: String,
+      required: true
+    },
     draggable: {
       type: Boolean,
       required: false,
