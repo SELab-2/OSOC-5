@@ -20,7 +20,7 @@
             </div>
             <div class="row no-wrap q-pb-sm">
             <q-input
-              v-model="studentStore.search"
+              v-model="search"
               @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
               debounce="300"
               class="fit q-mr-sm"
@@ -53,7 +53,7 @@
                 <div class="q-gutter-y-sm q-px-xs">
                 
             <SegmentedControl
-              v-model="studentStore.alumni"
+              v-model="alumni"
               color="primary"
               text-color="white"
               class="q-mt-md"
@@ -67,7 +67,7 @@
 
             <label>Suggestion:</label>
             <SegmentedControl
-              v-model="studentStore.decision"
+              v-model="suggestion"
               color="primary"
               :options="[
                 { name: 'yes', label: 'Yes' },
@@ -79,7 +79,7 @@
             />
 
             <q-select
-              v-model="studentStore.skills"
+              v-model="skills"
               rounded
               outlined
               dense
@@ -109,14 +109,14 @@
             </q-select>
 
             <q-select
-              v-model="studentStore.status"
+              v-model="status"
               rounded
               outlined
               dense
               clearable
               color="primary"
               bg-color="white"
-              :options="status"
+              :options="stati"
               :option-label="opt => opt.label"
               :option-value="opt => opt.value"
               label="Status"
@@ -127,7 +127,7 @@
 
             <div class="row q-gutter-x-md">
               <q-checkbox
-                v-model="studentStore.byMe"
+                v-model="byMe"
                 toggle-indeterminate
                 false-value="maybe"
                 indeterminate-value="false"
@@ -138,7 +138,7 @@
                 @click="async () => await loadStudents($refs.infiniteScroll)"
               />
               <q-checkbox
-                v-model="studentStore.onProject"
+                v-model="onProject"
                 toggle-indeterminate
                 true-value="true"
                 false-value="maybe"
@@ -167,7 +167,7 @@
                 class="q-pa-sm"
                 
                 :offset="250"
-                @load="async (index, done) => await loadNextStudents(index, done)"
+                @load="async (index, done) => await studentStore.loadNext(index, done, filters)"
               >
                 <StudentCard
                   v-for="student in studentStore.students"
@@ -226,7 +226,7 @@ import {defineComponent, ref} from 'vue'
 import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
-import status from "../features/mails/Status";
+import stati from "../features/mails/Status";
 import {useQuasar} from "quasar";
 import { Student } from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
@@ -270,7 +270,7 @@ export default defineComponent({
         backgroundColor: 'black',
         width: '4px',
       },
-      status,
+      stati,
     }
   },
   data() {
@@ -278,13 +278,43 @@ export default defineComponent({
       miniState: ref(false),
       showFilters: ref(false),
       showShadow: ref(false),
+      search: ref(''),
+      alumni: ref('all'),
+      suggestion: ref('none'),
+      byMe: ref('maybe'),
+      onProject: ref('maybe'),
+      status: ref(''),
+      skills: ref([])
     }
   },
   async mounted() {
-    //this.skillStore.loadSkills()
-    await this.studentStore.loadStudents()
+    this.skillStore.loadSkills()
+    await this.studentStore.loadStudents(this.filters)
   }, 
   computed: {
+    filters() {
+      let filter = {} as {
+        search: string
+        alum: boolean
+        student_coach: boolean
+        suggestion: string
+        suggested_by_user: string
+        on_project: string
+        status: string
+        skills: Array<number>
+      }
+
+      if (this.search) filter.search = this.search
+      if (this.alumni === 'alumni') filter.alum = true
+      if (this.alumni === 'student coaches') filter.student_coach = true
+      if (this.suggestion !== 'none') filter.suggestion = this.suggestion
+      if (this.byMe !== 'maybe') filter.suggested_by_user = this.byMe
+      if (this.onProject !== 'maybe') filter.on_project = this.onProject
+      if (this.status) filter.status = this.status
+      if (this.skills.length > 0) filter.skills = this.skills.map((skill: {id: number}) => skill.id)
+
+      return filter
+    },
     showDrawer() {
       console.log(this.$route.name)
         return this.$route.name === "Students" || this.$route.name === "Projects" || this.$route.name === "Student Page";
@@ -314,11 +344,8 @@ export default defineComponent({
     async loadStudents(scroll: any) {
       scroll.resume()
       this.studentStore.students = []
-      await this.studentStore.loadStudents()
+      await this.studentStore.loadStudents(this.filters)
     },
-    async loadNextStudents(index: number, done: any) {
-      await this.studentStore.loadNext(index, done)
-    }
   }
 })
 </script>

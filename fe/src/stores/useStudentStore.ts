@@ -3,14 +3,9 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
+import qs from "qs";
 
 interface State {
-  search: string
-  status: string
-  alumni: string
-  decision: string
-  byMe: string
-  onProject: string
   skills: Array<Skill>
   skillsStudents: Map<string, Skill>
   coaches: Map<string, User>
@@ -24,12 +19,6 @@ interface State {
 
 export const useStudentStore = defineStore('user/student', {
   state: (): State => ({
-    search: '',
-    status: '',
-    alumni: 'all',
-    decision: 'none',
-    byMe: 'maybe',
-    onProject: 'maybe',
     skills: [],
     skillsStudents: new Map(),
     coaches: new Map(),
@@ -88,29 +77,16 @@ export const useStudentStore = defineStore('user/student', {
       student.language = parseInt(student.language)
       student.englishRating = parseInt(student.englishRating)
     },
-    async loadStudents() {
+    async loadStudents(filters: Object) {
       this.isLoading = true
-      const filters = []
-
-      if (this.search) filters.push(`search=${this.search}`)
-      if (this.alumni === 'alumni') filters.push('alum=true')
-      if (this.alumni === 'student coaches') filters.push('student_coach=true')
-      if (this.decision !== 'none') filters.push(`suggestion=${this.decision}`)
-      if (this.byMe !== 'maybe') filters.push(`suggested_by_user=${this.byMe}`)
-      if (this.onProject !== 'maybe') filters.push(`on_project=${this.onProject}`)
-      if (this.status) filters.push(`status=${this.status}`)
-
-      for (const skill of this.skills) {
-        filters.push(`skills=${skill.id}`)
-      }
-
-      let url = ''
-      if (filters.length > 0) {
-        url = `&${filters.join('&')}`
-      }
 
       await instance
-        .get<{results: Student[], next: string}>(`students/?page=1${url}`)
+        .get<{results: Student[], next: string}>("students/?page=1", {
+          params: filters,
+          paramsSerializer: params => {
+            return qs.stringify(params, {arrayFormat: "repeat"})
+          }
+        }) // page 1!
         .then(async ({ data }) => {
           this.nextPage = data.next
 
@@ -124,7 +100,7 @@ export const useStudentStore = defineStore('user/student', {
       this.isLoading = false
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async loadNext(index: number, done: any) {
+    async loadNext(index: number, done: any, filters: Object) {
       this.isLoading = true
 
       if (this.nextPage == null) {
@@ -135,7 +111,9 @@ export const useStudentStore = defineStore('user/student', {
 
       if (this.nextPage !== '') {
         await instance
-            .get(this.nextPage)
+            .get(`students/?page=${index}`, {
+              params: filters
+            })
             .then(async ({data}) => {
               this.nextPage = data.next
 
