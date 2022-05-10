@@ -399,7 +399,7 @@ class Suggestion(models.Model):
     """
     class Suggestion(models.TextChoices):
         """
-        suggestion type enum, suggestion type can be Yesm No or Maybe
+        suggestion type enum, suggestion type can be Yes, No or Maybe
         when a coach selects 'undecided' for a suggestion, the suggestion is removed in the backend
         """
         YES = '0', _('Yes')
@@ -471,6 +471,19 @@ class SentEmail(models.Model):
     Information about which emails have been sent to which students
     """
     class EmailType(models.TextChoices):
+        """
+        email type enum
+        confirmation
+            a confirmation email sent to a student, they received a 'yes'
+        rejection
+            a rejection email sent to a student, they received a 'no'
+        hold tight
+            an email sent to a student to hold tight, they received a 'maybe'
+        contract
+            a contract was sent to a student
+        other
+            other type of mail that is not present here
+        """
         CONFIRMATION = '0', _('Confirmation')
         REJECTION = '1', _('Rejection')
         HOLD_TIGHT = '2', _('Hold on tight')
@@ -500,7 +513,7 @@ class SentEmail(models.Model):
         _("type"),
         max_length=1,
         choices=EmailType.choices,
-        null=True, 
+        null=True,
         blank=True
     )
 
