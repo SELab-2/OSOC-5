@@ -128,7 +128,7 @@ export const useStudentStore = defineStore('user/student', {
       if (this.byMe !== 'maybe') params.suggested_by_user = this.byMe
       if (this.onProject !== 'maybe') params.on_project = this.onProject
       if (this.status) params.status = this.status
-      if (this.skills.length > 0) this.skills.join('&')
+      if (this.skills.length > 0) params.skills = this.skills.join('&')
 
       await instance
         .get<{ results: Student[]; next: string }>('students/', {

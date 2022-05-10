@@ -10,6 +10,7 @@ interface State {
     isLoading: boolean
     searchMails: string
     mailStudents: Array<Student>
+    statusFilter: Array<number>
     mails: Map<number, Mail[]>
     selectedStudents: Array<Student>
 }
@@ -19,6 +20,7 @@ export const useMailStore = defineStore('user/mail', {
         isLoading: false,
         searchMails: '',
         mailStudents: [],
+        statusFilter: [],
         mails: new Map(),
         selectedStudents: []
     }),
@@ -31,7 +33,7 @@ export const useMailStore = defineStore('user/mail', {
             const params = {
                 page_size: pagination.rowsPerPage,
                 page: pagination.page
-            } as {page_size: number, page: number, search: string, ordering: string}
+            } as {page_size: number, page: number, search: string, ordering: string, status: string}
 
             // const filters = []
             if (this.searchMails) params.search = this.searchMails // filters.push(`search=${this.searchMails}`)
@@ -41,6 +43,9 @@ export const useMailStore = defineStore('user/mail', {
             } else if (pagination.sortBy !== null) {
                 params.ordering = `${order}${pagination.sortBy}`
             }
+            console.log(this.statusFilter)
+            console.log(this.statusFilter.join('&'))
+            if (this.statusFilter.length > 0) params.status = this.statusFilter.join(',')
 
             await instance
                 .get<{ results: Student[], count: number }>(`students/`, {params: params})

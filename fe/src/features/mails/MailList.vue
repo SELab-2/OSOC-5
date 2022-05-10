@@ -28,7 +28,7 @@
       </div>
       <div class="q-pl-md full-width">
         <q-select
-          v-model="statusFilter"
+          v-model="mailStore.statusFilter"
           rounded
           outlined
           dense
@@ -37,6 +37,9 @@
           use-chips
           label="Status"
           :options="status"
+          map-options
+          emit-value
+          @update:model-value="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
         />
       </div>
       <q-table
@@ -186,7 +189,6 @@ export default defineComponent({
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
-      statusFilter: ref([]),
       statusUpdate: ref(0),
       mailsColumns,
       columnsMails,
