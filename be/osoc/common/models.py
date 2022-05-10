@@ -470,25 +470,6 @@ class SentEmail(models.Model):
     """
     Information about which emails have been sent to which students
     """
-    class EmailType(models.TextChoices):
-        """
-        email type enum
-        confirmation
-            a confirmation email sent to a student, they received a 'yes'
-        rejection
-            a rejection email sent to a student, they received a 'no'
-        hold tight
-            an email sent to a student to hold tight, they received a 'maybe'
-        contract
-            a contract was sent to a student
-        other
-            other type of mail that is not present here
-        """
-        CONFIRMATION = '0', _('Confirmation')
-        REJECTION = '1', _('Rejection')
-        HOLD_TIGHT = '2', _('Hold on tight')
-        CONTRACT = '3', _('Contract')
-        OTHER = '4', _('Other')
 
     sender = models.ForeignKey(
         Coach,
@@ -512,7 +493,7 @@ class SentEmail(models.Model):
     type = models.CharField(
         _("type"),
         max_length=1,
-        choices=EmailType.choices,
+        choices=Student.Status.choices,
         null=True,
         blank=True
     )
