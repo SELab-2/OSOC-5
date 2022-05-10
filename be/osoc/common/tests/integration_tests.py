@@ -220,6 +220,9 @@ class StudentTestsCoach(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_student_bulk_status(self):
+        """
+        test POST /students/bulk_status
+        """
         student_status = '2'
         url = reverse("student-bulk-status")
         data = {
@@ -229,9 +232,12 @@ class StudentTestsCoach(APITestCase):
         response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(all([student.status == student_status for student in Student.objects.all()]))
+        self.assertTrue(all(student.status == student_status for student in Student.objects.all()))
 
     def test_student_bulk_status_bad_request(self):
+        """
+        test POST /students/bulk_status with bad request
+        """
         url = reverse("student-bulk-status")
         response = self.client.post(url, {}, format="json")
 
