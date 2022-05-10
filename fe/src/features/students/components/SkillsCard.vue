@@ -16,7 +16,7 @@
             v-for="(skill, index) in skills"
             :key="index"
             :best-skill="bestSkill ?? ''"
-            :color="typeof(skill) !== 'string' ? skill.color : ''"
+            :color="skill.color as string"
             :name="typeof(skill) !== 'string' ? skill.name : ''"
           />
         </ul>
@@ -43,7 +43,7 @@ export default defineComponent( {
       required: true
     },
     skills: {
-      type: Array<Skill>,
+      type: Array,
       required: true
     },
     bestSkill: {

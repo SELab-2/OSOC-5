@@ -11,8 +11,8 @@
           {{ student ? student.fullName : '' }}
         </h>
         <DecisionIcon
-          v-if="student?.finalDecison"
-          :decision="student.finalDecision.suggestion"
+          v-if="student?.finalDecision"
+          :decision="student?.finalDecision.suggestion"
         />
         <q-btn
           :href="student ? student.cv.toString() : ''"

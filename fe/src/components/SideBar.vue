@@ -159,7 +159,7 @@
               class="fadeOut q-px-sm"
               :thumb-style="thumbStyle"
               style="flex: 1; overflow: auto;"
-              @scroll="onScroll"
+              @scroll="showShadow = $event.verticalPosition > 5"
               
             >
               <q-infinite-scroll
@@ -245,10 +245,6 @@ export default defineComponent({
       required: false,
       default: false
     },
-    color: {
-      type: String,
-      required: true
-    },
     draggable: {
       type: Boolean,
       required: false,
@@ -256,7 +252,8 @@ export default defineComponent({
     },
     mustHover: {
       type: Boolean,
-      required: true
+      required: false,
+      default: false
     }
   },
   setup() {
@@ -296,10 +293,6 @@ export default defineComponent({
     }
   },
   methods: {
-    onScroll(info) {
-      console.log(info.verticalPosition)
-      this.showShadow = info.verticalPosition > 5
-    },
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
     /**

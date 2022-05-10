@@ -220,9 +220,11 @@ export default defineComponent({
   watch: {
     projectNameFilter: {
       handler() {
-        this.$refs.infinite.reset()
-        this.$refs.infinite.resume()
-        this.$refs.infinite.trigger()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const infscroll = this.$refs.infinite as any;
+        infscroll.reset()
+        infscroll.resume()
+        infscroll.trigger()
       },
     },
   },

@@ -60,7 +60,7 @@ export default defineComponent( {
         required: true
     },
     suggestions: {
-      type: Array<Suggestion>,
+      type: Array,
       required: true
     }
   },
