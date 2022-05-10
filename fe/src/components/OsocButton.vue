@@ -1,49 +1,48 @@
-<!-- 
-  Props:
-    glow-color (optional, default: lighter color than button): color of the glow on hover (e.g. 'purple', '#00FFB5', 'primary').
-    glow-size (optional, default: 500px): size of the glow on hover (e.g. '1000px') .
-    glow-scale (optional, default: 1): scale of the glow when clicked.
-    disable-click: disables the scale effect on click.
-    shadow-color: color of the shadow.
--->
-
 <template>
   <q-btn
+    ref="glowbutton"
     unelevated
     :flat="flat"
-    ref="glowbutton"
     class="bttn"
     :class="focusable ? 'focusable' : ''"
-    @mousemove="mousemove"
     :color="color"
     :style="glowStyle"
+    @mousemove="mousemove"
   >
-  <slot/>
+    <slot />
   </q-btn>
 </template>
-
-<style scoped>
-  :deep(.q-ripple) {
-    display:none;
-  }
-</style>
 
 <script lang="ts">
   import { ref, defineComponent } from 'vue'
   import { colors } from 'quasar'
 export default defineComponent({
-  name: 'btn',
+  name: 'OsocButton',
+  /**
+   * Props:
+   *  glow-color (optional, default: lighter color than button): color of the glow on hover (e.g. 'purple', '#00FFB5', 'primary').
+   *  glow-size (optional, default: 500px): size of the glow on hover (e.g. '1000px') .
+   *  glow-scale (optional, default: 1): scale of the glow when clicked.
+   *  disable-click: disables the scale effect on click.
+   *  shadow-color: color of the shadow.
+   */
   props: {
-    'glowColor': String,
+    'glowColor': {
+      type: String,
+      required: true
+    },
     'glowSize': {
       type: String,
       default: "500px"
-    },
+    }, 
     'glowScale': {
       type: [Number,String],
       default: 1
     },
-    'color': String,
+    'color': { 
+      type: String,
+      required: true
+    },
     'shadowColor': {
       type: String,
       default: 'transparent'
@@ -57,24 +56,15 @@ export default defineComponent({
     'flat': Boolean,
     'focusable': Boolean
   },
-  
   data() {
     return {
       x: ref(0),
       y: ref(0)
     }
   },
-  mounted() {
-    // This class produces a tint change on hover, but is unwanted for the glow button.
-    const button = this.$refs.glowbutton as any
-    button.$el.classList.remove('q-hoverable')
-    button.$el.removeChild(button.$el.children[0])
-    this.x = button.$el.clientWidth / 2
-    this.y = button.$el.clientHeight / 2
-  },
   computed: {
     glow() {
-      var color: String;
+      let color: string;
       if (this.glowColor) {
         color = (colors.getPaletteColor(this.glowColor) !== "#000000") ? colors.getPaletteColor(this.glowColor) : this.glowColor
       } else if (!this.color) {
@@ -107,7 +97,20 @@ export default defineComponent({
       }
     }
   },
+  mounted() {
+    // This class produces a tint change on hover, but is unwanted for the glow button.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const button = this.$refs.glowbutton as any
+    button.$el.classList.remove('q-hoverable')
+    button.$el.removeChild(button.$el.children[0])
+    this.x = button.$el.clientWidth / 2
+    this.y = button.$el.clientHeight / 2
+  },
   methods: {
+    /**
+     * This method makes the glow effect follow our mouse
+     * @param e the mouse movement over the button 
+     */
     mousemove(e: MouseEvent) {
       const test = (e.target as HTMLElement)?.getBoundingClientRect()
       this.x = e.clientX - test.left
@@ -116,6 +119,12 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+  :deep(.q-ripple) {
+    display:none;
+  }
+</style>
 
 <style lang="scss">
 

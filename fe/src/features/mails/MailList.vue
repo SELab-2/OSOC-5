@@ -19,7 +19,7 @@
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="mailStore.loadStudentsMails"
+          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
         >
           <template #append>
             <q-icon name="search" />
@@ -48,6 +48,8 @@
         row-key="url"
         selection="multiple"
         separator="horizontal"
+        :loading="mailStore.isLoading"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -59,6 +61,9 @@
             </q-td>
             <q-td auto-width>
               <q-icon
+                size="sm"
+                color="yellow"
+                :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                 @click="() => clickRow(props, props.row)"
                 size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               />
@@ -90,9 +95,9 @@
               >
                 <template #option="scope">
                   <q-item
-                    @click="() => updateStatus(props.row, props.row.status)"
                     class="items-center"
                     v-bind="scope.itemProps"
+                    @click="() => updateStatus(props.row, props.row.status)"
                   >
                     <q-item-section>
                       <q-item-label>{{ scope.opt.label }}</q-item-label>
@@ -105,11 +110,17 @@
               key="email"
               :props="props"
             >
-              <a :href="'mailto:' + props.row.email" style="color: black">{{ props.row.email }}</a>
+              <a
+                :href="'mailto:' + props.row.email"
+                style="color: black"
+              >{{ props.row.email }}</a>
             </q-td>
-
           </q-tr>
-          <q-tr no-hover v-if="props.expand" :props="props">
+          <q-tr
+            v-if="props.expand"
+            no-hover
+            :props="props"
+          >
             <q-td colspan="100%">
               <MailsOverview :student="props.row" />
             </q-td>
@@ -128,6 +139,8 @@ import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
+import columnsMails from "../../models/MailStudentColumns";
+import { useAuthenticationStore } from "../../stores/useAuthenticationStore";
 import router from "../../router";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import mailsColumns from "../../models/MailsColumns";
@@ -138,14 +151,24 @@ export default defineComponent({
     const mailStore = useMailStore()
     const q = useQuasar()
 
+    const pagination = ref({
+        sortBy: 'name',
+        descending: false,
+        page: 1,
+        rowsPerPage: 10,
+        rowsNumber: 10 // if getting data from a server
+      })
+
     return {
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
       statusFilter: ref([]),
       mailsColumns,
+      columnsMails,
       status,
-      q
+      q,
+      pagination,
     }
   },
   beforeMount() {
@@ -153,12 +176,17 @@ export default defineComponent({
       router.replace('/projects')
     }
   },
-  mounted() {
-    this.mailStore.loadStudentsMails()
+  async mounted() {
+    await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async onRequest(props: any) {
+      this.pagination = props.pagination
+      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
     updateStatus(student: Student, oldStatus: string) {
-      this!.$nextTick(() => {
+      this?.$nextTick(() => {
         this.mailStore
           .updateStatus(student)
           .catch((error) => {
@@ -168,10 +196,13 @@ export default defineComponent({
               message: error.detail,
               textColor: 'black'
             });
-            this.mailStore.mailStudents.find((s: Student) => s.id === student.id)!.status = oldStatus
+            const student = this.mailStore.mailStudents.find((s: Student) => s.id === student.id) as Student
+            if(student)
+              student.status = oldStatus
           })
       })
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clickRow(props: any, student: Student) {
       props.expand = !props.expand
       if (props.expand) this.mailStore.getMails(student)

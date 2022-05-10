@@ -11,7 +11,10 @@
       </div>
 
       <div v-else>
-        <ul v-if="studentStore.currentStudent" style="margin: 0px; padding-left: 20px;">
+        <ul
+          v-if="studentStore.currentStudent"
+          style="margin: 0px; padding-left: 20px;"
+        >
           <li>{{ 'Enrolled at: ' + studentStore.currentStudent.schoolName }}</li>
           <li>{{ 'Studies: ' + studentStore.currentStudent.studies }}</li>
           <li>{{ 'Degree: ' + studentStore.currentStudent.degree }}</li>

@@ -46,6 +46,11 @@ export const useProjectStore = defineStore('project', {
     projectFilter: '',
   }),
   actions: {
+    /**
+     * Fetches the suggested students
+     * @param students the students to fetch
+     * @returns the fetched students
+     */
     async fetchSuggestedStudents(
       students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
@@ -61,6 +66,12 @@ export const useProjectStore = defineStore('project', {
       }
       return newStudents
     },
+    /**
+     * Removes a suggestion from a project
+     * @param project the associated project
+     * @param suggestion the suggestion which needs to be removed
+     * @returns data returned by the back-end
+     */
     async removeSuggestion(
       project: Project,
       suggestion: ProjectSuggestionInterface
@@ -71,6 +82,14 @@ export const useProjectStore = defineStore('project', {
         coach: suggestion.coach.url,
       })
     },
+    /**
+     * Adds a suggestion to a project
+     * @param projectId the id of the project for which a suggestion is added
+     * @param studentUrl url of the student
+     * @param skillUrl url of the skill
+     * @param reason the reason why we made this suggestion
+     * @returns data returned by the back-end
+     */
     async addSuggestion(
       projectId: number,
       studentUrl: string,
@@ -83,13 +102,21 @@ export const useProjectStore = defineStore('project', {
         reason: reason,
       })
     },
+    /**
+     * Gets a skill
+     * @param skill the skill which we want to get
+     * @returns the fetched skill
+     */
     async getSkill(skill: TempProjectSkill): Promise<ProjectSkill> {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
-
-    // NOTE: this may be broken.
+    /**
+     * Gets a project
+     * @param project the project to get
+     */
     async getProject(project: TempProject) {
+      console.log('Loading')
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
@@ -114,11 +141,16 @@ export const useProjectStore = defineStore('project', {
         ),
       ])
     },
+    /**
+     * Loads the projects
+     */
     async loadProjects() {
       this.isLoadingProjects = true
       try {
         const { results } = (
-          await instance.get<{ results: TempProject[] }>(`projects/?search=${this.projectFilter}`)
+          await instance.get<{ results: TempProject[] }>(
+            `projects/?search=${this.projectFilter}`
+          )
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
@@ -155,6 +187,10 @@ export const useProjectStore = defineStore('project', {
         this.isLoadingProjects = false
       }
     },
+    /**
+     * Called when we recieve a suggestion from the websocket
+     * @param param0 object received from the websocket
+     */
     async receiveSuggestion({
       project_id,
       reason,
@@ -211,6 +247,10 @@ export const useProjectStore = defineStore('project', {
         )
       }
     },
+    /**
+     * Called when we receive a remove suggestion from the websocket
+     * @param param0 object received from the websocket
+     */
     removeReceivedSuggestion({
       skill,
       student,
@@ -277,7 +317,9 @@ export const useProjectStore = defineStore('project', {
           this.loadProjects()
           callback(true)
         })
-        .catch(() => {callback(false)})
+        .catch(() => {
+          callback(false)
+        })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getAndSetProject(id: string, callback: any) {
@@ -320,6 +362,13 @@ export const useProjectStore = defineStore('project', {
         .catch(() => {
           callback(false)
         })
+    },
+    editProject(project: Project) {
+      this.projectName = project.name
+      this.projectPartnerName = project.partnerName
+      this.projectLink = project.extraInfo
+      this.selectedCoaches = []
+      // skills
     },
   },
 })

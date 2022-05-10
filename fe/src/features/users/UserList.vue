@@ -23,33 +23,43 @@
       </div>
       <div class="row q-mb-md vertical-middle">
         <SegmentedControl
-          v-model="roleFilter"
+          v-model="coachStore.filterRole"
           :options="[
             { name: 'all', label: 'All' },
             { name: 'admin', label: 'Admins' },
             { name: 'coach', label: 'Coaches' },
             { name: 'inactive', label: 'Inactive' },
           ]"
+          @click="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
         />
 
         <q-space />
         <div class="row q-px-sm">
-          <btn color="yellow" icon-right="add" class="text-black" label="Add User" @click="newUserDialog = true" shadow-color="orange" shadow-strength="2"/>
+          <btn
+            color="yellow"
+            icon-right="add"
+            class="text-black"
+            label="Add User"
+            shadow-color="orange"
+            shadow-strength="2"
+            @click="newUserDialog = true"
+          />
         </div>
         <div class="row q-px-sm">
-          <q-space/>
+          <q-space />
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser />
+              <AddUser :created="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)" />
             </q-card>
           </q-dialog>
           <q-input
-            v-model="filter"
+            v-model="coachStore.filter"
             outlined
             dense
             debounce="300"
             color="yellow-4"
             placeholder="Search"
+            @update:modelValue="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
           >
             <template #append>
               <q-icon name="search" />
@@ -61,14 +71,15 @@
       <!-- filter cannot be empty, since this won't trigger the table filter function call.
              This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
       <q-table
+        v-model:pagination="pagination"
         class="my-table user-table shadow-4"
         table-header-style="user-table"
         :rows="coachStore.users"
         :columns="columns"
         row-key="id"
-        :filter="roleFilter"
-        :filter-method="useTableFilter"
         separator="horizontal"
+        :loading="coachStore.isLoadingUsers"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -88,6 +99,7 @@
               <q-select
                 v-model="props.row.role"
                 v-ripple
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 color="yellow"
                 borderless
                 dense
@@ -99,13 +111,12 @@
                 behavior="menu"
                 map-options
                 emit-value
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
               >
                 <template #option="scope">
                   <q-item
-                    @click="() => updateRole(props.row, props.row.role)"
                     class="items-center"
                     v-bind="scope.itemProps"
+                    @click="() => updateRole(props.row, props.row.role)"
                   >
                     <q-icon
                       class="q-mr-md icon"
@@ -136,13 +147,13 @@
               style="width: 10px"
             >
               <btn
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 flat
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
-                @click="coachStore.removeUser(props.row.id)"
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 glow-color="red-2"
+                @click="coachStore.removeUser(props.row.id)"
               />
             </q-td>
           </q-tr>
@@ -243,8 +254,14 @@ export default defineComponent({
   setup() {
     const coachStore = useCoachStore()
     const q = useQuasar()
-    
-    coachStore.loadUsers();
+
+    const pagination = ref({
+      sortBy: 'name',
+      descending: false,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 10 // if getting data from a server
+    })
 
     return {
       authenticationStore: useAuthenticationStore(),
@@ -255,6 +272,7 @@ export default defineComponent({
       columns,
       roles,
       coachStore,
+      pagination,
       q
     }
   },
@@ -263,7 +281,24 @@ export default defineComponent({
       router.replace('/projects')
     }
   },
+  async mounted() {
+    await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+  },
   methods: {
+    async onRequest(props: any) {
+      this.pagination = props.pagination
+      await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
+    async removeUser(id: number) {
+      await this.coachStore.removeUser(id)
+
+      if (this.coachStore.users.length === 1) {
+        this.pagination.page -= 1
+      }
+      this.pagination.rowsNumber -= 1
+
+      this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
     // Method for searching the table.
     // Terms is equal to roleFilter.
     // The method filter to the elements which pass both filters.

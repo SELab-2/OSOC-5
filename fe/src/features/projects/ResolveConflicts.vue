@@ -7,14 +7,14 @@
       bordered
       separator
     >
-<!--      <q-item-->
-<!--        v-for="conflict in conflicts"-->
-<!--        :key="conflict.user"-->
-<!--        v-ripple-->
-<!--        clickable-->
-<!--      >-->
-<!--        <q-item-section>{{ conflict.user.fullName() }}</q-item-section>-->
-<!--      </q-item>-->
+      <!--      <q-item-->
+      <!--        v-for="conflict in conflicts"-->
+      <!--        :key="conflict.user"-->
+      <!--        v-ripple-->
+      <!--        clickable-->
+      <!--      >-->
+      <!--        <q-item-section>{{ conflict.user.fullName() }}</q-item-section>-->
+      <!--      </q-item>-->
     </q-list>
   </div>
 </template>

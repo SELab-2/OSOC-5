@@ -1,6 +1,8 @@
 <template>
   <div class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-    <div class="text-h4 q-my-md">Basic Info</div>
+    <div class="text-h4 q-my-md">
+      Basic Info
+    </div>
     <q-input
       v-model="projectStore.projectName"
       outlined
@@ -9,7 +11,8 @@
       class="inputfield"
       :rules="[
         (val) =>
-          (val && val.length > 0) || 'Please enter the name of the project.',
+          (val && val.length > 0) ||
+          'Please enter the name of the project.',
       ]"
     />
     <q-input
@@ -20,7 +23,8 @@
       class="inputfield"
       :rules="[
         (val) =>
-          (val && val.length > 0) || 'Please enter the name of the partner.',
+          (val && val.length > 0) ||
+          'Please enter the name of the partner.',
       ]"
     />
     <q-input
@@ -31,7 +35,8 @@
       class="inputfield"
       :rules="[
         (val) =>
-          (val && val.length > 0) || 'Please enter the URL of the project.',
+          (val && val.length > 0) ||
+          'Please enter the URL of the project.',
       ]"
     />
   </div>
