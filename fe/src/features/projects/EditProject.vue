@@ -78,6 +78,7 @@ import DeleteProjectDialog from './components/subcomponents/DeleteProjectDialog.
 
 export default defineComponent({
   components: { ProjectCoaches, BasicInfo, ProjectSkills, DeleteProjectDialog },
+  name: 'EditProject',
   props: {
     id: {
       type: String,
