@@ -88,11 +88,21 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
     fields: first_name, last_name, email, is_admin and is_active
     is_admin and is_active are read-only
     """
+    projects = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name',
-                  'email', 'is_admin', 'is_active']
+                  'email', 'is_admin', 'is_active', 'projects']
         read_only_fields = ['is_admin', 'is_active']
+
+    def get_projects(self, obj):
+        """
+        get all projects the current coach is assigned to and return a list of urls
+        """
+        projects = obj.project_set.all() # will return product query set associate with this category
+        return [project['url'] for project in
+            ProjectSerializer(projects, many=True, context={"request": self.context.get("request")}).data]
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
