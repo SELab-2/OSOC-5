@@ -399,7 +399,7 @@ class Suggestion(models.Model):
     """
     class Suggestion(models.TextChoices):
         """
-        suggestion type enum, suggestion type can be Yesm No or Maybe
+        suggestion type enum, suggestion type can be Yes, No or Maybe
         when a coach selects 'undecided' for a suggestion, the suggestion is removed in the backend
         """
         YES = '0', _('Yes')
@@ -470,6 +470,7 @@ class SentEmail(models.Model):
     """
     Information about which emails have been sent to which students
     """
+
     sender = models.ForeignKey(
         Coach,
         on_delete=models.CASCADE
@@ -488,6 +489,13 @@ class SentEmail(models.Model):
         max_length=255,
         blank=True,
         default=""
+    )
+    type = models.CharField(
+        _("type"),
+        max_length=1,
+        choices=Student.Status.choices,
+        null=True,
+        blank=True
     )
 
     def __str__(self):

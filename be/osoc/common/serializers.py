@@ -238,7 +238,7 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
     sender = CoachPartialSerializer(read_only=True)
     class Meta:
         model = SentEmail
-        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
+        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info', 'type']
         read_only_fields = ['time']
 
 
