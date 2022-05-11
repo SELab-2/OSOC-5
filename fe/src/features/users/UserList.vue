@@ -314,6 +314,7 @@ export default defineComponent({
         filter.ordering = `${order}${this.pagination.sortBy}`
       }
 
+      console.log(filter)
       return filter
     }
   },
