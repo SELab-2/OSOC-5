@@ -58,8 +58,8 @@
                 >
                   <template #default="{ item }">
                     <q-radio
-                      v-model="selectedProjectUrl"
-                      :val="item.url"
+                      v-model="selectedProjectId"
+                      :val="item.id"
                       label="Select this project "
                     />
                     <ProjectConflictCard :project="item" />
@@ -113,7 +113,7 @@ export default defineComponent({
           q: $q,
           selectedConflict: ref({student: {}} as { student: Student; projects: Project[] }),
           showShadow: ref(false),
-          selectedProjectUrl: ref(""),
+          selectedProjectId: ref(-1),
           conflicts: ref([] as { student: Student; projects: Project[]; }[]),
           nextPage: ref("")
       }
@@ -123,11 +123,11 @@ export default defineComponent({
     },
     methods: {
      selectedProject() {
-        return this.selectedConflict.projects.filter(({url}) => url === this.selectedProjectUrl)[0]
+        return this.selectedConflict.projects.filter(({id}) => id === this.selectedProjectId)[0]
      },
      async loadConflicts() {
        this.selectedConflict = {student: {}} as { student: Student; projects: Project[] }
-       this.selectedProjectUrl = ""
+       this.selectedProjectId = -1
        const projects = await this.getConflictingProjects()
        this.conflicts = projects.conflicts
        this.nextPage = projects.nextPage
