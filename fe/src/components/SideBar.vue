@@ -100,9 +100,9 @@
                     >
                       <StudentSkillChip
                         v-for="skill of skills"
-                        :key="skill.id"
-                        :color="skill.color"
-                        :name="skill.name"
+                        :key="(skill as any).id"
+                        :color="(skill as any).color"
+                        :name="(skill as any).name"
                         best-skill=""
                       />
                     </div>
@@ -320,10 +320,6 @@ export default defineComponent({
     }
   },
   methods: {
-    onScroll(info) {
-      console.log(info.verticalPosition)
-      this.showShadow = info.verticalPosition > 5
-    },
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
     /**
