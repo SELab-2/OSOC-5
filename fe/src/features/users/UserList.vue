@@ -23,14 +23,14 @@
       </div>
       <div class="row q-mb-md vertical-middle">
         <SegmentedControl
-          v-model="coachStore.filterRole"
+          v-model="roleFilter"
           :options="[
             { name: 'all', label: 'All' },
             { name: 'admin', label: 'Admins' },
             { name: 'coach', label: 'Coaches' },
             { name: 'inactive', label: 'Inactive' },
           ]"
-          @click="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
+          @click="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
         />
 
         <q-space />
@@ -49,7 +49,7 @@
           <q-space />
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser :created="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)" />
+              <AddUser :created="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)" />
             </q-card>
           </q-dialog>
           <q-input
@@ -59,7 +59,7 @@
             debounce="300"
             color="yellow-4"
             placeholder="Search"
-            @update:modelValue="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
+            @update:modelValue="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
           >
             <template #append>
               <q-icon name="search" />
@@ -256,14 +256,6 @@ export default defineComponent({
     const coachStore = useCoachStore()
     const q = useQuasar()
 
-    const pagination = ref({
-      sortBy: 'name',
-      descending: false,
-      page: 1,
-      rowsPerPage: 10,
-      rowsNumber: 10 // if getting data from a server
-    })
-
     return {
       authenticationStore: useAuthenticationStore(),
       newUserDialog: ref(false),
@@ -273,8 +265,57 @@ export default defineComponent({
       columns,
       roles,
       coachStore,
-      pagination,
       q
+    }
+  },
+  data() {
+    const pagination = ref({
+      sortBy: 'name',
+      descending: false,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 10 // if getting data from a server
+    })
+
+    return {
+      pagination
+    }
+  },
+  computed: {
+    filters() {
+      const filter = {} as {
+        search: string
+        is_active: boolean
+        is_admin: boolean
+        ordering: string
+        page: number
+        page_size: number
+      }
+
+      if (this.filter) filter.search = this.filter
+      filter.page_size = this.pagination.rowsPerPage
+      filter.page = this.pagination.page
+      if (this.roleFilter === 'inactive') filter.is_active = false
+      if (this.roleFilter === 'admin') {
+        filter.is_active = true
+        filter.is_admin = true
+      }
+      if (this.roleFilter === 'coach'){
+        filter.is_active = true
+        filter.is_admin = false
+      }
+      const order = this.pagination.descending ? '-' : '+'
+      if (this.pagination.sortBy === 'name') {
+        filter.ordering = `${order}first_name,${order}last_name`
+      } else if (this.pagination.sortBy === 'role') {
+        const order = this.pagination.descending ? '+' : '-'
+        filter.ordering = `${order}is_admin,${order}is_active`
+      } else if (this.pagination.sortBy !== null) {
+        filter.ordering = `${order}${this.pagination.sortBy}`
+      }
+
+      console.log(filter)
+      return filter
     }
   },
   beforeMount() {
@@ -283,12 +324,12 @@ export default defineComponent({
     }
   },
   async mounted() {
-    await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    await this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
     async onRequest(props: any) {
       this.pagination = props.pagination
-      await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      await this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
     },
     async removeUser(id: number) {
       await this.coachStore.removeUser(id)
@@ -298,7 +339,7 @@ export default defineComponent({
       }
       this.pagination.rowsNumber -= 1
 
-      this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
     },
     // Method for searching the table.
     // Terms is equal to roleFilter.
@@ -316,52 +357,6 @@ export default defineComponent({
         })
       )
     },
-//     exportTable() {
-//       // naive encoding to csv format
-//       const current = new Date()
-//       const cDate =
-//         current.getFullYear() +
-//         '' +
-//         (current.getMonth() + 1) +
-//         '' +
-//         current.getDate()
-//       const cTime =
-//         current.getHours() + '' + current.getMinutes() + current.getSeconds()
-//       const dateTime = cDate + '' + cTime
-//       const content = [
-//         columns.slice(0, -1).map((col) => wrapCsvValue(col.label)),
-//       ]
-//         .concat(
-//           this.coachStore.users.map((row: { [x: string]: any }) =>
-//             columns
-//               .slice(0, -1)
-//               .map((col) =>
-//                 wrapCsvValue(
-//                   typeof col.field === 'function'
-//                     ? col.field(row)
-//                     : row[col.field === void 0 ? col.name : col.field],
-//                   col.format
-//                 )
-//               )
-//               .join(',')
-//           )
-//         )
-//         .join('\r\n')
-// 
-//       const status = exportFile(
-//         'table-export-' + dateTime + '.csv',
-//         content,
-//         'text/csv'
-//       )
-// 
-//       if (status !== true) {
-//         this.q.notify({
-//           message: 'Browser denied file download...',
-//           color: 'negative',
-//           icon: 'warning',
-//         })
-//       }
-//     },
     // Not so clean method for updating the role of an user. This is done this way because pinia events don't work in production mode andthe vue watcher doesn't work here.
     updateRole(user: User, oldRole: string) {
       // nextTick is used cause the user param contains the old role. We need to wait for the next tick to get the new role.

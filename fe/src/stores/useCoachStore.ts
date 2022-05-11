@@ -57,32 +57,14 @@ export const useCoachStore = defineStore('user/coach', {
       this.users = results.map((user) => new User(user))
       this.isLoadingUsers = false
     },
-    async loadUsersCoaches(pagination: any, setNumberOfRows: any) {
+    async loadUsersCoaches(filters: Object, setNumberOfRows: Function) {
       this.isLoadingUsers = true
-
-      const filters = []
-      if (this.filter) filters.push(`search=${this.filter}`)
-      if (this.filterRole === 'inactive') filters.push('is_active=false')
-      if (this.filterRole === 'admin')
-        filters.push('is_active=true&is_admin=true')
-      if (this.filterRole === 'coach')
-        filters.push('is_active=true&is_admin=false')
-      const order = pagination.descending ? '-' : '+'
-      if (pagination.sortBy === 'name') {
-        filters.push(`ordering=${order}first_name,${order}last_name`)
-      } else if (pagination.sortBy === 'role') {
-        const order = pagination.descending ? '+' : '-'
-        filters.push(`ordering=${order}is_admin,${order}is_active`)
-      } else if (pagination.sortBy !== null) {
-        filters.push(`ordering=${order}${pagination.sortBy}`)
-      }
-
-      let url = ''
-      if (filters) url = `&${filters.join('&')}`
 
       const { results, count } = (
         await instance.get<{ results: UserInterface[]; count: number }>(
-          `coaches/?page_size=${pagination.rowsPerPage}&page=${pagination.page}${url}`
+          "coaches/", {
+            params: filters
+            }
         )
       ).data
 
