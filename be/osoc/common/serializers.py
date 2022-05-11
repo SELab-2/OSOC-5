@@ -100,7 +100,7 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
         """
         get all projects the current coach is assigned to and return a list of urls
         """
-        projects = obj.project_set.all() # will return product query set associate with this category
+        projects = obj.project_set.all()
         return [project['url'] for project in
             ProjectSerializer(projects, many=True, context={"request": self.context.get("request")}).data]
 
