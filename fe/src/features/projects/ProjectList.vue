@@ -80,7 +80,7 @@
                 <!-- <q-checkbox label="My project" /> -->
                 <!-- <q-checkbox label="Students needed" /> -->
               </div>
-              <div>
+              <!-- <div>
                 <q-select
                   v-model="studentStore.skills"
                   rounded
@@ -110,7 +110,7 @@
                     </div>
                   </template>
                 </q-select>
-              </div>
+              </div> -->
             </div>
           </q-card-section>
         </div>
