@@ -65,7 +65,9 @@
           shadow-strength="2"
           no-wrap
         >
-          <div class="ellipsis">Conflicts</div>
+          <div class="ellipsis">
+            Conflicts
+          </div>
         </btn>
       </q-toolbar>
 
@@ -75,10 +77,10 @@
             <span class="text-h5 text-bold">Filters</span><br />
             <div class="row">
               <div class="column">
-                <q-checkbox label="My project" />
-                <q-checkbox label="Students needed" />
+                <!-- <q-checkbox label="My project" /> -->
+                <!-- <q-checkbox label="Students needed" /> -->
               </div>
-              <div>
+              <!-- <div>
                 <q-select
                   v-model="studentStore.skills"
                   rounded
@@ -108,7 +110,7 @@
                     </div>
                   </template>
                 </q-select>
-              </div>
+              </div> -->
             </div>
           </q-card-section>
         </div>
@@ -118,7 +120,7 @@
     <div
       id="scroll-target-id"
       style="flex: 1; overflow: auto"
-      @scroll="showShadow = $event.target.scrollTop > 5"
+      @scroll="showShadow = ($event.target as HTMLElement)?.scrollTop > 5"
     >
       <q-infinite-scroll
         ref="infinite"
@@ -191,7 +193,7 @@ export default defineComponent({
     }
   },
   computed: {
-    filters() {
+    filters(): Object {
       return {
         search: this.projectNameFilter,
       }
@@ -218,9 +220,11 @@ export default defineComponent({
   watch: {
     projectNameFilter: {
       handler() {
-        this.$refs.infinite.reset()
-        this.$refs.infinite.resume()
-        this.$refs.infinite.trigger()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const infscroll = this.$refs.infinite as any;
+        infscroll.reset()
+        infscroll.resume()
+        infscroll.trigger()
       },
     },
   },

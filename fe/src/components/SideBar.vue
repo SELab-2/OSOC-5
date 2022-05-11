@@ -4,7 +4,7 @@
       v-model="showDrawer"
       :mini="miniState"
       :mini-width="30"
-      :width="350"
+      :width="370"
       :breakpoint="100"
       class="bg-grey-1 shadow-4"
     >
@@ -159,8 +159,8 @@
         <q-scroll-area
           class="fadeOut q-px-sm"
           :thumb-style="thumbStyle"
-          style="flex: 1; overflow: auto;"
-          @scroll="onScroll"
+          style="flex: 1; overflow: hidden;"
+          @scroll="showShadow = $event.verticalPosition > 5"
 
         >
           <q-infinite-scroll
@@ -180,7 +180,7 @@
               :must-hover="mustHover"
               :student="student"
               :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
-              @click="clickStudent(student)"
+              @click="$router.push(`/students/${student.id}`)"
               @dragstart="onDragStart($event, student)"
             />
             <template #loading>
@@ -238,9 +238,10 @@ export default defineComponent({
   },
   name: 'SideBar',
   props: {
-    selectStudent: {
-      type: Function,
-      required: true
+    clickable: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     draggable: {
       type: Boolean,
@@ -249,19 +250,20 @@ export default defineComponent({
     },
     mustHover: {
       type: Boolean,
-      required: true
+      required: false,
+      default: false
     }
   },
   setup() {
     const studentStore = useStudentStore()
-    const $q = useQuasar()
-
     const skillStore = useSkillStore()
+
+    const $q = useQuasar()
 
     return {
       studentStore,
-      $q,
       skillStore,
+      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -324,6 +326,11 @@ export default defineComponent({
     },
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
+    /**
+     * Saves the component id and user name in the dataTransfer.
+     * @param e drag event
+     * @param item item being dragged
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDragStart(e: any, item: any) {
       const data = {
@@ -334,10 +341,10 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
       e.dataTransfer.effectAllowed = 'copy'
     },
-    clickStudent(student: Student) {
-      this.studentStore.selectedStudent = student.id
-      this.$router.push(`/students/${student.id}`)
-    },
+    /**
+     * Load all students and make the infinite scroll reload
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadStudents(scroll: any) {
       scroll.reset()
       scroll.resume()

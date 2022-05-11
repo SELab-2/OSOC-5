@@ -16,8 +16,8 @@
             v-for="(skill, index) in skills"
             :key="index"
             :best-skill="bestSkill ?? ''"
-            :color="typeof(skill) !== 'string' ? skill.color : ''"
-            :name="typeof(skill) !== 'string' ? skill.name : ''"
+            :color="skill.color as string"
+            :name="skill.name as string"
           />
         </ul>
       </div>
@@ -29,8 +29,8 @@
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import StudentSkillChip from "./StudentSkillChip.vue";
-import {defineComponent} from "@vue/runtime-core";
-import {Skill} from "../../../models/Skill";
+import {defineComponent, PropType} from "vue";
+import {Skill} from "../../../models/Skill"
 
 export default defineComponent( {
   components: {StudentSkillChip, LoadingSpinner},
@@ -44,7 +44,7 @@ export default defineComponent( {
       required: true
     },
     skills: {
-      type: Array<Skill>,
+      type: [Object] as PropType<Skill[]>,
       required: true
     },
     bestSkill: {

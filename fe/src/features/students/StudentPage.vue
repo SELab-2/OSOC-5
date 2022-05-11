@@ -3,133 +3,132 @@
     class="fit"
     style=" overflow: auto;"
   >
-  <div
-    class="justify-between row q-px-lg q-pt-lg studentcol">
-    <div class="row q-px-sm q-gutter-sm items-center">
-      <h class="text-bold text-h4">{{ student ? student.fullName : '' }}</h>
-      <q-btn :href="student ? student.cv.toString() : ''" target="_blank" size='12px' rounded outline color='black' label="CV"/>
-      <q-btn :href="student ? student.portfolio.toString() : ''" target="_blank" size='12px' rounded outline color='black' label='Portfolio'/>
-    </div>
     <div
-      v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
-      class="row q-gutter-sm items-center"
+      class="justify-between row q-px-lg q-pt-lg studentcol"
     >
-      <q-select
-        v-model="possibleFinalDecision"
-        emit-value
-        map-options
-        rounded
-        outlined
-        dense
-        style="width: 200px"
-        :options="[
-          { value: '0', label: 'Yes' },
-          { value: '2', label: 'Maybe' },
-          { value: '1', label: 'No' },
-          { value: '-1', label: 'Not decided' },
-        ]"
-        label="Final decision"
+      <div class="row q-px-sm q-gutter-sm items-center">
+        <h class="text-bold text-h4">
+          {{ student ? student.fullName : '' }}
+        </h>
+        <DecisionIcon
+          v-if="student?.finalDecision"
+          :decision="student?.finalDecision.suggestion"
+        />
+        <q-btn
+          :href="student ? student.cv.toString() : ''"
+          target="_blank"
+          size="12px"
+          rounded
+          outline
+          color="black"
+          label="CV"
+        />
+        <q-btn
+          :href="student ? student.portfolio.toString() : ''"
+          target="_blank"
+          size="12px"
+          rounded
+          outline
+          color="black"
+          label="Portfolio"
+        />
+      </div>
+      <div
+        v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
+        class="row q-gutter-sm items-center"
+      >
+        <q-select
+          v-model="possibleFinalDecision"
+          emit-value
+          map-options
+          rounded
+          outlined
+          dense
+          style="width: 200px"
+          :options="yesMaybeNoOptions"
+          label="Final decision"
+        />
+        <q-btn
+          class="cornered"
+          outline
+          label="Confirm"
+          @click="decisionDialog = true"
+        />
+        <q-dialog v-model="decisionDialog">
+          <DecisionCard
+            :name="student?.fullName ?? ''"
+            :suggestion-name="suggestionName(possibleFinalDecision)"
+            :suggestion-color="suggestionColor(possibleFinalDecision)"
+            :make-suggestion="(reason: string) => finalDecision(reason)"
+          />
+        </q-dialog>
+      </div>
+    </div>
+    <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+      <InfoDiv
+        v-if="student?.alum"
+        use-icon="mdi-account-school"
+        color="blue"
+        title="Alumni"
       />
+      <InfoDiv
+        v-if="student?.studentCoach"
+        use-icon="mdi-account-group"
+        color="yellow"
+        title="Student coach"
+      />
+      <InfoDiv
+        v-if="student?.employmentAgreement"
+        use-icon="mdi-file-document-edit"
+        color="red"
+        content="Employment"
+        :title="employment"
+      />
+      <InfoDiv
+        v-if="student?.gender"
+        :use-icon="genderIcon"
+        color="green"
+        content="Gender"
+        :title="gender"
+      />
+      <q-space />
       <q-btn
+        v-if="authenticationStore.loggedInUser?.isAdmin ?? false"
         class="cornered"
         outline
-        label="Confirm"
-        @click="finalDecision"
+        color="red"
+        icon-right="delete"
+        label="Delete"
+        @click="deleteDialog = true"
       />
+      <q-dialog v-model="deleteDialog">
+        <DeleteStudentDialog
+          :name="student?.fullName ?? ''"
+          :delete="deleteStudent"
+        />
+      </q-dialog>
     </div>
-  </div>
-  <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
-    <InfoDiv
-      v-if="student?.alum"
-      use-icon="mdi-account-school"
-      color="blue"
-      title="Alumni"
-    />
-    <InfoDiv
-      v-if="student?.studentCoach"
-      use-icon="mdi-account-group"
-      color="yellow"
-      title="Student coach"
-    />
-    <InfoDiv
-      v-if="student?.employmentAgreement"
-      use-icon="mdi-file-document-edit"
-      color="red"
-      content="Employment"
-      :title="employment"
-    />
-    <InfoDiv
-      v-if="student?.gender"
-      :use-icon="genderIcon"
-      color="green"
-      content="Gender"
-      :title="gender"
-    />
-  </div>
 
-  <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
-    <label>Suggest:</label>
-  </div>
-  <div class="row q-px-lg q-ml-sm items-center">
-    <SegmentedControl
-      v-model="mySuggestion"
-      :color="mySuggestionColor"
-      :options="[
-        { name: '0', label: 'Yes' },
-        { name: '2', label: 'Maybe' },
-        { name: '1', label: 'No' },
-        { name: '-1', label: 'Not decided' },
-      ]"
-      @update:modelValue="showDialog"
-    />
+    <div class="row q-px-lg q-ml-sm q-mt-sm items-center">
+      <label>Suggest:</label>
+    </div>
+    <div class="row q-px-lg q-ml-sm items-center">
+      <SegmentedControl
+        v-model="mySuggestion"
+        :color="mySuggestionColor"
+        :options="yesMaybeNoOptions"
+        @update:modelValue="showDialog"
+      />
 
-    <q-dialog v-model="suggestionDialog">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">
-            Suggest
-            <btn
-              :label="suggestionName"
-              dense
-              rounded
-              class="text-h6"
-              :class="suggestionColor"
-            />
-            for {{ name }}
-          </div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          Why are you making this decision? (optional)
-          <q-input
-            v-model="reason"
-            filled
-            type="textarea"
-          />
-        </q-card-section>
-
-        <q-card-actions
-          align="right"
-          class="text-primary"
-        >
-          <btn
-            v-close-popup
-            flat
-            color="grey"
-            label="Cancel"
-            glow-color="grey-4"
-          />
-          <btn
-            v-close-popup
-            flat
-            label="Suggest"
-            glow-color="teal-1"
-            @click="makeSuggestion"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-  </div>
+      <q-dialog v-model="suggestionDialog">
+        <DecisionCard
+          :name="student?.fullName ?? ''"
+          :suggestion-name="suggestionName(studentStore.possibleSuggestion)"
+          :suggestion-color="suggestionColor(studentStore.possibleSuggestion)"
+          :make-suggestion="(reason: string) => makeSuggestion(reason)"
+        />
+      </q-dialog>
+    </div>
 
   <div v-if="student" class="q-gutter-sm q-pa-lg">
     <div class="row">
@@ -153,7 +152,7 @@
       <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
         <SkillsCard
           :is-loading="studentStore.isLoading"
-          :skills="student?.skills"
+          :skills="student?.skills as any"
           :best-skill="student?.bestSkill"
           title="Skills"
         />
@@ -202,13 +201,23 @@ import SkillsCard from "./components/SkillsCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
-import {defineComponent} from "@vue/runtime-core";
+import { Skill } from "../../models/Skill";
+import {defineComponent} from "vue";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
+import DeleteStudentDialog from "./components/DeleteStudentDialog.vue";
+import DecisionCard from "./components/DecisionCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
+import DecisionIcon from "../../components/DecisionIcon.vue";
+import yesMaybeNoOptions from "../../models/YesMaybeNoOptions";
+import genderOptions from "../../models/GenderOptions";
+import router from "../../router";
 
 export default defineComponent ({
   components: {
+    DeleteStudentDialog,
+    DecisionCard,
+    DecisionIcon,
     InfoDiv,
     LanguageCard,
     ExtraInfoCard,
@@ -224,7 +233,6 @@ export default defineComponent ({
     },
   },
   setup() {
-    
     const baseURL =
     process.env.NODE_ENV == 'development'
       ? 'ws://localhost:8000/ws/socket_server/'
@@ -236,121 +244,77 @@ export default defineComponent ({
     return {
       authenticationStore,
       studentStore,
-      possibleFinalDecision: ref("-1"),
+      possibleFinalDecision: ref(-1),
       socket,
+      yesMaybeNoOptions,
+      genderOptions,
+      router,
     }
   },
   data() {
     const suggestionDialog = ref(false)
+    const decisionDialog = ref(false)
+    const deleteDialog = ref(false)
     const reason = ref("")
  
     return {
+      deleteDialog,
       suggestionDialog,
-      reason
+      decisionDialog
     }
   },
   computed: {
-    student(): Student | null {
-      return this.studentStore.students.find(s => s.id === (this.studentStore.selectedStudent ?? parseInt(this.id)))
-    },
     possibleSuggestion(): string {
       return this.studentStore.possibleSuggestion.toString()
     },
+    /**
+     * Retrieve the current selected student from the store
+     */
+    student(): Student | undefined {
+      return this.studentStore.students.find(s => s.id === parseInt(this.id))
+    },
+    /**
+     * Retrieve the possible suggestion from the store
+     */
     gender(): string {
-      let gender = ''
-      switch (this.student?.gender) {
-        case 0:
-          gender += 'Female'
-          break
-        case 1:
-          gender += 'Male'
-          break
-        case 2:
-          gender += 'Transgender'
-          break
-        default:
-          gender += 'Unknown'
-          break
-      }
+      let gender = genderOptions.find(element => element.value === this.student?.gender)?.name ?? 'Unknown'
+
       return this.student?.pronouns ? gender + `: ${this.student.pronouns}` : gender
     },
+    /**
+     * Get the employment agreement of this student
+     */
     employment(): string {
       const string = this.student?.employmentAgreement
+
+      // return uppercase agreement or an empty string
       return string ? string.charAt(0).toUpperCase() + string.slice(1) : '';
     },
+    /**
+     * Get gender icon of this student
+     */
     genderIcon(): string {
-      switch (this.student?.gender) {
-        case 0:
-          return 'mdi-gender-female'
-        case 1:
-          return 'mdi-gender-male'
-        case 2:
-          return 'mdi-gender-transgender'
-        default:
-          return 'person'
-      }
+      return genderOptions.find(element => element.value === this.student?.gender)?.icon ?? 'person'
     },
-    bestSkillColor(): string | null {
-      if (this.student) {
-        for (const skill of this.student.skills) {
-          if (typeof(skill) === 'string') {
-            return null
-          } else {
-            if (skill.name === this.student?.bestSkill) {
-              return skill.color
-            }
-          }
-        }
-      }
-      return null
-    },
-    mySuggestion(): string {
+    /**
+     * Get my suggestion if I suggested on this student or if the store is loading, return the possible suggestion
+     */
+    mySuggestion(): number {
       if (! this.studentStore.isLoading && this.student) {
         const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach.id === this.authenticationStore.loggedInUser?.id)
 
-        return mySuggestions.length > 0 ? mySuggestions[0].suggestion.toString() : (-1).toString()
+        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
-        return this.possibleSuggestion.toString()
+        return this.studentStore.possibleSuggestion
       }
 
     },
+    /**
+     * Get the color for my suggestion
+     */
     mySuggestionColor(): string {
-      let mySuggestion = this.mySuggestion
-      switch (mySuggestion) {
-        case "0":
-          return "green"
-        case "1":
-          return "red"
-        case "2":
-          return "yellow"
-        default:
-          return "grey"
-      }
+      return yesMaybeNoOptions.find(element => element.value == this.mySuggestion)?.color ?? ''
     },
-    suggestionName(): string {
-      switch (this.possibleSuggestion) {
-        case "0":
-          return "yes"
-        case "1":
-          return "no"
-        case "2":
-          return "maybe"
-        default:
-          return "not decided"
-      }
-    },
-    suggestionColor(): string {
-      switch (this.possibleSuggestion) {
-        case "0":
-          return "bg-green"
-        case "1":
-          return "bg-red"
-        case "2":
-          return "bg-yellow"
-        default:
-          return "bg-grey"
-      }
-    }
   },
   mounted() {
       this.socket.onmessage = async (event: { data: string }) => {
@@ -364,49 +328,83 @@ export default defineComponent ({
             this.studentStore.receiveFinalDecision(data.final_decision)
 
             if(this.student && this.student.finalDecision)
-             this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
+             this.possibleFinalDecision = this.student.finalDecision.suggestion
           } else if(data.hasOwnProperty('remove_final_decision')) {
             this.studentStore.removeFinalDecision(data.remove_final_decision)
 
-            if(this.student && this.student.finalDecision)
-              this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
+            if(this.student && this.student.finalDecision) {
+              this.possibleFinalDecision = this.student.finalDecision.suggestion
+            }
           }
-
       }
-   
 
     // Reload when new student is selected
     this.$watch('id', async (id: number) => {
       await this.studentStore.loadStudent(id)
 
       if (this.student?.finalDecision) {
-        this.possibleFinalDecision = this.student.finalDecision.suggestion.toString()
+        this.possibleFinalDecision = this.student.finalDecision.suggestion
       } else {
-        this.possibleFinalDecision = (-1).toString()
+        this.possibleFinalDecision = -1
       }
     }, {immediate: true})
   },
   methods: {
-    makeSuggestion: async function () {
+    /**
+     * Make a suggestion on this student
+     */
+    makeSuggestion: async function (reason: string) {
       if (this.student) {
-        await this.studentStore.updateSuggestion(this.student.id, this.reason)
-        this.reason = ""
+        await this.studentStore.updateSuggestion(this.student.id, reason)
       }
 
     },
     selectStudent: function (selected_student: Student) {
       this.$router.push(`/students/${selected_student.id}`)
     },
+    /**
+     * Set possible suggestion and show dialog
+     * @param value
+     */
     showDialog: function (value: number) {
       this.studentStore.possibleSuggestion = value
       this.suggestionDialog = true
     },
-    finalDecision: async function () {
+    deleteStudent: async function () {
       if (this.student) {
-        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision)
+        await this.studentStore.deleteStudent(this.student.url,
+          () => {
+            this.$q.notify({
+              icon: 'done',
+              color: 'positive',
+              message: 'Successfully deleted!',
+            })
+            router.push(`/students`)
+          },
+          () => this.$q.notify({
+            icon: "close",
+            color: "negative",
+            message: "Failed to delete!"
+          }))
       }
-
     },
+    finalDecision: async function (reason: string) {
+      if (this.student) {
+        await this.studentStore.updateFinalDecision(this.student.id, this.possibleFinalDecision, reason)
+      }
+    },
+    /**
+     * Get the name of the possible suggestion
+     */
+    suggestionName(suggestion: number): string {
+      return yesMaybeNoOptions.find(element => element.value == suggestion)?.label ?? ''
+    },
+    /**
+     * Get the background color of the possible suggestion
+     */
+    suggestionColor(suggestion: number): string {
+      return yesMaybeNoOptions.find(element => element.value == suggestion)?.background ?? ''
+    }
   },
 })
 </script>
