@@ -264,6 +264,9 @@ export default defineComponent ({
     }
   },
   computed: {
+    possibleSuggestion(): string {
+      return this.studentStore.possibleSuggestion.toString()
+    },
     /**
      * Retrieve the current selected student from the store
      */
