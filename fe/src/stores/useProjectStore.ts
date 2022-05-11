@@ -134,7 +134,6 @@ export const useProjectStore = defineStore('project', {
      * @param project the project to get
      */
     async getProject(project: TempProject) {
-      console.log('Loading')
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
@@ -168,6 +167,7 @@ export const useProjectStore = defineStore('project', {
         const { results } = (
           await instance.get<{ results: TempProject[] }>(`projects/`)
         ).data
+
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id, p.url)
         )
@@ -216,7 +216,7 @@ export const useProjectStore = defineStore('project', {
 
       this.projects = this.projects.concat(
         results.map(
-          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
+          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id, p.url)
         )
       )
 
