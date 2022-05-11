@@ -236,7 +236,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def delete_all(self, request):
+    def delete_all(self, request):  # pylint: disable=no-self-use
         """
         delete all students
         """
@@ -325,7 +325,7 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def delete_all(self, request):
+    def delete_all(self, request):  # pylint: disable=no-self-use
         """
         delete all coaches, !except admins and superusers!
         """
@@ -512,7 +512,7 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def delete_all(self, request):
+    def delete_all(self, request):  # pylint: disable=no-self-use
         """
         delete all projects
         """
@@ -617,7 +617,7 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def delete_all(self, request):
+    def delete_all(self, request):  # pylint: disable=no-self-use
         """
         delete all emails
         """
