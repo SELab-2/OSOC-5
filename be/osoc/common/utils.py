@@ -1,6 +1,8 @@
 """
 Utilities.
 """
+import csv
+from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.http import urlencode
 from rest_framework.reverse import reverse
@@ -53,3 +55,21 @@ def string_to_datetime_tz(string):
         return timezone.make_aware(timezone.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S"))
     except ValueError:
         return timezone.make_aware(timezone.datetime.strptime(string, "%Y-%m-%d"))
+
+def export_to_csv(queryset, filename, fields='all'):
+    """
+    export a queryset to a csv file
+    """
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{filename}.csv"'},
+    )
+    writer = csv.writer(response)
+    if fields == 'all':
+        fields = queryset.model._meta.fields
+    field_names = [field.name for field in fields]
+    headers = [field.verbose_name for field in fields]
+    writer.writerow(headers)
+    for item in queryset.values_list(*field_names):
+        writer.writerow(item)
+    return response

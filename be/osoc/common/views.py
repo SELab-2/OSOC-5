@@ -4,7 +4,7 @@ Views that create a connection between the database and the application.
 # pylint: disable=invalid-name
 from rest_framework import viewsets, mixins, permissions, status, filters
 from rest_framework.response import Response
-from rest_framework.views import PermissionDenied
+from rest_framework.views import PermissionDenied, APIView
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
@@ -13,6 +13,7 @@ from rest_auth.registration.views import RegisterView, SocialLoginView
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from .utils import export_to_csv
 from .pagination import StandardPagination
 from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
@@ -235,6 +236,13 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export students table to csv
+        """
+        return export_to_csv(self.get_queryset(), 'students')
+
 
 class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
@@ -315,6 +323,16 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response({"detail": "you can not update your own admin status"}, status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export coaches table to csv
+        """
+        # don't save password and other unnecessary fields
+        fields = [Coach._meta.get_field(f) for f in
+            ['id', 'email', 'first_name', 'last_name', 'is_admin', 'is_active', 'is_superuser', 'date_joined']]
+        return export_to_csv(self.get_queryset(), 'coaches', fields=fields)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -495,6 +513,13 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             return Response({"detail": "students must be unique"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export projects table to csv
+        """
+        return export_to_csv(self.get_queryset(), 'projects')
+
 
 class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
@@ -528,6 +553,13 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
                                 status=status.HTTP_403_FORBIDDEN)
             return Response(status=status.HTTP_204_NO_CONTENT)
         raise PermissionDenied()
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export skills table to csv
+        """
+        return export_to_csv(self.get_queryset(), 'skills')
 
 
 class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -569,6 +601,13 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
             serializer.save(sender=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export emails table to csv
+        """
+        return export_to_csv(self.get_queryset(), 'emails')
 
 
 class GithubLogin(SocialLoginView):
