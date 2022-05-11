@@ -78,7 +78,7 @@
         :columns="columns"
         row-key="id"
         separator="horizontal"
-        :loading="coachStore.isLoadingUsers"
+        :loading="coachStore.isLoading"
         @request="onRequest"
       >
         <template #body="props">

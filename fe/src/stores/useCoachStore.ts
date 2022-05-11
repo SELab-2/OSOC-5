@@ -5,17 +5,13 @@ import { useAuthenticationStore } from './useAuthenticationStore'
 
 interface State {
   users: Array<User>
-  filter: string
-  filterRole: string
-  isLoadingUsers: boolean
+  isLoading: boolean
 }
 
 export const useCoachStore = defineStore('user/coach', {
   state: (): State => ({
     users: [],
-    filter: '',
-    filterRole: 'all',
-    isLoadingUsers: false,
+    isLoading: false,
   }),
   actions: {
     /**
@@ -48,17 +44,17 @@ export const useCoachStore = defineStore('user/coach', {
      * Loads the users
      */
     async loadUsers() {
-      this.isLoadingUsers = true
+      this.isLoading = true
       const { results } = (
         await instance.get<{ results: UserInterface[] }>(
           'coaches/?page_size=500'
         )
       ).data
       this.users = results.map((user) => new User(user))
-      this.isLoadingUsers = false
+      this.isLoading = false
     },
     async loadUsersCoaches(filters: Object, setNumberOfRows: Function) {
-      this.isLoadingUsers = true
+      this.isLoading = true
 
       const { results, count } = (
         await instance.get<{ results: UserInterface[]; count: number }>(
@@ -71,7 +67,7 @@ export const useCoachStore = defineStore('user/coach', {
       setNumberOfRows(count)
       this.users = results.map((user) => new User(user))
 
-      this.isLoadingUsers = false
+      this.isLoading = false
     },
     /**
      * Updates the role from a user
