@@ -53,7 +53,7 @@
             </q-card>
           </q-dialog>
           <q-input
-            v-model="coachStore.filter"
+            v-model="filter"
             outlined
             dense
             debounce="300"
