@@ -13,13 +13,13 @@
         </div>
         <q-space />
         <q-input
-          v-model="mailStore.searchMails"
+          v-model="search"
           outlined
           dense
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
+          @update:modelValue="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
         >
           <template #append>
             <q-icon name="search" />
@@ -131,22 +131,26 @@ export default defineComponent({
     const mailStore = useMailStore()
     const q = useQuasar()
 
-    const pagination = ref({
-        sortBy: 'name',
-        descending: false,
-        page: 1,
-        rowsPerPage: 10,
-        rowsNumber: 10 // if getting data from a server
-      })
-
     return {
       mailStore,
       authenticationStore: useAuthenticationStore(),
-      filter: ref(''),
       columnsMails,
       status,
       q,
-      pagination,
+    }
+  },
+  data() {
+    const pagination = ref({
+      sortBy: 'name',
+      descending: false,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 10 // if getting data from a server
+    })
+
+    return {
+      search: ref(''),
+      pagination
     }
   },
   beforeMount() {
@@ -155,13 +159,35 @@ export default defineComponent({
     }
   },
   async mounted() {
-    await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
+  },
+  computed: {
+    filters() {
+      let filter = {} as {
+        search: string
+        page_size: number
+        page: number
+        ordering: string
+      }
+
+      if (this.search) filter.search = this.search
+      filter.page_size = this.pagination.rowsPerPage
+      filter.page = this.pagination.page
+      const order = this.pagination.descending ? '-' : '+'
+      if (this.pagination.sortBy === 'name') {
+          filter.ordering = `${order}first_name,${order}last_name`
+      } else if (this.pagination.sortBy !== null) {
+          filter.ordering = `${order}${this.pagination.sortBy}`
+      }
+
+      return filter
+    }
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async onRequest(props: any) {
       this.pagination = props.pagination
-      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
     },
     updateStatus(student: Student, oldStatus: string) {
       this?.$nextTick(() => {

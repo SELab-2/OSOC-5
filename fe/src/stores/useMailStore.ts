@@ -8,7 +8,6 @@ import {useAuthenticationStore} from "./useAuthenticationStore";
 
 interface State {
     isLoading: boolean
-    searchMails: string
     mailStudents: Array<Student>
     mails: Map<number, Mail[]>
 }
@@ -16,43 +15,29 @@ interface State {
 export const useMailStore = defineStore('user/mail', {
     state: (): State => ({
         isLoading: false,
-        searchMails: '',
         mailStudents: [],
         mails: new Map(),
     }),
     actions: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async loadStudentsMails(pagination: any, setNumberOfRows: any) {
+        async loadStudentsMails(filters: any, setNumberOfRows: any) {
             this.isLoading = true
             const studentStore = useStudentStore()
 
-            const params = {
-                page_size: pagination.rowsPerPage,
-                page: pagination.page
-            } as {page_size: number, page: number, search: string, ordering: string}
+            const {data} = await instance
+                .get<{ results: Student[], count: number }>(`students/`,
+                    {params: filters}
+                )
 
-            // const filters = []
-            if (this.searchMails) params.search = this.searchMails // filters.push(`search=${this.searchMails}`)
-            const order = pagination.descending ? '-' : '+'
-            if (pagination.sortBy === 'name') {
-                params.ordering = `${order}first_name,${order}last_name`
-            } else if (pagination.sortBy !== null) {
-                params.ordering = `${order}${pagination.sortBy}`
+            setNumberOfRows(data.count)
+
+            for (const student of data.results) {
+                await studentStore.transformStudent(student)
             }
 
-            await instance
-                .get<{ results: Student[], count: number }>(`students/`, {params: params})
-                .then(async ({ data }) => {
-                    setNumberOfRows(data.count)
+            this.mailStudents = data.results.map((student) => new Student(student))
 
-                    for (const student of data.results) {
-                        await studentStore.transformStudent(student)
-                    }
-
-                    this.mailStudents = data.results.map((student) => new Student(student))
-
-                    this.isLoading = false
-                })
+            this.isLoading = false
         },
         async getMails(student: Student) {
             this.isLoading = true
