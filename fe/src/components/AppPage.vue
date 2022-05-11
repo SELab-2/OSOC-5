@@ -3,7 +3,7 @@
   <SideBar />
   <q-page-container style="height: 100%">
     <router-view v-slot="{ Component }">
-      <keep-alive>
+      <keep-alive exclude="EditProject">
         <component :is="Component" />
       </keep-alive>
     </router-view>
