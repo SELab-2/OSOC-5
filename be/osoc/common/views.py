@@ -4,7 +4,7 @@ Views that create a connection between the database and the application.
 # pylint: disable=invalid-name
 from rest_framework import viewsets, mixins, permissions, status, filters
 from rest_framework.response import Response
-from rest_framework.views import PermissionDenied, APIView
+from rest_framework.views import PermissionDenied
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
