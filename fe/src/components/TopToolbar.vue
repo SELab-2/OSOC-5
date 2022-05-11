@@ -4,25 +4,21 @@
     height-hint="98"
   >
     <q-toolbar class="text-osoc-blue bg-white shadow-2">
-      <q-btn
-        flat
-        round
-      >
+      <btn flat round href="https://www.osoc.be">
         <q-avatar size="42px">
           <img src="../assets/logo.svg">
         </q-avatar>
-      </q-btn>
+      </btn>
 
       <q-space />
       <q-tabs
-        v-model="tab"
         class="centered-tabs"
         shrink
       >
         <q-route-tab
           name="students"
           label="Select Students"
-          to="/students"
+          :to="lastStudent ?? '/students'"
         />
         <q-route-tab
           name="projects"
@@ -160,10 +156,10 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue'
+import {defineComponent, ref, Ref} from 'vue'
 import { useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
-
+import { useStudentStore } from '../stores/useStudentStore'
 export default defineComponent({
   setup() {
     const $q = useQuasar()
@@ -172,12 +168,12 @@ export default defineComponent({
     const password2 = ref('')
     const display_popup = ref(false)
     return {
+      studentStore: useStudentStore(),
       isPwd1: ref(true),
       isPwd2: ref(true),
       password1,
       password2,
       display_popup,
-      tab: ref('students'),
       authenticationStore,
       on_dropdown_click() {
         display_popup.value = true
@@ -210,7 +206,9 @@ export default defineComponent({
     } 
   },
   data() {
+    let lastStudent: Ref<string | null> = ref(null)
     return {
+      lastStudent,
       dropdownitems: [
         {
           name: 'Change Password',
@@ -221,6 +219,16 @@ export default defineComponent({
           icon: 'key',
         },
       ],
+    }
+  },
+  watch: {
+    $route: {
+      handler(newValue) {
+      if (newValue.name === 'Student Page') {
+        this.lastStudent = newValue.path
+      }
+    },
+    immediate: true
     }
   },
   computed: {

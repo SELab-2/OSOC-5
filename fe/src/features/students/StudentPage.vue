@@ -1,18 +1,9 @@
 <template>
-  <SideBar
-    :key="sideBarKey"
-    color="bg-grey-3"
-    :clickable="true"
-    :draggable="false"
-    :must-hover="false"
-  />
-  
   <div
     class="fit"
     style=" overflow: auto;"
   >
     <div
-      :key="studentKey"
       class="justify-between row q-px-lg q-pt-lg studentcol"
     >
       <div class="row q-px-sm q-gutter-sm items-center">
@@ -20,8 +11,8 @@
           {{ student ? student.fullName : '' }}
         </h>
         <DecisionIcon
-          v-if="student !== null && student.finalDecision !== null"
-          :decision="student.finalDecision.suggestion"
+          v-if="student?.finalDecision"
+          :decision="student?.finalDecision.suggestion"
         />
         <q-btn
           :href="student ? student.cv.toString() : ''"
@@ -138,60 +129,66 @@
         />
       </q-dialog>
     </div>
-    <div class="q-gutter-sm q-pa-lg">
-      <div class="row">
-        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-          <SuggestionsCard
-            :index="studentKey"
-            title="Suggestions"
-          />
-        </div>
-        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-          <AcademiaCard
-            :index="studentKey"
-            title="Academia"
-          />
-        </div>
-        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-          <SkillsCard
-            :index="studentKey"
-            title="Skills"
-          />
-        </div>
 
+  <div v-if="student" class="q-gutter-sm q-pa-lg">
+    <div class="row">
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <SuggestionsCard
+          title="Suggestions"
+          :suggestions="student?.suggestions"
+        />
       </div>
-      <div class="row">
-        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-          <LanguageCard
-            :index="studentKey"
-            title="Language"
-          />
-        </div>
-        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-          <ExtraInfoCard
-            :index="studentKey"
-            title="Hinder for work"
-            :content="studentStore.currentStudent?.hinderWork ?? ''"
-          />
-        </div>
-        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-          <ExtraInfoCard
-            :index="studentKey"
-            title="Fun fact"
-            :content="studentStore.currentStudent?.funFact ?? ''"
-          />
-        </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <AcademiaCard
+          :is-loading="studentStore.isLoading"
+          :school-name="student?.schoolName"
+          :studies="student?.studies"
+          :degree="student?.degree"
+          :degree-duration="student?.degreeDuration"
+          :degree-current-year="student?.degreeCurrentYear"
+          title="Academia"
+        />
       </div>
-      <div class="row">
-        <div class="studentcol col-12">
-          <ExtraInfoCard
-            :index="studentKey"
-            title="Motivation"
-            :content="studentStore.currentStudent?.motivation ?? ''"
-          />
-        </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <SkillsCard
+          :is-loading="studentStore.isLoading"
+          :skills="student?.skills as any"
+          :best-skill="student?.bestSkill"
+          title="Skills"
+        />
       </div>
     </div>
+    <div class="row">
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <LanguageCard
+          title="Language"
+          :is-loading="studentStore.isLoading"
+          :language="student?.language"
+          :english-rating="student?.englishRating"
+        />
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <ExtraInfoCard
+          title="Hinder for work"
+          :content="student?.hinderWork ?? ''"
+        />
+      </div>
+      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <ExtraInfoCard
+          title="Fun fact"
+          :content="student?.funFact ?? ''"
+        />
+      </div>
+    </div>
+    <div class="row">
+      <div class="studentcol col-12">
+        <ExtraInfoCard
+          title="Motivation"
+          :content="student?.motivation ?? ''"
+        />
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -199,13 +196,13 @@
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import {useStudentStore} from "../../stores/useStudentStore";
 import {ref} from "vue";
-import SideBar from "../../components/SideBar.vue"
 import AcademiaCard from "./components/AcademiaCard.vue";
 import SkillsCard from "./components/SkillsCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
-import {defineComponent} from "@vue/runtime-core";
+import { Skill } from "../../models/Skill";
+import {defineComponent} from "vue";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
 import DeleteStudentDialog from "./components/DeleteStudentDialog.vue";
@@ -228,7 +225,6 @@ export default defineComponent ({
     SuggestionsCard,
     SkillsCard,
     SegmentedControl,
-    SideBar,
   },
   props: {
     id: {
@@ -262,8 +258,6 @@ export default defineComponent ({
     const reason = ref("")
  
     return {
-      sideBarKey: 0,
-      studentKey: 0,
       deleteDialog,
       suggestionDialog,
       decisionDialog
@@ -273,8 +267,8 @@ export default defineComponent ({
     /**
      * Retrieve the current selected student from the store
      */
-    student(): Student | null {
-      return this.studentStore.currentStudent
+    student(): Student | undefined {
+      return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
     /**
      * Retrieve the possible suggestion from the store
@@ -360,6 +354,10 @@ export default defineComponent ({
       if (this.student) {
         await this.studentStore.updateSuggestion(this.student.id, reason)
       }
+
+    },
+    selectStudent: function (selected_student: Student) {
+      this.$router.push(`/students/${selected_student.id}`)
     },
     /**
      * Set possible suggestion and show dialog

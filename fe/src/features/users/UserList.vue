@@ -251,6 +251,7 @@ const roles = [
 ]
 export default defineComponent({
   components: {AddUser, SegmentedControl },
+  name: 'Users',
   setup() {
     const coachStore = useCoachStore()
     const q = useQuasar()
