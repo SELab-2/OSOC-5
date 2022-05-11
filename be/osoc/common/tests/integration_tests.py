@@ -243,6 +243,15 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /students/delete_all without permission
+        """
+        url = reverse("student-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class StudentTestsAdmin(APITestCase):
     """
@@ -305,6 +314,16 @@ class StudentTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
+
+    def test_delete_all(self):
+        """
+        test DELETE /students/delete_all
+        """
+        url = reverse("student-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Student.objects.count(), 0)
 
 
 class CoachTestsCoach(APITestCase):
@@ -400,6 +419,15 @@ class CoachTestsCoach(APITestCase):
         """
         coach = Coach.objects.first()
         url = reverse("coach-detail", args=(coach.id,))
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /coaches/delete_all without permission
+        """
+        url = reverse("coach-delete-all")
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -522,6 +550,16 @@ class CoachTestsAdmin(APITestCase):
         self.assertEqual(response.data["first_name"], data["first_name"])
         # Is it possible to update 'coach' variable with latest info from database?
         self.assertEqual(coach.first_name, data["first_name"])
+
+    def test_delete_all(self):
+        """
+        test DELETE /coaches/delete_all
+        """
+        url = reverse("coach-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Coach.objects.filter(is_admin=False).count(), 0)
 
 
 class ProjectTestsCoach(APITestCase):
@@ -786,6 +824,15 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /projects/delete_all without permission
+        """
+        url = reverse("project-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class ProjectTestsAdmin(APITestCase):
     """
@@ -873,6 +920,16 @@ class ProjectTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(project.name, data["name"])
+
+    def test_delete_all(self):
+        """
+        test DELETE /projects/delete_all
+        """
+        url = reverse("project-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Project.objects.count(), 0)
 
 
 class SkillTestsCoach(APITestCase):
@@ -970,6 +1027,15 @@ class SkillTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /skills/delete_all without permission
+        """
+        url = reverse("skill-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class SkillTestsAdmin(APITestCase):
     """
@@ -1028,8 +1094,40 @@ class SkillTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_all(self):
+        """
+        test DELETE /skills/delete_all
+        """
+        url = reverse("skill-delete-all")
+        response = self.client.delete(url)
 
-class SentEmailTests(APITestCase):
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Skill.objects.count(), 0)
+
+    def test_delete_all_some_used(self):
+        """
+        test DELETE /skills/delete_all while some skills are used in a projectsuggestion
+        """
+        skill = SkillFactory(name="used skill")
+        project = ProjectFactory()
+        # add skill to project such that a projectsuggestion can be made
+        project.required_skills.add(skill)
+        student = StudentFactory()
+        # add student to projectsuggestions, now the skill is "used" in this project
+        ProjectSuggestion.objects.create(
+            project=project,
+            student=student,
+            skill=skill,
+            coach=self.admin
+        )
+        url = reverse("skill-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(Skill.objects.count(), 1)
+
+
+class SentEmailTestsCoach(APITestCase):
     """
     test class for testing sentemail model
     """
@@ -1141,6 +1239,39 @@ class SentEmailTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(email.info, data["info"])
+
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /sentemails/delete_all without permission
+        """
+        url = reverse("sentemail-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class SentEmailTestsAdmin(APITestCase):
+    """
+    test class for testing sentemail model by admin user (all permissions)
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        student = StudentFactory()
+        admin = AdminFactory()
+        self.client.force_authenticate(admin)
+        SentEmailFactory(sender=admin, receiver=student)
+
+    def test_delete_all(self):
+        """
+        test DELETE /sentemails/delete_all
+        """
+        url = reverse("sentemail-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(SentEmail.objects.count(), 0)
 
 
 class RegisterTests(APITestCase):
