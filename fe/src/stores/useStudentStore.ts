@@ -77,54 +77,26 @@ export const useStudentStore = defineStore('user/student', {
       student.language = parseInt(student.language)
       student.englishRating = parseInt(student.englishRating)
     },
-    async loadStudents(filters: Object) {
+    async loadNext(index: number, done: Function, filters: Object) {
       this.isLoading = true
 
-      await instance
-        .get<{results: Student[], next: string}>("students/?page=1", {
-          params: filters,
-          paramsSerializer: params => {
-            return qs.stringify(params, {arrayFormat: "repeat"})
-          }
-        }) // page 1!
-        .then(async ({ data }) => {
-          this.nextPage = data.next
+      if (index === 1) this.students = []
 
-          for (const student of data.results) {
-            await this.transformStudent(student)
-          }
+      const {data} = await instance
+          .get(`students/?page=${index}`, {
+            params: filters,
+            paramsSerializer: params => {
+              return qs.stringify(params, {arrayFormat: "repeat"})
+            }
+          })
 
-          this.students = data.results.map((student) => new Student(student))
-        })
-
-      this.isLoading = false
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async loadNext(index: number, done: any, filters: Object) {
-      this.isLoading = true
-
-      if (this.nextPage == null) {
-        done(true)
-        this.isLoading = false
-        return
+      for (const student of data.results) {
+        await this.transformStudent(student)
       }
 
-      if (this.nextPage !== '') {
-        await instance
-            .get(`students/?page=${index}`, {
-              params: filters
-            })
-            .then(async ({data}) => {
-              this.nextPage = data.next
+      this.students.push(...data.results.map((student: Student) => new Student(student)))
 
-              for (const student of data.results) {
-                await this.transformStudent(student)
-              }
-
-              this.students.push(...data.results.map((student: Student) => new Student(student)))
-            })
-      }
-      done()
+      done(data.next === null)
       this.isLoading = false
     },
     async loadStudent(studentId: number) {

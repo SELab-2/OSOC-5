@@ -289,8 +289,7 @@ export default defineComponent({
   },
   async mounted() {
     this.skillStore.loadSkills()
-    await this.studentStore.loadStudents(this.filters)
-  }, 
+  },
   computed: {
     filters() {
       let filter = {} as {
@@ -342,9 +341,11 @@ export default defineComponent({
       this.$router.push(`/students/${student.id}`)
     },
     async loadStudents(scroll: any) {
+      scroll.reset()
       scroll.resume()
-      this.studentStore.students = []
-      await this.studentStore.loadStudents(this.filters)
+      scroll.trigger()
+      // this.studentStore.students = []
+      // await this.studentStore.loadStudents(this.filters)
     },
   }
 })
