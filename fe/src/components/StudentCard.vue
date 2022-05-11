@@ -6,33 +6,20 @@
       style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);"
     />
     <q-card
+      
+      flat
       class="full-width position"
       :class="active? 'bg-teal-1' : ''"
+      v-ripple
+      style="box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px, rgba(0, 0, 0, 0.16) 0px 1px 4px !important;"
     >
-      <q-card-section rounded>
+      <q-card-section>
         <div class="row justify-between">
           <div>
-            <label class="text-bold q-pr-xs">{{ name }}</label>
-            <q-icon
-              v-if="official === YES"
-              class="final-decision-icon"
-              size="xs"
-              name="mdi-check"
-              color="green"
-            />
-            <q-icon
-              v-else-if="official === MAYBE"
-              class="final-decision-icon"
-              size="xs"
-              name="mdi-help"
-              color="yellow"
-            />
-            <q-icon
-              v-else-if="official === NO"
-              class="final-decision-icon"
-              size="xs"
-              name="mdi-close"
-              color="red"
+            <label class="text-bold q-pr-xs">{{ student.fullName }}</label>
+            <DecisionIcon
+              v-if="student !== null && student.finalDecision !== null"
+              :decision="student.finalDecision.suggestion"
             />
             <q-chip
               v-if="student.alum"
@@ -51,20 +38,17 @@
           <div
             class="bg-red"
             style="height: 4px"
-            :style="noStyle"
-            label="Test"
+            :style="getStyle(1)"
           />
           <div
             class="bg-yellow"
             style="height: 4px"
-            :style="maybeStyle"
-            label="Test"
+            :style="getStyle(2)"
           />
           <div
             class="bg-green"
             style="height: 4px"
-            :style="yesStyle"
-            label="Test"
+            :style="getStyle(0)"
           />
         </div>
       </q-card-section>
@@ -96,9 +80,12 @@ import {useAuthenticationStore} from "../stores/useAuthenticationStore";
 import { Suggestion } from "../models/Suggestion";
 import {Student} from "../models/Student";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
+import DecisionIcon from "./DecisionIcon.vue";
+import yesMaybeNoOptions from "../models/YesMaybeNoOptions";
 
 export default defineComponent({
   components: {
+    DecisionIcon,
     StudentSkillChip,
   },
   props: {
@@ -124,55 +111,41 @@ export default defineComponent({
       authenticationStore
     }
   },
-  data: function() {
-    return {
-      YES : 0,
-      NO : 1,
-      MAYBE : 2,
-    };
-  },
   computed: {
+    /**
+     * Get the total number of suggestions on this student
+     */
     total(): number {
       return this.student.suggestions.length
     },
-    yesStyle(): { width: string } {
-      const widthYes = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === this.YES).length / this.total
-      return { width: (widthYes + '%')}
-    },
-    maybeStyle(): { width: string } {
-      const widthMaybe = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === this.MAYBE).length / this.total
-      return { width: (widthMaybe + '%')}
-    },
-    noStyle(): { width: string } {
-      const widthNo = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === this.NO).length / this.total
-      return { width: (widthNo + '%')}
-    },
-    name(): string {
-      return this.student.firstName + ' ' + this.student.lastName
-    },
-    official(): number {
-      if (this.student.finalDecision) {
-        return this.student.finalDecision.suggestion
-      } else {
-        return -1
-      }
-    },
-    mySuggestion(): number | null {
-      if (this.student) {
-        const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
-          if (this.authenticationStore.loggedInUser != null) {
-            return suggestion.coach.id === this.authenticationStore.loggedInUser.id
-          }
-        })
+    /**
+     * Get my own suggestion or -1 if I did not do any suggestion yet
+     */
+    mySuggestion(): number {
+      const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
+        if (this.authenticationStore.loggedInUser != null) {
+          return suggestion.coach.id === this.authenticationStore.loggedInUser.id
+        }
+      })
 
-        return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
-      } else {
-        return null
-      }
+      return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
     },
+    /**
+     * Get the background color for the given suggestion
+     */
     mySuggestionColor: function () {
-      let mySuggestion = this.mySuggestion
-      return mySuggestion === this.YES ? "bg-green" : (mySuggestion === this.MAYBE ? "bg-yellow" : (mySuggestion === this.NO ? "bg-red" : "bg-grey"))
+      return yesMaybeNoOptions.find(element => element.value === this.mySuggestion)?.background
+    },
+  },
+  methods: {
+    /**
+     * Get the width for a div depending on suggestion
+     * @param value of suggestion
+     */
+    getStyle(value: number): { width: string } {
+      const width = 100 * this.student.suggestions.filter((sug: Suggestion) => sug.suggestion === value).length / this.total
+
+      return { width: (width + '%')}
     },
   }
 })

@@ -1,17 +1,18 @@
 <template>
+  <!-- <q-page-container style="height: 100%"> -->
+
   <div>
-    <SideBar :must-hover="false" :selectStudent="selectStudent" color="bg-grey-3" :draggable="false"/>
     <div class="q-pa-lg full-height flex-center">
       <label>Select a student from the sidebar to get started</label>
     </div>
   </div>
+  <!-- </q-page-container> -->
 </template>
 
 <script lang="ts">
 import {ref} from "vue"
 import SideBar from "../../components/SideBar.vue"
 import {defineComponent} from "@vue/runtime-core";
-import { Student } from "../../models/Student";
 
 export default defineComponent({
   components: {
@@ -23,11 +24,6 @@ export default defineComponent({
     return {
       student,
     }
-  },
-  methods: {
-    selectStudent: function (selected_student: Student) {
-      this.$router.push(`/students/${selected_student.id}`)
-    },
   }
 })
 </script>

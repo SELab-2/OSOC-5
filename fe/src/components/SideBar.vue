@@ -1,46 +1,62 @@
 <template>
   <div>
     <q-drawer
-      v-model="drawer"
-      show-if-above
-      :mini="!drawer || miniState"
+      v-model="showDrawer"
+      :mini="miniState"
       :mini-width="30"
-      :width="350"
+      :width="370"
       :breakpoint="100"
-      bordered
-      class="full-height"
-      :class="color"
+      class="bg-grey-1 shadow-4"
     >
-      <div
-        :style="drawer && !miniState? '' : 'display: none'"
-        class="fit full-height"
-      >
-        <div class="">
-          <div class="absolute-full q-ma-sm column q-gutter-y-sm">
-            <div class="text-bold text-h5">
-              Filters
+    <div
+    :style="!miniState? '' : 'display: none'"
+      style="height: 100%; overflow: hidden;"
+      class="fit column"
+    >
+        
+          <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms" class="q-px-sm">
+            <div class="text-bold text-h5 q-py-sm">
+              Students
             </div>
-
+            <div class="row no-wrap q-pb-sm">
             <q-input
               v-model="studentStore.search"
-              outlined
-              dense
-              rounded
-              debounce="300"
-              color="green"
-              bg-color="white"
-              label="Search"
               @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
+              debounce="300"
+              class="fit q-mr-sm"
+              dense
+              outlined
+              color="teal"
+              label="Search Students"
+              hide-bottom-space
             >
-              <template #append>
-                <q-icon name="search" />
-              </template>
+            <template v-slot:append>
+              <q-icon name="search" color="teal-4" />
+            </template>
             </q-input>
-
+            <btn
+              round
+              size="0.95em"
+              glow-color="teal-2"
+              shadow-color="osoc-red"
+              :shadow-strength="showFilters ? 2 : 5"
+              :color="showFilters ? 'primary' : 'light-grey'"
+              :class="`text-${showFilters ? 'white' : 'green'}`"
+              icon="tune"
+              @click="showFilters = !showFilters"
+            />
+            
+          </div>
+            <q-slide-transition>
+              <div v-if="showFilters" class="overflow-hidden">
+                <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
+                <div class="q-gutter-y-sm q-px-xs">
+                
             <SegmentedControl
               v-model="studentStore.alumni"
               color="primary"
               text-color="white"
+              class="q-mt-md"
               :options="[
                 { name: 'all', label: 'All' },
                 { name: 'alumni', label: 'Alumni' },
@@ -134,19 +150,22 @@
                 @click="async () => await loadStudents($refs.infiniteScroll)"
               />
             </div>
+          </div>
+              </div>
+            </q-slide-transition>
+          </div>
 
-            <div class="text-bold text-h5">
-              Students
-            </div>
             <q-scroll-area
-              class=" fadeOut"
+              class="fadeOut q-px-sm"
               :thumb-style="thumbStyle"
-              style="flex: 1 1 auto"
+              style="flex: 1; overflow: auto;"
+              @scroll="showShadow = $event.verticalPosition > 5"
+              
             >
               <q-infinite-scroll
-                :key="scrollKey"
                 ref="infiniteScroll"
-                class="q-px-sm"
+                class="q-pa-sm"
+                
                 :offset="250"
                 @load="async (index, done) => await loadNextStudents(index, done)"
               >
@@ -154,13 +173,13 @@
                   v-for="student in studentStore.students"
                   :id="student.email"
                   :key="student.email"
-                  v-ripple
+                  
                   class="q-ma-sm"
-                  :draggable="draggable ?? false"
+                  :draggable="draggable"
                   :must-hover="mustHover"
                   :student="student"
                   :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
-                  @click="clickStudent(student)"
+                  @click="$router.push(`/students/${student.id}`)"
                   @dragstart="onDragStart($event, student)"
                 />
                 <template #loading>
@@ -174,7 +193,8 @@
               </q-infinite-scroll>
             </q-scroll-area>
           </div>
-        </div>
+        
+      
 
         <q-inner-loading
           :showing="studentStore.isLoading"
@@ -182,19 +202,18 @@
           label-class="text-teal"
           label-style="font-size: 1.1em"
         />
-      </div>
+      
 
       <div
         class="absolute"
-        style="top: 15px; right: -17px"
+        style="top: 15px; right: -17px; z-index: 2;"
       >
         <btn
           dense
-          round
-          style="border-radius: 30px;"
-          unelevated
+          shadow-color="yellow"
+          shadow-strength = "1"
           color="yellow"
-          :icon="drawer && !miniState? 'chevron_left' : 'chevron_right'"
+          :icon="!miniState? 'chevron_left' : 'chevron_right'"
           @click="miniState = !miniState"
         />
       </div>
@@ -219,34 +238,34 @@ export default defineComponent({
     StudentCard,
     SegmentedControl,
   },
+  name: 'SideBar',
   props: {
-    selectStudent: {
-      type: Function,
-      required: true
-    },
-    color: {
-      type: String,
-      required: true
+    clickable: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     draggable: {
       type: Boolean,
-      required: false
+      required: false,
+      default: true
     },
     mustHover: {
       type: Boolean,
-      required: true
+      required: false,
+      default: false
     }
   },
   setup() {
     const studentStore = useStudentStore()
-    const $q = useQuasar()
-
     const skillStore = useSkillStore()
+
+    const $q = useQuasar()
 
     return {
       studentStore,
-      $q,
       skillStore,
+      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -254,22 +273,33 @@ export default defineComponent({
         width: '4px',
       },
       status,
-      scrollKey: 0
     }
   },
   data() {
     return {
       miniState: ref(false),
-      drawer: ref(true),
+      showFilters: ref(false),
+      showShadow: ref(false),
     }
   },
   async mounted() {
-    //this.skillStore.loadSkills()
+    await this.skillStore.loadSkills()
     await this.studentStore.loadStudents()
-  },   
+  }, 
+  computed: {
+    showDrawer() {
+      console.log(this.$route.name)
+        return this.$route.name === "Students" || this.$route.name === "Projects" || this.$route.name === "Student Page";
+    }
+  },
   methods: {
     // Saves the component id and user name in the dataTransfer.
     // TODO: send id of user instead of name.
+    /**
+     * Saves the component id and user name in the dataTransfer.
+     * @param e drag event
+     * @param item item being dragged
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDragStart(e: any, item: any) {
       const data = {
@@ -280,18 +310,18 @@ export default defineComponent({
       e.dataTransfer.dropEffect = 'copy'
       e.dataTransfer.effectAllowed = 'copy'
     },
-    clickStudent(student: Student) {
-      this.selectStudent(student)
-    },
+    /**
+     * Load all students and make the infinite scroll reload
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadStudents(scroll: any) {
       scroll.resume()
       this.studentStore.students = []
       await this.studentStore.loadStudents()
-      this.scrollKey += 1
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async loadNextStudents(index: number, done: any) {
       await this.studentStore.loadNext(index, done)
-      this.scrollKey += 1
     }
   }
 })
@@ -304,17 +334,5 @@ export default defineComponent({
   
 :deep(.q-item) {
   padding: 8px 8px !important;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  right: 0px;
-  background-color: darkgray;
-  border-radius: 7px;
-  width: 4px;
-  opacity: 0.75;
 }
 </style>

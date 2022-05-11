@@ -21,35 +21,50 @@ export const useMailStore = defineStore('user/mail', {
         mails: new Map(),
     }),
     actions: {
-        async loadStudentsMails() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async loadStudentsMails(pagination: any, setNumberOfRows: any) {
             this.isLoading = true
             const studentStore = useStudentStore()
 
-            const filters = []
-            if (this.searchMails) filters.push(`search=${this.searchMails}`)
+            const params = {
+                page_size: pagination.rowsPerPage,
+                page: pagination.page
+            } as {page_size: number, page: number, search: string, ordering: string}
 
-            let url = ''
-            if (filters) url = `?${filters.join('&')}`
+            // const filters = []
+            if (this.searchMails) params.search = this.searchMails // filters.push(`search=${this.searchMails}`)
+            const order = pagination.descending ? '-' : '+'
+            if (pagination.sortBy === 'name') {
+                params.ordering = `${order}first_name,${order}last_name`
+            } else if (pagination.sortBy !== null) {
+                params.ordering = `${order}${pagination.sortBy}`
+            }
 
             await instance
-                .get<{ results: Student[] }>(`students/${url}`)
+                .get<{ results: Student[], count: number }>(`students/`, {params: params})
                 .then(async ({ data }) => {
+                    setNumberOfRows(data.count)
+
                     for (const student of data.results) {
                         await studentStore.transformStudent(student)
                     }
 
                     this.mailStudents = data.results.map((student) => new Student(student))
-                })
 
-            this.isLoading = false
+                    this.isLoading = false
+                })
         },
         async getMails(student: Student) {
             this.isLoading = true
 
             const studentStore = useStudentStore()
 
+            const params = {
+                receiver: student.id
+            }
+
             await instance
-                .get<{ results: Mail[] }>(`emails/?receiver=${student.id}`)
+                .get<{ results: Mail[] }>(`emails/`, {params: params})
                 .then(async ({ data }) => {
                     for (const mail of data.results) {
                         mail.time = new Date(mail.time).toLocaleString()
