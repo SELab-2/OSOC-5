@@ -235,6 +235,14 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all students
+        """
+        Student.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
@@ -315,6 +323,14 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response({"detail": "you can not update your own admin status"}, status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all coaches, !except admins and superusers!
+        """
+        Coach.objects.filter(is_admin=False).filter(is_superuser=False).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -495,6 +511,14 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             return Response({"detail": "students must be unique"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all projects
+        """
+        Project.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
@@ -528,6 +552,28 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
                                 status=status.HTTP_403_FORBIDDEN)
             return Response(status=status.HTTP_204_NO_CONTENT)
         raise PermissionDenied()
+
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):
+        """
+        delete all skills, some skills can't be deleted when they are used in a projectsuggestion
+        returns HTTP response:
+            204 NO CONTENT: all skills were deleted
+            202 ACCEPTED: some skills were deleted, some were not, see response data
+        """
+        not_deleted = set()
+        for skill in self.get_queryset():
+            try:
+                skill.delete()
+            except RestrictedError:
+                not_deleted.add(SkillSerializer(skill, context={'request': request}).data['url'])
+        if not_deleted:
+            returndata = {
+                "detail": "can't delete some skills, because they are used in a project suggestion",
+                "skills": not_deleted
+            }
+            return Response(returndata, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -569,6 +615,14 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
             serializer.save(sender=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all emails
+        """
+        SentEmail.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GithubLogin(SocialLoginView):
