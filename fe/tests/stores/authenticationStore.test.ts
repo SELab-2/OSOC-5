@@ -7,6 +7,7 @@ import { useAuthenticationStore } from "../../src/stores/useAuthenticationStore"
 import axios, { AxiosRequestConfig } from "axios"
 import { instance } from '../../src/utils/axios'
 import {UrlMockMappingPost, UrlMockMappingGet} from '../mockUrlMappings'
+import router from "../../src/router"
 const baseURL = "https://sel2-5.ugent.be/api/";
 
 
@@ -38,6 +39,30 @@ describe("authenticationStore", () => {
     expect(localStorage.getItem('refreshToken')).toBe("funky")
     expect(postcall).toHaveBeenCalledOnce()
     expect(getcall_i).toHaveBeenCalledOnce()
-    expect(authenticationStore.loggedInUser.succes).toBeTruthy()
+    expect(authenticationStore.loggedInUser.isActive).toBeTruthy()
   });
+
+  it("logout", async() => {
+    const authenticationStore = useAuthenticationStore()
+    localStorage.setItem("refreshToken", "test")
+    await authenticationStore.logout()
+    expect(localStorage.getItem('refreshToken')).toBeNull()
+  });
+
+  it("register", async() => {
+    const authenticationStore = useAuthenticationStore()
+    await authenticationStore.register({firstName: "me", lastName:"too", email:"example@address.com"
+    , password1: "admin", password2: "admin", is_admin: true, is_active: true})
+    expect(postcall).toHaveBeenCalledOnce()
+  });
+
+  it("checkLogin", async() => {
+    const spyRouter = vi.spyOn(router, "push")
+    const authenticationStore = useAuthenticationStore()
+    localStorage.setItem("refreshToken", "test")
+    localStorage.setItem("accessToken", "test")
+    await authenticationStore.checkLogin()
+    expect(spyRouter).toHaveBeenCalledOnce()
+  })
+  
 });
