@@ -3,16 +3,14 @@
     style="height: 100vh"
     view="hHh lpR fFf"
   >
-    <q-page-container style="height: 100%">
-      <Suspense>
-        <template #default>
-          <router-view />
-        </template>
-        <template #fallback>
-          Loading...
-        </template>
-      </Suspense>
-    </q-page-container>
+    <Suspense>
+      <template #default>
+        <router-view />
+      </template>
+      <template #fallback>
+        Loading...
+      </template>
+    </Suspense>
   </q-layout>
 </template>
 
