@@ -3,7 +3,6 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
-import qs from "qs";
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import qs from "qs";
 

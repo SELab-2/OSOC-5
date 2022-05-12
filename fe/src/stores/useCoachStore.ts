@@ -80,9 +80,6 @@ export const useCoachStore = defineStore('user/coach', {
         is_active: user.isActive,
       })
     },
-    showDeleteDialog: function() {
-      this.deleteDialog = true
-    },
     /**
      * Removes a user from the database
      * @param userId id of the user which we want to remove
