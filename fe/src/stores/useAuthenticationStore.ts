@@ -55,6 +55,8 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         username: email,
         email,
         password,
+      }).catch(error => {
+        console.log(error.response)
       })
       localStorage.setItem('refreshToken', data.refresh_token)
       localStorage.setItem('accessToken', data.access_token)
@@ -65,7 +67,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     async logout() {
       localStorage.removeItem('refreshToken')
       localStorage.removeItem('accessToken')
-
+      localStorage.removeItem('sessionid')
       const studentStore = useStudentStore()
       studentStore.$reset()
       const skillStore = useStudentStore()
