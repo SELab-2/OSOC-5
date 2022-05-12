@@ -19,6 +19,8 @@
     "axios": "^0.26.1",
     "pinia": "^2.0.13",
     "pinia-plugin-persistedstate": "^1.5.1",
+    "qs": "^6.10.3",
+    "@types/qs": "^6.9.7",
     "quasar": "^2.6.5",
     "vite": "^2.8.6",
     "vue": "^3.2.33",

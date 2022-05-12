@@ -3,16 +3,11 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
+import qs from "qs";
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import qs from "qs";
 
 interface State {
-  search: string
-  status: string
-  alumni: string
-  decision: string
-  byMe: string
-  onProject: string
   skills: Array<Skill>
   skillsStudents: Map<string, Skill>
   coaches: Map<string, User>
@@ -25,12 +20,6 @@ interface State {
 
 export const useStudentStore = defineStore('user/student', {
   state: (): State => ({
-    search: '',
-    status: '',
-    alumni: 'all',
-    decision: 'none',
-    byMe: 'maybe',
-    onProject: 'maybe',
     skills: [],
     skillsStudents: new Map(),
     coaches: new Map(),
@@ -101,83 +90,26 @@ export const useStudentStore = defineStore('user/student', {
       student.englishRating = parseInt(student.englishRating)
       student.status = parseInt(student.status)
     },
-    /**
-     * Load all students depending on chosen filters
-     */
-    async loadStudents() {
+    async loadNext(index: number, done: Function, filters: Object) {
       this.isLoading = true
 
-      const params = {
-        page: 1,
-      } as {
-        page: number
-        search: string
-        alum: boolean
-        student_coach: boolean
-        suggestion: string
-        suggested_by_user: string
-        on_project: string
-        status: string
-        skills: Array<number>
+      if (index === 1) this.students = []
+
+      const {data} = await instance
+          .get(`students/?page=${index}`, {
+            params: filters,
+            paramsSerializer: params => {
+              return qs.stringify(params, {arrayFormat: "repeat"})
+            }
+          })
+
+      for (const student of data.results) {
+        await this.transformStudent(student)
       }
 
-      if (this.search) params.search = this.search
-      if (this.alumni === 'alumni') params.alum = true
-      if (this.alumni === 'student coaches') params.student_coach = true
-      if (this.decision !== 'none') params.suggestion = this.decision
-      if (this.byMe !== 'maybe') params.suggested_by_user = this.byMe
-      if (this.onProject !== 'maybe') params.on_project = this.onProject
-      if (this.status) params.status = this.status
-      if (this.skills.length > 0) params.skills = this.skills.map(skill => skill.id)
+      this.students.push(...data.results.map((student: Student) => new Student(student)))
 
-      await instance
-        .get<{ results: Student[]; next: string }>('students/', {
-          params: params,
-          paramsSerializer: params => {
-            return qs.stringify(params, {arrayFormat: "repeat"})
-          }
-        })
-        .then(async ({ data }) => {
-          this.nextPage = data.next
-
-          for (const student of data.results) {
-            await this.transformStudent(student)
-          }
-
-          this.students = data.results.map((student) => new Student(student))
-        })
-
-      this.isLoading = false
-    },
-    /**
-     * Load next x students and add them to the rest of the students
-     * @param index current index in scroll
-     * @param done to be called when done fetching new student
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async loadNext(index: number, done: any) {
-      this.isLoading = true
-
-      if (this.nextPage == null) {
-        done(true)
-        this.isLoading = false
-        return
-      }
-
-      if (this.nextPage !== '') {
-        await instance.get(this.nextPage).then(async ({ data }) => {
-          this.nextPage = data.next
-
-          for (const student of data.results) {
-            await this.transformStudent(student)
-          }
-
-          this.students.push(
-            ...data.results.map((student: Student) => new Student(student))
-          )
-        })
-      }
-      done()
+      done(data.next === null)
       this.isLoading = false
     },
     /**

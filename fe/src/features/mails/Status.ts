@@ -1,4 +1,4 @@
-const status = [
+const stati = [
     {
         label: 'Applied',
         value: 0
@@ -25,4 +25,4 @@ const status = [
     }
 ]
 
-export default status;
+export default stati;

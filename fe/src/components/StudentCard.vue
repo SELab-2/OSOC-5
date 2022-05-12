@@ -6,10 +6,14 @@
       style="position: absolute; z-index: -1; top: 50%; left: 5px; transform: translate(-50%, -50%);"
     />
     <q-card
+      
+      flat
       class="full-width position"
       :class="active? 'bg-teal-1' : ''"
+      v-ripple
+      style="box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px, rgba(0, 0, 0, 0.16) 0px 1px 4px !important;"
     >
-      <q-card-section rounded>
+      <q-card-section>
         <div class="row justify-between">
           <div>
             <label class="text-bold q-pr-xs">{{ student.fullName }}</label>

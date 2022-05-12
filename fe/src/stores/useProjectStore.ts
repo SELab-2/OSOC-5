@@ -25,25 +25,21 @@ import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
-  isLoadingProjects: boolean
   projectName: string
   projectPartnerName: string
   projectLink: string
   filterCoaches: string
   selectedCoaches: Array<User>
-  projectFilter: string
 }
 
 export const useProjectStore = defineStore('project', {
   state: (): State => ({
     projects: [],
-    isLoadingProjects: false,
     projectName: '',
     projectPartnerName: '',
     projectLink: '',
     filterCoaches: '',
     selectedCoaches: [],
-    projectFilter: '',
   }),
   actions: {
     /**
@@ -145,12 +141,9 @@ export const useProjectStore = defineStore('project', {
      * Loads the projects
      */
     async loadProjects() {
-      this.isLoadingProjects = true
       try {
         const { results } = (
-          await instance.get<{ results: TempProject[] }>(
-            `projects/?search=${this.projectFilter}`
-          )
+          await instance.get<{ results: TempProject[] }>(`projects/`)
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
@@ -183,9 +176,46 @@ export const useProjectStore = defineStore('project', {
         // data.forEach(p => this.getProject(p))
       } catch (error) {
         // console.log(error)
-      } finally {
-        this.isLoadingProjects = false
       }
+    },
+    async loadNext(index: number, done: Function, filters: Object) {
+      // Remove all the data when the first page is requested.
+      if (index === 1) this.projects = []
+
+      const { results, next } = (
+        await instance.get<{ results: TempProject[]; next: string }>(
+          `projects/?page=${index}`,
+          { params: filters }
+        )
+      ).data
+
+      let base = this.projects.length
+
+      this.projects = this.projects.concat(
+        results.map(
+          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
+        )
+      )
+
+      results.forEach(async (project, i) => {
+        const coaches: Array<User> = await Promise.all(
+          project.coaches.map((coach) => useCoachStore().getUser(coach))
+        )
+
+        const skills: Array<ProjectSkillInterface> = await Promise.all(
+          project.requiredSkills.map((skill) => this.getSkill(skill))
+        )
+
+        const students: Array<ProjectSuggestionInterface> =
+          await this.fetchSuggestedStudents(project.suggestedStudents)
+
+        this.projects[base + i].coaches = coaches
+        this.projects[base + i].requiredSkills = skills
+        this.projects[base + i].suggestedStudents = students
+      })
+      // If next is null, we are at the end of the results.
+      // We can signal this to q-infinite-scroll by returning done(true)
+      done(next === null)
     },
     /**
      * Called when we recieve a suggestion from the websocket

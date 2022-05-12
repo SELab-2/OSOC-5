@@ -6,20 +6,17 @@
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <div v-if="studentStore.isLoading">
+      <div v-if="isLoading">
         <LoadingSpinner />
       </div>
 
       <div v-else>
-        <ul
-          v-if="studentStore.currentStudent"
-          style="margin: 0px; padding-left: 20px;"
-        >
-          <li>{{ 'Enrolled at: ' + studentStore.currentStudent.schoolName }}</li>
-          <li>{{ 'Studies: ' + studentStore.currentStudent.studies }}</li>
-          <li>{{ 'Degree: ' + studentStore.currentStudent.degree }}</li>
-          <li>{{ 'Duration of degree: ' + studentStore.currentStudent.degreeDuration }}</li>
-          <li>{{ 'Current year of degree: ' + studentStore.currentStudent.degreeCurrentYear }}</li>
+        <ul style="margin: 0px; padding-left: 20px;">
+          <li>{{ 'Enrolled at: ' + schoolName }}</li>
+          <li>{{ 'Studies: ' + studies }}</li>
+          <li>{{ 'Degree: ' + degree }}</li>
+          <li>{{ 'Duration of degree: ' + degreeDuration }}</li>
+          <li>{{ 'Current year of degree: ' + degreeCurrentYear }}</li>
         </ul>
       </div>
     </q-card-section>
@@ -30,6 +27,7 @@
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import {defineComponent} from "@vue/runtime-core";
+import {Student} from "../../../models/Student";
 
 export default defineComponent( {
   components: {LoadingSpinner},
@@ -38,6 +36,30 @@ export default defineComponent( {
       type: String,
       required: true
     },
+    schoolName: {
+      type: String,
+      required: true
+    },
+    studies: {
+      type: String,
+      required: true
+    },
+    degree: {
+      type: String,
+      required: true
+    },
+    degreeDuration: {
+      type: Number,
+      required: true
+    },
+    degreeCurrentYear: {
+      type: Number,
+      required: true
+    },
+    isLoading: {
+      type: Boolean,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()

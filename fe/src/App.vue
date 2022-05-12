@@ -1,9 +1,7 @@
 <template>
   <q-layout style="height: 100vh" view="hHh lpR fFf">
 
-    <q-page-container style="height: 100%">
       <router-view />
-    </q-page-container>
 
   </q-layout>
 </template>

@@ -6,21 +6,18 @@
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <div v-if="studentStore.isLoading">
+      <div v-if="isLoading">
         <LoadingSpinner />
       </div>
 
       <div v-else>
-        <ul
-          v-if="studentStore.currentStudent"
-          style="margin: 0px; padding-left: 0px;"
-        >
+        <ul style="margin: 0px; padding-left: 0px;">
           <StudentSkillChip
-            v-for="(skill, index) in studentStore.currentStudent.skills"
+            v-for="(skill, index) in skills"
             :key="index"
-            :best-skill="studentStore.currentStudent.bestSkill ?? ''"
-            :color="typeof(skill) !== 'string' ? skill.color : ''"
-            :name="typeof(skill) !== 'string' ? skill.name : ''"
+            :best-skill="bestSkill ?? ''"
+            :color="skill.color as string"
+            :name="skill.name as string"
           />
         </ul>
       </div>
@@ -32,7 +29,8 @@
 import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import StudentSkillChip from "./StudentSkillChip.vue";
-import {defineComponent} from "@vue/runtime-core";
+import {defineComponent, PropType} from "vue";
+import {Skill} from "../../../models/Skill"
 
 export default defineComponent( {
   components: {StudentSkillChip, LoadingSpinner},
@@ -41,6 +39,18 @@ export default defineComponent( {
       type: String,
       required: true
     },
+    isLoading: {
+      type: Boolean,
+      required: true
+    },
+    skills: {
+      type: [Object] as PropType<Skill[]>,
+      required: true
+    },
+    bestSkill: {
+      type: String,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()
