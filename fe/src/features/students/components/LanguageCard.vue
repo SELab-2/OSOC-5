@@ -6,24 +6,24 @@
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <div v-if="studentStore.isLoading">
+      <div v-if="isLoading">
         <LoadingSpinner />
       </div>
 
       <div class="column" v-else>
-        <div v-if="language" >
-          Language: {{ language }}
+        <div v-if="languageString" >
+          Language: {{ languageString }}
         </div>
         <div>
           English rating:
           <q-icon
-            v-for="index in (studentStore.currentStudent?.englishRating ?? 0)"
+            v-for="index in (englishRating ?? 0)"
             :key="index"
             color="yellow"
             name="star"
           />
           <q-icon
-            v-for="index in 5 - (studentStore.currentStudent?.englishRating ?? 0)"
+            v-for="index in 5 - (englishRating ?? 0)"
             :key="index"
             color="grey"
             name="star"
@@ -46,6 +46,18 @@ export default defineComponent( {
       type: String,
       required: true
     },
+    isLoading: {
+      type: Boolean,
+      required: true
+    },
+    language: {
+      type: Number,
+      required: true
+    },
+    englishRating: {
+      type: Number,
+      required: true
+    }
   },
   setup() {
     const studentStore = useStudentStore()
@@ -55,7 +67,7 @@ export default defineComponent( {
     }
   },
   computed: {
-    language(): string {
+    languageString(): string {
       switch (this.studentStore.currentStudent?.language) {
         case 0:
           return "Dutch"

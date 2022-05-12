@@ -19,7 +19,7 @@
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="mailStore.loadStudentsMails"
+          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
         >
           <template #append>
             <q-icon name="search" />
@@ -28,11 +28,14 @@
       </div>
 
       <q-table
+        v-model:pagination="pagination"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
-        :columns="columns"
+        :columns="columnsMails"
         row-key="id"
         separator="horizontal"
+        :loading="mailStore.isLoading"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -41,8 +44,11 @@
           >
             <q-td auto-width>
               <q-icon
+                size="sm"
+                color="yellow"
+                :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                 @click="() => clickRow(props, props.row)"
-                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+              />
             </q-td>
             <q-td
               key="name"
@@ -71,9 +77,9 @@
               >
                 <template #option="scope">
                   <q-item
-                    @click="() => updateStatus(props.row, props.row.status)"
                     class="items-center"
                     v-bind="scope.itemProps"
+                    @click="() => updateStatus(props.row, props.row.status)"
                   >
                     <q-item-section>
                       <q-item-label>{{ scope.opt.label }}</q-item-label>
@@ -81,17 +87,22 @@
                   </q-item>
                 </template>
               </q-select>
-              
             </q-td>
             <q-td
               key="email"
               :props="props"
             >
-              <a :href="'mailto:' + props.row.email" style="color: black">{{ props.row.email }}</a>
+              <a
+                :href="'mailto:' + props.row.email"
+                style="color: black"
+              >{{ props.row.email }}</a>
             </q-td>
-            
           </q-tr>
-          <q-tr no-hover v-if="props.expand" :props="props">
+          <q-tr
+            v-if="props.expand"
+            no-hover
+            :props="props"
+          >
             <q-td colspan="100%">
               <MailsOverview :student="props.row" />
             </q-td>
@@ -106,47 +117,13 @@
 import {defineComponent} from "@vue/runtime-core";
 import {ref} from 'vue'
 import {Student} from "../../models/Student";
-import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
+import columnsMails from "../../models/MailStudentColumns";
+import { useAuthenticationStore } from "../../stores/useAuthenticationStore";
 import router from "../../router";
-import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
-
-const columns = [
-  {
-    name: 'visibility',
-    required: false,
-    label: '',
-    align: 'left' as const,
-    field: '',
-    sortable: false,
-  },
-  {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left' as const,
-    field: 'name',
-    sortable: true,
-  },
-  {
-    name: 'status',
-    required: true,
-    label: 'Status',
-    align: 'left' as const,
-    field: 'status',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    align: 'right' as const,
-    label: 'Email',
-    field: 'email',
-    sortable: true,
-  }
-]
 
 export default defineComponent({
   components: {MailsOverview},
@@ -154,13 +131,22 @@ export default defineComponent({
     const mailStore = useMailStore()
     const q = useQuasar()
 
+    const pagination = ref({
+        sortBy: 'name',
+        descending: false,
+        page: 1,
+        rowsPerPage: 10,
+        rowsNumber: 10 // if getting data from a server
+      })
+
     return {
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
-      columns,
+      columnsMails,
       status,
-      q
+      q,
+      pagination,
     }
   },
   beforeMount() {
@@ -168,12 +154,17 @@ export default defineComponent({
       router.replace('/projects')
     }
   },
-  mounted() {
-    this.mailStore.loadStudentsMails()
+  async mounted() {
+    await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async onRequest(props: any) {
+      this.pagination = props.pagination
+      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    },
     updateStatus(student: Student, oldStatus: string) {
-      this!.$nextTick(() => {
+      this?.$nextTick(() => {
         this.mailStore
           .updateStatus(student)
           .catch((error) => {
@@ -183,10 +174,13 @@ export default defineComponent({
               message: error.detail,
               textColor: 'black'
             });
-            this.mailStore.mailStudents.find((s: Student) => s.id === student.id)!.status = oldStatus
+            const student = this.mailStore.mailStudents.find((s: Student) => s.id === student.id) as Student
+            if(student)
+              student.status = oldStatus
           })
       })
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clickRow(props: any, student: Student) {
       props.expand = !props.expand
       if (props.expand) this.mailStore.getMails(student)
