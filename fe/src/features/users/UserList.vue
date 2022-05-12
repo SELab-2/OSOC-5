@@ -153,7 +153,7 @@
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 glow-color="red-2"
-                @click="coachStore.removeUser(props.row.id)"
+                @click="removeUser(props.row.id)"
               />
             </q-td>
           </q-tr>
@@ -334,7 +334,7 @@ export default defineComponent({
     async removeUser(id: number) {
       await this.coachStore.removeUser(id)
 
-      if (this.coachStore.users.length === 1) {
+      if (this.coachStore.users.length === 1 && this.pagination.page != 0) {
         this.pagination.page -= 1
       }
       this.pagination.rowsNumber -= 1

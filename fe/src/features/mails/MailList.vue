@@ -28,7 +28,7 @@
       </div>
       <div class="q-pl-md full-width">
         <q-select
-          v-model="mailStore.statusFilter"
+          v-model="statusFilter"
           rounded
           outlined
           dense
@@ -39,7 +39,7 @@
           :options="status"
           map-options
           emit-value
-          @update:model-value="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
+          @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
         />
       </div>
       <q-table
@@ -201,6 +201,7 @@ export default defineComponent({
 
     return {
       search: ref(''),
+      statusFilter: ref([]),
       pagination
     }
   },
@@ -219,6 +220,7 @@ export default defineComponent({
         page_size: number
         page: number
         ordering: string
+        status: string
       }
 
       if (this.search) filter.search = this.search
@@ -230,6 +232,7 @@ export default defineComponent({
       } else if (this.pagination.sortBy !== null) {
           filter.ordering = `${order}${this.pagination.sortBy}`
       }
+      if (this.statusFilter.length > 0) filter.status = this.statusFilter.join(',')
 
       return filter
     }

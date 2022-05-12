@@ -27,9 +27,11 @@ export const useMailStore = defineStore('user/mail', {
             this.isLoading = true
             const studentStore = useStudentStore()
 
+            console.log(filters)
+
             const {data} = await instance
                 .get<{ results: Student[], count: number }>(`students/`,
-                    {params: filters}
+                    {params: filters},
                 )
 
             setNumberOfRows(data.count)
