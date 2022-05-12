@@ -48,7 +48,7 @@ export const useStudentStore = defineStore('user/student', {
       this.students.push(newstudent)
       return newstudent
     },
-    async deleteStudent(url: string, success: any, fail: any) {
+    async deleteStudent(url: string, success: Function, fail: Function) {
       await instance
         .delete(url)
         .then(() => success())

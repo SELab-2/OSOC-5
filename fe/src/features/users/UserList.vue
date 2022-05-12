@@ -75,7 +75,7 @@
         class="my-table user-table shadow-4"
         table-header-style="user-table"
         :rows="coachStore.users"
-        :columns="columns"
+        :columns="userColumns"
         row-key="id"
         separator="horizontal"
         :loading="coachStore.isLoading"
@@ -84,17 +84,14 @@
         <template #body="props">
           <q-tr
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
-            :props="props"
           >
             <q-td
               key="name"
-              :props="props"
             >
               {{ props.row.fullName }}
             </q-td>
             <q-td
               key="role"
-              :props="props"
             >
               <q-select
                 v-model="props.row.role"
@@ -132,13 +129,11 @@
             </q-td>
             <q-td
               key="assignedto"
-              :props="props"
             >
               {{ props.row.assignedto }}
             </q-td>
             <q-td
               key="email"
-              :props="props"
             >
               {{ props.row.email }}
             </q-td>
@@ -147,32 +142,46 @@
               style="width: 10px"
             >
               <btn
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
+                v-if="authenticationStore.loggedInUser?.email !== props.row.email"
                 flat
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 glow-color="red-2"
-                @click="removeUser(props.row.id)"
+                @click="() => deleteUserMethod(props.row)"
               />
             </q-td>
           </q-tr>
         </template>
       </q-table>
+
+      <q-dialog
+        :model-value="userId !== -1"
+        @update:model-value="userId = -1"
+      >
+        <DeleteDialog
+          :name="userName"
+          type="user"
+          :delete="() => removeUser(userId)"
+        />
+      </q-dialog>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted} from '@vue/runtime-core'
+import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
+import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
 import AddUser from "./AddUser.vue";
+import userColumns from "../../models/UserColumns";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import router from "../../router";
+import roles from "../../models/UserRoles";
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
@@ -191,66 +200,8 @@ const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undef
   return `"${formatted}"`
 }
 
-const columns = [
-  {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left' as const,
-    field: 'name',
-    sortable: true,
-  },
-  {
-    name: 'role',
-    required: true,
-    label: 'Role',
-    align: 'left' as const,
-    field: 'role',
-    sortable: true,
-  },
-  {
-    name: 'assignedto',
-    required: false,
-    label: 'Assigned To',
-    align: 'left' as const,
-    field: 'assignedto',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    align: 'right' as const,
-    label: 'Email',
-    field: 'email',
-    sortable: true,
-  },
-  {
-    name: 'action',
-    align: 'right' as const,
-    label: '',
-    field: '',
-    sortable: false,
-  },
-]
-
-const roles = [
-  {
-    label: 'Admin',
-    value: 'admin',
-    icon: 'mdi-account-outline',
-  },
-  {
-    label: 'Coach',
-    value: 'coach',
-    icon: 'mdi-whistle-outline',
-  },
-  {
-    label: 'Inactive',
-    value: 'inactive',
-    icon: 'mdi-close',
-  },
-]
 export default defineComponent({
-  components: {AddUser, SegmentedControl },
+  components: {AddUser, SegmentedControl, DeleteDialog },
   name: 'Users',
   setup() {
     const coachStore = useCoachStore()
@@ -262,7 +213,7 @@ export default defineComponent({
       active: ref(true),
       filter: ref(''),
       roleFilter: ref('all'),
-      columns,
+      userColumns,
       roles,
       coachStore,
       q
@@ -278,7 +229,10 @@ export default defineComponent({
     })
 
     return {
-      pagination
+      pagination,
+      deleteDialog: ref(false),
+      userId: ref(-1),
+      userName: ref('')
     }
   },
   computed: {
@@ -314,7 +268,6 @@ export default defineComponent({
         filter.ordering = `${order}${this.pagination.sortBy}`
       }
 
-      console.log(filter)
       return filter
     }
   },
@@ -331,8 +284,23 @@ export default defineComponent({
       this.pagination = props.pagination
       await this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
     },
+    deleteUserMethod(props: any) {
+      this.userId = props.id
+      this.userName = props.fullName
+    },
     async removeUser(id: number) {
-      await this.coachStore.removeUser(id)
+      await this.coachStore.removeUser(id, () => {
+          this.$q.notify({
+            icon: 'done',
+            color: 'positive',
+            message: 'Successfully deleted!',
+          })
+        },
+        () => this.$q.notify({
+          icon: "close",
+          color: "negative",
+          message: "Failed to delete!"
+        }))
 
       if (this.coachStore.users.length === 1 && this.pagination.page != 0) {
         this.pagination.page -= 1

@@ -80,14 +80,18 @@ export const useCoachStore = defineStore('user/coach', {
         is_active: user.isActive,
       })
     },
+    showDeleteDialog: function() {
+      this.deleteDialog = true
+    },
     /**
      * Removes a user from the database
      * @param userId id of the user which we want to remove
      */
-    async removeUser(userId: number) {
+    async removeUser(userId: number, success: Function, fail: Function) {
       await instance
         .delete(`coaches/${userId}/`)
-        .catch(() => console.log('Failed to delete'))
+        .then(() => success())
+        .catch(() => fail())
     },
     clearUsers() {
       this.$reset()
