@@ -213,6 +213,8 @@
           color="yellow"
           :icon="!miniState? 'chevron_left' : 'chevron_right'"
           @click="miniState = !miniState"
+          :style="`transform: translate(${showDrawer ? 0 : -50}%)`"
+          style="transition: translate ease 500ms;"
         />
       </div>
     </q-drawer>
