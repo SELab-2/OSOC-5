@@ -176,8 +176,8 @@
               :key="student.email"
 
               class="q-ma-sm"
-              :draggable="draggable"
-              :must-hover="mustHover"
+              :draggable="onProjectsPage"
+              :must-hover="onProjectsPage"
               :student="student"
               :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
               @click="$router.push(`/students/${student.id}`)"
@@ -237,23 +237,6 @@ export default defineComponent({
     SegmentedControl,
   },
   name: 'SideBar',
-  props: {
-    clickable: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    draggable: {
-      type: Boolean,
-      required: false,
-      default: true
-    },
-    mustHover: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
   setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
@@ -291,6 +274,12 @@ export default defineComponent({
     this.skillStore.loadSkills()
   },
   computed: {
+    onProjectsPage() {
+      return this.$route.name === "Projects"
+    },
+    onStudentsPage() {
+      return this.$route.name === "Students" || this.$route.name === "Student Page";
+    },
     filters() {
       let filter = {} as {
         search: string
@@ -315,8 +304,7 @@ export default defineComponent({
       return filter
     },
     showDrawer() {
-      console.log(this.$route.name)
-      return this.$route.name === "Students" || this.$route.name === "Projects" || this.$route.name === "Student Page";
+      return this.onProjectsPage || this.onStudentsPage
     }
   },
   methods: {
