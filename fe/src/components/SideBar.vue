@@ -69,11 +69,13 @@
                 <SegmentedControl
                   v-model="suggestion"
                   color="primary"
+                  no-padding
                   :options="[
-                { name: 'yes', label: 'Yes' },
-                { name: 'maybe', label: 'Maybe' },
-                { name: 'no', label: 'No' },
-                { name: 'none', label: 'None' },
+                { name: 'yes', label: 'Yes', amount: 1 },
+                { name: 'maybe', label: 'Maybe', amount: 1 },
+                { name: 'no', label: 'No', amount: 1 },
+                { name: 'undecided', label: 'Undecided', amount: 1 },
+                { name: 'none', label: 'None', amount: 1 },
               ]"
                   @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
