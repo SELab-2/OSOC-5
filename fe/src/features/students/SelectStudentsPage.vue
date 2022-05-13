@@ -11,14 +11,12 @@
 
 const options = [
   "https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json", // Pijl
-  "https://assets7.lottiefiles.com/packages/lf20_lodmufpp.json", // Regenboog
-  "https://assets4.lottiefiles.com/private_files/lf30_atq8bxjz.json", // Ogen
-  "https://assets7.lottiefiles.com/private_files/lf30_w0rzeebl.json", // Confetti
-  "https://assets5.lottiefiles.com/packages/lf20_kyusfkfp.json", // Banaan
-  "https://assets5.lottiefiles.com/packages/lf20_zkhpkpyc.json", // Tomaat
-  "https://assets7.lottiefiles.com/private_files/lf30_cdui7M.json" // Erwten
-  
-  
+  // "https://assets7.lottiefiles.com/packages/lf20_lodmufpp.json", // Regenboog
+  // "https://assets4.lottiefiles.com/private_files/lf30_atq8bxjz.json", // Ogen
+  // "https://assets7.lottiefiles.com/private_files/lf30_w0rzeebl.json", // Confetti
+  // "https://assets5.lottiefiles.com/packages/lf20_kyusfkfp.json", // Banaan
+  // "https://assets5.lottiefiles.com/packages/lf20_zkhpkpyc.json", // Tomaat
+  // "https://assets7.lottiefiles.com/private_files/lf30_cdui7M.json" // Erwten
 ]
 
 export default {
@@ -39,4 +37,5 @@ export default {
   align-items: center;
   justify-content: center 
 }
+
 </style>
