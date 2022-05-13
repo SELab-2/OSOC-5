@@ -13,6 +13,7 @@
         <DecisionIcon
           v-if="student?.finalDecision"
           :decision="student?.finalDecision.suggestion"
+          :reason="student?.finalDecision.reason"
         />
         <q-btn
           :href="student ? student.cv.toString() : ''"

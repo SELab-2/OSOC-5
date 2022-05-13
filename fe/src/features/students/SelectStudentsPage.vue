@@ -15,9 +15,6 @@ import SideBar from "../../components/SideBar.vue"
 import {defineComponent} from "@vue/runtime-core";
 
 export default defineComponent({
-  components: {
-    SideBar,
-  },
   setup() {
     const student = ref(null)
 
