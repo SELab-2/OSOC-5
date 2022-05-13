@@ -340,7 +340,7 @@ export default defineComponent ({
 
     // Reload when new student is selected
     this.$watch('id', async (id: number) => {
-      await this.studentStore.loadStudent(id)
+      await this.studentStore.loadStudent(id, () => this.$router.replace('/students'))
 
       if (this.student?.finalDecision) {
         this.possibleFinalDecision = this.student.finalDecision.suggestion

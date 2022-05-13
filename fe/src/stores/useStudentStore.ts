@@ -115,7 +115,7 @@ export const useStudentStore = defineStore('user/student', {
      * Load a student by its id
      * @param studentId the id of the student
      */
-    async loadStudent(studentId: number) {
+    async loadStudent(studentId: number, fail: Function) {
       this.isLoading = true
 
       await instance.get(`students/${studentId}/`).then(async ({ data }) => {
@@ -123,6 +123,7 @@ export const useStudentStore = defineStore('user/student', {
 
         this.currentStudent = new Student(data as Student)
       })
+          .catch(() => fail())
 
       this.isLoading = false
     },
