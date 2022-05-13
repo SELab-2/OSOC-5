@@ -145,7 +145,8 @@ export const useStudentStore = defineStore('user/student', {
         })
       }
 
-      await this.loadStudent(studentId)
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      await this.loadStudent(studentId, () => {})
 
       this.isLoading = false
     },
