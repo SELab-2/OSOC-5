@@ -354,7 +354,7 @@ export default defineComponent ({
      */
     makeSuggestion: async function (reason: string) {
       if (this.student) {
-        await this.studentStore.updateSuggestion(this.student.id, reason)
+        await this.studentStore.updateSuggestion(this.student.id, this.possibleSuggestion, reason)
       }
 
     },
