@@ -124,12 +124,12 @@
     >
       <q-infinite-scroll
         ref="infinite"
-        @load="(i, done) => projectStore.loadNext(i, done, filters)"
+        @load="(i, done) => loadNext(i, done, filters)"
         :offset="250"
         scroll-target="#scroll-target-id"
       >
         <masonry-wall
-          :items="projectStore.projects"
+          :items="projects"
           :ssr-columns="1"
           :column-width="320"
           :gap="0"
@@ -168,6 +168,7 @@ import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from '../../stores/useStudentStore'
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 import { useSkillStore } from '../../stores/useSkillStore'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ProjectList',
@@ -177,8 +178,13 @@ export default defineComponent({
       process.env.NODE_ENV == 'development'
         ? 'ws://localhost:8000/ws/socket_server/'
         : 'wss://sel2-5.ugent.be/ws/socket_server/'
+        
+    const { loadNext, receiveSuggestion, removeReceivedSuggestion} = useProjectStore()
     return {
-      projectStore: useProjectStore(),
+      ...storeToRefs(useProjectStore()),
+      loadNext,
+      receiveSuggestion,
+      removeReceivedSuggestion,
       studentStore: useStudentStore(),
       authenticationStore: useAuthenticationStore(),
       skillStore: useSkillStore(),
@@ -200,16 +206,16 @@ export default defineComponent({
     },
     expanded: {
       get() {
-        if (this.projectStore.projects.length === 0) return false
+        if (this.projects.length === 0) return false
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (this as any).projectStore.projects.every(
+        return (this as any).projects.every(
           (p: { selectedRoles: any }) =>
             Object.values(p.selectedRoles ?? { k: false }).every((r) => r)
         )
       },
       set(newValue) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.projectStore.projects.forEach((p: any) => {
+        this.projects.forEach((p: any) => {
           for (let r in p.selectedRoles) {
             p.selectedRoles[r] = newValue
           }
@@ -241,9 +247,9 @@ export default defineComponent({
       } else if (data.hasOwnProperty('remove_final_decision')) {
         this.studentStore.removeFinalDecision(data.remove_final_decision)
       } else if (data.hasOwnProperty('suggest_student'))
-        this.projectStore.receiveSuggestion(data.suggest_student)
+        this.receiveSuggestion(data.suggest_student)
       else if (data.hasOwnProperty('remove_student'))
-        this.projectStore.removeReceivedSuggestion(data.remove_student)
+        this.removeReceivedSuggestion(data.remove_student)
     }
   },
 })

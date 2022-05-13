@@ -214,11 +214,11 @@ export const useProjectStore = defineStore('project', {
 
       let base = this.projects.length
 
-      this.projects = this.projects.concat(
+      this.projects = [...this.projects,...
         results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id, p.url)
         )
-      )
+      ]
 
       results.forEach(async (project, i) => {
         const coaches: Array<User> = await Promise.all(
