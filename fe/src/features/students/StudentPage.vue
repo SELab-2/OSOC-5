@@ -124,8 +124,8 @@
       <q-dialog v-model="suggestionDialog">
         <DecisionCard
           :name="student?.fullName ?? ''"
-          :suggestion-name="suggestionName(studentStore.possibleSuggestion)"
-          :suggestion-color="suggestionColor(studentStore.possibleSuggestion)"
+          :suggestion-name="suggestionName(possibleSuggestion)"
+          :suggestion-color="suggestionColor(possibleSuggestion)"
           :make-suggestion="(reason: string) => makeSuggestion(reason)"
         />
       </q-dialog>
@@ -244,7 +244,6 @@ export default defineComponent ({
     return {
       authenticationStore,
       studentStore,
-      possibleFinalDecision: ref(-1),
       socket,
       yesMaybeNoOptions,
       genderOptions,
@@ -260,18 +259,18 @@ export default defineComponent ({
     return {
       deleteDialog,
       suggestionDialog,
-      decisionDialog
+      decisionDialog,
+      possibleFinalDecision: ref(-1),
+      possibleSuggestion: ref(-1)
     }
   },
   computed: {
-    possibleSuggestion(): string {
-      return this.studentStore.possibleSuggestion.toString()
-    },
     /**
      * Retrieve the current selected student from the store
      */
-    student(): Student | undefined {
-      return this.studentStore.students.find(s => s.id === parseInt(this.id))
+    student(): Student | null {
+      return this.studentStore.currentStudent
+      // return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
     /**
      * Retrieve the possible suggestion from the store
@@ -305,7 +304,7 @@ export default defineComponent ({
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
-        return this.studentStore.possibleSuggestion
+        return this.possibleSuggestion
       }
 
     },
@@ -367,7 +366,7 @@ export default defineComponent ({
      * @param value
      */
     showDialog: function (value: number) {
-      this.studentStore.possibleSuggestion = value
+      this.possibleSuggestion = value
       this.suggestionDialog = true
     },
     deleteStudent: async function () {

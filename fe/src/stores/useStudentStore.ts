@@ -12,9 +12,7 @@ interface State {
   coaches: Map<string, User>
   students: Array<Student>
   isLoading: boolean
-  possibleSuggestion: number
   currentStudent: Student | null
-  nextPage: string | null
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -24,9 +22,7 @@ export const useStudentStore = defineStore('user/student', {
     coaches: new Map(),
     students: [],
     isLoading: false,
-    possibleSuggestion: -1,
     currentStudent: null,
-    nextPage: '',
   }),
   actions: {
     /**
@@ -132,15 +128,15 @@ export const useStudentStore = defineStore('user/student', {
      * @param studentId the id of the student
      * @param reason the reason to do the suggestion
      */
-    async updateSuggestion(studentId: number, reason: string) {
+    async updateSuggestion(studentId: number, possibleSuggestion: number, reason: string) {
       this.isLoading = true
 
       // check if -1 is selected to delete suggestion
-      if (this.possibleSuggestion === -1) {
+      if (possibleSuggestion === -1) {
         await instance.delete(`students/${studentId}/remove_suggestion/`)
       } else {
         await instance.post(`students/${studentId}/make_suggestion/`, {
-          suggestion: this.possibleSuggestion,
+          suggestion: possibleSuggestion,
           reason: reason,
         })
       }
