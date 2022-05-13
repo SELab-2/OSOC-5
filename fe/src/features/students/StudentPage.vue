@@ -102,8 +102,9 @@
         @click="deleteDialog = true"
       />
       <q-dialog v-model="deleteDialog">
-        <DeleteStudentDialog
+        <DeleteDialog
           :name="student?.fullName ?? ''"
+          type="student"
           :delete="deleteStudent"
         />
       </q-dialog>
@@ -201,11 +202,10 @@ import SkillsCard from "./components/SkillsCard.vue";
 import SuggestionsCard from "./components/SuggestionsCard.vue";
 import SegmentedControl from "../../components/SegmentedControl.vue"
 import { Student } from "../../models/Student";
-import { Skill } from "../../models/Skill";
 import {defineComponent} from "vue";
 import ExtraInfoCard from "./components/ExtraInfoCard.vue";
 import LanguageCard from "./components/LanguageCard.vue";
-import DeleteStudentDialog from "./components/DeleteStudentDialog.vue";
+import DeleteDialog from "../../components/DeleteDialog.vue";
 import DecisionCard from "./components/DecisionCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
 import DecisionIcon from "../../components/DecisionIcon.vue";
@@ -215,7 +215,7 @@ import router from "../../router";
 
 export default defineComponent ({
   components: {
-    DeleteStudentDialog,
+    DeleteDialog,
     DecisionCard,
     DecisionIcon,
     InfoDiv,

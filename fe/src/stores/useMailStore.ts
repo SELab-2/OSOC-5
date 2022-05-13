@@ -1,6 +1,7 @@
 import {Student} from "../models/Student";
 import {Mail} from "../models/Mail";
 import {defineStore} from "pinia";
+import qs from "qs";
 import {instance} from "../utils/axios";
 import {User} from "../models/User";
 import {useStudentStore} from "./useStudentStore";
@@ -8,51 +9,48 @@ import {useAuthenticationStore} from "./useAuthenticationStore";
 
 interface State {
     isLoading: boolean
-    searchMails: string
     mailStudents: Array<Student>
+    statusFilter: Array<number>
     mails: Map<number, Mail[]>
 }
 
 export const useMailStore = defineStore('user/mail', {
     state: (): State => ({
         isLoading: false,
-        searchMails: '',
         mailStudents: [],
+        statusFilter: [],
         mails: new Map(),
     }),
     actions: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async loadStudentsMails(pagination: any, setNumberOfRows: any) {
+        async loadStudentsMails(filters: any, setNumberOfRows: any) {
             this.isLoading = true
             const studentStore = useStudentStore()
 
-            const params = {
-                page_size: pagination.rowsPerPage,
-                page: pagination.page
-            } as {page_size: number, page: number, search: string, ordering: string}
+            console.log(filters)
 
-            // const filters = []
-            if (this.searchMails) params.search = this.searchMails // filters.push(`search=${this.searchMails}`)
-            const order = pagination.descending ? '-' : '+'
-            if (pagination.sortBy === 'name') {
-                params.ordering = `${order}first_name,${order}last_name`
-            } else if (pagination.sortBy !== null) {
-                params.ordering = `${order}${pagination.sortBy}`
+            const {data} = await instance
+                .get<{ results: Student[], count: number }>(`students/`,
+                    {params: filters},
+                )
+
+            setNumberOfRows(data.count)
+
+            for (const student of data.results) {
+                await studentStore.transformStudent(student)
             }
 
-            await instance
-                .get<{ results: Student[], count: number }>(`students/`, {params: params})
-                .then(async ({ data }) => {
-                    setNumberOfRows(data.count)
+            this.mailStudents = data.results.map((student) => new Student(student))
 
-                    for (const student of data.results) {
-                        await studentStore.transformStudent(student)
-                    }
-
-                    this.mailStudents = data.results.map((student) => new Student(student))
-
-                    this.isLoading = false
-                })
+            this.isLoading = false
+        },
+        async updateStatusStudents(updateValue: number, students: Array<Student>) {
+          if (students.length > 0) {
+              await instance.post('students/bulk_status/', {
+                  status: updateValue,
+                  students: students.map(student => student.url)
+              })
+          }
         },
         async getMails(student: Student) {
             this.isLoading = true
