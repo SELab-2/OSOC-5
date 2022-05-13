@@ -133,7 +133,7 @@ export default defineComponent({
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 10px !important;
   span {
     pointer-events: none;
   }
