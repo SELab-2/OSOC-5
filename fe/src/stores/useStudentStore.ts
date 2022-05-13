@@ -3,9 +3,8 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
-import qs from "qs";
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
-import { useCoachStore } from './useCoachStore'
+import qs from "qs";
 
 interface State {
   skills: Array<Skill>
@@ -48,7 +47,7 @@ export const useStudentStore = defineStore('user/student', {
       this.students.push(newstudent)
       return newstudent
     },
-    async deleteStudent(url: string, success: any, fail: any) {
+    async deleteStudent(url: string, success: Function, fail: Function) {
       await instance
         .delete(url)
         .then(() => success())
@@ -88,6 +87,7 @@ export const useStudentStore = defineStore('user/student', {
       student.gender = parseInt(student.gender)
       student.language = parseInt(student.language)
       student.englishRating = parseInt(student.englishRating)
+      student.status = parseInt(student.status)
     },
     async loadNext(index: number, done: Function, filters: Object) {
       this.isLoading = true
