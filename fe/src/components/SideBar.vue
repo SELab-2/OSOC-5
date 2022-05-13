@@ -315,7 +315,6 @@ export default defineComponent({
       return filter
     },
     showDrawer() {
-      console.log(this.$route.name)
       return this.$route.name === "Students" || this.$route.name === "Projects" || this.$route.name === "Student Page";
     }
   },

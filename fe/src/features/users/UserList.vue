@@ -23,14 +23,14 @@
       </div>
       <div class="row q-mb-md vertical-middle">
         <SegmentedControl
-          v-model="coachStore.filterRole"
+          v-model="roleFilter"
           :options="[
             { name: 'all', label: 'All' },
             { name: 'admin', label: 'Admins' },
             { name: 'coach', label: 'Coaches' },
             { name: 'inactive', label: 'Inactive' },
           ]"
-          @click="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
+          @click="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
         />
 
         <q-space />
@@ -49,17 +49,17 @@
           <q-space />
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser :created="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)" />
+              <AddUser :created="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)" />
             </q-card>
           </q-dialog>
           <q-input
-            v-model="coachStore.filter"
+            v-model="filter"
             outlined
             dense
             debounce="300"
             color="yellow-4"
             placeholder="Search"
-            @update:modelValue="async () => await coachStore.loadUsersCoaches(pagination, (count: number) => pagination.rowsNumber = count)"
+            @update:modelValue="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
           >
             <template #append>
               <q-icon name="search" />
@@ -75,26 +75,23 @@
         class="my-table user-table shadow-4"
         table-header-style="user-table"
         :rows="coachStore.users"
-        :columns="columns"
+        :columns="userColumns"
         row-key="id"
         separator="horizontal"
-        :loading="coachStore.isLoadingUsers"
+        :loading="coachStore.isLoading"
         @request="onRequest"
       >
         <template #body="props">
           <q-tr
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
-            :props="props"
           >
             <q-td
               key="name"
-              :props="props"
             >
               {{ props.row.fullName }}
             </q-td>
             <q-td
               key="role"
-              :props="props"
             >
               <q-select
                 v-model="props.row.role"
@@ -132,13 +129,11 @@
             </q-td>
             <q-td
               key="assignedto"
-              :props="props"
             >
               {{ props.row.assignedto }}
             </q-td>
             <q-td
               key="email"
-              :props="props"
             >
               {{ props.row.email }}
             </q-td>
@@ -147,32 +142,46 @@
               style="width: 10px"
             >
               <btn
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
+                v-if="authenticationStore.loggedInUser?.email !== props.row.email"
                 flat
                 round
                 style="color: #f14a3b"
                 icon="mdi-trash-can-outline"
                 glow-color="red-2"
-                @click="coachStore.removeUser(props.row.id)"
+                @click="() => deleteUserMethod(props.row)"
               />
             </q-td>
           </q-tr>
         </template>
       </q-table>
+
+      <q-dialog
+        :model-value="userId !== -1"
+        @update:model-value="userId = -1"
+      >
+        <DeleteDialog
+          :name="userName"
+          type="user"
+          :delete="() => removeUser(userId)"
+        />
+      </q-dialog>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted} from '@vue/runtime-core'
+import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
 import {exportFile, useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
+import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
 import AddUser from "./AddUser.vue";
+import userColumns from "../../models/UserColumns";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import router from "../../router";
+import roles from "../../models/UserRoles";
 
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
@@ -191,71 +200,26 @@ const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undef
   return `"${formatted}"`
 }
 
-const columns = [
-  {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left' as const,
-    field: 'name',
-    sortable: true,
-  },
-  {
-    name: 'role',
-    required: true,
-    label: 'Role',
-    align: 'left' as const,
-    field: 'role',
-    sortable: true,
-  },
-  {
-    name: 'assignedto',
-    required: false,
-    label: 'Assigned To',
-    align: 'left' as const,
-    field: 'assignedto',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    align: 'right' as const,
-    label: 'Email',
-    field: 'email',
-    sortable: true,
-  },
-  {
-    name: 'action',
-    align: 'right' as const,
-    label: '',
-    field: '',
-    sortable: false,
-  },
-]
-
-const roles = [
-  {
-    label: 'Admin',
-    value: 'admin',
-    icon: 'mdi-account-outline',
-  },
-  {
-    label: 'Coach',
-    value: 'coach',
-    icon: 'mdi-whistle-outline',
-  },
-  {
-    label: 'Inactive',
-    value: 'inactive',
-    icon: 'mdi-close',
-  },
-]
 export default defineComponent({
-  components: {AddUser, SegmentedControl },
+  components: {AddUser, SegmentedControl, DeleteDialog },
   name: 'Users',
   setup() {
     const coachStore = useCoachStore()
     const q = useQuasar()
 
+    return {
+      authenticationStore: useAuthenticationStore(),
+      newUserDialog: ref(false),
+      active: ref(true),
+      filter: ref(''),
+      roleFilter: ref('all'),
+      userColumns,
+      roles,
+      coachStore,
+      q
+    }
+  },
+  data() {
     const pagination = ref({
       sortBy: 'name',
       descending: false,
@@ -265,16 +229,46 @@ export default defineComponent({
     })
 
     return {
-      authenticationStore: useAuthenticationStore(),
-      newUserDialog: ref(false),
-      active: ref(true),
-      filter: ref(''),
-      roleFilter: ref('all'),
-      columns,
-      roles,
-      coachStore,
       pagination,
-      q
+      deleteDialog: ref(false),
+      userId: ref(-1),
+      userName: ref('')
+    }
+  },
+  computed: {
+    filters() {
+      const filter = {} as {
+        search: string
+        is_active: boolean
+        is_admin: boolean
+        ordering: string
+        page: number
+        page_size: number
+      }
+
+      if (this.filter) filter.search = this.filter
+      filter.page_size = this.pagination.rowsPerPage
+      filter.page = this.pagination.page
+      if (this.roleFilter === 'inactive') filter.is_active = false
+      if (this.roleFilter === 'admin') {
+        filter.is_active = true
+        filter.is_admin = true
+      }
+      if (this.roleFilter === 'coach'){
+        filter.is_active = true
+        filter.is_admin = false
+      }
+      const order = this.pagination.descending ? '-' : '+'
+      if (this.pagination.sortBy === 'name') {
+        filter.ordering = `${order}first_name,${order}last_name`
+      } else if (this.pagination.sortBy === 'role') {
+        const order = this.pagination.descending ? '+' : '-'
+        filter.ordering = `${order}is_admin,${order}is_active`
+      } else if (this.pagination.sortBy !== null) {
+        filter.ordering = `${order}${this.pagination.sortBy}`
+      }
+
+      return filter
     }
   },
   beforeMount() {
@@ -283,22 +277,37 @@ export default defineComponent({
     }
   },
   async mounted() {
-    await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    await this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
     async onRequest(props: any) {
       this.pagination = props.pagination
-      await this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      await this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
+    },
+    deleteUserMethod(props: any) {
+      this.userId = props.id
+      this.userName = props.fullName
     },
     async removeUser(id: number) {
-      await this.coachStore.removeUser(id)
+      await this.coachStore.removeUser(id, () => {
+          this.$q.notify({
+            icon: 'done',
+            color: 'positive',
+            message: 'Successfully deleted!',
+          })
+        },
+        () => this.$q.notify({
+          icon: "close",
+          color: "negative",
+          message: "Failed to delete!"
+        }))
 
-      if (this.coachStore.users.length === 1) {
+      if (this.coachStore.users.length === 1 && this.pagination.page != 0) {
         this.pagination.page -= 1
       }
       this.pagination.rowsNumber -= 1
 
-      this.coachStore.loadUsersCoaches(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
     },
     // Method for searching the table.
     // Terms is equal to roleFilter.
@@ -316,52 +325,6 @@ export default defineComponent({
         })
       )
     },
-//     exportTable() {
-//       // naive encoding to csv format
-//       const current = new Date()
-//       const cDate =
-//         current.getFullYear() +
-//         '' +
-//         (current.getMonth() + 1) +
-//         '' +
-//         current.getDate()
-//       const cTime =
-//         current.getHours() + '' + current.getMinutes() + current.getSeconds()
-//       const dateTime = cDate + '' + cTime
-//       const content = [
-//         columns.slice(0, -1).map((col) => wrapCsvValue(col.label)),
-//       ]
-//         .concat(
-//           this.coachStore.users.map((row: { [x: string]: any }) =>
-//             columns
-//               .slice(0, -1)
-//               .map((col) =>
-//                 wrapCsvValue(
-//                   typeof col.field === 'function'
-//                     ? col.field(row)
-//                     : row[col.field === void 0 ? col.name : col.field],
-//                   col.format
-//                 )
-//               )
-//               .join(',')
-//           )
-//         )
-//         .join('\r\n')
-// 
-//       const status = exportFile(
-//         'table-export-' + dateTime + '.csv',
-//         content,
-//         'text/csv'
-//       )
-// 
-//       if (status !== true) {
-//         this.q.notify({
-//           message: 'Browser denied file download...',
-//           color: 'negative',
-//           icon: 'warning',
-//         })
-//       }
-//     },
     // Not so clean method for updating the role of an user. This is done this way because pinia events don't work in production mode andthe vue watcher doesn't work here.
     updateRole(user: User, oldRole: string) {
       // nextTick is used cause the user param contains the old role. We need to wait for the next tick to get the new role.

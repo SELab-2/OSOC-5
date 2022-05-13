@@ -17,6 +17,10 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = ['sel2-5.ugent.be']
 
+# Only use session cookies if explicitly asked
+# https://dj-rest-auth.readthedocs.io/en/latest/configuration.html
+REST_SESSION_LOGIN = False
+
 # Database
 DATABASES = {
     'default': {
