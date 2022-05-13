@@ -276,10 +276,10 @@ export default defineComponent({
     this.skillStore.loadSkills()
   },
   computed: {
-    onProjectsPage() {
+    onProjectsPage(): boolean {
       return this.$route.name === "Projects"
     },
-    onStudentsPage() {
+    onStudentsPage(): boolean {
       return this.$route.name === "Students" || this.$route.name === "Student Page";
     },
     filters() {
@@ -305,7 +305,7 @@ export default defineComponent({
 
       return filter
     },
-    showDrawer() {
+    showDrawer(): boolean {
       return this.onProjectsPage || this.onStudentsPage
     }
   },
