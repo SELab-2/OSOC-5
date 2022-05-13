@@ -13,28 +13,44 @@
         </div>
         <q-space />
         <q-input
-          v-model="mailStore.searchMails"
+          v-model="search"
           outlined
           dense
           debounce="300"
           color="yellow-4"
           placeholder="Search"
-          @update:modelValue="async () => await mailStore.loadStudentsMails(pagination, (count: number) => pagination.rowsNumber = count)"
+          @update:modelValue="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
         >
           <template #append>
             <q-icon name="search" />
           </template>
         </q-input>
       </div>
-
+      <div class="q-pl-md full-width">
+        <q-select
+          v-model="statusFilter"
+          rounded
+          outlined
+          dense
+          multiple
+          clearable
+          use-chips
+          label="Status"
+          :options="status"
+          map-options
+          emit-value
+          @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
+        />
+      </div>
       <q-table
-        v-model:pagination="pagination"
+        v-model:selected="selectedStudents"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
-        :columns="columnsMails"
-        row-key="id"
-        separator="horizontal"
+        :columns="mailsColumns"
         :loading="mailStore.isLoading"
+        row-key="url"
+        selection="multiple"
+        separator="horizontal"
         @request="onRequest"
       >
         <template #body="props">
@@ -42,6 +58,9 @@
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
             :props="props"
           >
+            <q-td>
+              <q-checkbox v-model="props.selected" />
+            </q-td>
             <q-td auto-width>
               <q-icon
                 size="sm"
@@ -104,11 +123,38 @@
             :props="props"
           >
             <q-td colspan="100%">
-              <MailsOverview :student="props.row" />
+              <MailsOverview
+                :student="props.row"
+              />
             </q-td>
           </q-tr>
         </template>
       </q-table>
+      <div class="row q-gutter-sm items-center justify-end">
+        <q-select
+          v-model="statusUpdate"
+          style="width: 220px"
+          rounded
+          outlined
+          dense
+          use-chips
+          emit-value
+          map-options
+          label="New status"
+          :options="status"
+        />
+        <q-button>
+          <btn
+            padding="7px"
+            color="yellow"
+            shadow-strength="2.5"
+            no-wrap
+            @click="updateStatusStudents"
+          >
+            Bulk update status
+          </btn>
+        </q-button>
+      </div>
     </div>
   </div>
 </template>
@@ -122,8 +168,9 @@ import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
 import columnsMails from "../../models/MailStudentColumns";
-import { useAuthenticationStore } from "../../stores/useAuthenticationStore";
 import router from "../../router";
+import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
+import mailsColumns from "../../models/MailsColumns";
 
 export default defineComponent({
   components: {MailsOverview},
@@ -131,22 +178,31 @@ export default defineComponent({
     const mailStore = useMailStore()
     const q = useQuasar()
 
-    const pagination = ref({
-        sortBy: 'name',
-        descending: false,
-        page: 1,
-        rowsPerPage: 10,
-        rowsNumber: 10 // if getting data from a server
-      })
-
     return {
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
+      statusUpdate: ref(null),
+      selectedStudents: ref([]),
+      mailsColumns,
       columnsMails,
       status,
       q,
-      pagination,
+    }
+  },
+  data() {
+    const pagination = ref({
+      sortBy: 'name',
+      descending: false,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 10 // if getting data from a server
+    })
+
+    return {
+      search: ref(''),
+      statusFilter: ref([]),
+      pagination
     }
   },
   beforeMount() {
@@ -155,15 +211,47 @@ export default defineComponent({
     }
   },
   async mounted() {
-    await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+    await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
+  },
+  computed: {
+    filters() {
+      let filter = {} as {
+        search: string
+        page_size: number
+        page: number
+        ordering: string
+        status: string
+      }
+
+      if (this.search) filter.search = this.search
+      filter.page_size = this.pagination.rowsPerPage
+      filter.page = this.pagination.page
+      const order = this.pagination.descending ? '-' : '+'
+      if (this.pagination.sortBy === 'name') {
+          filter.ordering = `${order}first_name,${order}last_name`
+      } else if (this.pagination.sortBy !== null) {
+          filter.ordering = `${order}${this.pagination.sortBy}`
+      }
+      if (this.statusFilter.length > 0) filter.status = this.statusFilter.join(',')
+
+      return filter
+    }
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async onRequest(props: any) {
       this.pagination = props.pagination
-      await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
     },
-    updateStatus(student: Student, oldStatus: string) {
+    async updateStatusStudents() {
+      if (this.statusUpdate !== null) {
+        await this.mailStore.updateStatusStudents(this.statusUpdate, this.selectedStudents)
+        this.selectedStudents = []
+        this.statusUpdate = null
+        await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      }
+    },
+    updateStatus(student: Student, oldStatus: number) {
       this?.$nextTick(() => {
         this.mailStore
           .updateStatus(student)

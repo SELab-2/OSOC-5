@@ -5,17 +5,13 @@ import { useAuthenticationStore } from './useAuthenticationStore'
 
 interface State {
   users: Array<User>
-  filter: string
-  filterRole: string
-  isLoadingUsers: boolean
+  isLoading: boolean
 }
 
 export const useCoachStore = defineStore('user/coach', {
   state: (): State => ({
     users: [],
-    filter: '',
-    filterRole: 'all',
-    isLoadingUsers: false,
+    isLoading: false,
   }),
   actions: {
     /**
@@ -48,48 +44,30 @@ export const useCoachStore = defineStore('user/coach', {
      * Loads the users
      */
     async loadUsers() {
-      this.isLoadingUsers = true
+      this.isLoading = true
       const { results } = (
         await instance.get<{ results: UserInterface[] }>(
           'coaches/?page_size=500'
         )
       ).data
       this.users = results.map((user) => new User(user))
-      this.isLoadingUsers = false
+      this.isLoading = false
     },
-    async loadUsersCoaches(pagination: any, setNumberOfRows: any) {
-      this.isLoadingUsers = true
-
-      const filters = []
-      if (this.filter) filters.push(`search=${this.filter}`)
-      if (this.filterRole === 'inactive') filters.push('is_active=false')
-      if (this.filterRole === 'admin')
-        filters.push('is_active=true&is_admin=true')
-      if (this.filterRole === 'coach')
-        filters.push('is_active=true&is_admin=false')
-      const order = pagination.descending ? '-' : '+'
-      if (pagination.sortBy === 'name') {
-        filters.push(`ordering=${order}first_name,${order}last_name`)
-      } else if (pagination.sortBy === 'role') {
-        const order = pagination.descending ? '+' : '-'
-        filters.push(`ordering=${order}is_admin,${order}is_active`)
-      } else if (pagination.sortBy !== null) {
-        filters.push(`ordering=${order}${pagination.sortBy}`)
-      }
-
-      let url = ''
-      if (filters) url = `&${filters.join('&')}`
+    async loadUsersCoaches(filters: Object, setNumberOfRows: Function) {
+      this.isLoading = true
 
       const { results, count } = (
         await instance.get<{ results: UserInterface[]; count: number }>(
-          `coaches/?page_size=${pagination.rowsPerPage}&page=${pagination.page}${url}`
+          "coaches/", {
+            params: filters
+            }
         )
       ).data
 
       setNumberOfRows(count)
       this.users = results.map((user) => new User(user))
 
-      this.isLoadingUsers = false
+      this.isLoading = false
     },
     /**
      * Updates the role from a user
@@ -106,10 +84,11 @@ export const useCoachStore = defineStore('user/coach', {
      * Removes a user from the database
      * @param userId id of the user which we want to remove
      */
-    async removeUser(userId: number) {
+    async removeUser(userId: number, success: Function, fail: Function) {
       await instance
         .delete(`coaches/${userId}/`)
-        .catch(() => console.log('Failed to delete'))
+        .then(() => success())
+        .catch(() => fail())
     },
     clearUsers() {
       this.$reset()
