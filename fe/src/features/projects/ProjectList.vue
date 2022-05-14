@@ -172,7 +172,7 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ProjectList',
-  components: { SideBar, ProjectCard },
+  components: { ProjectCard },
   setup() {
     const baseURL =
       process.env.NODE_ENV == 'development'
