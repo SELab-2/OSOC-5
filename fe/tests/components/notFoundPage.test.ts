@@ -7,6 +7,7 @@ const wrapperFactory = () => mount(NotFoundPage, {})
 describe('NotFoundPage.vue', () => {
 
     it('Test if the text is displayed correctly', () => {
+        // No longer needed?
         // expect(NotFoundPage).toBeTruthy();
         // const wrapper = wrapperFactory();
         // expect(wrapper.find('h1').exists()).toBeTruthy()
