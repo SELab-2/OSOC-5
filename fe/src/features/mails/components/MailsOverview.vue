@@ -229,6 +229,7 @@ export default defineComponent({
     ]
     const currentStep: Ref = ref(undefined)
     const type: Ref<number|null> = ref(null)
+    const selected: Ref<number|null> = ref(null)
 
     return {
       show: ref(true),
@@ -240,7 +241,7 @@ export default defineComponent({
       info: '',
       currentStep,
       approvalStates,
-      selected: ref(null),
+      selected,
       steps: steps
     }
   },
@@ -254,7 +255,14 @@ export default defineComponent({
       return data
     },
     currentstepids() {
-      return this.currentsteps.map(s => s.type)
+      return this.currentsteps.map(
+        mail => {
+          const type = mail.type
+          if (type === 2 || type === 5) return 2
+          if (type === 3 || type === 4) return 3
+          return type
+        }
+      )
     },
   },
   async mounted() {
