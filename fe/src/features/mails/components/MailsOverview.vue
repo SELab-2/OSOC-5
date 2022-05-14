@@ -269,7 +269,7 @@ export default defineComponent({
       await this.mailStore.getMails(this.student)
     },
     onclickmail() {
-      if (this.selected) {
+      if (this.selected !== null) {
         this.type = this.selected
 
         const label = approvalStates.filter(state => state.value === this.selected)[0].label
