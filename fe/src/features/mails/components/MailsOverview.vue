@@ -1,118 +1,152 @@
 <template>
-  <q-stepper
-    ref="stepper"
-    v-model="currentStep"
-    flat
-    header-nav
-    active-color="yellow"
-    active-icon="none"
-    class="text-weight-medium"
-    animated
-  >
-    <q-step
-      v-for="step in steps"
-      :key="step.state"
-      :name="step.state"
-      :title="step.name"
-      :icon="step.icon"
-      :done="currentstepids.includes(step.state)"
-    >
-      <q-input
-        v-if="!currentsteps.find(s => parseInt(s.info) === step.state)"
-        v-model="date" 
-        outlined 
-        style="width: fit-content"
-        :disable="currentstepids.includes(step.state)"
+  <div class="row">
+    <div class="col-6">
+      <q-stepper
+        ref="stepper"
+        v-model="currentStep"
+        flat
+        vertical
+        header-nav
+        active-color="yellow"
+        active-icon="none"
+        class="text-weight-medium"
+        animated
+        @before-transition="adaptState"
       >
-        <template #prepend>
-          <q-icon
-            name="event"
-            class="cursor-pointer"
+        <q-step
+          v-for="step in steps"
+          :key="step.state"
+          :name="step.state"
+          :title="step.name"
+          :icon="step.icon"
+          :done="currentstepids.includes(step.state)"
+        >
+          <q-input
+            v-if="!currentsteps.find(s => parseInt(s.info) === step.state)"
+            v-model="date"
+            outlined
+            style="width: fit-content"
+            :disable="currentstepids.includes(step.state)"
           >
-            <q-popup-proxy
-              cover
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date 
-                v-model="date"
-                mask="YYYY-MM-DD HH:mm"
+            <template #prepend>
+              <q-icon
+                name="event"
+                class="cursor-pointer"
               >
-                <div class="row items-center justify-end">
-                  <q-btn
-                    v-close-popup
-                    label="Close"
-                    color="primary"
-                    flat
-                  />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-      
-        <template #append>
-          <q-icon
-            name="access_time"
-            class="cursor-pointer"
-          >
-            <q-popup-proxy
-              cover
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-time
-                v-model="date"
-                mask="YYYY-MM-DD HH:mm"
-                format24h
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date
+                    v-model="date"
+                    mask="YYYY-MM-DD HH:mm"
+                  >
+                    <div class="row items-center justify-end">
+                      <q-btn
+                        v-close-popup
+                        label="Close"
+                        color="primary"
+                        flat
+                      />
+                    </div>
+                  </q-date>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+
+            <template #append>
+              <q-icon
+                name="access_time"
+                class="cursor-pointer"
               >
-                <div class="row items-center justify-end">
-                  <q-btn
-                    v-close-popup
-                    label="Close"
-                    color="primary"
-                    flat
-                  />
-                </div>
-              </q-time>
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-      </q-input>
-      <div v-else>
-        <!-- <div> -->
-        Sent at {{ currentsteps.find(s => parseInt(s.info) === step.state)?.time ?? 'unknown time' }}
-        <!-- </div> -->
-      </div>
-      <!-- <q-input
-        label="Email"
-        v-model="step.email"
-        outlined
-        type="textarea"
-        color="yellow"
-      /> -->
-      
-      <q-stepper-navigation>
-        <btn
-          :disable="currentstepids.includes(step.state)"
-          color="yellow"
-          label="Mark as sent"
-          shadow-color="orange"
-          shadow-strength="2"
-          @click="onclickmail(step.state)"
-        />
-        <btn
-          v-if="currentsteps.find(s => parseInt(s.info) === step.state)"
-          label="Delete"
-          color="red"
-          class="q-mx-md"
-          shadow-color="red"
-          shadow-strength="2"
-          @click="() => { deleteMail(currentsteps.find(m => parseInt(m.info) === step.state)!)}"
-        />
-      </q-stepper-navigation>
-    </q-step>
-  </q-stepper>
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-time
+                    v-model="date"
+                    mask="YYYY-MM-DD HH:mm"
+                    format24h
+                  >
+                    <div class="row items-center justify-end">
+                      <q-btn
+                        v-close-popup
+                        label="Close"
+                        color="primary"
+                        flat
+                      />
+                    </div>
+                  </q-time>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+          <div v-else>
+            <!-- <div> -->
+            Sent at {{ currentsteps.find(s => parseInt(s.info) === step.state)?.time ?? 'unknown time' }}
+            <!-- </div> -->
+          </div>
+          <!-- <q-input
+            label="Email"
+            v-model="step.email"
+            outlined
+            type="textarea"
+            color="yellow"
+          /> -->
+
+          <div v-if="step.states.length > 1">
+            <q-radio
+              v-for="state in step.states"
+              :key="state.value"
+              :model-value="selected"
+              :val="state"
+              :label="state.name"
+            />
+          </div>
+
+          <q-stepper-navigation>
+            <btn
+              :disable="currentstepids.includes(step.state)"
+              color="yellow"
+              label="Mark as sent"
+              shadow-color="orange"
+              shadow-strength="2"
+              @click="onclickmail()"
+            />
+
+            <btn
+              v-if="currentsteps.find(s => parseInt(s.info) === step.state)"
+              label="Delete"
+              color="red"
+              class="q-mx-md"
+              shadow-color="red"
+              shadow-strength="2"
+              @click="() => { deleteMail(currentsteps.find(m => parseInt(m.info) === step.state)) }"
+            />
+          </q-stepper-navigation>
+        </q-step>
+      </q-stepper>
+    </div>
+    <div class="col-6 q-pt-lg">
+      <q-list>
+        <q-item v-for="mail in this.mailStore.mails.get(student.id)" :key="mail.id">
+          <q-item-section>
+            <q-item-label >By {{mail.sender.firstName}} {{mail.sender.lastName}}</q-item-label>
+            <q-item-label v-if="mail.info" caption lines="2">{{mail.info}}</q-item-label>
+          </q-item-section>
+
+          <q-item-section side top>
+            <q-item-label caption>{{ mail.time }}</q-item-label>
+            <q-icon name="mdi-trash-can-outline" color="red" @click="deleteMail(mail)" />
+          </q-item-section>
+
+          <q-separator spaced inset />
+        </q-item>
+      </q-list>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -121,6 +155,7 @@ import {Student} from "../../../models/Student";
 import {Mail} from "../../../models/Mail";
 import {ref, Ref} from "vue";
 import {useMailStore} from "../../../stores/useMailStore";
+import approvalStates from "../../../models/ApprovalStates";
 
 enum ApprovalStates {
   Applied = 1,
@@ -152,8 +187,36 @@ export default defineComponent({
     const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
     const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     const dateTime = date + ' ' + time;
-    const statuses = [ApprovalStates.Applied, ApprovalStates.Awaiting, ApprovalStates.Approved, ApprovalStates.ContractConfirmed, ApprovalStates.ContractDeclined, ApprovalStates.Rejected]
-    const currentStep: Ref<ApprovalStates | undefined> = ref(undefined)
+    const statuses = approvalStates.map(state => state.value)
+
+    const steps = [
+      {
+        state: ApprovalStates.Applied,
+        icon: 'grade',
+        name: 'Applied',
+        states: approvalStates.filter(state => state.value === 1)
+      },
+      {
+        state: ApprovalStates.Awaiting,
+        name: 'Awaiting',
+        icon: 'schedule',
+        states: approvalStates.filter(state => state.value === 2)
+      },
+      {
+        state: ApprovalStates.Approved,
+        name: 'Approved/Rejected',
+        icon: 'check',
+        states: approvalStates.filter(state => state.value === 3 || state.value === 6)
+      },
+      {
+        state: ApprovalStates.ContractConfirmed,
+        name: 'Contract Confirmed/Declined',
+        icon: 'playlist_add_check',
+        states: approvalStates.filter(state => state.value === 4 || state.value === 5)
+      },
+    ]
+    const currentStep: Ref = ref(undefined)
+
     return {
       show: ref(true),
       removed: ref(false),
@@ -162,28 +225,8 @@ export default defineComponent({
       statuses,
       info: '',
       currentStep,
-      steps: [
-        {
-          state: ApprovalStates.Applied,
-          icon: 'grade',
-          name: 'Applied'
-        },
-        {
-          state: ApprovalStates.Awaiting,
-          name: 'Awaiting',
-          icon: 'schedule',
-        },
-        {
-          state: ApprovalStates.Approved,
-          name: 'Approved/Rejected',
-          icon: 'check',
-        },
-        {
-          state: ApprovalStates.ContractConfirmed,
-          name: 'Contract Confirmed/Declined',
-          icon: 'playlist_add_check',
-        },
-      ],
+      selected: ref({} as {name: string, value: number}),
+      steps: steps
     }
   },
   computed: {
@@ -201,17 +244,21 @@ export default defineComponent({
       return this.currentsteps.map(s => parseInt(s.info))
     },
   },
-  mounted() {
-    this.mailStore.getMails(this.student)
+  async mounted() {
+    await this.mailStore.getMails(this.student)
   },
   methods: {
+    adaptState(newState: any, oldState: any) {
+      this.selected = this.steps.filter(step => step.state === newState)[0].states[0]
+      console.log(newState)
+      console.log(oldState)
+    },
     async deleteMail(mail: Mail) {
       await this.mailStore.deleteMail(mail)
       await this.mailStore.getMails(this.student)
-
     },
-    onclickmail(status: number) {
-      this.info = status.toString();
+    onclickmail() {
+      this.info = this.selected.name;
       this.sendMail();
       if (this.currentStep) this.currentStep++;
     },
@@ -219,8 +266,11 @@ export default defineComponent({
       await this.mailStore.sendMail(this.student, this.date, this.info)
       await this.mailStore.getMails(this.student)
 
+      this.reset()
+    },
+    reset() {
+      this.date = (new Date()).toLocaleString()
       this.info = ''
-      this.resetDate()
     },
     stop() {
       this.removed = false
@@ -240,13 +290,6 @@ export default defineComponent({
         this.deleteMail(mail)
       }, 500)
       return
-    },
-
-    resetDate() {
-      const today = new Date();
-      const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-      const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      this.date = date + ' ' + time
     },
   }
 })
