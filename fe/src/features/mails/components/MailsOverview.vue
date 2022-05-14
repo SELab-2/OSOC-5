@@ -22,7 +22,7 @@
           :done="currentstepids.includes(step.state)"
         >
           <div
-            v-if="!currentsteps.find(s => parseInt(s.info) === step.state)"
+            v-if="!currentsteps().find(s => s.type === step.state)"
             class="q-gutter-sm"
           >
             <q-input
@@ -103,7 +103,7 @@
           </div>
           <div v-else>
             <!-- <div> -->
-            Sent at {{ currentsteps.find(s => parseInt(s.info) === step.state)?.time ?? 'unknown time' }}
+            Sent at {{ currentsteps().find(s => s.type === step.state)?.time ?? 'unknown time' }}
             <!-- </div> -->
           </div>
           <!-- <q-input
@@ -125,13 +125,18 @@
             />
 
             <btn
-              v-if="currentsteps.find(s => parseInt(s.info) === step.state)"
+              v-if="currentsteps().find(s => s.type === step.state)"
               label="Delete"
               color="red"
               class="q-mx-md"
               shadow-color="red"
               shadow-strength="2"
-              @click="() => { deleteMail(currentsteps.find(m => parseInt(m.info) === step.state)) }"
+              @click="() => { () => {
+                const mail = currentsteps().find(m => m.type === step.state)
+                if (mail !== undefined) {
+                  deleteMail(mail)
+                }
+              }}"
             />
           </q-stepper-navigation>
         </q-step>
@@ -139,19 +144,19 @@
     </div>
     <div class="col-6 q-pt-lg">
       <q-list>
-        <q-item v-for="mail in this.mailStore.mails.get(student.id)" :key="mail.id">
+        <q-item v-for="mail in mailStore.mails.get(student.id) ?? []" :key="mail.id">
           <q-item-section :avatar="mail.type !== null">
             <q-icon :name="approvalStates.filter(state => state.value === mail.type)[0]?.icon ?? ''" />
           </q-item-section>
 
           <q-item-section>
-            <q-item-label >By {{mail.sender.firstName}} {{mail.sender.lastName}}</q-item-label>
+            <q-item-label v-if="typeof(mail.sender) !== 'string'" >By {{mail.sender.firstName}} {{mail.sender.lastName}}</q-item-label>
             <q-item-label v-if="mail.info" caption lines="2">{{mail.info}}</q-item-label>
           </q-item-section>
 
           <q-item-section side top>
             <q-item-label caption>{{ mail.time }}</q-item-label>
-            <q-icon name="mdi-trash-can-outline" color="red" @click="deleteMail(mail)" />
+            <q-icon style="cursor: pointer" name="mdi-trash-can-outline" color="red" @click="deleteMail(mail)" />
           </q-item-section>
 
           <q-separator spaced inset />

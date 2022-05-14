@@ -183,7 +183,7 @@
                           type="textarea"
                         />
 
-                        <q-btn class="bg-yellow" @click="() => this.sendMail(props.row)" v-close-popup>
+                        <q-btn class="bg-yellow" @click="() => sendMail(props.row)" v-close-popup>
                           Send
                         </q-btn>
                       </div>

@@ -32,6 +32,8 @@ const mailsColumns = [
     },
     {
         name: 'sendMail',
+        label: '',
+        field: 'email',
         required: true,
     }
 ]
