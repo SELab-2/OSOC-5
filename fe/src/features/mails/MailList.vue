@@ -285,7 +285,7 @@ export default defineComponent({
       } else if (this.pagination.sortBy !== null) {
           filter.ordering = `${order}${this.pagination.sortBy}`
       }
-      if (this.statusFilter.length > 0) filter.status = this.statusFilter.join(',')
+      if (this.statusFilter && this.statusFilter.length > 0) filter.status = this.statusFilter.join(',')
 
       return filter
     }
