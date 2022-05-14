@@ -3,6 +3,7 @@ import {User} from "./User";
 export interface MailInterface {
     url: string
     id: number
+    type: number
     sender: string | User
     receiver: string | User
     time: string
@@ -12,6 +13,7 @@ export interface MailInterface {
 export class Mail implements MailInterface {
     id: number;
     info: string;
+    type: number;
     receiver: string | User;
     sender: string | User;
     time: string;
@@ -21,6 +23,7 @@ export class Mail implements MailInterface {
     constructor(
         id: number,
         info: string,
+        type: number,
         receiver: string | User,
         sender: string | User,
         time: string,
@@ -33,10 +36,11 @@ export class Mail implements MailInterface {
         } else {
             this.id = args[0]
             this.info = args[1]
-            this.receiver = args[2]
-            this.sender = args[3]
-            this.time = args[4]
-            this.url = args[5]
+            this.type = args[2]
+            this.receiver = args[3]
+            this.sender = args[4]
+            this.time = args[5]
+            this.url = args[6]
         }
     }
 }

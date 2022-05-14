@@ -212,7 +212,7 @@
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import {ref} from 'vue'
+import {Ref, ref} from 'vue'
 import {Student} from "../../models/Student";
 import {useQuasar} from "quasar";
 import status from "./Status";
@@ -297,7 +297,7 @@ export default defineComponent({
       this.info = ''
     },
     async sendMail(student: Student) {
-      await this.mailStore.sendMail(student, this.date, this.info)
+      await this.mailStore.sendMail(student, null, this.date, this.info)
       await this.mailStore.getMails(student)
     },
     async onRequest(props: any) {

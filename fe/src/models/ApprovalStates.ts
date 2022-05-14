@@ -1,31 +1,31 @@
 const approvalStates = [
     {
-        name: 'Applied',
+        label: 'Applied',
         value: 1,
         icon: 'grade',
     },
     {
-        name: 'Awaiting',
+        label: 'Awaiting',
         value: 2,
         icon: 'schedule',
     },
     {
-        name: 'Approved',
+        label: 'Approved',
         value: 3,
         icon: 'check',
     },
     {
-        name: 'Contract Confirmed',
+        label: 'Contract Confirmed',
         value: 4,
         icon: 'playlist_add_check',
     },
     {
-        name: 'Contract Declined',
+        label: 'Contract Declined',
         value: 5,
         icon: 'playlist_add_check',
     },
     {
-        name: 'Rejected',
+        label: 'Rejected',
         value: 6,
         icon: 'check',
     }

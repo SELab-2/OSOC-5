@@ -21,68 +21,93 @@
           :icon="step.icon"
           :done="currentstepids.includes(step.state)"
         >
-          <q-input
+          <div
             v-if="!currentsteps.find(s => parseInt(s.info) === step.state)"
-            v-model="date"
-            outlined
-            style="width: fit-content"
-            :disable="currentstepids.includes(step.state)"
+            class="q-gutter-sm"
           >
-            <template #prepend>
-              <q-icon
-                name="event"
-                class="cursor-pointer"
-              >
-                <q-popup-proxy
-                  cover
-                  transition-show="scale"
-                  transition-hide="scale"
+            <q-input
+              v-model="date"
+              outlined
+              style="width: fit-content"
+              :disable="currentstepids.includes(step.state)"
+            >
+              <template #prepend>
+                <q-icon
+                  name="event"
+                  class="cursor-pointer"
                 >
-                  <q-date
-                    v-model="date"
-                    mask="YYYY-MM-DD HH:mm"
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
                   >
-                    <div class="row items-center justify-end">
-                      <q-btn
-                        v-close-popup
-                        label="Close"
-                        color="primary"
-                        flat
-                      />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
+                    <q-date
+                      v-model="date"
+                      mask="YYYY-MM-DD HH:mm"
+                    >
+                      <div class="row items-center justify-end">
+                        <q-btn
+                          v-close-popup
+                          label="Close"
+                          color="primary"
+                          flat
+                        />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
 
-            <template #append>
-              <q-icon
-                name="access_time"
-                class="cursor-pointer"
-              >
-                <q-popup-proxy
-                  cover
-                  transition-show="scale"
-                  transition-hide="scale"
+              <template #append>
+                <q-icon
+                  name="access_time"
+                  class="cursor-pointer"
                 >
-                  <q-time
-                    v-model="date"
-                    mask="YYYY-MM-DD HH:mm"
-                    format24h
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
                   >
-                    <div class="row items-center justify-end">
-                      <q-btn
-                        v-close-popup
-                        label="Close"
-                        color="primary"
-                        flat
-                      />
-                    </div>
-                  </q-time>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
+                    <q-time
+                      v-model="date"
+                      mask="YYYY-MM-DD HH:mm"
+                      format24h
+                    >
+                      <div class="row items-center justify-end">
+                        <q-btn
+                          v-close-popup
+                          label="Close"
+                          color="primary"
+                          flat
+                        />
+                      </div>
+                    </q-time>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+            <q-input
+              label="Info"
+              v-model="info"
+              filled
+              type="textarea"
+            />
+
+            <div v-if="step.states.length > 1">
+              <q-option-group
+                :options="step.states"
+                v-model="selected"
+                type="group"
+              />
+<!--              <q-radio-->
+<!--                v-for="state in step.states"-->
+<!--                :key="state.value"-->
+<!--                :model-value="selected"-->
+<!--                :val="state"-->
+<!--                :label="state.name"-->
+<!--              />-->
+            </div>
+          </div>
           <div v-else>
             <!-- <div> -->
             Sent at {{ currentsteps.find(s => parseInt(s.info) === step.state)?.time ?? 'unknown time' }}
@@ -95,16 +120,6 @@
             type="textarea"
             color="yellow"
           /> -->
-
-          <div v-if="step.states.length > 1">
-            <q-radio
-              v-for="state in step.states"
-              :key="state.value"
-              :model-value="selected"
-              :val="state"
-              :label="state.name"
-            />
-          </div>
 
           <q-stepper-navigation>
             <btn
@@ -132,6 +147,10 @@
     <div class="col-6 q-pt-lg">
       <q-list>
         <q-item v-for="mail in this.mailStore.mails.get(student.id)" :key="mail.id">
+          <q-item-section :avatar="mail.type !== null">
+            <q-icon :name="approvalStates.filter(state => state.value === mail.type)[0]?.icon ?? ''" />
+          </q-item-section>
+
           <q-item-section>
             <q-item-label >By {{mail.sender.firstName}} {{mail.sender.lastName}}</q-item-label>
             <q-item-label v-if="mail.info" caption lines="2">{{mail.info}}</q-item-label>
@@ -216,32 +235,33 @@ export default defineComponent({
       },
     ]
     const currentStep: Ref = ref(undefined)
+    const type: Ref<number|null> = ref(null)
 
     return {
       show: ref(true),
       removed: ref(false),
       date: ref(dateTime),
+      type: type,
       timeout,
       statuses,
       info: '',
       currentStep,
-      selected: ref({} as {name: string, value: number}),
+      approvalStates,
+      selected: ref(null as {label: string, value: number}|null),
       steps: steps
     }
   },
   computed: {
     currentsteps() {
       if (!this.mailStore.mails.has(this.student.id)) return []
-      const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => {
-        return this.statuses.includes(parseInt(mail.info))
-      })
+      const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => mail.type !== null)
       if (!this.currentStep) {
-        this.currentStep = this.statuses.find(s => !data.map(d=>parseInt(d.info)).includes(s))
+        this.currentStep = this.statuses.find(s => !data.map(d=> d.type ).includes(s))
       }
       return data
     },
     currentstepids() {
-      return this.currentsteps.map(s => parseInt(s.info))
+      return this.currentsteps.map(s => s.type)
     },
   },
   async mounted() {
@@ -250,25 +270,29 @@ export default defineComponent({
   methods: {
     adaptState(newState: any, oldState: any) {
       this.selected = this.steps.filter(step => step.state === newState)[0].states[0]
-      console.log(newState)
-      console.log(oldState)
     },
     async deleteMail(mail: Mail) {
       await this.mailStore.deleteMail(mail)
       await this.mailStore.getMails(this.student)
     },
     onclickmail() {
-      this.info = this.selected.name;
-      this.sendMail();
-      if (this.currentStep) this.currentStep++;
+      if (this.selected) {
+        this.type = this.selected.value;
+        if (this.info) this.info = this.selected.label + ': ' + this.info
+        else this.info = this.selected.label
+
+        this.sendMail();
+        if (this.currentStep) this.currentStep++;
+      }
     },
     async sendMail() {
-      await this.mailStore.sendMail(this.student, this.date, this.info)
+      await this.mailStore.sendMail(this.student, this.type, this.date, this.info)
       await this.mailStore.getMails(this.student)
 
       this.reset()
     },
     reset() {
+      this.type = null
       this.date = (new Date()).toLocaleString()
       this.info = ''
     },
