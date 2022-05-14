@@ -243,8 +243,8 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         Student.objects.all().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['get'], 
-            filter_backends=[filters.SearchFilter, DjangoFilterBackend, 
+    @action(detail=False, methods=['get'],
+            filter_backends=[filters.SearchFilter, DjangoFilterBackend,
             StudentOnProjectFilter, StudentSuggestedByUserFilter, MultipleStatusFilter])
     def count(self, request):
         """
