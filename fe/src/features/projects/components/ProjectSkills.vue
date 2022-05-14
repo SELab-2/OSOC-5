@@ -46,7 +46,7 @@
         v-model:skill="editSkill"
       />
 
-    <SkillTable :filter-skills="filterSkills" v-model:editSkill="editSkill" />
+    <SkillTable :filter-skills="filterSkills" v-model:editSkill="editSkill" v-model:showDialog="showDialog" />
   </div>
 </template>
 
@@ -92,13 +92,10 @@ export default defineComponent ({
   watch: {
     showDialog(newValue) {
       // newValue false means the popup closed
-      if (!newValue) {
+      if (!newValue && this.editSkill) {
         this.editSkill.id > 0 ? this.updateSkill() : this.addSkill()
       }
     },
-    editSkill(newValue) {
-      if (!this.showDialog) this.showDialog = true
-    }
   }
 })
 </script>

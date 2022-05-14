@@ -2,16 +2,19 @@
   <q-dialog
     v-model="_visible"
     persistent
+    
   >
-  <q-card class="create-skill-popup">
+  <q-card class="create-skill-popup column" style="min-width: 400px; align-items: center;
+  justify-content: center;">
     <q-card-section>
       <div class="text-h6">
-        {{ `${_skill.id === -1 ? 'New' : 'Edit'} Skill`  }}
+        {{ `${_skill.id === -1 ? 'New' : 'Edit'} Skill` }}
       </div>
     </q-card-section>
 
-    <q-card-section class="q-pt-none">
+    
       <q-input
+        style="width: 90%;"
         v-model="_skill.name"
         outlined
         autofocus
@@ -22,18 +25,26 @@
           (val) => (val && val.length > 0) || 'Enter the name of the skill.',
         ]"
       />
-    </q-card-section>
+    
     <q-card-section>
-      <div class="row">
+      <div class="row" style="max-width: 230px">
         <q-chip
           v-for="color in quasarColors"
           :key="color"
           @click="_skill.color = color"
+          outline
           clickable
-          :color="`${color}-8`"
-          :class="`bg-${color}-4`"
-          :style="`height: 25px; width:25px; border-radius: 50%; margin-right: 15px`"
+          :color="`${color}-${_skill.color === color ? 8 : 4}`"
+          :class="`bg-${color}-${_skill.color === color ? 4 : 1}`"
+          style="border-width: 1.5px;"
+        >
+        <div 
+          v-if="_skill.color === color" 
+          class="bg-white" 
+          style="width: 8px; height: 8px; border-radius: 30px; position: absolute; margin-left: auto;margin-right: auto;left: 0;right: 0;"
         />
+        </q-chip>
+
       </div>
     </q-card-section>
     <q-card-actions
@@ -45,7 +56,7 @@
         flat
         label="Cancel"
         glow-color="#C0FFF4"
-        @click="() => { _skill = backup; _visible = false }"
+        @click="() => { $nextTick(() => {$emit('update:skill', backup)}); _visible = false }"
       />
       <btn
         v-close-popup
@@ -83,12 +94,13 @@ export default defineComponent({
       quasarColors,
     }
   },
+
   computed: {
     _skill: {
       get(): Skill | null {
         if (this.skill) return this.skill
         this.$emit('update:skill', new Skill('', -1, '', ''))
-        return new Skill('', -1, '', '') // New skill that will removed directly after
+        return new Skill('', -1, '', '')
       },
       set(n) {
         this.$emit('update:skill', n)

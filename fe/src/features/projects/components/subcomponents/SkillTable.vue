@@ -25,62 +25,24 @@
           :props="props"
           auto-width
         >
-          <q-tooltip anchor="center middle">
-            Click to edit
-          </q-tooltip>
-          {{ props.row.amount }}
-          <q-popup-edit
+          <q-input
+            borderless
+            type="number"
             v-slot="scope"
             v-model.number="props.row.amount"
-            buttons
-            label-set="Save"
-            label-cancel="Close"
-            :validate="amountRangeValidation"
-          >
-            <q-input
-              v-model.number="scope.value"
-              type="number"
-              hint="Enter a positive number."
-              :error="errorSkillAmount"
-              :error-message="errorMessageSkillAmount"
-              dense
-              autofocus
-              borderless
-              @keyup.enter="scope.set"
-            />
-          </q-popup-edit>
+            min="0"
+          />
         </q-td>
         <q-td
           key="comment"
           :props="props"
         >
-          <q-tooltip anchor="center middle">
-            Click to edit
-          </q-tooltip>
-          <div v-if="props.row.comment.length !== 0">
-            {{ props.row.comment }}
-          </div>
-          <div
-            v-else
-            style="font-style: italic; color: gray"
-          >
-            Click to add comment.
-          </div>
-          <q-popup-edit
-            v-slot="scope"
+          <q-input
             v-model="props.row.comment"
-            buttons
-          >
-            <q-input
-              v-model="scope.value"
-              type="text"
-              autogrow
-              autofocus
-              counter
-              borderless
-              @keyup.enter.stop
-            />
-          </q-popup-edit>
+            borderless
+            type="text"
+            placeholder="Click to add comment."
+          />
         </q-td>
         <q-td
           key="color"
@@ -103,7 +65,7 @@
             style="color: #3d3d3d"
             icon="mdi-pencil-outline"
             glow-color="grey-5"
-            @click="_editSkill = props.row"
+            @click="_editSkill = props.row; $emit('update:showDialog', true)"
           />
         </q-td>
         <q-td
@@ -123,17 +85,6 @@
     </template>
   </q-table>
 
-  <q-dialog
-    :model-value="editSkillDialog"
-    class="full-width"
-    persistent
-  >
-    <NewSkillDialog
-      dialog-title="Edit skill"
-      submit-text="Update skill"
-      :callback="() => (editSkillDialog = false)"
-    />
-  </q-dialog>
   <q-dialog
     class="full-width"
     :model-value="deleteSkill !== -1"
@@ -165,6 +116,10 @@ export default defineComponent({
     editSkill: {
       type: Skill,
       required: true
+    },
+    showDialog: {
+      type: Boolean,
+      required: true
     }
   },
   setup() {
@@ -177,9 +132,6 @@ export default defineComponent({
     const errorSkillAmount = ref(false)
     const errorMessageSkillAmount = ref('')
 
-    // variables for the new skill dialog popup
-    const editSkillDialog = ref(false)
-
     return {
       skillStore,
       deleteSkill,
@@ -187,7 +139,6 @@ export default defineComponent({
       errorSkillAmount,
       errorMessageSkillAmount,
       deleteSkillName,
-      editSkillDialog,
     }
   },
   methods: {
@@ -219,7 +170,7 @@ export default defineComponent({
       set(n) {
         this.$emit('update:editSkill', n)
       }
-    }
+    },
   }
 })
 </script>
