@@ -176,8 +176,8 @@
               :key="student.email"
 
               class="q-ma-sm"
-              :draggable="draggable"
-              :must-hover="mustHover"
+              :draggable="onProjectsPage"
+              :must-hover="onProjectsPage"
               :student="student"
               :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
               @click="$router.push(`/students/${student.id}`)"
@@ -213,6 +213,8 @@
           color="yellow"
           :icon="!miniState? 'chevron_left' : 'chevron_right'"
           @click="miniState = !miniState"
+          :style="`transform: translate(${showDrawer ? 0 : -50}%)`"
+          style="transition: translate ease 500ms;"
         />
       </div>
     </q-drawer>
@@ -237,23 +239,6 @@ export default defineComponent({
     SegmentedControl,
   },
   name: 'SideBar',
-  props: {
-    clickable: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    draggable: {
-      type: Boolean,
-      required: false,
-      default: true
-    },
-    mustHover: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  },
   setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
@@ -291,6 +276,12 @@ export default defineComponent({
     this.skillStore.loadSkills()
   },
   computed: {
+    onProjectsPage(): boolean {
+      return this.$route.name === "Projects"
+    },
+    onStudentsPage(): boolean {
+      return this.$route.name === "Students" || this.$route.name === "Student Page";
+    },
     filters() {
       let filter = {} as {
         search: string
@@ -314,8 +305,8 @@ export default defineComponent({
 
       return filter
     },
-    showDrawer() {
-      return this.$route.name === "Students" || this.$route.name === "Projects" || this.$route.name === "Student Page";
+    showDrawer(): boolean {
+      return this.onProjectsPage || this.onStudentsPage
     }
   },
   methods: {
