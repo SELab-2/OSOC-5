@@ -87,7 +87,7 @@ export const useMailStore = defineStore('user/mail', {
                     )
                 })
 
-            this.isLoading = true
+            this.isLoading = false
         },
         async updateStatus(student: Student) {
             await instance.patch(`students/${student.id}/`, {
