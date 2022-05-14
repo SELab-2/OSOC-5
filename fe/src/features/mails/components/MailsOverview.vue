@@ -87,25 +87,18 @@
               </template>
             </q-input>
             <q-input
-              label="Info"
               v-model="info"
+              label="Info"
               filled
               type="textarea"
             />
 
             <div v-if="step.states.length > 1">
               <q-option-group
-                :options="step.states"
                 v-model="selected"
+                :options="step.states"
                 type="group"
               />
-<!--              <q-radio-->
-<!--                v-for="state in step.states"-->
-<!--                :key="state.value"-->
-<!--                :model-value="selected"-->
-<!--                :val="state"-->
-<!--                :label="state.name"-->
-<!--              />-->
             </div>
           </div>
           <div v-else>
@@ -247,7 +240,7 @@ export default defineComponent({
       info: '',
       currentStep,
       approvalStates,
-      selected: ref(null as {label: string, value: number}|null),
+      selected: ref(0),
       steps: steps
     }
   },
@@ -269,7 +262,7 @@ export default defineComponent({
   },
   methods: {
     adaptState(newState: any, oldState: any) {
-      this.selected = this.steps.filter(step => step.state === newState)[0].states[0]
+      this.selected = this.steps.filter(step => step.state === newState)[0].states[0].value
     },
     async deleteMail(mail: Mail) {
       await this.mailStore.deleteMail(mail)
@@ -277,9 +270,11 @@ export default defineComponent({
     },
     onclickmail() {
       if (this.selected) {
-        this.type = this.selected.value;
-        if (this.info) this.info = this.selected.label + ': ' + this.info
-        else this.info = this.selected.label
+        this.type = this.selected
+
+        const label = approvalStates.filter(state => state.value === this.selected)[0].label
+        if (this.info) this.info = label + ': ' + this.info
+        else this.info = label
 
         this.sendMail();
         if (this.currentStep) this.currentStep++;
