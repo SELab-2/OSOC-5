@@ -14,19 +14,20 @@
     "@quasar/extras": "^1.13.5",
     "@quasar/vite-plugin": "^1.0.9",
     "@types/node": "^17.0.31",
+    "@types/qs": "^6.9.7",
     "@vitejs/plugin-vue": "^2.3.1",
     "@yeger/vue-masonry-wall": "3.0.26",
     "axios": "^0.26.1",
     "pinia": "^2.0.13",
     "pinia-plugin-persistedstate": "^1.5.1",
     "qs": "^6.10.3",
-    "@types/qs": "^6.9.7",
     "quasar": "^2.6.5",
     "vite": "^2.8.6",
     "vue": "^3.2.33",
     "vue-meta": "^2.4.0",
     "vue-router": "^4.0.14",
-    "vue-tsc": "^0.33.9"
+    "vue-tsc": "^0.33.9",
+    "vue3-lottie": "^2.1.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
