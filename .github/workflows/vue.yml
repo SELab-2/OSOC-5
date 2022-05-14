@@ -8,6 +8,9 @@ on:
       - 'fe/src/**/*.js'
       - 'fe/src/**/*.ts'
       - 'fe/src/**/*.vue'
+      - 'fe/tests/**/*.js'
+      - 'fe/tests/**/*.ts'
+      - 'fe/tests/**/*.vue'
 
 jobs:
   vue:
