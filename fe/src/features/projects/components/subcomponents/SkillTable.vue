@@ -103,7 +103,7 @@
             style="color: #3d3d3d"
             icon="mdi-pencil-outline"
             glow-color="grey-5"
-            @click="editSkill(props.row)"
+            @click="_editSkill = props.row"
           />
         </q-td>
         <q-td
@@ -149,7 +149,7 @@
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-core'
 import { ref } from 'vue'
-import { ProjectTableSkill } from '../../../../models/Skill'
+import { ProjectTableSkill, Skill } from '../../../../models/Skill'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import columnsSkills from '../../../../models/ProjectSkillsColumns'
 import DeleteSkillDialog from './DeleteSkillDialog.vue'
@@ -162,6 +162,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    editSkill: {
+      type: Skill,
+      required: true
+    }
   },
   setup() {
     const skillStore = useSkillStore()
@@ -191,12 +195,6 @@ export default defineComponent({
       this.deleteSkill = skill.id
       this.deleteSkillName = skill.name
     },
-    editSkill(skill: ProjectTableSkill) {
-      this.editSkillDialog = true
-      this.skillStore.popupID = skill.id
-      this.skillStore.popupName = skill.name
-      this.skillStore.popupColor = skill.color
-    },
     amountRangeValidation(val: number) {
       if (val < 0) {
         this.errorSkillAmount = true
@@ -213,6 +211,16 @@ export default defineComponent({
       )
     },
   },
+  computed: {
+    _editSkill: {
+      get() {
+        return this.editSkill
+      },
+      set(n) {
+        this.$emit('update:editSkill', n)
+      }
+    }
+  }
 })
 </script>
 <style scoped lang="sass"></style>

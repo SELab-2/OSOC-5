@@ -4,7 +4,7 @@
       Basic Info
     </div>
     <q-input
-      v-model="projectStore.projectName"
+      v-model="_name"
       outlined
       label="Project name"
       lazy-rules
@@ -16,7 +16,7 @@
       ]"
     />
     <q-input
-      v-model="projectStore.projectPartnerName"
+      v-model="_partnerName"
       outlined
       label="Partner name"
       lazy-rules
@@ -28,7 +28,7 @@
       ]"
     />
     <q-input
-      v-model="projectStore.projectLink"
+      v-model="_info"
       outlined
       label="Project URL"
       lazy-rules
@@ -47,12 +47,45 @@ import { defineComponent } from '@vue/runtime-core'
 import { useProjectStore } from '../../../stores/useProjectStore'
 
 export default defineComponent({
-  setup() {
-    const projectStore = useProjectStore()
-
-    return {
-      projectStore,
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    partnerName: {
+      type: String,
+      required: true
+    },
+    info: {
+      type: String,
+      required: false
     }
   },
+  computed: {
+    _name: {
+      get(): string {
+        return this.name
+      },
+      set(n: string) {
+        this.$emit('update:name', n)
+      }
+    },
+    _partnerName: {
+      get(): string {
+        return this.partnerName
+      },
+      set(n: string) {
+        this.$emit('update:partnerName', n)
+      }
+    },
+    _info: {
+      get(): string {
+        return this.info
+      },
+      set(n: string) {
+        this.$emit('update:info', n)
+      }
+    }
+  }
 })
 </script>

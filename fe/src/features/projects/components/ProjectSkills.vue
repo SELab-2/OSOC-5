@@ -13,7 +13,7 @@
         label="Add skill"
         shadow-strength="2"
         glow-color="#00F1AF"
-        @click="openDialog"
+        @click="showDialog = true"
       />
       <q-space />
       <q-input
@@ -41,19 +41,12 @@
         </template>
       </q-input>
     </div>
-
-    <q-dialog
-      v-model="newSkillPrompt"
-      persistent
-    >
       <NewSkillDialog
-        dialog-title="Create a new skill"
-        submit-text="Add skill"
-        :callback="() => newSkillPrompt = false"
+        v-model="showDialog"
+        v-model:skill="editSkill"
       />
-    </q-dialog>
 
-    <SkillTable :filter-skills="filterSkills" />
+    <SkillTable :filter-skills="filterSkills" v-model:editSkill="editSkill" />
   </div>
 </template>
 
@@ -63,32 +56,49 @@ import { ref } from "vue";
 import SkillTable from "./subcomponents/SkillTable.vue";
 import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
 import { useSkillStore } from "../../../stores/useSkillStore";
-
+import { Skill } from "../../../models/Skill"
 export default defineComponent ({
   components: {NewSkillDialog, SkillTable},
-  setup() {
-
-    const skillStore = useSkillStore()
-
-    // Filters
-    const filterSkills = ref('')
-
-    // variables for the new skill dialog popup
-    const newSkillPrompt = ref(false)
-
+  data() {
+    let editSkill: Ref<Skill | null> = ref(null)
     return {
-      skillStore,
-      filterSkills,
-      newSkillPrompt,
-
-      openDialog(){
-        newSkillPrompt.value = true;
-        skillStore.popupName = ''
-        skillStore.popupColor = ''
-        skillStore.popupID = -1
-
-      },
+      skillStore: useSkillStore(),
+      filterSkills: ref(''),
+      newSkillPrompt: ref(false),
+      editSkill,
+      showDialog: ref(false)
     }
   },
+  methods: {
+    addSkill() {
+      this.skillStore.addSkill(this.editSkill, (success: boolean) => {
+        this.$q.notify({
+          icon: success ? 'done' : 'close',
+          color: success ? 'positive' : 'negative',
+          message: success ? 'Success' : 'Failed'
+        })
+      })
+    },
+    updateSkill() {
+      this.skillStore.updateSkill(this.editSkill, () => {
+        this.$q.notify({
+          icon: 'close',
+          color: 'negative',
+          message: 'Failed to update'
+        })
+      })
+    }
+  },
+  watch: {
+    showDialog(newValue) {
+      // newValue false means the popup closed
+      if (!newValue) {
+        this.editSkill.id > 0 ? this.updateSkill() : this.addSkill()
+      }
+    },
+    editSkill(newValue) {
+      if (!this.showDialog) this.showDialog = true
+    }
+  }
 })
 </script>

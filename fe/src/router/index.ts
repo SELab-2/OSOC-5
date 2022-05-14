@@ -7,6 +7,7 @@ import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
 import EditProject from '../features/projects/EditProject.vue'
 import CreateProjects from '../features/projects/CreateProject.vue'
+import CreateProject from '../features/projects/CreateProject2.vue'
 import UserList from '../features/users/UserList.vue'
 import MailList from '../features/mails/MailList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
@@ -69,6 +70,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: CreateProjects,
+      },
+      {
+        path: '/projects/create2',
+        name: 'Create Project',
+        meta: {
+          requiresAuth: true,
+        },
+        component: CreateProject,
       },
       {
         path: '/users',

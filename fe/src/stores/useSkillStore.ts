@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
-import { ProjectTableSkill, Skill, TempProjectSkill } from '../models/Skill'
+import { ProjectTableSkill, Skill, TempProjectSkill, ProjectSkill } from '../models/Skill'
 import { User } from '../models/User'
 
 interface State {
-  skills: Array<ProjectTableSkill>
+  skills: Array<Skill>
   isLoadingSkills: boolean
   popupName: string
   popupColor: string
@@ -71,60 +71,28 @@ export const useSkillStore = defineStore('skills', {
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async addSkill(callback: any) {
-      // Process the new skill
-      if (
-        this.popupName &&
-        this.popupName.length > 0 &&
-        this.popupColor.length > 0
-      ) {
-        if (this.popupID >= 0) {
-          // skill already exists so we update it
-          instance
-            .patch(`skills/${this.popupID}/`, {
-              name: this.popupName,
-              color: this.popupColor,
-            })
-            .then(() => {
-              for (const skill of this.skills) {
-                if (skill.id === this.popupID) {
-                  skill.color = this.popupColor
-                  skill.name = this.popupName
-                }
-              }
-
-              return callback(0)
-            })
-            .catch(() => callback(1))
-        } else {
-          // make new skill
-          instance
-            .post('skills/', {
-              name: this.popupName,
-              color: this.popupColor,
-            })
-            .then((response) => {
-              // ON SUCCESS ADD THIS TO THE LOCAL STORE
-              this.skills.push({
-                name: response['data']['name'],
-                amount: 0,
-                url: response['data']['url'],
-                color: response['data']['color'],
-                id: response['data']['id'],
-                comment: '',
-              })
-              // When finished run the callback so the popup closes.
-              callback(0)
-            })
-            .catch(() => {
-              this.isLoadingSkills = false
-              callback(1)
-            })
-        }
-      } else {
-        callback(2)
+    async addSkill(skill: Skill, callback: Function) {
+      try {
+        const { data } = await instance.post<Skill>('skills/', {
+          name: skill.name,
+          color: skill.color,
+        })
+        this.skills.push(data)
+        callback(true)
+      } catch (e) {
+        callback(false)
       }
     },
+    
+    async updateSkill(skill: Skill, callback: Function) {
+      try {
+        await instance.patch(`skills/${skill.id}/`, skill)
+      } catch(e) {
+        // Should put the previous value back
+        callback()
+      }
+    },
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async deleteSkill(deletedSkillId: number, callback: any) {
       // delete in database
