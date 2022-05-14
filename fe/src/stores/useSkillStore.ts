@@ -24,50 +24,22 @@ export const useSkillStore = defineStore('skills', {
     async getSkill(url: string): Promise<Skill> {
       const skill = this.skills.find((skill) => skill.url === url)
       if (skill) return skill
-      const { data } = await instance.get<ProjectTableSkill>(url)
+      const { data } = await instance.get<Skill>(url)
 
       // Check again if not present, it could be added in the meantime.
       const skill2 = this.skills.find((skill) => skill.url === url)
       if (skill2) return skill2
 
       const newSkill = new Skill(data)
-      this.skills.push({
-        name: newSkill.name,
-        amount: 0,
-        url: newSkill.url,
-        color: newSkill.color,
-        id: newSkill.id,
-        comment: '',
-      })
+      this.skills.push(newSkill)
       return newSkill
     },
     /*
      * SKILLS
      */
     async loadSkills() {
-      // start the loading animation
-      this.isLoadingSkills = true
-      this.skills = []
-      // console.log('LOAD SKILLS')
-      return instance
-        .get('skills/?page_size=500')
-        .then(({ data }) => {
-          // set the skill of the store
-          for (const skill of data['results'] as Skill[]) {
-            this.skills.push({
-              name: skill.name,
-              amount: 0,
-              url: skill.url,
-              color: skill.color,
-              id: skill.id,
-              comment: '',
-            })
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-        .finally(() => (this.isLoadingSkills = false))
+      const { results } = (await instance.get<{ results: Skill[] }>('skills/?page_size=500')).data
+      this.skills = results.map(skill => new Skill(skill.name, skill.id, skill.color, skill.url))
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

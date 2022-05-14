@@ -47,7 +47,6 @@
 				:name="3"
 				title="Skills"
 				icon="assignment"
-				
 			>
 				<ProjectSkills/>
 			</q-step>
