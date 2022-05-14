@@ -246,16 +246,8 @@ export default defineComponent({
     }
   },
   computed: {
-    currentsteps() {
-      if (!this.mailStore.mails.has(this.student.id)) return []
-      const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => mail.type !== null)
-      if (!this.currentStep) {
-        this.currentStep = this.statuses.find(s => !data.map(d=> d.type ).includes(s))
-      }
-      return data
-    },
     currentstepids() {
-      return this.currentsteps.map(
+      return this.currentsteps().map(
         mail => {
           const type = mail.type
           if (type === 2 || type === 5) return 2
@@ -317,6 +309,14 @@ export default defineComponent({
         this.deleteMail(mail)
       }, 500)
       return
+    },
+    currentsteps() {
+      if (!this.mailStore.mails.has(this.student.id)) return []
+      const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => mail.type !== null)
+      if (!this.currentStep) {
+        this.currentStep = this.statuses.find(s => !data.map(d=> d.type ).includes(s))
+      }
+      return data
     },
   }
 })
