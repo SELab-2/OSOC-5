@@ -95,9 +95,9 @@
 
             <div v-if="step.states.length > 1">
               <q-option-group
-                v-model="selected"
                 :options="step.states"
-                type="group"
+                type="radio"
+                v-model="selected"
               />
             </div>
           </div>
@@ -170,12 +170,12 @@ import {useMailStore} from "../../../stores/useMailStore";
 import approvalStates from "../../../models/ApprovalStates";
 
 enum ApprovalStates {
-  Applied = 1,
-  Awaiting = 2,
-  Approved = 3,
-  ContractConfirmed = 4,
-  ContractDeclined = 5,
-  Rejected = 6
+  Applied = 0,
+  Awaiting = 1,
+  Approved = 2,
+  ContractConfirmed = 3,
+  ContractDeclined = 4,
+  Rejected = 5
 }
 
 export default defineComponent({
@@ -206,25 +206,25 @@ export default defineComponent({
         state: ApprovalStates.Applied,
         icon: 'grade',
         name: 'Applied',
-        states: approvalStates.filter(state => state.value === 1)
+        states: approvalStates.filter(state => state.value === 0)
       },
       {
         state: ApprovalStates.Awaiting,
         name: 'Awaiting',
         icon: 'schedule',
-        states: approvalStates.filter(state => state.value === 2)
+        states: approvalStates.filter(state => state.value === 1)
       },
       {
         state: ApprovalStates.Approved,
         name: 'Approved/Rejected',
         icon: 'check',
-        states: approvalStates.filter(state => state.value === 3 || state.value === 6)
+        states: approvalStates.filter(state => state.value === 2 || state.value === 5)
       },
       {
         state: ApprovalStates.ContractConfirmed,
         name: 'Contract Confirmed/Declined',
         icon: 'playlist_add_check',
-        states: approvalStates.filter(state => state.value === 4 || state.value === 5)
+        states: approvalStates.filter(state => state.value === 3 || state.value === 4)
       },
     ]
     const currentStep: Ref = ref(undefined)
@@ -240,7 +240,7 @@ export default defineComponent({
       info: '',
       currentStep,
       approvalStates,
-      selected: ref(0),
+      selected: ref(null),
       steps: steps
     }
   },
