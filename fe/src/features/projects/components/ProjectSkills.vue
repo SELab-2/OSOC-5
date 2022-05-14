@@ -15,7 +15,16 @@
         glow-color="#00F1AF"
         @click="showDialog = true"
       />
+      
       <q-space />
+        <btn
+          size="sm"
+          color="primary"
+          icon="mdi-pencil-outline"
+          shadow-strength="2"
+          glow-color="#00F1AF"
+          @click="showEditIcons = !showEditIcons"
+        />
       <q-input
         v-model="filterSkills"
         style="max-width: 190px"
@@ -41,6 +50,48 @@
         </template>
       </q-input>
     </div>
+    
+    <div class="row no-wrap justify-between">
+     <div style="width: 40%; float:left">
+       <div class="text-h6">Selected Skills</div>
+       <create-project-chip
+       v-for="skill in projectSkills"
+        :key="skill.skill.id"
+        :skill="skill"
+        />
+       
+     </div>
+     <q-splitter/>
+    <div style="width: 40%; float: right; text-align: right">
+      <div class="text-h6">Available Skills</div>
+      <q-chip 
+        v-for="skill in skillStore.skills"
+        :key="skill.id"
+        v-show="!projectSkills.some(s => s.skill.id === skill.id)"
+        outline
+        clickable
+        :color="`${skill.color}-4`"
+        :class="`bg-${skill.color}-1`"
+        style="border-width: 1.5px;"
+        @click="addSkillToProject(skill)"
+      >
+        <div>
+          <span class="text-subtitle1 text-black">{{ skill.name }}</span>
+          <btn
+            v-if="showEditIcons"
+            flat
+            round
+            style="color: #3d3d3d"
+            icon="mdi-pencil-outline"
+            glow-color="grey-5"
+            @click="editSkill = skill; showDialog=true"
+          />
+        </div>
+        
+      </q-chip>
+    </div>
+    </div>
+    
       <NewSkillDialog
         v-model="showDialog"
         v-model:skill="editSkill"
@@ -56,9 +107,11 @@ import { ref } from "vue";
 import SkillTable from "./subcomponents/SkillTable.vue";
 import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
 import { useSkillStore } from "../../../stores/useSkillStore";
-import { Skill } from "../../../models/Skill"
+import { Skill, ProjectSkill } from "../../../models/Skill"
+import ProjectRoleChip from "./ProjectRoleChip"
+import CreateProjectChip from "./createprojectchip.vue"
 export default defineComponent ({
-  components: {NewSkillDialog, SkillTable},
+  components: {NewSkillDialog, SkillTable,CreateProjectChip},
   data() {
     let editSkill: Ref<Skill | null> = ref(null)
     return {
@@ -66,10 +119,19 @@ export default defineComponent ({
       filterSkills: ref(''),
       newSkillPrompt: ref(false),
       editSkill,
-      showDialog: ref(false)
+      showDialog: ref(false),
+      projectSkills: ref([]),
+      showEditIcons: ref(false)
     }
   },
   methods: {
+    addSkillToProject(skill: Skill) {
+      this.projectSkills.push(new ProjectSkill(0, '', skill))
+    },
+    removeSkillFromProject(skill: Skill) {
+      const i = this.projectSkills.findIndex(s => s.skill.id === skill.id)
+      this.projectSkills.slice(i,1)
+    },
     addSkill() {
       this.skillStore.addSkill(this.editSkill, (success: boolean) => {
         this.$q.notify({
@@ -96,6 +158,20 @@ export default defineComponent ({
         this.editSkill.id > 0 ? this.updateSkill() : this.addSkill()
       }
     },
+  },
+  computed: {
+    selectedSkills: {
+      get() {
+        return this.projectSkills.map(s => s.skill)
+      },
+      set(n) {
+        console.log(n)
+        const oldSkills = this.projectSkills.map(s => s.skill)
+        n.filter(s => !oldSkills.includes(s)).forEach(s => {
+          this.projectSkills.push(new ProjectSkill(0, '', s))
+        })
+      }
+    }
   }
 })
 </script>
