@@ -40,30 +40,33 @@
         :limits="[20,80]"
       >
       <template #before>
+        <div v-if="coaches.length === 0">
+          Click the desired coaches to add them to the project.
+        </div>
+        <div v-else>
         
-         
-           <q-chip 
-             v-for="coach in coaches"
-             :key="coach.id"
-             outline
-             :color="getColorFromCoach(coach)"
-             class="q-pr-none q-pl-sm"
-             :class="`bg-${getColorFromCoach(coach)}-1`"
-             style="border-width: 1.5px; width: fit-content;"
-             @click="addCoachToProject(coach)"
-           >
-             <div class="row items-center">
-               <span class="text-subtitle1 text-black">{{ coach.fullName }}</span>
-               <btn
-                 class="q-px-xs"
-                 size="sm"
-                 icon="o_delete"
-                 @click="removeCoachFromProject(coach)"
-               />
-             </div>
-             
-           </q-chip>
+         <q-chip 
+           v-for="coach in coaches"
+           :key="coach.id"
+           outline
+           :color="getColorFromCoach(coach)"
+           class="q-pr-none q-pl-sm"
+           :class="`bg-${getColorFromCoach(coach)}-1`"
+           style="border-width: 1.5px; width: fit-content;"
+           @click="addCoachToProject(coach)"
+         >
+           <div class="row items-center">
+             <span class="text-subtitle1 text-black">{{ coach.fullName }}</span>
+             <btn
+               class="q-px-xs"
+               size="sm"
+               icon="o_delete"
+               @click="removeCoachFromProject(coach)"
+             />
+           </div>
            
+         </q-chip>
+        </div>
          
       </template>
       <template #after>
