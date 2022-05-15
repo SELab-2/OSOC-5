@@ -11,13 +11,12 @@ export default defineComponent({
 			playing: ref(false)
 		}
 	},
+	// Lottie animation is paused when the view is deactivated.
+	// This is done for performance reasons when used in conjunction with keep-alive.
 	activated() {
-		console.log("starting")
 		this.playing = false
 	},
 	deactivated() {
-		console.log("stopping")
-
 		this.playing = true
 	}
 })
