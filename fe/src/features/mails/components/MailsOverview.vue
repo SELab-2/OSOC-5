@@ -19,17 +19,23 @@
           :name="step.state"
           :title="step.name"
           :icon="step.icon"
-          :done="currentstepids.includes(step.state)"
+          :done="disable(step.state)"
         >
           <div
-            v-if="!currentsteps().find(s => s.type === step.state)"
+            v-if="currentstepids.find(s => s === step.state) !== undefined"
+            style="color: red"
+          >
+            This mail is already send!
+          </div>
+          <div
+            v-else
             class="q-gutter-sm"
           >
             <q-input
               v-model="date"
               outlined
               style="width: fit-content"
-              :disable="currentstepids.includes(step.state)"
+              :disable="disable(step.state)"
             >
               <template #prepend>
                 <q-icon
@@ -88,6 +94,7 @@
             </q-input>
             <q-input
               v-model="info"
+              :disable="disable(step.state)"
               label="Info"
               filled
               type="textarea"
@@ -95,48 +102,24 @@
 
             <div v-if="step.states.length > 1">
               <q-option-group
+                :disable="disable(step.state)"
                 :options="step.states"
                 type="radio"
                 v-model="selected"
               />
             </div>
           </div>
-          <div v-else>
-            <!-- <div> -->
-            Sent at {{ currentsteps().find(s => s.type === step.state)?.time ?? 'unknown time' }}
-            <!-- </div> -->
-          </div>
-          <!-- <q-input
-            label="Email"
-            v-model="step.email"
-            outlined
-            type="textarea"
-            color="yellow"
-          /> -->
 
-          <q-stepper-navigation>
+          <q-stepper-navigation
+            v-if="currentstepids.find(s => s === step.state) === undefined"
+          >
             <btn
-              :disable="currentstepids.includes(step.state)"
+              :disable="disable(step.state)"
               color="yellow"
               label="Mark as sent"
               shadow-color="orange"
               shadow-strength="2"
               @click="onclickmail()"
-            />
-
-            <btn
-              v-if="currentsteps().find(s => s.type === step.state)"
-              label="Delete"
-              color="red"
-              class="q-mx-md"
-              shadow-color="red"
-              shadow-strength="2"
-              @click="() => { () => {
-                const mail = currentsteps().find(m => m.type === step.state)
-                if (mail !== undefined) {
-                  deleteMail(mail)
-                }
-              }}"
             />
           </q-stepper-navigation>
         </q-step>
@@ -267,7 +250,9 @@ export default defineComponent({
   },
   methods: {
     adaptState(newState: any, oldState: any) {
-      this.selected = this.steps.filter(step => step.state === newState)[0].states[0].value
+      const state = this.steps.filter(step => step.state === newState)[0]
+      if (state)
+        this.selected = state.states[0].value
     },
     async deleteMail(mail: Mail) {
       await this.mailStore.deleteMail(mail)
@@ -296,6 +281,9 @@ export default defineComponent({
       this.date = (new Date()).toLocaleString()
       this.info = ''
     },
+    disable(state: number) {
+      return this.currentstepids.includes(state)
+    },
     stop() {
       this.removed = false
       if (!this.timeout) return
@@ -318,7 +306,7 @@ export default defineComponent({
     currentsteps() {
       if (!this.mailStore.mails.has(this.student.id)) return []
       const data = (this.mailStore.mails.get(this.student.id) ?? []).filter(mail => mail.type !== null)
-      if (!this.currentStep) {
+      if (this.currentStep === null) {
         this.currentStep = this.statuses.find(s => !data.map(d=> d.type ).includes(s))
       }
       return data
