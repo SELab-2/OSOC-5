@@ -66,6 +66,18 @@
 			shadow-color="orange"
 		/>
 	</q-page-sticky>
+	<q-page-sticky position="bottom-left" :offset="[18, 18]">
+		<btn
+			v-if="step > 1"
+			fab
+			@click="step -= 1"
+			padding="10px"
+			icon="arrow_back"
+			label="Previous"
+			color="yellow"
+			shadow-color="orange"
+		/>
+	</q-page-sticky>
 	<!-- </div> -->
 </template>
 
