@@ -52,17 +52,18 @@
     </div>
     
     <div class="row no-wrap justify-between">
-     <div style="width: 40%; float:left">
+     <div style="width: 60%; float:left">
        <div class="text-h6">Selected Skills</div>
        <create-project-chip
        v-for="skill in projectSkills"
         :key="skill.skill.id"
         :skill="skill"
+        @remove="removeSkillFromProject(skill.skill)"
         />
        
      </div>
      <q-splitter/>
-    <div style="width: 40%; float: right; text-align: right">
+    <div style="width: 20%; float: right; text-align: right">
       <div class="text-h6">Available Skills</div>
       <q-chip 
         v-for="skill in skillStore.skills"
@@ -130,7 +131,8 @@ export default defineComponent ({
     },
     removeSkillFromProject(skill: Skill) {
       const i = this.projectSkills.findIndex(s => s.skill.id === skill.id)
-      this.projectSkills.slice(i,1)
+      console.log(i)
+      this.projectSkills.splice(i,1)
     },
     addSkill() {
       this.skillStore.addSkill(this.editSkill, (success: boolean) => {

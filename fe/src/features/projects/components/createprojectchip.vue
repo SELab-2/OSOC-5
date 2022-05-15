@@ -2,9 +2,9 @@
 	<!-- v-model:selected is not used here since this displays an icon, which we don't want. As an alternative, @click is used. -->
 	<!-- A Custom implementation of the icon is used, since a chip always reserves place for an icon, even when we don't want it. -->
 	<q-chip
-		clickable
 		outline
 		:color="`${skill.skill.color}-4`"
+		class="q-pt-none"
 		:class="`bg-${skill.skill.color}-1`"
 		:style="`border-width: 1.5px; padding-right: 8px; padding-left: ${skill.comment ? 2 : 8}px`"
 		style="height: fit-content"
@@ -28,18 +28,31 @@
 				>
 					{{ skill.skill.name }}
 				</div>
-				<div
-					class="text-bold"
-					style="padding-left: 3px"
-					:class="`text-${enabled ? 'white' : `${skill.skill.color}-8`}`"
-				>
-					{{ _skill.amount }}
-				</div>
+				<q-space/>
+				<q-input 
+					type="number" 
+					v-model.number="_skill.amount"
+					dense 
+					borderless
+					min="0" 
+					style="max-width: 50px"
+					:input-style="{'text-align': 'right'}"
+					:input-class="`text-bold text-${enabled ? 'white' : `${skill.skill.color}-8`}`"
+				/>
+				<btn
+					class="q-px-xs"
+					size="sm"
+					icon="o_delete"
+					@click="$emit('remove')"
+				/>
 			</div>
 			<div> 
 				<q-input
-					auto-grow
+					dense
+					autogrow
 					outlined
+					:color="_skill.skill.color"
+					label="Comment"
 				/>
 			</div>
 			</div>
@@ -78,3 +91,9 @@ export default defineComponent({
 	}
 })
 </script>
+
+<style scoped>
+:deep(.q-ripple) {
+	visibility: hidden
+}
+</style>
