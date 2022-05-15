@@ -59,6 +59,18 @@
            @click="addCoachToProject(coach)"
          >
            <div class="row items-center">
+             <q-icon
+               style="margin-left: -6px"
+               v-if="coach.projects.length > 0"
+               name="info"
+               size="sm"
+               :color="`${getColor(i)}-6`"
+             >
+             <q-tooltip v-if="coach.projects.length > 0" class="text-subtitle2 text-black bg-grey-1 shadow-5 cornered">
+               <span>Already assigned to the projects:</span>
+               <span v-for="project in coach.projects"><br/>{{ project.name }}</span>
+             </q-tooltip>
+             </q-icon>
              <span class="text-subtitle1 text-black">{{ coach.fullName }}</span>
              <btn
                class="q-px-xs"
@@ -85,13 +97,24 @@
             style="border-width: 1.5px;"
             @click="addCoachToProject(coach)"
           >
-            <div>
+            <div class="row" style="display: flex; align-items: center">
+              <q-icon
+                style="margin-left: -11px"
+                v-if="coach.projects.length > 0"
+                name="info"
+                size="sm"
+                :color="`${getColor(i)}-6`"
+              >
+              <q-tooltip v-if="coach.projects.length > 0" class="text-subtitle2 text-black bg-grey-1 shadow-5 cornered">
+                <span>Already assigned to the projects:</span>
+                <span v-for="project in coach.projects"><br/>{{ project.name }}</span>
+              </q-tooltip>
+              </q-icon>
               <span class="text-subtitle1 text-black">{{ coach.fullName }}</span>
             </div>
             
+            
           </q-chip>
-          <div class="text-h6">Unavailable Coaches</div>
-          <div>These coaches are assigned to other projects.</div>
         </div>
       </template>
     </q-splitter>
