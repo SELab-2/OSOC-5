@@ -25,21 +25,13 @@ import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
-  projectName: string
-  projectPartnerName: string
-  projectLink: string
-  filterCoaches: string
-  selectedCoaches: Array<User>
+  shouldRefresh: Boolean
 }
 
 export const useProjectStore = defineStore('project', {
   state: (): State => ({
     projects: [],
-    projectName: '',
-    projectPartnerName: '',
-    projectLink: '',
-    filterCoaches: '',
-    selectedCoaches: [],
+    shouldRefresh: false
   }),
   actions: {
     /**

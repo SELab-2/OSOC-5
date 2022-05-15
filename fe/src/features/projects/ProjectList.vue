@@ -234,7 +234,19 @@ export default defineComponent({
       },
     },
   },
+  activated() {
+    // Check if the projects list has been altered in another view. 
+    // If this flag is set, the view resets the pagination and loads all the projects.
+    if (this.shouldRefresh) {
+      this.shouldRefresh = false
+      const infscroll = this.$refs.infinite as any;
+      infscroll.reset()
+      infscroll.resume()
+      infscroll.trigger()
+    }
+  },
   mounted() {
+
     this.socket.onmessage = async (event: { data: string }) => {
       const data = JSON.parse(event.data)
 

@@ -159,7 +159,7 @@ export default defineComponent({
 				} else {
 					await this.projectStore.addProject(mappedProject)
 				}
-				this.projectStore.loadProjects()
+				this.projectStore.shouldRefresh = true
 				router.replace('/projects')
 			}
 		},
