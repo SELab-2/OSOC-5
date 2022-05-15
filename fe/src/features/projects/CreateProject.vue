@@ -64,7 +64,13 @@
 			:disable="step === 3 && !allDone"
 			color="yellow"
 			shadow-color="orange"
-		/>
+		>
+		<q-tooltip v-if="step === 3 && !allDone" style="width: 300px">
+			<span class="text-body2">
+			Some data is missing.<br/>Please check if you filled in a name, partner name, info, and have selected at least one skill and coach.
+			</span>
+		</q-tooltip>
+		</btn>
 	</q-page-sticky>
 	<q-page-sticky position="bottom-left" :offset="[18, 18]">
 		<btn
