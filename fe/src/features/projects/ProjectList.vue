@@ -264,7 +264,7 @@ export default defineComponent({
 }
 </style>
 
-<style lang="sass" scoped>
+<style lang="sass">
 .my-card
     border-radius: 10px !important
 

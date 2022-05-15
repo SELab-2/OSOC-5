@@ -2,28 +2,35 @@
   <div
     class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6"
   >
-    <div class="text-h4 q-my-md">
-      Project Skills
-    </div>
+    
     <div class="row">
-      <btn
-        class="cornered q-mb-sm"
-        color="primary"
-        icon="add"
-        label="Add skill"
-        shadow-strength="2"
-        glow-color="#00F1AF"
-        @click="showDialog = true"
-      />
-      
-      <q-space />
+      <div class="text-h4">
+        Project Skills
+      </div>
+      <q-space/>
         <btn
-          size="sm"
-          color="primary"
+          round
+          style="margin-bottom: 15px"
+          size="12px"
+          glow-color="teal-3"
+          shadow-color="teal"
+          :shadow-strength="2"
+          color="teal"
+          class="text-white"
+          icon="add"
+          @click="showDialog = true"
+        />
+        <btn
+          round
+          style="margin-bottom: 15px"
+          size="12px"
+          glow-color="teal-3"
+          shadow-color="teal"
+          :shadow-strength="editMode ? 2 : 5"
+          :color="editMode ? 'teal' : 'white'"
+          :class="`text-${editMode ? 'white' : 'teal'}`"
           icon="mdi-pencil-outline"
-          shadow-strength="2"
-          glow-color="#00F1AF"
-          @click="showEditIcons = !showEditIcons"
+          @click="editMode = !editMode"
         />
       <q-input
         v-model="filterSkills"
@@ -50,61 +57,57 @@
         </template>
       </q-input>
     </div>
-    
-    <div class="row no-wrap justify-between">
-     <div style="width: 60%; float:left">
-       <div class="text-h6">Selected Skills</div>
-       <create-project-chip
-       v-for="skill in projectSkills"
-        :key="skill.skill.id"
-        :skill="skill"
-        @remove="removeSkillFromProject(skill.skill)"
-        />
+    <q-splitter
+      v-model="splitterModel"
+      style="height: 400px"
+      :limits="[20,80]"
+    >
+    <template #before>
+      
        
-     </div>
-     <q-splitter/>
-    <div style="width: 20%; float: right; text-align: right">
-      <div class="text-h6">Available Skills</div>
-      <q-chip 
-        v-for="skill in skillStore.skills"
-        :key="skill.id"
-        v-show="!projectSkills.some(s => s.skill.id === skill.id)"
-        outline
-        clickable
-        :color="`${skill.color}-4`"
-        :class="`bg-${skill.color}-1`"
-        style="border-width: 1.5px;"
-        @click="addSkillToProject(skill)"
-      >
-        <div>
-          <span class="text-subtitle1 text-black">{{ skill.name }}</span>
-          <btn
-            v-if="showEditIcons"
-            flat
-            round
-            style="color: #3d3d3d"
-            icon="mdi-pencil-outline"
-            glow-color="grey-5"
-            @click="editSkill = skill; showDialog=true"
+         <div class="text-h6">Selected Skills</div>
+         <create-project-chip
+         v-for="skill in skills"
+          :key="skill.skill.id"
+          :skill="skill"
+          @remove="removeSkillFromProject(skill.skill)"
           />
-        </div>
-        
-      </q-chip>
-    </div>
-    </div>
+         
+       
+    </template>
+    <template #after>
+      <div style="float: right; text-align: right">
+      <div class="text-h6">Available Skills</div>
+        <q-chip 
+          v-for="skill in skillStore.skills"
+          :key="skill.id"
+          v-show="!skills.some(s => s.skill.id === skill.id)"
+          outline
+          clickable
+          :color="`${skill.color}-4`"
+          :class="`bg-${skill.color}-1`"
+          style="border-width: 1.5px; width: fit-content;"
+          @click="() => { if (editMode) { editSkill = skill; showDialog = true} else { addSkillToProject(skill) }}"
+        >
+          <div>
+            <span class="text-subtitle1 text-black">{{ skill.name }}</span>
+          </div>
+          
+        </q-chip>
+      </div>
+    </template>
+  </q-splitter>
     
       <NewSkillDialog
         v-model="showDialog"
         v-model:skill="editSkill"
       />
-
-    <SkillTable :filter-skills="filterSkills" v-model:editSkill="editSkill" v-model:showDialog="showDialog" />
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import { ref } from "vue";
+import { ref, PropType } from "vue";
 import SkillTable from "./subcomponents/SkillTable.vue";
 import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
 import { useSkillStore } from "../../../stores/useSkillStore";
@@ -113,6 +116,12 @@ import ProjectRoleChip from "./ProjectRoleChip"
 import CreateProjectChip from "./createprojectchip.vue"
 export default defineComponent ({
   components: {NewSkillDialog, SkillTable,CreateProjectChip},
+  props: {
+    skills: {
+      type: [Object] as PropType<ProjectSkill[]>,
+      required: true
+    }
+  },
   data() {
     let editSkill: Ref<Skill | null> = ref(null)
     return {
@@ -121,18 +130,18 @@ export default defineComponent ({
       newSkillPrompt: ref(false),
       editSkill,
       showDialog: ref(false),
-      projectSkills: ref([]),
-      showEditIcons: ref(false)
+      editMode: ref(false),
+      splitterModel: ref(70)
     }
   },
   methods: {
     addSkillToProject(skill: Skill) {
-      this.projectSkills.push(new ProjectSkill(0, '', skill))
+      this.skills.push(new ProjectSkill(0, '', skill))
     },
     removeSkillFromProject(skill: Skill) {
-      const i = this.projectSkills.findIndex(s => s.skill.id === skill.id)
+      const i = this.skills.findIndex(s => s.skill.id === skill.id)
       console.log(i)
-      this.projectSkills.splice(i,1)
+      this.skills.splice(i,1)
     },
     addSkill() {
       this.skillStore.addSkill(this.editSkill, (success: boolean) => {
@@ -161,19 +170,5 @@ export default defineComponent ({
       }
     },
   },
-  computed: {
-    selectedSkills: {
-      get() {
-        return this.projectSkills.map(s => s.skill)
-      },
-      set(n) {
-        console.log(n)
-        const oldSkills = this.projectSkills.map(s => s.skill)
-        n.filter(s => !oldSkills.includes(s)).forEach(s => {
-          this.projectSkills.push(new ProjectSkill(0, '', s))
-        })
-      }
-    }
-  }
 })
 </script>

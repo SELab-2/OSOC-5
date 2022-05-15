@@ -17,9 +17,9 @@
 				<div class="column">
 					First, some basic info!
 					<BasicInfo
-						v-model:name="name"
-						v-model:partnerName="partnerName"
-						v-model:info="info"
+						v-model:name="project.name"
+						v-model:partnerName="project.partnerName"
+						v-model:info="project.extraInfo"
 					/>
 				</div>
 
@@ -48,7 +48,7 @@
 				title="Skills"
 				icon="assignment"
 			>
-				<ProjectSkills/>
+				<ProjectSkills :skills="project.requiredSkills"/>
 			</q-step>
 
 			<q-step
@@ -77,6 +77,7 @@ import ProjectCoaches from "./components/ProjectCoaches.vue";
 import ProjectSkills from "./components/ProjectSkills.vue";
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
+import { Project } from '../../models/Project'
 export default {
 	setup () {
 		return {
@@ -88,9 +89,7 @@ export default {
 	components: { BasicInfo, ProjectCoaches, ProjectSkills },
 	data() {
 		return {
-			name: ref(''),
-			partnerName: ref(''),
-			info: ref('')
+			project: ref(new Project('','','',0,[],[],[]))
 		}
 	},
 	mounted(){

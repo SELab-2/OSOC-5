@@ -4,10 +4,9 @@
 	<q-chip
 		outline
 		:color="`${skill.skill.color}-4`"
-		class="q-pt-none"
+		class="q-pt-none q-px-sm"
 		:class="`bg-${skill.skill.color}-1`"
-		:style="`border-width: 1.5px; padding-right: 8px; padding-left: ${skill.comment ? 2 : 8}px`"
-		style="height: fit-content"
+		style="border-width: 1.5px; height: fit-content"
 		@click="enabled = !enabled"
 	>
 		<template #default>
@@ -16,12 +15,6 @@
 				class="row"
 				style="display: flex; align-items: center"
 			>
-				<q-icon
-					v-if="skill.comment"
-					name="info"
-					size="sm"
-					:color="`${skill.skill.color}-2`"
-				/>
 				<div
 					class="text-weight-medium"
 					style="color: black;"
@@ -51,6 +44,7 @@
 					dense
 					autogrow
 					outlined
+					v-model="_skill.comment"
 					:color="_skill.skill.color"
 					label="Comment"
 				/>
