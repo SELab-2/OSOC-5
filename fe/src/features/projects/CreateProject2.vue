@@ -1,6 +1,7 @@
 <template>
 	<!-- <div> -->
 	<q-stepper
+		v-if="project"
 		v-model="step"
 		color="primary"
 		class="column"
@@ -57,7 +58,7 @@
 			@click="next()"
 			padding="10px"
 			:icon-right="step < 4 ? 'arrow_forward' : 'check'"
-			:label="step < 4 ? 'Next' : 'Submit'"
+			:label="step < 4 ? 'Next' : (id ? 'Update' : 'Submit')"
 			:disable="step === 3 && !allDone"
 			color="yellow"
 			shadow-color="orange"
@@ -67,7 +68,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, defineComponent } from 'vue'
 import BasicInfo from "./components/BasicInfo.vue";
 import ProjectCoaches from "./components/ProjectCoaches.vue";
 import ProjectSkills from "./components/ProjectSkills.vue";
@@ -77,7 +78,7 @@ import { useProjectStore } from '../../stores/useProjectStore'
 
 import { Project } from '../../models/Project'
 import Overview from "./components/CreateOverview.vue"
-export default {
+export default defineComponent({
 	name: 'CreateProject',
 	components: { BasicInfo, ProjectCoaches, ProjectSkills, Overview },
 	props: {
@@ -87,16 +88,24 @@ export default {
 		}
 	},
 	data() {
-		const project = useProjectStore().projects.find(p => p.id === parseInt(this.id)) ?? new Project('','','',0,[],[],[])
-		console.log(project)
-		console.log(useProjectStore().projects.find(p => p.id === parseInt(this.id)))
+		const projectStore = useProjectStore();
+		const project = ref(null);
 		return {
 			step: ref(1),
 			skillStore: useSkillStore(),
 			coachStore: useCoachStore(),
 			projectStore: useProjectStore(),
-			project: ref(project)
+			project
 		}
+	},
+	async created() {
+		let project;
+		if (this.id) {
+			project = await this.projectStore.getProject(this.id)
+		} else {
+			project = new Project('','','',0,[],[],[])
+		}
+		return this.project = project
 	},
 	mounted(){
 		this.skillStore.loadSkills()
@@ -120,9 +129,13 @@ export default {
 					}),
 					coaches: this.project.coaches.map(c => c.url),					
 				}
-				this.projectStore.addProject(mappedProject)
+				if (this.id) {
+					this.projectStore.updateProject(mappedProject, this.project.id)
+				} else {
+					this.projectStore.addProject(mappedProject)
+					}
 			}
-		}
+		},
 	},
 	computed: {
 		basicInfoDone() {
@@ -138,7 +151,7 @@ export default {
 			return this.basicInfoDone && this.coachesDone && this.skillsDone
 		}
 	}
-}
+})
 </script>
 
 <style scoped>

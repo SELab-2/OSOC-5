@@ -111,8 +111,9 @@ export const useProjectStore = defineStore('project', {
      * Gets a project
      * @param project the project to get
      */
-    async getProject(project: TempProject) {
+    async getProject(id: number): Promise<Project> {
       console.log('Loading')
+      const project: Project = (await instance.get<Project>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
@@ -125,8 +126,7 @@ export const useProjectStore = defineStore('project', {
         await this.fetchSuggestedStudents(project.suggestedStudents)
 
       // Is added to projects here because we do not want to await on each project.
-      this.projects = this.projects.concat([
-        new Project(
+      return new Project(
           project.name,
           project.partnerName,
           project.extraInfo,
@@ -134,8 +134,8 @@ export const useProjectStore = defineStore('project', {
           skills,
           coaches,
           students
-        ),
-      ])
+        )
+      
     },
     /**
      * Loads the projects
@@ -343,6 +343,14 @@ export const useProjectStore = defineStore('project', {
         return false
       }
     },
+    async updateProject(project: Project, id: number) {
+      try {
+        await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(project))
+        return true
+      } catch (error) {
+        return false
+      }
+    },
     submitProject(
       skills: Array<ProjectTableSkill>,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -382,25 +390,7 @@ export const useProjectStore = defineStore('project', {
           callback(false)
         })
     },
-    async updateProject(
-      id: string,
-      skills: Array<ProjectTableSkill>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      callback: any
-    ) {
-      const projectData = this.formatProjectData(skills)
-
-      // POST request to make a project
-      return instance
-        .patch(`projects/${id}/`, convertObjectKeysToSnakeCase(projectData))
-        .then(() => {
-          this.loadProjects()
-          callback(true)
-        })
-        .catch(() => {
-          callback(false)
-        })
-    },
+    
     editProject(project: Project) {
       this.projectName = project.name
       this.projectPartnerName = project.partnerName
