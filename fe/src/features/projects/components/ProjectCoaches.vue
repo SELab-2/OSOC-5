@@ -127,12 +127,11 @@ import {defineComponent, ref} from "vue";
 import {useProjectStore} from "../../../stores/useProjectStore";
 import {useCoachStore} from "../../../stores/useCoachStore";
 import { User } from "../../../models/User"
-import CoachTable from "./subcomponents/CoachTable.vue";
 import CreateProjectChip from "./createprojectchip.vue"
 import quasarColors from '../../../models/QuasarColors'
 import LottieAnimation from '../../../components/LottieAnimation.vue'
 export default defineComponent({
-  components: {CoachTable, CreateProjectChip,LottieAnimation},
+  components: {CreateProjectChip,LottieAnimation},
   props: {
     coaches: {
       type: [Object] as PropType<User[]>,

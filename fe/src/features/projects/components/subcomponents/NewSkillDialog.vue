@@ -52,11 +52,17 @@
       class="text-primary"
     >
       <btn
+        flat
+        color="red"
+        label="Delete"
+        @click="showDelete = true"
+      />
+      <btn
         v-close-popup
         flat
         label="Cancel"
         glow-color="#C0FFF4"
-        @click="() => { $nextTick(() => {$emit('update:skill', backup)}); _visible = false }"
+        @click="() => { $emit('update:skill', backup); _visible = false }"
       />
       <btn
         v-close-popup
@@ -68,13 +74,15 @@
     </q-card-actions>
   </q-card>
   </q-dialog>
+  <DeleteSkillDialog :deleteSkillId="_skill.id" :deleteSkillName="_skill.name" v-model:visible="showDelete"/>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/runtime-core'
+import { defineComponent, ref } from '@vue/runtime-core'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import quasarColors from '../../../../models/QuasarColors'
 import { Skill } from "../../../../models/Skill"
+import DeleteSkillDialog from './DeleteSkillDialog.vue'
 
 export default defineComponent({
   props: {
@@ -87,11 +95,13 @@ export default defineComponent({
       required: true
     }
   },
+  components: { DeleteSkillDialog },
   data(props) {
     return {
       skillStore: useSkillStore(),
       backup: props.skill,
       quasarColors,
+      showDelete: ref(false)
     }
   },
 

@@ -116,7 +116,6 @@
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
 import { ref, PropType } from "vue";
-import SkillTable from "./subcomponents/SkillTable.vue";
 import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
 import { useSkillStore } from "../../../stores/useSkillStore";
 import { Skill, ProjectSkill } from "../../../models/Skill"
@@ -125,7 +124,7 @@ import CreateProjectChip from "./createprojectchip.vue"
 import LottieAnimation from '../../../components/LottieAnimation.vue'
 
 export default defineComponent ({
-  components: {NewSkillDialog, SkillTable,CreateProjectChip, LottieAnimation},
+  components: {NewSkillDialog, CreateProjectChip, LottieAnimation},
   props: {
     skills: {
       type: [Object] as PropType<ProjectSkill[]>,
