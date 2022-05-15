@@ -6,7 +6,9 @@
       :mini-width="30"
       :width="370"
       :breakpoint="100"
-      class="bg-grey-1 shadow-4"
+      class="shadow-4"
+      :class="`bg-${$q.dark.isActive ? 'dark2' : 'grey-1'}`"
+      dark="false"
     >
       <div
         :style="!miniState? '' : 'display: none'"

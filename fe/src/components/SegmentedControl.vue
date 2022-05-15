@@ -1,6 +1,7 @@
 <template>
   <q-tabs
-    class="bg-white text-black shadow-2"
+    :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-white text-black'"
+    class="shadow-2"
     :indicator-color="color"
     style="border-radius: 10px;"
     v-bind="$attrs"

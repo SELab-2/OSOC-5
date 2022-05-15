@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card shadow-4 q-ma-sm" flat bordered>
+  <q-card class="my-card shadow-4 q-ma-sm" flat bordered :dark="$q.dark.isActive">
     <q-card-section class="column">
       <div class="row">
         <h5 class="text-bold q-mt-none q-mb-none">
@@ -34,7 +34,7 @@
             glow-color="teal-3"
             shadow-color="teal"
             :shadow-strength="showInfo ? 2 : 5"
-            :color="showInfo ? 'teal' : 'white'"
+            :color="showInfo ? 'teal' : 'transparent'"
             :class="`text-${showInfo ? 'white' : 'teal'}`"
             icon="info"
             @click="showInfo = !showInfo"

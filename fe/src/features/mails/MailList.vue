@@ -80,7 +80,7 @@
       >
         <template #body="props">
           <q-tr
-            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1 text-black' : ''"
             :props="props"
           >
             <q-td>

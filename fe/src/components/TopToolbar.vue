@@ -3,7 +3,7 @@
     class="bg-white text-white"
     height-hint="98"
   >
-    <q-toolbar class="text-osoc-blue bg-white shadow-2">
+    <q-toolbar class="shadow-2" :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'osoc-blue'}`">
       <btn flat round href="https://www.osoc.be">
         <q-avatar size="42px">
           <img src="../assets/logo.svg">

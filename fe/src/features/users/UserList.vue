@@ -83,7 +83,8 @@
       >
         <template #body="props">
           <q-tr
-            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+            :class="props.rowIndex % 2 == 1 && !$q.dark.isActive ? 'bg-yellow-1' : ''"
+            :style="`background-color: ${props.rowIndex % 2 == 1 && $q.dark.isActive ? colors.lighten(colors.getPaletteColor('yellow'),-75) : ''}`"
           >
             <q-td
               key="name"
@@ -173,7 +174,7 @@
 import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
-import {exportFile, useQuasar} from 'quasar'
+import {exportFile, useQuasar, colors} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
@@ -182,7 +183,6 @@ import userColumns from "../../models/UserColumns";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import router from "../../router";
 import roles from "../../models/UserRoles";
-
 const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
   let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
 
@@ -216,7 +216,8 @@ export default defineComponent({
       userColumns,
       roles,
       coachStore,
-      q
+      q,
+      colors
     }
   },
   data() {

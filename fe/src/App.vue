@@ -8,11 +8,16 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
+import { Dark } from 'quasar'
 
 (useQuasar().notify as any).setDefaults({
-  position: 'bottom-right',
+  position: 'bottom-middle',
   actions: [{ icon: 'close', color: 'white' }]
 })
+
+// Dark.set(true)
+console.log(Dark.isActive)
+
 
 </script>
 

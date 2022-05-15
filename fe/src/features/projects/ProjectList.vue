@@ -6,9 +6,9 @@
     >
       <q-toolbar
         style="overflow: visible; padding: 8px"
-        class="text-blue bg-white"
+        :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'blue'}`"
       >
-        <div class="text-bold text-h4 q-ml-md text-black">Projects</div>
+        <div class="text-bold text-h4 q-ml-md" :class="`text-${$q.dark.isActive ? 'white' : 'black'}`">Projects</div>
         <q-space />
 
         <btn
@@ -18,7 +18,7 @@
           glow-color="teal-3"
           shadow-color="teal"
           :shadow-strength="showFilters ? 2 : 5"
-          :color="showFilters ? 'teal' : 'white'"
+          :color="showFilters ? 'teal' : 'transparent'"
           :class="`text-${showFilters ? 'white' : 'teal'}`"
           icon="tune"
           @click="showFilters = !showFilters"
@@ -50,7 +50,7 @@
           glow-color="teal-3"
           shadow-color="teal"
           :shadow-strength="expanded ? 2 : 5"
-          :color="expanded ? 'teal' : 'white'"
+          :color="expanded ? 'teal' : 'transparent'"
           :class="`text-${expanded ? 'white' : 'teal'}`"
           @click="expanded = !expanded"
         />
