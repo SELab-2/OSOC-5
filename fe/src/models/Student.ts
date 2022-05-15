@@ -1,11 +1,10 @@
 import { Skill } from './Skill'
 import { Suggestion } from './Suggestion'
+import { User } from './User'
 
 export interface TempStudent {
   student: string
-  coach:
-    | { id: number; firstName: string; lastName: string; url: string }
-    | string
+  coach: User
   skill: string
   reason: string
 }
@@ -40,7 +39,7 @@ export interface StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
-  status: string
+  status: number
 }
 
 export class Student implements StudentInterface {
@@ -73,7 +72,7 @@ export class Student implements StudentInterface {
   hinderWork: string
   pronouns: string
   studentCoach: boolean
-  status: string
+  status: number
 
   constructor(obj: StudentInterface)
   constructor(
@@ -106,7 +105,7 @@ export class Student implements StudentInterface {
     hinderWork: string,
     pronouns: string,
     studentCoach: boolean,
-    status: string)
+    status: number)
 
   constructor(...args: any[]) {
     if (args.length == 1) {

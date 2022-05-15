@@ -14,7 +14,12 @@ interface State {
   loggedInUser: UserInterface | null
 }
 
-function getCookie(name: String) {
+/**
+ * Gets a cookie
+ * @param name the name of the cookie
+ * @returns the value of the cookie
+ */
+function getCookie(name: string) {
   let cookieValue = null
   if (document.cookie && document.cookie !== '') {
     const cookies = document.cookie.split(';')
@@ -36,6 +41,9 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     loggedInUser: null,
   }),
   actions: {
+    /**
+     * If we are logged in, we are redirected to /projects
+     */
     checkLogin(): void {
       if (
         localStorage.getItem('refreshToken') &&
@@ -44,6 +52,10 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         router.push({ name: 'Projects' }).then()
       }
     },
+    /**
+     * Logs us in
+     * @param param0 email and password with which we try to log in
+     */
     async login({
       email,
       password,
@@ -60,10 +72,16 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       })
       localStorage.setItem('refreshToken', data.refresh_token)
       localStorage.setItem('accessToken', data.access_token)
-      instance.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken') as any
+      instance.defaults.headers.common['X-CSRFToken'] = getCookie(
+        'csrftoken'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) as any
       const result = await instance.get<User>('coaches/' + data.user.pk)
       this.loggedInUser = result.data
     },
+    /**
+     * Logs us out and cleares the data
+     */
     async logout() {
       localStorage.removeItem('refreshToken')
       localStorage.removeItem('accessToken')
@@ -80,33 +98,63 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       this.$reset()
       router.push({ name: 'Login' }).then()
     },
-    async changePassword({p1, p2}: 
-      {p1: string, p2: string}) {
+    /**
+     * Changes the password of the currently logged in user
+     * @param param0 the new password
+     */
+    async changePassword({ p1, p2 }: { p1: string; p2: string }) {
       const config = {
-        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
-      };
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }
       const bodyParameters = {
         new_password1: p1,
         new_password2: p2,
-      };
-      const {data} = await axios.post(baseURL + 'auth/password/change/', bodyParameters, config)
-      },
-    async register({firstName, lastName, email, password1, password2, is_admin, is_active}:
-      {firstName: string, lastName: string, email: string, password1: string, password2: string, is_admin: boolean, is_active: boolean}) {
-        const config = {
-          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
-        };
-        const bodyParameters = {
-          first_name: firstName,
-          last_name: lastName,
-          username: email,
-          email: email,
-          password1: password1,
-          password2: password2,
-          is_active: is_active,
-          is_admin: is_admin,
-        };
-        const {data} = await axios.post(baseURL + 'auth/register/', bodyParameters, config)
       }
+      await axios.post(
+        baseURL + 'auth/password/change/',
+        bodyParameters,
+        config
+      )
+    },
+    /**
+     * Registers a new user
+     * @param param0 the user information
+     */
+    async register({
+      firstName,
+      lastName,
+      email,
+      password1,
+      password2,
+      is_admin,
+      is_active,
+    }: {
+      firstName: string
+      lastName: string
+      email: string
+      password1: string
+      password2: string
+      is_admin: boolean
+      is_active: boolean
+    }) {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }
+      const bodyParameters = {
+        first_name: firstName,
+        last_name: lastName,
+        username: email,
+        email: email,
+        password1: password1,
+        password2: password2,
+        is_active: is_active,
+        is_admin: is_admin,
+      }
+      await axios.post(baseURL + 'auth/register/', bodyParameters, config)
+    },
   },
 })

@@ -1,47 +1,19 @@
 <template>
-  <div>
-    <SideBar :must-hover="false" :selectStudent="selectStudent" color="bg-grey-3" :draggable="false"/>
-    <div class="q-pa-lg full-height flex-center">
-      <label>Select a student from the sidebar to get started</label>
+  <div class="placeholder">
+    <div class="q-mb-xl">
+        <Vue3Lottie animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" />
+        <h6 class="text-bold q-mt-none q-mb-xl">Select a student from the sidebar to get started</h6>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import {ref} from "vue"
-import SideBar from "../../components/SideBar.vue"
-import {defineComponent} from "@vue/runtime-core";
-import { Student } from "../../models/Student";
+<style scoped>
 
-export default defineComponent({
-  components: {
-    SideBar,
-  },
-  setup() {
-    const student = ref(null)
-
-    return {
-      student,
-    }
-  },
-  methods: {
-    selectStudent: function (selected_student: Student) {
-      this.$router.push(`/students/${selected_student.id}`)
-    },
-  }
-})
-</script>
-
-<style>
-.minimum_width {
-  min-width: 300px !important;
+.placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center 
 }
 
-.studentcol {
-  padding: 5px;
-}
-
-.cornered {
-  border-radius: 10px !important
-}
 </style>

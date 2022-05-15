@@ -37,21 +37,16 @@
         />
       </template>
     </q-input>
-    <label class="fpwd cursor-pointer underlined">Forgot your password?</label>
-    <br>
 
     <btn
+      class="q-mt-md"
       color="primary"
       label="Sign in"
       type="submit"
-      size="md"
-      class="q-mx-md cornered"
+      glow-size="800px"
       glow-color="#00F1AF"
+      
     />
-    <!--     <br/> -->
-    <label class="text-bold">or</label>
-
-    <GitHubSignInButton />
   </q-form>
 </template>
 
@@ -120,16 +115,7 @@ export default defineComponent({
 </style>
 
 <style>
-.underlined {
-  text-decoration: underline;
-}
-.router-link {
-  color: inherit;
-}
 
-.cornered {
-  border-radius: 10px !important;
-}
 .fpwd {
   float: right;
   position: absolute;
@@ -140,15 +126,5 @@ export default defineComponent({
 
 .q-field__control {
   border-radius: 10px !important;
-}
-
-.underlined {
-  text-decoration: underline;
-}
-.q-checkbox__bg {
-  border-radius: 6px !important;
-}
-.router-link {
-  color: inherit;
 }
 </style>

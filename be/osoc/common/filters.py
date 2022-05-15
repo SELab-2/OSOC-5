@@ -2,13 +2,26 @@
 Filters used in views.py
 """
 
-from django.forms import ValidationError
 from rest_framework import filters
 from .models import Project, Student, Suggestion
 from .utils import string_to_datetime_tz
 
 true_strings = ['true', '1', 'yes', 't', 'y']
 false_strings = ['false', '0', 'no', 'f', 'n']
+
+
+class MultipleStatusFilter(filters.BaseFilterBackend):
+    """
+    a filter class to be abe to filter on multiple statuses of students
+    i dont know how to implement this in a more generic way, but this will do for now
+    query parameter 'status' should be included in the url
+    """
+    def filter_queryset(self, request, queryset, view):
+        param = request.query_params.get('status')
+        if param is not None:
+            return queryset.filter(status__in=param.split(','))
+        return queryset
+
 
 class StudentOnProjectFilter(filters.BaseFilterBackend):
     """
