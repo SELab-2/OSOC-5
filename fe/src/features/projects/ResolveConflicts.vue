@@ -99,6 +99,7 @@ import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
 import { Project } from '../../models/Project'
 import { Student } from '../../models/Student'
+import router from '../../router'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from '../../stores/useStudentStore'
 import { instance } from '../../utils/axios'
@@ -106,7 +107,7 @@ import ProjectConflictCard from "./components/ProjectConflictCard.vue"
 
 export default defineComponent({
     components: { ProjectConflictCard },
-    async setup() {
+    setup() {
       const $q = useQuasar()
 
       return {
@@ -190,6 +191,8 @@ export default defineComponent({
         const projectStore = useProjectStore()
         await projectStore.loadProjects() 
         await this.loadConflicts()
+
+        if(this.conflicts.length == 0) router.push("/projects")
         } catch(error) {
           this.q.notify({
               icon: 'warning',

@@ -3,14 +3,14 @@
     style="height: 100vh"
     view="hHh lpR fFf"
   >
-    <Suspense>
-      <template #default>
-        <router-view />
-      </template>
-      <template #fallback>
+    <!-- <Suspense> -->
+    <!-- <template #default> -->
+    <router-view />
+    <!-- </template> -->
+    <!-- <template #fallback>
         Loading...
       </template>
-    </Suspense>
+    </Suspense> -->
   </q-layout>
 </template>
 

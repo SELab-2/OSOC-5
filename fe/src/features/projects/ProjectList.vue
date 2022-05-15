@@ -1,5 +1,8 @@
 <template>
-  <div style="overflow: hidden" class="fit column">
+  <div
+    style="overflow: hidden"
+    class="fit column"
+  >
     <div
       :class="`${showShadow ? 'shadow-2' : ''}`"
       style="z-index: 1; transition: box-shadow ease 500ms;"
@@ -8,7 +11,9 @@
         style="overflow: visible; padding: 8px"
         class="text-blue bg-white"
       >
-        <div class="text-bold text-h4 q-ml-md text-black">Projects</div>
+        <div class="text-bold text-h4 q-ml-md text-black">
+          Projects
+        </div>
         <q-space />
 
         <btn
@@ -25,8 +30,8 @@
         />
         <!-- Do not remove the label attribute, otherwise the label slot does not work -->
         <q-input
-          tabindex="-1"
           v-model="projectNameFilter"
+          tabindex="-1"
           debounce="300"
           dense
           outlined
@@ -35,11 +40,14 @@
           style="margin-top: 5px"
           hide-bottom-space
         >
-          <template v-slot:label>
+          <template #label>
             <span class="text-weight-medium text-teal-3">Search Projects</span>
           </template>
-          <template v-slot:append>
-            <q-icon name="search" color="teal-3" />
+          <template #append>
+            <q-icon
+              name="search"
+              color="teal-3"
+            />
           </template>
         </q-input>
         <btn
@@ -57,6 +65,7 @@
 
         <q-space />
         <btn
+          v-if="conflictsExists"
           padding="7px"
           icon="r_warning"
           color="red-7"
@@ -74,7 +83,7 @@
       <q-slide-transition style="height: fit-content">
         <div v-if="showFilters">
           <q-card-section>
-            <span class="text-h5 text-bold">Filters</span><br />
+            <span class="text-h5 text-bold">Filters</span><br>
             <div class="row">
               <div class="column">
                 <!-- <q-checkbox label="My project" /> -->
@@ -124,9 +133,9 @@
     >
       <q-infinite-scroll
         ref="infinite"
-        @load="(i, done) => loadNext(i, done, filters)"
         :offset="250"
         scroll-target="#scroll-target-id"
+        @load="(i, done) => loadNext(i, done, filters)"
       >
         <masonry-wall
           :items="projects"
@@ -138,19 +147,25 @@
             <project-card :project="item" />
           </template>
         </masonry-wall>
-        <template v-slot:loading>
+        <template #loading>
           <div class="row justify-center q-my-md">
-            <q-spinner color="teal" size="40px" />
+            <q-spinner
+              color="teal"
+              size="40px"
+            />
           </div>
         </template>
       </q-infinite-scroll>
     </div>
   </div>
 
-  <q-page-sticky position="bottom-right" :offset="[18, 18]">
+  <q-page-sticky
+    position="bottom-right"
+    :offset="[18, 18]"
+  >
     <btn
-      fab
       v-if="authenticationStore.loggedInUser?.isAdmin"
+      fab
       padding="10px"
       icon="add"
       color="yellow"
@@ -169,6 +184,7 @@ import { useStudentStore } from '../../stores/useStudentStore'
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
+import { instance } from '../../utils/axios'
 
 export default defineComponent({
   name: 'ProjectList',
@@ -196,6 +212,7 @@ export default defineComponent({
       showShadow: ref(false),
       showFilters: ref(false),
       projectNameFilter: ref(''),
+      conflictsExists: ref(true),
     }
   },
   computed: {
@@ -251,7 +268,11 @@ export default defineComponent({
       else if (data.hasOwnProperty('remove_student'))
         this.removeReceivedSuggestion(data.remove_student)
     }
-  },
+
+    instance.get('projects/get_conflicting_projects').then(({data}) => {
+      this.conflictsExists = data.count > 0
+    })
+  },  
 })
 </script>
 
