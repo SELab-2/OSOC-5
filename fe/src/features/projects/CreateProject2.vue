@@ -94,6 +94,7 @@ export default {
 			step: ref(1),
 			skillStore: useSkillStore(),
 			coachStore: useCoachStore(),
+			projectStore: useProjectStore(),
 			project: ref(project)
 		}
 	},
@@ -103,7 +104,24 @@ export default {
 	},
 	methods: {
 		next() {
-			this.step += 1
+			if (this.step < 4) {
+				this.step += 1
+			} else {
+				const mappedProject = {
+					name: this.project.name,
+					partnerName: this.project.partnerName,
+					extraInfo: this.project.extraInfo,
+					requiredSkills: this.project.requiredSkills.map(s => {
+						return {
+							amount: s.amount,
+							comment: s.comment,
+							skill: s.skill.url
+						}
+					}),
+					coaches: this.project.coaches.map(c => c.url),					
+				}
+				this.projectStore.addProject(mappedProject)
+			}
 		}
 	},
 	computed: {

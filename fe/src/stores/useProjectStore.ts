@@ -335,6 +335,14 @@ export const useProjectStore = defineStore('project', {
         coaches: coachList,
       }
     },
+    async addProject(project: Project) {
+      try {
+        await instance.post('projects/', convertObjectKeysToSnakeCase(project))
+        return true
+      } catch (error) {
+        return false
+      }
+    },
     submitProject(
       skills: Array<ProjectTableSkill>,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
