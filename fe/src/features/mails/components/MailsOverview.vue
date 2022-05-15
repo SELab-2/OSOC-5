@@ -23,9 +23,8 @@
         >
           <div
             v-if="currentstepids.find(s => s === step.state) !== undefined"
-            style="color: red"
           >
-            This mail is already send!
+            This mail is already send.
           </div>
           <div
             v-else
@@ -267,7 +266,7 @@ export default defineComponent({
         else this.info = label
 
         this.sendMail();
-        if (this.currentStep) this.currentStep++;
+        if (this.currentStep !== null) this.currentStep++;
       }
     },
     async sendMail() {
