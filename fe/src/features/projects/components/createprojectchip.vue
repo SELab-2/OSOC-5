@@ -3,10 +3,12 @@
 	<!-- A Custom implementation of the icon is used, since a chip always reserves place for an icon, even when we don't want it. -->
 	<q-chip
 		outline
+		
 		:color="`${skill.skill.color}-4`"
 		class="q-pt-none q-px-sm"
 		:class="`bg-${skill.skill.color}-1`"
-		style="border-width: 1.5px; height: fit-content"
+		style="border-width: 1.5px; height: fit-content;"
+		:style="`box-shadow: ${colors.getPaletteColor(skill.skill.color,0)} 0px 8px 20px -12px;`"
 		@click="enabled = !enabled"
 	>
 		<template #default>
@@ -59,6 +61,8 @@
 import {defineComponent, ref} from "vue";
 import { Skill, ProjectSkill } from "../../../models/Skill"
 import ProjectRoleChip from './ProjectRoleChip.vue'
+import { colors } from 'quasar'
+
 export default defineComponent({
 	props: {
 		skill: {
@@ -70,7 +74,8 @@ export default defineComponent({
 	data() {
 		console.log("created")
 		return {
-			open: ref(false)
+			open: ref(false),
+			colors
 		}
 	},
 	computed: {
