@@ -17,6 +17,17 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name']
 
+
+class ProjectPartialSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer to show some fields of the project model
+    used in coach serializer
+    """
+    class Meta:
+        model = Project
+        fields = ['id', 'url', 'name']
+
+
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the Suggestion model
@@ -101,8 +112,7 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
         get all projects the current coach is assigned to and return a list of urls
         """
         projects = obj.project_set.all()
-        return [project['url'] for project in
-            ProjectSerializer(projects, many=True, context={"request": self.context.get("request")}).data]
+        return ProjectPartialSerializer(projects, many=True, context={"request": self.context.get("request")}).data
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
