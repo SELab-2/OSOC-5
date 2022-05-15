@@ -3,9 +3,11 @@
 	<q-stepper
 		v-if="project"
 		v-model="step"
-		color="primary"
 		class="column"
 		style="height: 100%"
+		active-icon="none"
+		done-color="teal"
+		active-color="teal"
 		animated
 		keep-alive
 		header-nav
@@ -14,7 +16,7 @@
 		<q-step
 			:name="1"
 			title="Project Info"
-			icon="settings"
+			icon="r_info"
 			:done="basicInfoDone"
 		>
 			<BasicInfo
@@ -28,7 +30,7 @@
 			:name="2"
 			title="Coaches"
 			caption="Optional"
-			icon="create_new_folder"
+			icon="r_group"
 			:done="coachesDone"
 		>
 			<ProjectCoaches :coaches="project.coaches"/>
@@ -37,7 +39,7 @@
 		<q-step
 			:name="3"
 			title="Skills"
-			icon="assignment"
+			icon="r_build"
 			:done="skillsDone"
 		>
 			<ProjectSkills :skills="project.requiredSkills"/>
@@ -46,7 +48,7 @@
 		<q-step
 			:name="4"
 			title="Overview"
-			icon="add_comment"
+			icon="r_receipt_long"
 			:disable="!allDone"
 		>
 			<overview :project="project"/>
@@ -78,6 +80,8 @@ import { useProjectStore } from '../../stores/useProjectStore'
 
 import { Project } from '../../models/Project'
 import Overview from "./components/CreateOverview.vue"
+import router from '../../router'
+
 export default defineComponent({
 	name: 'CreateProject',
 	components: { BasicInfo, ProjectCoaches, ProjectSkills, Overview },
@@ -112,7 +116,7 @@ export default defineComponent({
 		this.coachStore.loadUsers()
 	},
 	methods: {
-		next() {
+		async next() {
 			if (this.step < 4) {
 				this.step += 1
 			} else {
@@ -130,10 +134,12 @@ export default defineComponent({
 					coaches: this.project.coaches.map(c => c.url),					
 				}
 				if (this.id) {
-					this.projectStore.updateProject(mappedProject, this.project.id)
+					await this.projectStore.updateProject(mappedProject, this.project.id)
 				} else {
-					this.projectStore.addProject(mappedProject)
-					}
+					await this.projectStore.addProject(mappedProject)
+				}
+				this.projectStore.loadProjects()
+				router.replace('/projects')
 			}
 		},
 	},
