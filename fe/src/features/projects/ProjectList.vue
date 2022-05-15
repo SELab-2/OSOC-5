@@ -157,15 +157,6 @@
       to="/projects/create"
       shadow-color="orange"
     />
-    <btn
-      fab
-      v-if="authenticationStore.loggedInUser?.isAdmin"
-      padding="10px"
-      icon="remove"
-      color="yellow"
-      to="/projects/create2"
-      shadow-color="orange"
-    />
   </q-page-sticky>
 </template>
 

@@ -89,7 +89,6 @@ import ProjectSkills from "./components/ProjectSkills.vue";
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { useProjectStore } from '../../stores/useProjectStore'
-
 import { Project } from '../../models/Project'
 import Overview from "./components/CreateOverview.vue"
 import router from '../../router'
@@ -117,7 +116,11 @@ export default defineComponent({
 	async created() {
 		let project;
 		if (this.id) {
-			project = await this.projectStore.getProject(this.id)
+			try {
+				project = await this.projectStore.getProject(this.id)
+			} catch (error) {
+				router.replace('/notfound')
+			}
 		} else {
 			project = new Project('','','',0,[],[],[])
 		}
