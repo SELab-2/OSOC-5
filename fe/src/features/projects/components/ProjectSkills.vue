@@ -63,12 +63,20 @@
       
        
          <div class="text-h6">Selected Skills</div>
+         <div v-if="skills.length === 0" class="placeholder">
+           <div class="q-mb-xl">
+               <Vue3Lottie animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" style="transform: rotate(180deg)" />
+               <h6 class="text-bold q-mt-none q-mb-xl">Select a skill to add it to the project.</h6>
+           </div>
+         </div>
+         <div v-else>
          <create-project-chip
          v-for="skill in skills"
           :key="skill.skill.id"
           :skill="skill"
           @remove="removeSkillFromProject(skill.skill)"
           />
+         </div>
          
        
     </template>

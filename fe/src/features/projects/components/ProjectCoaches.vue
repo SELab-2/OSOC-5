@@ -40,8 +40,11 @@
         :limits="[20,80]"
       >
       <template #before>
-        <div v-if="coaches.length === 0">
-          Click the desired coaches to add them to the project.
+        <div v-if="coaches.length === 0" class="placeholder">
+          <div class="q-mb-xl">
+              <Vue3Lottie animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" style="transform: rotate(180deg)" />
+              <h6 class="text-bold q-mt-none q-mb-xl">Select a coach to add them to the project.</h6>
+          </div>
         </div>
         <div v-else>
         

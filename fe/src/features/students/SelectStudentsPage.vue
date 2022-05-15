@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<style scoped>
+<style>
 
 .placeholder {
   height: 100%;
