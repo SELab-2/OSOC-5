@@ -135,7 +135,7 @@
           :gap="0"
         >
           <template #default="{ item }">
-            <project-card :project="item" />
+            <project-card editable :project="item" />
           </template>
         </masonry-wall>
         <template v-slot:loading>

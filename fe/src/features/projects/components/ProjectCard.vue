@@ -20,6 +20,7 @@
         <q-space />
         <div>
           <btn
+            v-if="editable"
             flat
             round
             size="12px"
@@ -81,7 +82,7 @@
               class="row flex-center"
             >
               <div class="text-caption text-grey">Skills:</div>
-              <btn flat round size="sm" @click="expanded = !expanded">
+              <btn flat v-if="editable" round size="sm" @click="expanded = !expanded">
                 <q-icon
                   size="2em"
                   name="expand_more"
@@ -164,6 +165,10 @@ export default defineComponent({
       type: Project,
       required: true,
     },
+    editable: {
+      type: Boolean,
+      required: false,
+    }
   },
   components: { ProjectRoleChip, ProjectCardSuggestion },
   setup() {
@@ -176,7 +181,7 @@ export default defineComponent({
   data() {
     return {
       hovered: ref(-1),
-      showInfo: ref(false),
+      showInfo: ref(!this.editable ?? false),
     }
   },
 
