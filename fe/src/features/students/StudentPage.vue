@@ -320,21 +320,10 @@ export default defineComponent ({
       this.socket.onmessage = async (event: { data: string }) => {
           const data = JSON.parse(event.data)
 
-          if(data.hasOwnProperty('suggestion'))
-            await this.studentStore.receiveSuggestion(data.suggestion)
-          else if(data.hasOwnProperty('remove_suggestion'))
-            this.studentStore.removeSuggestion(data.remove_suggestion)
-          else if(data.hasOwnProperty('final_decision')) {
-            this.studentStore.receiveFinalDecision(data.final_decision)
-
-            if(this.student && this.student.finalDecision)
+          if(data.hasOwnProperty('final_decision') && this.student && this.student.finalDecision)
              this.possibleFinalDecision = this.student.finalDecision.suggestion
-          } else if(data.hasOwnProperty('remove_final_decision')) {
-            this.studentStore.removeFinalDecision(data.remove_final_decision)
-
-            if(this.student && this.student.finalDecision) {
+          else if(data.hasOwnProperty('remove_final_decision') && this.student && this.student.finalDecision) {
               this.possibleFinalDecision = this.student.finalDecision.suggestion
-            }
           }
       }
 

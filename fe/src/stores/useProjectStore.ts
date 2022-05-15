@@ -101,11 +101,6 @@ export const useProjectStore = defineStore('project', {
         }
       )
 
-      const studentStore = useStudentStore()
-      studentStore.students = studentStore.students.filter(
-        ({ url }) => url !== studentUrl
-      )
-
       return response
     },
     /**
@@ -232,19 +227,22 @@ export const useProjectStore = defineStore('project', {
      * Called when we recieve a suggestion from the websocket
      * @param param0 object received from the websocket
      */
-    async receiveSuggestion({
-      project_id,
-      reason,
-      coach,
-      student,
-      skill,
-    }: {
-      project_id: string
-      reason: string
-      coach: { id: number; firstName: string; lastName: string; url: string }
-      student: string
-      skill: string
-    }) {
+    async receiveSuggestion(
+      {
+        project_id,
+        reason,
+        coach,
+        student,
+        skill,
+      }: {
+        project_id: string
+        reason: string
+        coach: { id: number; firstName: string; lastName: string; url: string }
+        student: string
+        skill: string
+      },
+      onProject: string
+    ) {
       const projectId = Number.parseInt(project_id)
       const project = this.projects.filter(({ id }) => id === projectId)[0]
 
@@ -272,14 +270,20 @@ export const useProjectStore = defineStore('project', {
             true
           )
         )
+        console.log(onProject)
+        console.log(studentStore.students.some(({ url }) => url === student))
 
-        if (
-          studentStore.onProject === 'maybe' ||
-          studentStore.onProject === 'no'
-        )
+        if (onProject === 'false')
           studentStore.students = studentStore.students.filter(
             ({ url }) => url !== student
           )
+        else if (
+          onProject === 'true' &&
+          !studentStore.students.some(({ url }) => url === student)
+        ) {
+          const studentObject = await studentStore.getStudent(student)
+          studentStore.students.unshift(studentObject)
+        }
 
         // Remove the "New" badge from the new suggestion after a short period.
         setTimeout(
@@ -300,15 +304,18 @@ export const useProjectStore = defineStore('project', {
      * Called when we receive a remove suggestion from the websocket
      * @param param0 object received from the websocket
      */
-    removeReceivedSuggestion({
-      skill,
-      student,
-      project_id,
-    }: {
-      skill: string
-      student: string
-      project_id: string
-    }) {
+    removeReceivedSuggestion(
+      {
+        skill,
+        student,
+        project_id,
+      }: {
+        skill: string
+        student: string
+        project_id: string
+      },
+      onProject: string
+    ) {
       const projectId = Number.parseInt(project_id)
       const project = this.projects.filter(({ id }) => id === projectId)[0]
 
@@ -324,7 +331,8 @@ export const useProjectStore = defineStore('project', {
           project.suggestedStudents[suggestionIndex].student.url === student
         ) {
           const studentStore = useStudentStore()
-          if (studentStore.onProject === 'true')
+
+          if (onProject === 'true')
             studentStore.students = studentStore.students.filter(
               ({ url }) => url !== student
             )

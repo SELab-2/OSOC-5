@@ -1,5 +1,8 @@
 <template>
-  <div style="overflow: hidden" class="fit column">
+  <div
+    style="overflow: hidden"
+    class="fit column"
+  >
     <div
       :class="`${showShadow ? 'shadow-2' : ''}`"
       style="z-index: 1; transition: box-shadow ease 500ms;"
@@ -8,7 +11,9 @@
         style="overflow: visible; padding: 8px"
         class="text-blue bg-white"
       >
-        <div class="text-bold text-h4 q-ml-md text-black">Projects</div>
+        <div class="text-bold text-h4 q-ml-md text-black">
+          Projects
+        </div>
         <q-space />
 
         <btn
@@ -25,8 +30,8 @@
         />
         <!-- Do not remove the label attribute, otherwise the label slot does not work -->
         <q-input
-          tabindex="-1"
           v-model="projectNameFilter"
+          tabindex="-1"
           debounce="300"
           dense
           outlined
@@ -35,11 +40,14 @@
           style="margin-top: 5px"
           hide-bottom-space
         >
-          <template v-slot:label>
+          <template #label>
             <span class="text-weight-medium text-teal-3">Search Projects</span>
           </template>
-          <template v-slot:append>
-            <q-icon name="search" color="teal-3" />
+          <template #append>
+            <q-icon
+              name="search"
+              color="teal-3"
+            />
           </template>
         </q-input>
         <btn
@@ -74,7 +82,7 @@
       <q-slide-transition style="height: fit-content">
         <div v-if="showFilters">
           <q-card-section>
-            <span class="text-h5 text-bold">Filters</span><br />
+            <span class="text-h5 text-bold">Filters</span><br>
             <div class="row">
               <div class="column">
                 <!-- <q-checkbox label="My project" /> -->
@@ -124,9 +132,9 @@
     >
       <q-infinite-scroll
         ref="infinite"
-        @load="(i, done) => loadNext(i, done, filters)"
         :offset="250"
         scroll-target="#scroll-target-id"
+        @load="(i, done) => loadNext(i, done, filters)"
       >
         <masonry-wall
           :items="projects"
@@ -138,19 +146,25 @@
             <project-card :project="item" />
           </template>
         </masonry-wall>
-        <template v-slot:loading>
+        <template #loading>
           <div class="row justify-center q-my-md">
-            <q-spinner color="teal" size="40px" />
+            <q-spinner
+              color="teal"
+              size="40px"
+            />
           </div>
         </template>
       </q-infinite-scroll>
     </div>
   </div>
 
-  <q-page-sticky position="bottom-right" :offset="[18, 18]">
+  <q-page-sticky
+    position="bottom-right"
+    :offset="[18, 18]"
+  >
     <btn
-      fab
       v-if="authenticationStore.loggedInUser?.isAdmin"
+      fab
       padding="10px"
       icon="add"
       color="yellow"
@@ -166,7 +180,6 @@ import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from '../../stores/useStudentStore'
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
-import { wsBaseUrl } from '../../utils/baseUrl';
 
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
@@ -175,16 +188,13 @@ export default defineComponent({
   name: 'ProjectList',
   components: { ProjectCard },
   setup() {
-    const { loadNext, receiveSuggestion, removeReceivedSuggestion} = useProjectStore()
+    const { loadNext } = useProjectStore()
     
     return {
       ...storeToRefs(useProjectStore()),
       loadNext,
-      receiveSuggestion,
-      removeReceivedSuggestion,
       studentStore: useStudentStore(),
       authenticationStore: useAuthenticationStore(),
-      socket: new WebSocket(wsBaseUrl)
       skillStore: useSkillStore(),
     }
   },
@@ -230,24 +240,6 @@ export default defineComponent({
         infscroll.trigger()
       },
     },
-  },
-  mounted() {
-    this.socket.onmessage = async (event: { data: string }) => {
-      const data = JSON.parse(event.data)
-
-      if (data.hasOwnProperty('suggestion')) {
-        await this.studentStore.receiveSuggestion(data.suggestion)
-      } else if (data.hasOwnProperty('remove_suggestion')) {
-        this.studentStore.removeSuggestion(data.remove_suggestion)
-      } else if (data.hasOwnProperty('final_decision')) {
-        this.studentStore.receiveFinalDecision(data.final_decision)
-      } else if (data.hasOwnProperty('remove_final_decision')) {
-        this.studentStore.removeFinalDecision(data.remove_final_decision)
-      } else if (data.hasOwnProperty('suggest_student'))
-        this.receiveSuggestion(data.suggest_student)
-      else if (data.hasOwnProperty('remove_student'))
-        this.removeReceivedSuggestion(data.remove_student)
-    }
   },
 })
 </script>

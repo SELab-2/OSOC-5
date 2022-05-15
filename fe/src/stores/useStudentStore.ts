@@ -4,6 +4,7 @@ import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
+import { baseUrl } from '../utils/baseUrl'
 import qs from 'qs'
 
 interface State {
@@ -281,7 +282,7 @@ export const useStudentStore = defineStore('user/student', {
      * @param suggestion the suggestion that was made
      * @param reason the reason why this suggestion was made
      */
-    receiveFinalDecision({
+    async receiveFinalDecision({
       student_id,
       suggestion,
       coach,
@@ -301,18 +302,12 @@ export const useStudentStore = defineStore('user/student', {
       const finalDecision = {
         student: studentId,
         coach: coach,
-        suggestion,
+        suggestion: Number.parseInt(suggestion),
         reason,
       }
 
       // We found the corresponding student
       if (student) {
-        const finalDecision = {
-          student: studentId,
-          coach: coach,
-          suggestion: Number.parseInt(suggestion),
-          reason,
-        }
         student.finalDecision = finalDecision
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
