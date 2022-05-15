@@ -1,5 +1,5 @@
 <template>
-  <div class="variable">
+  <div style="overflow: hidden" class="fit column">
     <div class="row">
       <div class="text-h4">
         Project Coaches
@@ -36,7 +36,7 @@
     </div>
     <q-splitter
         v-model="splitterModel"
-        style="height: 400px"
+        style="flex: 1; overflow: auto"
         :limits="[20,80]"
       >
       <template #before>
@@ -84,6 +84,8 @@
             </div>
             
           </q-chip>
+          <div class="text-h6">Unavailable Coaches</div>
+          <div>These coaches are assigned to other projects.</div>
         </div>
       </template>
     </q-splitter>

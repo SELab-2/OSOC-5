@@ -1,8 +1,10 @@
 <template>
-	<div>
+	<!-- <div> -->
 	<q-stepper
 		v-model="step"
 		color="primary"
+		class="column"
+		style="height: 100%"
 		animated
 		keep-alive
 		header-nav
@@ -56,11 +58,12 @@
 			padding="10px"
 			:icon-right="step < 4 ? 'arrow_forward' : 'check'"
 			:label="step < 4 ? 'Next' : 'Submit'"
+			:disable="step === 3 && !allDone"
 			color="yellow"
 			shadow-color="orange"
 		/>
 	</q-page-sticky>
-	</div>
+	<!-- </div> -->
 </template>
 
 <script>
@@ -119,3 +122,16 @@ export default {
 	}
 }
 </script>
+
+<style scoped>
+
+:deep(.q-stepper__content) {
+	flex: 1
+}
+
+:deep(.q-stepper__step-content), :deep(.q-stepper__step-inner) {
+	height: 100%
+}
+
+
+</style>

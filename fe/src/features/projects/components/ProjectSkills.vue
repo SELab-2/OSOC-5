@@ -1,5 +1,5 @@
 <template>
-    
+    <div style="overflow: hidden" class="fit column">
     <div class="row">
       <div class="text-h4">
         Project Skills
@@ -56,7 +56,7 @@
     </div>
     <q-splitter
       v-model="splitterModel"
-      style="height: 400px"
+      style="flex: 1; overflow: auto"
       :limits="[20,80]"
     >
     <template #before>
@@ -99,6 +99,7 @@
         v-model="showDialog"
         v-model:skill="editSkill"
       />
+    </div>
 </template>
 
 <script lang="ts">
