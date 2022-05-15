@@ -1,5 +1,5 @@
 <template>
-  <div class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
+  <div class="variable">
     <div class="text-h4 q-my-md">
       Basic Info
     </div>
@@ -89,3 +89,14 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+
+@media only screen and (min-width: 800px) {
+  .variable {
+    margin: auto;
+    width: 40%
+  }
+}
+
+</style>

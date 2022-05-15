@@ -61,7 +61,7 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         props: true,
-        component: EditProject,
+        component: CreateProject,
       },
       {
         path: '/projects/create',

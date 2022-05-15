@@ -1,7 +1,4 @@
 <template>
-  <div
-    class="projectcol col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6"
-  >
     
     <div class="row">
       <div class="text-h4">
@@ -102,7 +99,6 @@
         v-model="showDialog"
         v-model:skill="editSkill"
       />
-  </div>
 </template>
 
 <script lang="ts">
@@ -136,7 +132,7 @@ export default defineComponent ({
   },
   methods: {
     addSkillToProject(skill: Skill) {
-      this.skills.push(new ProjectSkill(0, '', skill))
+      this.skills.push(new ProjectSkill(1, '', skill))
     },
     removeSkillFromProject(skill: Skill) {
       const i = this.skills.findIndex(s => s.skill.id === skill.id)

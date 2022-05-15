@@ -27,7 +27,7 @@
 					v-model.number="_skill.amount"
 					dense 
 					borderless
-					min="0" 
+					min="1" 
 					style="max-width: 50px"
 					:input-style="{'text-align': 'right'}"
 					:input-class="`text-bold text-${enabled ? 'white' : `${skill.skill.color}-8`}`"

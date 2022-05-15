@@ -1,72 +1,65 @@
 <template>
-	<div class="q-pa-md">
-		<q-stepper
-			v-model="step"
-			color="primary"
-			animated
-			keep-alive
-			header-nav
-			flat
+	<div>
+	<q-stepper
+		v-model="step"
+		color="primary"
+		animated
+		keep-alive
+		header-nav
+		flat
+	>
+		<q-step
+			:name="1"
+			title="Project Info"
+			icon="settings"
+			:done="basicInfoDone"
 		>
-			<q-step
-				:name="1"
-				title="Project Info"
-				icon="settings"
-				:done="step > 1"
-			>
-				<div class="column">
-					First, some basic info!
-					<BasicInfo
-						v-model:name="project.name"
-						v-model:partnerName="project.partnerName"
-						v-model:info="project.extraInfo"
-					/>
-				</div>
+			<BasicInfo
+				v-model:name="project.name"
+				v-model:partnerName="project.partnerName"
+				v-model:info="project.extraInfo"
+			/>
+		</q-step>
 
-				<q-stepper-navigation>
-					<q-btn @click="step = 2" color="primary" label="Continue" />
-				</q-stepper-navigation>
-			</q-step>
+		<q-step
+			:name="2"
+			title="Coaches"
+			caption="Optional"
+			icon="create_new_folder"
+			:done="coachesDone"
+		>
+			<ProjectCoaches :coaches="project.coaches"/>
+		</q-step>
 
-			<q-step
-				:name="2"
-				title="Coaches"
-				caption="Optional"
-				icon="create_new_folder"
-				:done="step > 2"
-			>
-				<ProjectCoaches />
+		<q-step
+			:name="3"
+			title="Skills"
+			icon="assignment"
+			:done="skillsDone"
+		>
+			<ProjectSkills :skills="project.requiredSkills"/>
+		</q-step>
 
-				<q-stepper-navigation>
-					<q-btn @click="step = 3" color="primary" label="Continue" />
-					<q-btn flat @click="step = 1" color="primary" label="Back" class="q-ml-sm" />
-				</q-stepper-navigation>
-			</q-step>
-
-			<q-step
-				:name="3"
-				title="Skills"
-				icon="assignment"
-			>
-				<ProjectSkills :skills="project.requiredSkills"/>
-			</q-step>
-
-			<q-step
-				:name="4"
-				title="Overview"
-				icon="add_comment"
-				disable
-			>
-				Try out different ad text to see what brings in the most customers, and learn how to
-				enhance your ads using features like ad extensions. If you run into any problems with
-				your ads, find out how to tell if they're running and how to resolve approval issues.
-
-				<q-stepper-navigation>
-					<q-btn color="primary" label="Finish" />
-					<q-btn flat @click="step = 2" color="primary" label="Back" class="q-ml-sm" />
-				</q-stepper-navigation>
-			</q-step>
-		</q-stepper>
+		<q-step
+			:name="4"
+			title="Overview"
+			icon="add_comment"
+			:disable="!allDone"
+		>
+			<overview :project="project"/>
+		</q-step>
+	</q-stepper>
+	<q-page-sticky position="bottom-right" :offset="[18, 18]">
+		<btn
+			fab
+			@click="next()"
+			padding="10px"
+			:icon-right="step < 4 ? 'arrow_forward' : 'check'"
+			:label="step < 4 ? 'Next' : 'Submit'"
+			color="yellow"
+			shadow-color="orange"
+		/>
+	</q-page-sticky>
 	</div>
 </template>
 
@@ -77,24 +70,52 @@ import ProjectCoaches from "./components/ProjectCoaches.vue";
 import ProjectSkills from "./components/ProjectSkills.vue";
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
+import { useProjectStore } from '../../stores/useProjectStore'
+
 import { Project } from '../../models/Project'
+import Overview from "./components/CreateOverview.vue"
 export default {
-	setup () {
+	name: 'CreateProject',
+	components: { BasicInfo, ProjectCoaches, ProjectSkills, Overview },
+	props: {
+		id: {
+			type: String,
+			required: false
+		}
+	},
+	data() {
+		const project = useProjectStore().projects.find(p => p.id === parseInt(this.id)) ?? new Project('','','',0,[],[],[])
+		console.log(project)
+		console.log(useProjectStore().projects.find(p => p.id === parseInt(this.id)))
 		return {
 			step: ref(1),
 			skillStore: useSkillStore(),
-			coachStore: useCoachStore()
-		}
-	},
-	components: { BasicInfo, ProjectCoaches, ProjectSkills },
-	data() {
-		return {
-			project: ref(new Project('','','',0,[],[],[]))
+			coachStore: useCoachStore(),
+			project: ref(project)
 		}
 	},
 	mounted(){
 		this.skillStore.loadSkills()
 		this.coachStore.loadUsers()
+	},
+	methods: {
+		next() {
+			this.step += 1
+		}
+	},
+	computed: {
+		basicInfoDone() {
+			return this.project.name.length > 0 && this.project.partnerName.length > 0
+		},
+		coachesDone() {
+			return this.project.coaches.length > 0
+		},
+		skillsDone() {
+			return this.project.requiredSkills.length > 0
+		},
+		allDone() {
+			return this.basicInfoDone && this.coachesDone && this.skillsDone
+		}
 	}
 }
 </script>
