@@ -17,6 +17,17 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name']
 
+
+class ProjectPartialSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer to show some fields of the project model
+    used in coach serializer
+    """
+    class Meta:
+        model = Project
+        fields = ['id', 'url', 'name']
+
+
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the Suggestion model
@@ -88,11 +99,20 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
     fields: first_name, last_name, email, is_admin and is_active
     is_admin and is_active are read-only
     """
+    projects = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name',
-                  'email', 'is_admin', 'is_active']
+                  'email', 'is_admin', 'is_active', 'projects']
         read_only_fields = ['is_admin', 'is_active']
+
+    def get_projects(self, obj):
+        """
+        get all projects the current coach is assigned to and return a list of urls
+        """
+        projects = obj.project_set.all()
+        return ProjectPartialSerializer(projects, many=True, context={"request": self.context.get("request")}).data
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
