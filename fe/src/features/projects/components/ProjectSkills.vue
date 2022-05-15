@@ -109,6 +109,7 @@
       <NewSkillDialog
         v-model="showDialog"
         v-model:skill="editSkill"
+        @submit="editSkill.id > 0 ? updateSkill() : addSkill()"
       />
     </div>
 </template>
@@ -169,14 +170,6 @@ export default defineComponent ({
           message: 'Failed to update'
         })
       })
-    }
-  },
-  watch: {
-    showDialog(newValue) {
-      // newValue false means the popup closed
-      if (!newValue && this.editSkill) {
-        this.editSkill.id > 0 ? this.updateSkill() : this.addSkill()
-      }
     },
   },
 })

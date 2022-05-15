@@ -62,14 +62,14 @@
         flat
         label="Cancel"
         glow-color="#C0FFF4"
-        @click="() => { $emit('update:skill', backup); _visible = false }"
+        @click="_skill.name = backup.name; _skill.color = backup.color; _visible = false"
       />
       <btn
         v-close-popup
         flat
         :label="_skill.id === -1 ? 'Add' : 'Update'"
         glow-color="#C0FFF4"
-        @click="_visible = false"
+        @click="$emit('submit'); _visible = false"
       />
     </q-card-actions>
   </q-card>
@@ -96,12 +96,17 @@ export default defineComponent({
     }
   },
   components: { DeleteSkillDialog },
-  data(props) {
+  data() {
     return {
       skillStore: useSkillStore(),
-      backup: props.skill,
+      backup: null,
       quasarColors,
       showDelete: ref(false)
+    }
+  },
+  watch: {
+    skill(newValue) {
+      this.backup = Object.assign({}, newValue)
     }
   },
 
