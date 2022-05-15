@@ -45,6 +45,7 @@
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
         <div v-if="showInfo">
+          <btn icon="r_link"/>
           <div class="text-h6">Info</div>
           <div class="text-body2">
             {{ project.extraInfo }}
@@ -102,11 +103,11 @@
                 selectedRoles[skill.skill.id] || hovered === skill.skill.id
               "
               @update:modelValue="selectedRoles[skill.skill.id] = $event"
-              v-for="(skill, index) in project.requiredSkills"
+              v-for="skill in project.requiredSkills"
               @dragleave="onDragLeave($event, skill)"
               @dragover="checkDrag($event, skill)"
               @drop="onDrop($event, skill)"
-              :key="index"
+              :key="skill.skill.id"
               :skill="skill"
               :occupied="groupedStudents[skill.skill.id]?.length"
             />

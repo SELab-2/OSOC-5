@@ -20,6 +20,7 @@
             <DecisionIcon
               v-if="student !== null && student.finalDecision !== null"
               :decision="student.finalDecision.suggestion"
+              :reason="student.finalDecision.reason"
             />
             <q-chip
               v-if="student.alum"
