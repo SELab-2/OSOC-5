@@ -25,6 +25,9 @@ import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
+  
+  // Flag so projectlist can determine if it should reset the pagination and reload all the projects or not.
+  // Is used e.g. when a conflict is resolved, or a project is created/updated.
   shouldRefresh: Boolean
 }
 

@@ -29,7 +29,6 @@
 		<q-step
 			:name="2"
 			title="Coaches"
-			caption="Optional"
 			icon="r_group"
 			:done="coachesDone"
 		>
@@ -113,6 +112,7 @@ export default defineComponent({
 		const project = ref(null);
 		return {
 			step: ref(1),
+			visitedSteps: ref([false, false, false, false]),
 			skillStore: useSkillStore(),
 			coachStore: useCoachStore(),
 			projectStore: useProjectStore(),

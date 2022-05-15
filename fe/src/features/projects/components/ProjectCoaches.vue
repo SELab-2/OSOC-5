@@ -42,7 +42,7 @@
       <template #before>
         <div v-if="coaches.length === 0" class="placeholder">
           <div class="q-mb-xl">
-              <Vue3Lottie animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" style="transform: rotate(180deg)" />
+              <lottie-animation animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" style="transform: rotate(180deg)" />
               <h6 class="text-bold q-mt-none q-mb-xl">Select a coach to add them to the project.</h6>
           </div>
         </div>
@@ -107,9 +107,9 @@ import { User } from "../../../models/User"
 import CoachTable from "./subcomponents/CoachTable.vue";
 import CreateProjectChip from "./createprojectchip.vue"
 import quasarColors from '../../../models/QuasarColors'
-
+import LottieAnimation from '../../../components/LottieAnimation.vue'
 export default defineComponent({
-  components: {CoachTable, CreateProjectChip},
+  components: {CoachTable, CreateProjectChip,LottieAnimation},
   props: {
     coaches: {
       type: [Object] as PropType<User[]>,

@@ -69,7 +69,7 @@
        
          <div v-if="skills.length === 0" class="placeholder">
            <div class="q-mb-xl">
-               <Vue3Lottie animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" style="transform: rotate(180deg)" />
+               <lottie-animation animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" style="transform: rotate(180deg)" />
                <h6 class="text-bold q-mt-none q-mb-xl">Select a skill to add it to the project.</h6>
            </div>
          </div>
@@ -122,8 +122,10 @@ import { useSkillStore } from "../../../stores/useSkillStore";
 import { Skill, ProjectSkill } from "../../../models/Skill"
 import ProjectRoleChip from "./ProjectRoleChip"
 import CreateProjectChip from "./createprojectchip.vue"
+import LottieAnimation from '../../../components/LottieAnimation.vue'
+
 export default defineComponent ({
-  components: {NewSkillDialog, SkillTable,CreateProjectChip},
+  components: {NewSkillDialog, SkillTable,CreateProjectChip, LottieAnimation},
   props: {
     skills: {
       type: [Object] as PropType<ProjectSkill[]>,
