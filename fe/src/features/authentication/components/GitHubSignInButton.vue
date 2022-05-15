@@ -7,6 +7,6 @@
     size="md"
     glow-color="#666666"
     glow-scale="1.5"
-    shadow-color='grey'
+    shadow-color="grey"
   />
 </template>

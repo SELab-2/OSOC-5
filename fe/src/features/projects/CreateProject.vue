@@ -19,7 +19,7 @@
                 size="md"
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
-                shadow-strength=2
+                shadow-strength="2"
                 @click="onCancel"
               />
               <btn
@@ -30,7 +30,7 @@
                 size="md"
                 class="q-mx-md cornered"
                 glow-color="#00F1AF"
-                shadow-strength=2
+                shadow-strength="2"
               />
             </div>
           </div>
@@ -49,14 +49,12 @@
 
 <script lang="ts">
 import router from '../../router'
-import { ref } from 'vue'
 import { defineComponent, onMounted } from '@vue/runtime-core'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import BasicInfo from "./components/BasicInfo.vue";
 import {useProjectStore} from "../../stores/useProjectStore";
 import ProjectCoaches from "./components/ProjectCoaches.vue";
-import ProjectRoles from "./components/ProjectRoles.vue";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import ProjectSkills from "./components/ProjectSkills.vue";
 
@@ -67,24 +65,30 @@ export default defineComponent({
     const coachStore = useCoachStore()
     const projectStore = useProjectStore()
 
-    const selected_coaches = ref([])
+
 
     return {
       skillStore,
       coachStore,
       projectStore,
       authenticationStore: useAuthenticationStore(),
-      selected_coaches,
+
     }
   },
   beforeMount() {
-    if (!this.authenticationStore.loggedInUser?.isAdmin) {
-      router.replace('/projects')
-    }
+  if (!this.authenticationStore.loggedInUser?.isAdmin) {
+    router.replace('/projects')
+  }
   },
-  mounted() {
+  mounted(){
     this.skillStore.loadSkills()
     this.coachStore.loadUsers()
+  // makes sure the fields are empty
+    this.projectStore.projectName = ''
+    this.projectStore.projectPartnerName = ''
+    this.projectStore.projectLink = ''
+    this.projectStore.filterCoaches = ''
+    this.projectStore.selectedCoaches = []
   },
   methods: {
     onSubmit() {

@@ -7,42 +7,92 @@
       class="q-pa-md q-gutter-md"
       style="width: 1000px"
     >
-      <div class="row">
-        <div class="text-bold text-h4">
-          Sent Mails
-        </div>
-        <q-space />
-        <q-input
-          v-model="mailStore.searchMails"
-          outlined
-          dense
-          debounce="300"
-          color="yellow-4"
-          placeholder="Search"
-          @update:modelValue="mailStore.loadStudentsMails"
-        >
-          <template #append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
+      <div class="text-bold text-h4">
+        Sent Mails
       </div>
-
+      <div class="row">
+        <div class="row col-6 q-gutter-sm">
+          <q-input
+            v-model="search"
+            outlined
+            dense
+            debounce="300"
+            color="yellow-4"
+            placeholder="Search"
+            @update:modelValue="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
+          >
+            <template #append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+          <q-select
+            v-model="statusFilter"
+            class="col"
+            rounded
+            outlined
+            dense
+            multiple
+            clearable
+            use-chips
+            label="Status"
+            :options="status"
+            map-options
+            emit-value
+            @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
+          />
+        </div>
+        <div class="row col-6 q-gutter-sm justify-end">
+          <q-select
+            v-model="statusUpdate"
+            style="width: 220px"
+            rounded
+            outlined
+            dense
+            use-chips
+            emit-value
+            map-options
+            label="New status"
+            :options="status"
+          />
+          <q-button>
+            <btn
+              padding="7px"
+              color="yellow"
+              shadow-strength="2.5"
+              no-wrap
+              @click="updateStatusStudents"
+            >
+              Bulk update status
+            </btn>
+          </q-button>
+        </div>
+      </div>
       <q-table
+        v-model:selected="selectedStudents"
         class="my-table mail-table shadow-4"
         :rows="mailStore.mailStudents"
-        :columns="columns"
-        row-key="id"
+        :columns="mailsColumns"
+        :loading="mailStore.isLoading"
+        row-key="url"
+        selection="multiple"
         separator="horizontal"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
             :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
             :props="props"
           >
+            <q-td>
+              <q-checkbox v-model="props.selected" />
+            </q-td>
             <q-td auto-width>
               <q-icon
+                size="sm"
+                color="yellow"
+                :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                 @click="() => clickRow(props, props.row)"
-                size="sm" color="yellow" :name="props.expand ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+              />
             </q-td>
             <q-td
               key="name"
@@ -71,9 +121,9 @@
               >
                 <template #option="scope">
                   <q-item
-                    @click="() => updateStatus(props.row, props.row.status)"
                     class="items-center"
                     v-bind="scope.itemProps"
+                    @click="() => updateStatus(props.row, props.row.status)"
                   >
                     <q-item-section>
                       <q-item-label>{{ scope.opt.label }}</q-item-label>
@@ -81,19 +131,77 @@
                   </q-item>
                 </template>
               </q-select>
-              
             </q-td>
             <q-td
               key="email"
               :props="props"
             >
-              <a :href="'mailto:' + props.row.email" style="color: black">{{ props.row.email }}</a>
+              <a
+                :href="'mailto:' + props.row.email"
+                style="color: black"
+              >{{ props.row.email }}</a>
             </q-td>
-            
+            <q-td style="align-content: flex-end">
+              <q-btn
+                size="sm" color="yellow" round dense icon="mail" @click="reset"
+              >
+                <q-menu>
+                  <q-list>
+                    <q-item tag="label">
+                      <div class="column q-gutter-sm">
+                        <label>Add new mail:</label>
+                        <q-input filled v-model="date">
+                          <template v-slot:prepend>
+                            <q-icon name="event" class="cursor-pointer">
+                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
+                                  <div class="row items-center justify-end">
+                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                  </div>
+                                </q-date>
+                              </q-popup-proxy>
+                            </q-icon>
+                          </template>
+
+                          <template v-slot:append>
+                            <q-icon name="access_time" class="cursor-pointer">
+                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                                  <div class="row items-center justify-end">
+                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                  </div>
+                                </q-time>
+                              </q-popup-proxy>
+                            </q-icon>
+                          </template>
+                        </q-input>
+
+                        <q-input
+                          label="Info"
+                          v-model="info"
+                          filled
+                          type="textarea"
+                        />
+
+                        <q-btn class="bg-yellow" @click="() => sendMail(props.row)" v-close-popup>
+                          Send
+                        </q-btn>
+                      </div>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </q-td>
           </q-tr>
-          <q-tr no-hover v-if="props.expand" :props="props">
+          <q-tr
+            v-if="props.expand"
+            no-hover
+            :props="props"
+          >
             <q-td colspan="100%">
-              <MailsOverview :student="props.row" />
+              <MailsOverview
+                :student="props.row"
+              />
             </q-td>
           </q-tr>
         </template>
@@ -104,49 +212,16 @@
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import {ref} from 'vue'
+import {Ref, ref} from 'vue'
 import {Student} from "../../models/Student";
-import {useStudentStore} from "../../stores/useStudentStore";
 import {useQuasar} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
+import columnsMails from "../../models/MailStudentColumns";
 import router from "../../router";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
-
-const columns = [
-  {
-    name: 'visibility',
-    required: false,
-    label: '',
-    align: 'left' as const,
-    field: '',
-    sortable: false,
-  },
-  {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left' as const,
-    field: 'name',
-    sortable: true,
-  },
-  {
-    name: 'status',
-    required: true,
-    label: 'Status',
-    align: 'left' as const,
-    field: 'status',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    align: 'right' as const,
-    label: 'Email',
-    field: 'email',
-    sortable: true,
-  }
-]
+import mailsColumns from "../../models/MailsColumns";
 
 export default defineComponent({
   components: {MailsOverview},
@@ -158,9 +233,29 @@ export default defineComponent({
       mailStore,
       authenticationStore: useAuthenticationStore(),
       filter: ref(''),
-      columns,
+      statusUpdate: ref(null),
+      selectedStudents: ref([]),
+      mailsColumns,
+      columnsMails,
       status,
-      q
+      q,
+    }
+  },
+  data() {
+    const pagination = ref({
+      sortBy: 'name',
+      descending: false,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 10 // if getting data from a server
+    })
+
+    return {
+      search: ref(''),
+      statusFilter: ref([]),
+      date: ref((new Date()).toLocaleString()),
+      info: ref(''),
+      pagination
     }
   },
   beforeMount() {
@@ -168,12 +263,57 @@ export default defineComponent({
       router.replace('/projects')
     }
   },
-  mounted() {
-    this.mailStore.loadStudentsMails()
+  async mounted() {
+    await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
+  },
+  computed: {
+    filters() {
+      let filter = {} as {
+        search: string
+        page_size: number
+        page: number
+        ordering: string
+        status: string
+      }
+
+      if (this.search) filter.search = this.search
+      filter.page_size = this.pagination.rowsPerPage
+      filter.page = this.pagination.page
+      const order = this.pagination.descending ? '-' : '+'
+      if (this.pagination.sortBy === 'name') {
+          filter.ordering = `${order}first_name,${order}last_name`
+      } else if (this.pagination.sortBy !== null) {
+          filter.ordering = `${order}${this.pagination.sortBy}`
+      }
+      if (this.statusFilter && this.statusFilter.length > 0) filter.status = this.statusFilter.join(',')
+
+      return filter
+    }
   },
   methods: {
-    updateStatus(student: Student, oldStatus: string) {
-      this!.$nextTick(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reset() {
+      this.date = (new Date()).toLocaleString()
+      this.info = ''
+    },
+    async sendMail(student: Student) {
+      await this.mailStore.sendMail(student, null, this.date, this.info)
+      await this.mailStore.getMails(student)
+    },
+    async onRequest(props: any) {
+      this.pagination = props.pagination
+      await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
+    },
+    async updateStatusStudents() {
+      if (this.statusUpdate !== null) {
+        await this.mailStore.updateStatusStudents(this.statusUpdate, this.selectedStudents)
+        this.selectedStudents = []
+        this.statusUpdate = null
+        await this.mailStore.loadStudentsMails(this.pagination, (count: number) => this.pagination.rowsNumber = count)
+      }
+    },
+    updateStatus(student: Student, oldStatus: number) {
+      this?.$nextTick(() => {
         this.mailStore
           .updateStatus(student)
           .catch((error) => {
@@ -183,10 +323,13 @@ export default defineComponent({
               message: error.detail,
               textColor: 'black'
             });
-            this.mailStore.mailStudents.find((s: Student) => s.id === student.id)!.status = oldStatus
+            const student = this.mailStore.mailStudents.find((s: Student) => s.id === student.id) as Student
+            if(student)
+              student.status = oldStatus
           })
       })
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clickRow(props: any, student: Student) {
       props.expand = !props.expand
       if (props.expand) this.mailStore.getMails(student)

@@ -1,9 +1,17 @@
 <template>
   <!-- appear only when a new entry is added. Otherwise, the suggestions may be glitchy when removing suggestions. -->
   <q-slide-transition :appear="(fromLocal || fromWebsocket) && !suggestion.reason">
-    <div v-if="show" style="margin-left: 10px">
+    <div
+      v-if="show"
+      style="margin-left: 10px"
+    >
       <div class="column full-width">
-        <div :lines="1" tabindex="-1" class="row flex-center no-wrap" style="height: 30px">
+        <div
+          :lines="1"
+          tabindex="-1"
+          class="row flex-center no-wrap"
+          style="height: 30px"
+        >
           <div
             class="text-weight-medium row wrap text-no-wrap"
             :class="removed ? 'text-strike' : ''"
@@ -11,17 +19,48 @@
             {{ suggestion.student.firstName }}
             {{ suggestion.student.lastName }}
           </div>
-          <q-badge v-if="fromWebsocket || fromLocal" rounded :color="suggestion.skill.color" :label="fromWebsocket ? 'New' : 'Draft'" class="q-ml-xs" />
+          <q-badge
+            v-if="fromWebsocket || fromLocal"
+            rounded
+            :color="suggestion.skill.color"
+            :label="fromWebsocket ? 'New' : 'Draft'"
+            class="q-ml-xs"
+          />
           
-          <q-space/>
-          <div v-if="!removed" style="flex-wrap: nowrap; display: block; min-width: 72px">
-            <btn tabindex="-1" class="gt-xs" size="sm" @mouseover="() => {
-              if (progress === 0) progress = 3
-            }" @mouseleave="() => {
-              if (progress === 3) progress = 0
-            }" flat dense round icon="r_comment" />
-            <btn tabindex="-1" class="gt-xs" size="sm" flat dense round icon="info" />
-            <btn tabindex="-1"
+          <q-space />
+          <div
+            v-if="!removed"
+            style="flex-wrap: nowrap; display: block; min-width: 48px"
+          >
+            <btn
+              tabindex="-1"
+              class="gt-xs"
+              size="sm"
+              flat
+              dense
+              round
+              icon="r_person"
+              :to="`/students/${suggestion.student.id}`"
+            />
+            <btn
+              v-if="!fromLocal"
+              tabindex="-1"
+              class="gt-xs"
+              size="sm"
+              flat
+              dense
+              round
+              icon="r_info"
+              @mouseover="() => {
+                if (progress === 0) progress = 3
+              }"
+              @mouseleave="() => {
+                if (progress === 3) progress = 0
+              }"
+              @click="disableHover = !disableHover"
+            />
+            <btn
+              tabindex="-1"
               class="gt-xs"
               size="sm"
               flat
@@ -34,21 +73,43 @@
               }"
             />
           </div>
-          <btn v-else label="undo" @click="stop" dense style="justify-content: center; height: 30px"/>
+          <btn
+            v-else
+            label="undo"
+            dense
+            style="justify-content: center; height: 30px"
+            @click="stop"
+          />
         </div>
+        <q-slide-transition>
+          <div
+            v-if="progress === 3 || disableHover"
+            style="margin-left: 10px"
+          >
+            <div>Assigned by {{ suggestion.coach.fullName }}</div>
+            <div v-if="suggestion.reason">
+              <div class="text-bold">
+                Comment
+              </div>
+              {{ suggestion.reason }}
+            </div>
+            <div v-else>
+              No comment provided
+            </div>
+          </div>
+        </q-slide-transition>
         <q-slide-transition v-if="progress >= 0">
           <q-input
-            :autofocus="progress !== 3"
+            v-if="fromLocal || (progress !== 0 && progress !== 3)"
+            v-model="localSuggestion.reason"
+            autofocus
             :color="suggestion.skill.color"
-            v-if="fromLocal || progress !== 0"
-            v-model="suggestion.reason"
             dense
             outlined
             autogrow
             label="Comment (Optional)"
-            :disabled="progress === 3"
           >
-            <template v-slot:after v-if="progress !== 3">
+            <template #after>
               <btn
                 :color="progress === 2 ? 'positive' : suggestion.skill.color"
                 dense
@@ -56,15 +117,21 @@
                 focusable
                 padding="sm"
                 :loading="progress === 1"
-                @click="confirm"
                 :icon="progress === 0 ? 'r_send' : 'r_check'"
                 :glow-color="progress === 2 ? 'green-2' : `${suggestion.skill.color}-2`"
+                @click="confirm"
               />
             </template>
           </q-input>
         </q-slide-transition>
-        <div v-else class="row justify-evenly items-center text-red full-width">
-          <q-icon size="20px" name="error" />
+        <div
+          v-else
+          class="row justify-evenly items-center text-red full-width"
+        >
+          <q-icon
+            size="20px"
+            name="error"
+          />
           <div>Cannot add suggestion.</div>
           <btn
             class="q-py-none"
@@ -103,13 +170,27 @@ export default defineComponent({
     },
   },
   data() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let timeout: any | null = null
     return {
       projectStore: useProjectStore(),
       show: ref(true),
       progress: ref(0),
       removed: ref(false),
-      timeout
+      disableHover: ref(false),
+      timeout,
+      localSuggestion: this.suggestion
+    }
+  },
+  computed: {
+    isNew() {
+      return this.suggestion instanceof NewProjectSuggestion
+    },
+    fromLocal() {
+      return this.isNew && (this.suggestion as NewProjectSuggestion).fromLocal
+    },
+    fromWebsocket() {
+      return this.isNew && (this.suggestion as NewProjectSuggestion).fromWebsocket
     }
   },
   beforeUnmount() {
@@ -152,17 +233,6 @@ export default defineComponent({
         this.progress = -1
       }
     },
-  },
-  computed: {
-    isNew() {
-      return this.suggestion instanceof NewProjectSuggestion
-    },
-    fromLocal() {
-      return this.isNew && (this.suggestion as NewProjectSuggestion).fromLocal
-    },
-    fromWebsocket() {
-      return this.isNew && (this.suggestion as NewProjectSuggestion).fromWebsocket
-    }
   }
 })
 </script>

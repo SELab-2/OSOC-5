@@ -8,10 +8,13 @@ on:
       - 'fe/src/**/*.js'
       - 'fe/src/**/*.ts'
       - 'fe/src/**/*.vue'
+      - 'fe/tests/**/*.js'
+      - 'fe/tests/**/*.ts'
+      - 'fe/tests/**/*.vue'
 
 jobs:
-  build:
-    runs-on: self-hosted
+  vue:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up node

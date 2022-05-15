@@ -2,27 +2,26 @@
   <q-card class="create-skill-popup">
     <q-card-section>
       <div class="text-h6">
-        Create a new skill
+        {{ dialogTitle }}
       </div>
     </q-card-section>
 
     <q-card-section class="q-pt-none">
       <q-input
-        v-model="newSkill"
+        v-model="skillStore.popupName"
         outlined
         autofocus
         class="inputfield"
         label="Skill name"
         lazy-rules
         :rules="[
-          (val) =>
-            (val && val.length > 0) || 'Enter the name of the new skill.',
+          (val) => (val && val.length > 0) || 'Enter the name of the skill.',
         ]"
       />
     </q-card-section>
     <q-card-section class="q-pt-none">
       <q-select
-        v-model="newSkillColor"
+        v-model="skillStore.popupColor"
         filled
         use-input
         input-debounce="0"
@@ -63,11 +62,12 @@
         flat
         label="Cancel"
         glow-color="#C0FFF4"
+        @click="newSkillCancel"
       />
       <btn
         v-close-popup
         flat
-        label="Add skill"
+        :label="submitText"
         glow-color="#C0FFF4"
         @click="newSkillConfirm"
       />
@@ -76,94 +76,102 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
-import { ref } from "vue";
-import { useSkillStore } from "../../../../stores/useSkillStore";
-import quasarColors from "../../../../models/QuasarColors";
+import { defineComponent } from '@vue/runtime-core'
+import { ref } from 'vue'
+import { useSkillStore } from '../../../../stores/useSkillStore'
+import quasarColors from '../../../../models/QuasarColors'
 
 export default defineComponent({
   props: {
-    resetNewSkillPrompt: {
+    dialogTitle: {
+      type: String,
+      required: true,
+    },
+    submitText: {
+      type: String,
+      required: true,
+    },
+    callback: {
       type: Function,
-      required: true
-    }
+      required: true,
+    },
   },
   setup() {
-    const skillStore = useSkillStore();
+    const skillStore = useSkillStore()
 
-    // variables for the new skill dialog popup
-    const newSkill = ref("");
-    const newSkillColor = ref("");
-
-    const options = ref(quasarColors);
+    const options = ref(quasarColors)
 
     return {
       skillStore,
-      newSkill,
-      newSkillColor,
 
       options,
 
       quasarColors,
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filterFn(val: string, update: any) {
-        if (val === "") {
+        if (val === '') {
           update(() => {
-            options.value = quasarColors;
-          });
-          return;
+            options.value = quasarColors
+          })
+          return
         } else {
           update(() => {
-            const needle = val.toLowerCase();
-            options.value = quasarColors.filter(v => v.toLowerCase().indexOf(needle) > -1);
-          });
+            const needle = val.toLowerCase()
+            options.value = quasarColors.filter(
+              (v) => v.toLowerCase().indexOf(needle) > -1
+            )
+          })
         }
-
-      }
-    };
+      },
+    }
   },
   methods: {
     newSkillConfirm() {
-      // check if the new skill value is valid
-      if (
-        this.newSkill &&
-        this.newSkill.length > 0 &&
-        this.newSkillColor.length > 0
-      ) {
-        // when valid call the store object and add the skill
-        this.skillStore.addSkill(
-          this.newSkill,
-          this.newSkillColor,
-
-          // callback
-          (success: boolean) => {
-            if (success) {
+      // when valid call the store object and add the skill
+      this.skillStore.addSkill(
+        // callback
+        (exitCode: number) => {
+          switch (exitCode) {
+            case 1: {
               this.$q.notify({
-                icon: "done",
-                color: "positive",
-                message: `Added new project skill: ${this.newSkill}.`,
-                textColor: "black"
-              });
-              this.resetNewSkillPrompt();
-              this.newSkill = "";
-              this.newSkillColor = "";
-            } else {
+                icon: 'close',
+                color: 'negative',
+                message: 'Failed!',
+              })
+              break
+            }
+            case 2: {
               this.$q.notify({
-                icon: "close",
-                color: "negative",
-                message: "Failed to add skill!"
-              });
+                icon: 'close',
+                color: 'negative',
+                message: 'Invalid skill-name and/or color!',
+              })
+              break
+            }
+            default: {
+              this.$q.notify({
+                icon: 'done',
+                color: 'positive',
+                message: `Success!.`,
+                textColor: 'black',
+              })
+              this.skillStore.popupName = ''
+              this.skillStore.popupColor = ''
+              this.skillStore.popupID = -1
+              break
             }
           }
-        );
-      } else {
-        this.$q.notify({
-          icon: "close",
-          color: "negative",
-          message: "Invalid name/color!"
-        });
-      }
-    }
-  }
-});
+          this.callback()
+        }
+      )
+    },
+    newSkillCancel() {
+      this.skillStore.popupName = ''
+      this.skillStore.popupColor = ''
+      this.skillStore.popupID = -1
+      this.callback()
+    },
+  },
+})
 </script>

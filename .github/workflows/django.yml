@@ -8,8 +8,8 @@ on:
       - 'be/osoc/**/*.py'
 
 jobs:
-  build:
-    runs-on: self-hosted
+  django:
+    runs-on: ubuntu-latest
     services:
       db:
         image: postgres
@@ -19,17 +19,17 @@ jobs:
           POSTGRES_PASSWORD: dev
         ports:
           - 5432:5432
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: "3.9"
-    - name: Start Redis
-      uses: supercharge/redis-github-action@1.4.0
-      with:
-        redis-version: [6]
-        redis-port: 6379
     - name: Install Dependencies
       working-directory: ./be
       run: |
@@ -42,3 +42,9 @@ jobs:
         python manage.py test
       env:
         POSTGRES_HOST: localhost
+        REDIS_HOST: localhost
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
