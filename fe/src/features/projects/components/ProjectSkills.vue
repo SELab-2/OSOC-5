@@ -54,6 +54,11 @@
         </template>
       </q-input>
     </div>
+    <div class="row text-h6">
+      <div>Selected Skills</div>
+      <q-space/>
+      <div>Available Skills</div>
+    </div>
     <q-splitter
       v-model="splitterModel"
       style="flex: 1; overflow: auto"
@@ -62,7 +67,6 @@
     <template #before>
       
        
-         <div class="text-h6">Selected Skills</div>
          <div v-if="skills.length === 0" class="placeholder">
            <div class="q-mb-xl">
                <Vue3Lottie animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json" :height="200" :width="200" style="transform: rotate(180deg)" />
@@ -82,7 +86,6 @@
     </template>
     <template #after>
       <div style="float: right; text-align: right">
-      <div class="text-h6">Available Skills</div>
         <q-chip 
           v-for="skill in skillStore.skills"
           :key="skill.id"
