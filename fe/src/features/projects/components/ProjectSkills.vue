@@ -182,16 +182,16 @@ export default defineComponent ({
 <style scoped lang="scss">
 
 .updown {
-  animation: MoveUpDown 2s ease infinite;
+  animation: MoveUpDown 1s ease infinite;
   animation-delay: var(--random);
 }
 
 @keyframes MoveUpDown {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateX(0);
   }
   50% {
-    transform: translateY(3px);
+    transform: translateX(3px);
   }
 }
 
