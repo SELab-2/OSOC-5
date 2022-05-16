@@ -5,19 +5,19 @@
 </template>
 
 <script lang="ts">
-
+import { defineComponent } from 'vue'
 const options = [
   "https://assets8.lottiefiles.com/packages/lf20_GIyuXJ.json",
   "https://assets1.lottiefiles.com/packages/lf20_zyu0ctqb.json",
   "https://assets1.lottiefiles.com/packages/lf20_a3kesdek.json"
 ]
 
-export default {
+export default defineComponent({
   data() {
     return {
       options
     }
   },
-}
+})
 
 </script>
