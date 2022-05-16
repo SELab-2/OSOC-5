@@ -74,8 +74,8 @@
                 { name: 'yes', label: 'Yes', amount: 1 },
                 { name: 'maybe', label: 'Maybe', amount: 1 },
                 { name: 'no', label: 'No', amount: 1 },
-                { name: 'undecided', label: 'Undecided', amount: 1 },
-                { name: 'none', label: 'None', amount: 1 },
+                { name: 'none', label: 'Undecided', amount: 1 },
+                { name: 'nofilter', label: 'None', amount: 1 },
               ]"
                   @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
@@ -282,7 +282,7 @@ export default defineComponent({
       showShadow: ref(false),
       search: ref(''),
       alumni: ref('all'),
-      suggestion: ref('none'),
+      suggestion: ref('nofilter'),
       byMe: ref('maybe'),
       onProject: ref('maybe'),
       status: ref(''),
@@ -308,7 +308,7 @@ export default defineComponent({
       if (this.search) filter.search = this.search
       if (this.alumni === 'alumni') filter.alum = true
       if (this.alumni === 'student coaches') filter.student_coach = true
-      if (this.suggestion !== 'none') filter.suggestion = this.suggestion
+      if (this.suggestion !== 'nofilter') filter.suggestion = this.suggestion
       if (this.byMe !== 'maybe') filter.suggested_by_user = this.byMe
       if (this.onProject !== 'maybe') filter.on_project = this.onProject
       if (this.status) filter.status = this.status
