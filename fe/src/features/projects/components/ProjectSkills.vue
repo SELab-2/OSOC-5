@@ -1,22 +1,10 @@
 <template>
     <div style="overflow: hidden" class="fit column">
-    <div class="row">
+    <div class="row q-gutter-sm">
       <div class="text-h4">
         Project Skills
       </div>
       <q-space/>
-        <btn
-          round
-          style="margin-bottom: 15px"
-          size="12px"
-          glow-color="teal-3"
-          shadow-color="teal"
-          :shadow-strength="2"
-          color="teal"
-          class="text-white"
-          icon="add"
-          @click="showDialog = true"
-        />
         <btn
           round
           style="margin-bottom: 15px"
@@ -28,6 +16,18 @@
           :class="`text-${editMode ? 'white' : 'teal'}`"
           icon="mdi-pencil-outline"
           @click="editMode = !editMode"
+        />
+        <btn
+          round
+          style="margin-bottom: 15px"
+          size="12px"
+          glow-color="teal-3"
+          shadow-color="teal"
+          :shadow-strength="2"
+          color="teal"
+          class="text-white"
+          icon="add"
+          @click="showDialog = true"
         />
       <q-input
         v-model="filterSkills"
