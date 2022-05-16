@@ -57,7 +57,7 @@
     <div class="row text-h6">
       <div>Selected Skills</div>
       <q-space/>
-      <div>Available Skills</div>
+      <div>{{ editMode ? 'Select a skill to edit' : 'Available Skills' }}</div>
     </div>
     <q-splitter
       v-model="splitterModel"
@@ -86,14 +86,15 @@
     </template>
     <template #after>
       <div style="float: right; text-align: right">
-        <q-chip 
+        <q-chip
           v-for="skill in skillStore.skills"
           :key="skill.id"
-          v-show="!skills.some(s => s.skill.id === skill.id)"
+          v-show="!skills.some(s => s.skill.id === skill.id) || editMode"
           outline
           clickable
           :color="`${skill.color}-4`"
-          :class="`bg-${skill.color}-1`"
+          :class="`bg-${skill.color}-1 ${editMode ? 'updown' : ''}`"
+          :style="`--random: ${randomNumber()}s`"
           style="border-width: 1.5px; width: fit-content;"
           @click="() => { if (editMode) { editSkill = skill; showDialog = true} else { addSkillToProject(skill) }}"
         >
@@ -171,6 +172,27 @@ export default defineComponent ({
         })
       })
     },
+    randomNumber() {
+      return Math.floor(Math.random() * 10) / 5;
+    }
   },
 })
 </script>
+
+<style scoped lang="scss">
+
+.updown {
+  animation: MoveUpDown 2s ease infinite;
+  animation-delay: var(--random);
+}
+
+@keyframes MoveUpDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+</style>
