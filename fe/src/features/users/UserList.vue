@@ -250,7 +250,7 @@ export default defineComponent({
       }
 
       if (this.filter) filter.search = this.filter
-      filter.page_size = this.pagination.rowsPerPage
+      if (this.pagination.rowsPerPage > 0) filter.page_size = this.pagination.rowsPerPage
       filter.page = this.pagination.page
       if (this.roleFilter === 'inactive') filter.is_active = false
       if (this.roleFilter === 'admin') {
@@ -270,6 +270,7 @@ export default defineComponent({
       } else if (this.pagination.sortBy !== null) {
         filter.ordering = `${order}${this.pagination.sortBy}`
       }
+      console.log(filter)
 
       return filter
     }
