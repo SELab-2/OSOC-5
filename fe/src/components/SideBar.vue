@@ -13,15 +13,17 @@
         style="height: 100%; overflow: hidden;"
         class="fit column"
       >
-        <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms"
-             class="q-px-sm">
+        <div
+          :class="`${showShadow ? 'shadow-2' : ''}`"
+          style="z-index: 1; transition: box-shadow ease 500ms"
+          class="q-px-sm"
+        >
           <div class="text-bold text-h5 q-py-sm">
             Students
           </div>
           <div class="row no-wrap q-pb-sm">
             <q-input
               v-model="search"
-              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
               debounce="300"
               class="fit q-mr-sm"
               dense
@@ -29,9 +31,13 @@
               color="teal"
               label="Search Students"
               hide-bottom-space
+              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
             >
-              <template v-slot:append>
-                <q-icon name="search" color="teal-4"/>
+              <template #append>
+                <q-icon
+                  name="search"
+                  color="teal-4"
+                />
               </template>
             </q-input>
             <btn
@@ -45,23 +51,24 @@
               icon="tune"
               @click="showFilters = !showFilters"
             />
-
           </div>
           <q-slide-transition>
-            <div v-if="showFilters" class="overflow-hidden">
+            <div
+              v-if="showFilters"
+              class="overflow-hidden"
+            >
               <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
               <div class="q-gutter-y-sm q-px-xs">
-
                 <SegmentedControl
                   v-model="alumni"
                   color="primary"
                   text-color="white"
                   class="q-mt-md"
                   :options="[
-                { name: 'all', label: 'All' },
-                { name: 'alumni', label: 'Alumni' },
-                { name: 'student coaches', label: 'Student Coaches'}
-              ]"
+                    { name: 'all', label: 'All' },
+                    { name: 'alumni', label: 'Alumni' },
+                    { name: 'student coaches', label: 'Student Coaches'}
+                  ]"
                   @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
@@ -70,11 +77,11 @@
                   v-model="suggestion"
                   color="primary"
                   :options="[
-                { name: 'yes', label: 'Yes' },
-                { name: 'maybe', label: 'Maybe' },
-                { name: 'no', label: 'No' },
-                { name: 'none', label: 'None' },
-              ]"
+                    { name: 'yes', label: 'Yes' },
+                    { name: 'maybe', label: 'Maybe' },
+                    { name: 'no', label: 'No' },
+                    { name: 'none', label: 'Not decided' },
+                  ]"
                   @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
@@ -161,7 +168,6 @@
           :thumb-style="thumbStyle"
           style="flex: 1; overflow: hidden;"
           @scroll="showShadow = $event.verticalPosition > 5"
-
         >
           <q-infinite-scroll
             ref="infiniteScroll"
@@ -195,12 +201,12 @@
         </q-scroll-area>
       </div>
 
-<!--      <q-inner-loading-->
-<!--        :showing="studentStore.isLoading"-->
-<!--        label="Please wait..."-->
-<!--        label-class="text-teal"-->
-<!--        label-style="font-size: 1.1em"-->
-<!--      />-->
+      <!--      <q-inner-loading-->
+      <!--        :showing="studentStore.isLoading"-->
+      <!--        label="Please wait..."-->
+      <!--        label-class="text-teal"-->
+      <!--        label-style="font-size: 1.1em"-->
+      <!--      />-->
 
       <div
         class="absolute"
@@ -212,9 +218,9 @@
           shadow-strength="1"
           color="yellow"
           :icon="!miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = !miniState"
           :style="`transform: translate(${showDrawer ? 0 : -50}%)`"
           style="transition: translate ease 500ms;"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -233,12 +239,12 @@ import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 
 export default defineComponent({
+  name: 'SideBar',
   components: {
     StudentSkillChip,
     StudentCard,
     SegmentedControl,
   },
-  name: 'SideBar',
   setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
@@ -271,9 +277,6 @@ export default defineComponent({
       status: ref(''),
       skills: ref([])
     }
-  },
-  async mounted() {
-    this.skillStore.loadSkills()
   },
   computed: {
     onProjectsPage(): boolean {
@@ -308,6 +311,9 @@ export default defineComponent({
     showDrawer(): boolean {
       return this.onProjectsPage || this.onStudentsPage
     }
+  },
+  async mounted() {
+    this.skillStore.loadSkills()
   },
   methods: {
     // Saves the component id and user name in the dataTransfer.

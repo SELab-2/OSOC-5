@@ -7,6 +7,7 @@
     row-key="skill"
     :filter="filterSkills"
     :filter-method="filterSkillsMethod"
+    :pagination="pagination"
   >
     <template #body="props">
       <q-tr
@@ -184,6 +185,12 @@ export default defineComponent({
       errorMessageSkillAmount,
       deleteSkillName,
       editSkillDialog,
+      pagination: {
+        sortBy: 'amount',
+        descending: true,
+        page: 1,
+        rowsPerPage: 5
+      },
     }
   },
   methods: {
