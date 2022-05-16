@@ -73,6 +73,7 @@
       <q-table
         v-model:pagination="pagination"
         class="my-table user-table shadow-4"
+        style="overflow: auto"
         table-header-style="user-table"
         :rows="coachStore.users"
         :columns="userColumns"
@@ -129,17 +130,19 @@
             </q-td>
             <q-td
               key="assignedto"
+              style="overflow-x: auto"
             >
-              {{ props.row.assignedto }}
+              {{ props.row.projects.map(project => project.name).join(', ') }}
             </q-td>
             <q-td
               key="email"
+              style="position: sticky"
             >
               {{ props.row.email }}
             </q-td>
             <q-td
               key="remove"
-              style="width: 10px"
+              style="width: 10px; position: sticky"
             >
               <btn
                 v-if="authenticationStore.loggedInUser?.email !== props.row.email"
