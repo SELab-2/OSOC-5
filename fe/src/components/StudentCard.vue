@@ -28,6 +28,12 @@
             >
               Alumni
             </q-chip>
+            <q-chip
+              v-if="student.studentCoach"
+              size="8px"
+            >
+              Student Coach
+            </q-chip>
           </div>
 
           <label class="text-bold">{{ total }}</label>
