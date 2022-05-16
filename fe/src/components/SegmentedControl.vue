@@ -10,10 +10,13 @@
       v-for="(option, index) in options"
       :key="index"
       no-caps
+      :style="noPadding ? 'padding: 0px 0px !important;' : ''"
       :ripple="false"
       :name="option.name"
       :label="option.label"
-    />
+    >
+    <div v-if="option.amount !== undefined" class="text-caption" color="red" floating>{{ option.amount! }}</div>
+    </q-tab>
   </q-tabs>
 </template>
 
@@ -24,12 +27,15 @@
   export default defineComponent({
     props: {
       options: {
-        type:  [Object] as PropType<{name: string|number, label: string}[]>, 
+        type:  [Object] as PropType<{name: string|number, label: string, amount?: number}[]>, 
         required: true
       },
       color: {
         type: String,
         default: "yellow-4"
+      },
+      noPadding: {
+        type: Boolean
       }
     }
   })
