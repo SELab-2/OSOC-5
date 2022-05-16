@@ -85,24 +85,29 @@
        
     </template>
     <template #after>
-      <div style="float: right; text-align: right">
-        <q-chip
-          v-for="skill in skillStore.skills"
-          :key="skill.id"
-          v-show="!skills.some(s => s.skill.id === skill.id) || editMode"
-          outline
-          clickable
-          :color="`${skill.color}-4`"
-          :class="`bg-${skill.color}-1 ${editMode ? 'updown' : ''}`"
-          :style="`--random: ${randomNumber()}s`"
-          style="border-width: 1.5px; width: fit-content;"
-          @click="() => { if (editMode) { editSkill = skill; showDialog = true} else { addSkillToProject(skill) }}"
+      <div id="scroll-target-id" style="float: right; text-align: right" @scroll="(e) => onLoad(e)">
+        <q-infinite-scroll
+          @load="(i,done) => skillStore.loadNext(i, done, {})"
+          scroll-target="#scroll-target-id"
         >
-          <div>
-            <span class="text-subtitle1 text-black">{{ skill.name }}</span>
-          </div>
-          
-        </q-chip>
+          <q-chip
+            v-for="skill in skillStore.skills"
+            :key="skill.id"
+            v-show="!skills.some(s => s.skill.id === skill.id) || editMode"
+            outline
+            clickable
+            :color="`${skill.color}-4`"
+            :class="`bg-${skill.color}-1 ${editMode ? 'updown' : ''}`"
+            :style="`--random: ${randomNumber()}s`"
+            style="border-width: 1.5px; width: fit-content;"
+            @click="() => { if (editMode) { editSkill = skill; showDialog = true} else { addSkillToProject(skill) }}"
+          >
+            <div>
+              <span class="text-subtitle1 text-black">{{ skill.name }}</span>
+            </div>
+            
+          </q-chip>
+        </q-infinite-scroll>
       </div>
     </template>
   </q-splitter>
@@ -154,6 +159,10 @@ export default defineComponent ({
       console.log(i)
       this.skills.splice(i,1)
     },
+    onLoad(index) {
+      console.log(index)
+    },
+    
     addSkill() {
       this.skillStore.addSkill(this.editSkill, (success: boolean) => {
         this.$q.notify({

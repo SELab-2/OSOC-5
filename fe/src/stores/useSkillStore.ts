@@ -41,6 +41,16 @@ export const useSkillStore = defineStore('skills', {
       const { results } = (await instance.get<{ results: Skill[] }>('skills/?page_size=500')).data
       this.skills = results.map(skill => new Skill(skill.name, skill.id, skill.color, skill.url))
     },
+    
+    async loadNext(index: number, done: Function, filters: Object) {
+      console.log("Loading", index)
+      if (index === 1) this.skills = []
+      
+      const { results, next } = (await instance.get<{ results: Skill[], next: string }>(`skills/?page=${index}&page_size=1`, { params: filters })).data
+      
+      this.skills.push(...results.map(s => new Skill(s)))
+      done(next === null)
+    },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async addSkill(skill: Skill, callback: Function) {
