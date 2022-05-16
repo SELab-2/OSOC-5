@@ -102,7 +102,7 @@ export const useStudentStore = defineStore('user/student', {
           sum += value
         }
 
-        data.counts.total = sum
+        data.counts.none = sum
         this.counts = data.counts
       }
 
