@@ -73,7 +73,6 @@
       <q-table
         v-model:pagination="pagination"
         class="my-table user-table shadow-4"
-        auto-width
         table-header-style="user-table"
         :rows="coachStore.users"
         :columns="userColumns"
@@ -132,11 +131,12 @@
             <q-td
               key="assignedto"
             >
+            <q-scroll-area :thumb-style="thumbStyle" style="height: 20px; text-align: center; width: 250px;">
               {{ props.row.projects.map(project => project.name).join(', ') }}
+            </q-scroll-area>
             </q-td>
             <q-td
               key="email"
-              style="position: sticky"
             >
               {{ props.row.email }}
             </q-td>
@@ -214,6 +214,11 @@ export default defineComponent({
     })
 
     return {
+      thumbStyle: {
+        borderRadius: '7px',
+        backgroundColor: 'black',
+        height: '4px'
+      },
       pagination,
       deleteDialog: ref(false),
       userId: ref(-1),
