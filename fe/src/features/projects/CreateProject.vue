@@ -6,18 +6,22 @@
 		class="column"
 		style="height: 100%"
 		active-icon="none"
+		error-icon="none"
 		done-color="teal"
 		active-color="teal"
+		error-color="yellow"
 		animated
 		keep-alive
 		header-nav
 		flat
 	>
 		<q-step
-			:name="1"
+			:name="0"
 			title="Project Info"
 			icon="r_info"
 			:done="basicInfoDone"
+			:caption="visitedSteps[0] && !basicInfoDone ? 'Empty Fields Left' : ''"
+			
 		>
 			<BasicInfo
 				v-model:name="project.name"
@@ -27,28 +31,31 @@
 		</q-step>
 
 		<q-step
-			:name="2"
+			:name="1"
 			title="Coaches"
 			icon="r_group"
 			:done="coachesDone"
+			:caption="visitedSteps[1] && !coachesDone ? 'No Coaches Selected' : ''"
 		>
 			<ProjectCoaches :coaches="project.coaches"/>
 		</q-step>
 
 		<q-step
-			:name="3"
+			:name="2"
 			title="Skills"
 			icon="r_build"
 			:done="skillsDone"
+			:caption="visitedSteps[2] && !skillsDone ? 'No Skills Selected' : ''"
 		>
 			<ProjectSkills :skills="project.requiredSkills"/>
 		</q-step>
 
 		<q-step
-			:name="4"
+			:name="3"
 			title="Overview"
 			icon="r_receipt_long"
 			:disable="!allDone"
+			:caption="visitedSteps[3] && !allDone ? 'Empty Fields Left' : ''"
 		>
 			<overview :project="project"/>
 		</q-step>
@@ -58,13 +65,13 @@
 			fab
 			@click="next()"
 			padding="10px"
-			:icon-right="step < 4 ? 'arrow_forward' : 'check'"
-			:label="step < 4 ? 'Next' : (id ? 'Update' : 'Submit')"
-			:disable="step === 3 && !allDone"
+			:icon-right="step < 3 ? 'arrow_forward' : 'check'"
+			:label="step < 3 ? 'Next' : (id ? 'Update' : 'Submit')"
+			:disable="step === 2 && !allDone"
 			color="yellow"
 			shadow-color="orange"
 		>
-		<q-tooltip v-if="step === 3 && !allDone" style="width: 300px">
+		<q-tooltip v-if="step === 2 && !allDone" style="width: 300px">
 			<span class="text-body2">
 			Some data is missing.<br/>Please check if you filled in a name, partner name, info, and have selected at least one skill and coach.
 			</span>
@@ -73,7 +80,7 @@
 	</q-page-sticky>
 	<q-page-sticky position="bottom-left" :offset="[18, 18]">
 		<btn
-			v-if="step > 1"
+			v-if="step > 0"
 			fab
 			@click="step -= 1"
 			padding="10px"
@@ -111,7 +118,7 @@ export default defineComponent({
 		const projectStore = useProjectStore();
 		const project = ref(null);
 		return {
-			step: ref(1),
+			step: ref(0),
 			visitedSteps: ref([false, false, false, false]),
 			skillStore: useSkillStore(),
 			coachStore: useCoachStore(),
@@ -138,7 +145,7 @@ export default defineComponent({
 	},
 	methods: {
 		async next() {
-			if (this.step < 4) {
+			if (this.step < 3) {
 				this.step += 1
 			} else {
 				const mappedProject = {
@@ -163,6 +170,11 @@ export default defineComponent({
 				router.replace('/projects')
 			}
 		},
+	},
+	watch: {
+		step(newValue, oldValue) {
+			this.visitedSteps[oldValue] = true
+		}
 	},
 	computed: {
 		basicInfoDone() {
