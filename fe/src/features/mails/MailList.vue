@@ -7,40 +7,65 @@
       class="q-pa-md q-gutter-md"
       style="width: 1000px"
     >
-      <div class="row">
-        <div class="text-bold text-h4">
-          Sent Mails
-        </div>
-        <q-space />
-        <q-input
-          v-model="search"
-          outlined
-          dense
-          debounce="300"
-          color="yellow-4"
-          placeholder="Search"
-          @update:modelValue="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
-        >
-          <template #append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
+      <div class="text-bold text-h4">
+        Sent Mails
       </div>
-      <div class="q-pl-md full-width">
-        <q-select
-          v-model="statusFilter"
-          rounded
-          outlined
-          dense
-          multiple
-          clearable
-          use-chips
-          label="Status"
-          :options="status"
-          map-options
-          emit-value
-          @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
-        />
+      <div class="row">
+        <div class="row col-6 q-gutter-sm">
+          <q-input
+            v-model="search"
+            outlined
+            dense
+            debounce="300"
+            color="yellow-4"
+            placeholder="Search"
+            @update:modelValue="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
+          >
+            <template #append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+          <q-select
+            v-model="statusFilter"
+            class="col"
+            rounded
+            outlined
+            dense
+            multiple
+            clearable
+            use-chips
+            label="Status"
+            :options="status"
+            map-options
+            emit-value
+            @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
+          />
+        </div>
+        <div class="row col-6 q-gutter-sm justify-end">
+          <q-select
+            v-model="statusUpdate"
+            style="width: 220px"
+            rounded
+            outlined
+            dense
+            use-chips
+            emit-value
+            map-options
+            label="New status"
+            :options="status"
+          />
+          <q-button>
+            <btn
+              padding="7px"
+              color="yellow"
+              shadow-strength="2.5"
+              no-wrap
+              @click="updateStatusStudents"
+            >
+              Bulk update status
+            </btn>
+          </q-button>
+        </div>
       </div>
       <q-table
         v-model:selected="selectedStudents"
@@ -116,6 +141,57 @@
                 style="color: black"
               >{{ props.row.email }}</a>
             </q-td>
+            <q-td style="align-content: flex-end">
+              <q-btn
+                size="sm" color="yellow" round dense icon="mail" @click="reset"
+              >
+                <q-menu>
+                  <q-list>
+                    <q-item tag="label">
+                      <div class="column q-gutter-sm">
+                        <label>Add new mail:</label>
+                        <q-input filled v-model="date">
+                          <template v-slot:prepend>
+                            <q-icon name="event" class="cursor-pointer">
+                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
+                                  <div class="row items-center justify-end">
+                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                  </div>
+                                </q-date>
+                              </q-popup-proxy>
+                            </q-icon>
+                          </template>
+
+                          <template v-slot:append>
+                            <q-icon name="access_time" class="cursor-pointer">
+                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                                  <div class="row items-center justify-end">
+                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                  </div>
+                                </q-time>
+                              </q-popup-proxy>
+                            </q-icon>
+                          </template>
+                        </q-input>
+
+                        <q-input
+                          label="Info"
+                          v-model="info"
+                          filled
+                          type="textarea"
+                        />
+
+                        <q-btn class="bg-yellow" @click="() => sendMail(props.row)" v-close-popup>
+                          Send
+                        </q-btn>
+                      </div>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </q-td>
           </q-tr>
           <q-tr
             v-if="props.expand"
@@ -130,38 +206,13 @@
           </q-tr>
         </template>
       </q-table>
-      <div class="row q-gutter-sm items-center justify-end">
-        <q-select
-          v-model="statusUpdate"
-          style="width: 220px"
-          rounded
-          outlined
-          dense
-          use-chips
-          emit-value
-          map-options
-          label="New status"
-          :options="status"
-        />
-        <q-button>
-          <btn
-            padding="7px"
-            color="yellow"
-            shadow-strength="2.5"
-            no-wrap
-            @click="updateStatusStudents"
-          >
-            Bulk update status
-          </btn>
-        </q-button>
-      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import {ref} from 'vue'
+import {Ref, ref} from 'vue'
 import {Student} from "../../models/Student";
 import {useQuasar} from "quasar";
 import status from "./Status";
@@ -202,6 +253,8 @@ export default defineComponent({
     return {
       search: ref(''),
       statusFilter: ref([]),
+      date: ref((new Date()).toLocaleString()),
+      info: ref(''),
       pagination
     }
   },
@@ -232,13 +285,21 @@ export default defineComponent({
       } else if (this.pagination.sortBy !== null) {
           filter.ordering = `${order}${this.pagination.sortBy}`
       }
-      if (this.statusFilter.length > 0) filter.status = this.statusFilter.join(',')
+      if (this.statusFilter && this.statusFilter.length > 0) filter.status = this.statusFilter.join(',')
 
       return filter
     }
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reset() {
+      this.date = (new Date()).toLocaleString()
+      this.info = ''
+    },
+    async sendMail(student: Student) {
+      await this.mailStore.sendMail(student, null, this.date, this.info)
+      await this.mailStore.getMails(student)
+    },
     async onRequest(props: any) {
       this.pagination = props.pagination
       await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)

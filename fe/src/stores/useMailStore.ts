@@ -27,8 +27,6 @@ export const useMailStore = defineStore('user/mail', {
             this.isLoading = true
             const studentStore = useStudentStore()
 
-            console.log(filters)
-
             const {data} = await instance
                 .get<{ results: Student[], count: number }>(`students/`,
                     {params: filters},
@@ -62,10 +60,11 @@ export const useMailStore = defineStore('user/mail', {
             }
 
             await instance
-                .get<{ results: Mail[] }>(`emails/`, {params: params})
+                .get(`emails/`, {params: params})
                 .then(async ({ data }) => {
                     for (const mail of data.results) {
                         mail.time = new Date(mail.time).toLocaleString()
+                        mail.type = parseInt(mail.type)
 
                         const sender = mail.sender
 
@@ -84,24 +83,25 @@ export const useMailStore = defineStore('user/mail', {
 
                     this.mails.set(
                         student.id,
-                        data.results.map((mail) => new Mail(mail))
+                        data.results.map((mail: Mail) => new Mail(mail))
                     )
                 })
 
-            this.isLoading = true
+            this.isLoading = false
         },
         async updateStatus(student: Student) {
             await instance.patch(`students/${student.id}/`, {
                 status: student.status,
             })
         },
-        async sendMail(student: Student, date: string, info: string) {
+        async sendMail(student: Student, type: number|null, date: string, info: string) {
             const authenticationStore = useAuthenticationStore()
 
             if (authenticationStore.loggedInUser) {
                 await instance.post(`emails/`, {
                     sender: authenticationStore.loggedInUser.url,
                     receiver: student.url,
+                    type: type,
                     time: date,
                     info: info,
                 })

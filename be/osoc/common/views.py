@@ -243,6 +243,23 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         Student.objects.all().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=False, methods=['get'],
+            filter_backends=[filters.SearchFilter, DjangoFilterBackend,
+            StudentOnProjectFilter, StudentSuggestedByUserFilter, MultipleStatusFilter])
+    def count(self, request):
+        """
+        endpoint to count how many students are in the 'yes', 'maybe' and 'no' categories
+        this also takes current filters (except the suggestion filter) into account
+        """
+        students = self.filter_queryset(self.get_queryset())
+        counts = {
+            "yes": students.filter(final_decision__suggestion=Suggestion.Suggestion.YES).count(),
+            "no": students.filter(final_decision__suggestion=Suggestion.Suggestion.NO).count(),
+            "maybe": students.filter(final_decision__suggestion=Suggestion.Suggestion.MAYBE).count(),
+            "undecided": students.filter(final_decision=None).count()
+        }
+        return Response({"counts": counts})
+
 
 class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
