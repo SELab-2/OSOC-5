@@ -90,20 +90,23 @@ export const useStudentStore = defineStore('user/student', {
       student.englishRating = parseInt(student.englishRating)
       student.status = parseInt(student.status)
     },
+    async loadYesMaybeNo() {
+      const { data } = await instance.get('students/count/')
+
+      let sum = 0
+      for (const value of Object.values(data.counts) as number[]) {
+        sum += value
+      }
+
+      data.counts.none = sum
+      this.counts = data.counts
+    },
     async loadNext(index: number, done: Function, filters: Object) {
       this.isLoading = true
 
       if (index === 1) {
         this.students = []
-        const { data } = await instance.get('students/count/')
-
-        let sum = 0
-        for (const value of Object.values(data.counts) as number[]) {
-          sum += value
-        }
-
-        data.counts.none = sum
-        this.counts = data.counts
+        await this.loadYesMaybeNo()
       }
 
       const { data } = await instance.get(`students/?page=${index}`, {
@@ -309,6 +312,8 @@ export const useStudentStore = defineStore('user/student', {
     }) {
       this.isLoading = true
 
+      await this.loadYesMaybeNo()
+
       const studentId = Number.parseInt(student_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
@@ -340,12 +345,14 @@ export const useStudentStore = defineStore('user/student', {
      * @param student to remove the suggestion from
      * @param coach from who the suggestion is deleted
      */
-    removeFinalDecision({ student_id }: { student_id: string }) {
+    async removeFinalDecision({student_id}: { student_id: string }) {
       this.isLoading = true
+
+      await this.loadYesMaybeNo()
 
       const studentId = Number.parseInt(student_id)
 
-      const student = this.students.filter(({ id }) => id === studentId)[0]
+      const student = this.students.filter(({id}) => id === studentId)[0]
 
       // We found the corresponding student
       if (student) {
