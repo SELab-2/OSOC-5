@@ -32,6 +32,7 @@
           >
             Student Coach
           </q-chip>
+          <q-space/>
           <label class="text-bold">{{ total }}</label>
         </div>
         <div
