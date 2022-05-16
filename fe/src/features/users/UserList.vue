@@ -73,7 +73,8 @@
       <q-table
         v-model:pagination="pagination"
         class="my-table user-table shadow-4"
-        style="overflow: auto"
+        style="overflow: auto; width: auto"
+        auto-width
         table-header-style="user-table"
         :rows="coachStore.users"
         :columns="userColumns"
@@ -177,7 +178,7 @@
 import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
-import {exportFile, useQuasar} from 'quasar'
+import {useQuasar} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
@@ -254,7 +255,6 @@ export default defineComponent({
       } else if (this.pagination.sortBy !== null) {
         filter.ordering = `${order}${this.pagination.sortBy}`
       }
-      console.log(filter)
 
       return filter
     }
