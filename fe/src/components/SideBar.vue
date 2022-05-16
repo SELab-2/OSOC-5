@@ -272,7 +272,7 @@ export default defineComponent({
       showShadow: ref(false),
       search: ref(''),
       alumni: ref('all'),
-      suggestion: ref('nofilter'),
+      suggestion: ref('none'),
       byMe: ref('maybe'),
       onProject: ref('maybe'),
       status: ref(''),
@@ -301,7 +301,7 @@ export default defineComponent({
       if (this.search) filter.search = this.search
       if (this.alumni === 'alumni') filter.alum = true
       if (this.alumni === 'student coaches') filter.student_coach = true
-      if (this.suggestion !== 'nofilter') filter.suggestion = this.suggestion
+      if (this.suggestion !== 'none') filter.suggestion = this.suggestion
       if (this.byMe !== 'maybe') filter.suggested_by_user = this.byMe
       if (this.onProject !== 'maybe') filter.on_project = this.onProject
       if (this.status) filter.status = this.status
