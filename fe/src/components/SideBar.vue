@@ -13,15 +13,17 @@
         style="height: 100%; overflow: hidden;"
         class="fit column"
       >
-        <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms"
-             class="q-px-sm">
+        <div
+          :class="`${showShadow ? 'shadow-2' : ''}`"
+          style="z-index: 1; transition: box-shadow ease 500ms"
+          class="q-px-sm"
+        >
           <div class="text-bold text-h5 q-py-sm">
             Students
           </div>
           <div class="row no-wrap q-pb-sm">
             <q-input
               v-model="search"
-              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
               debounce="300"
               class="fit q-mr-sm"
               dense
@@ -29,9 +31,13 @@
               color="teal"
               label="Search Students"
               hide-bottom-space
+              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
             >
-              <template v-slot:append>
-                <q-icon name="search" color="teal-4"/>
+              <template #append>
+                <q-icon
+                  name="search"
+                  color="teal-4"
+                />
               </template>
             </q-input>
             <btn
@@ -45,23 +51,24 @@
               icon="tune"
               @click="showFilters = !showFilters"
             />
-
           </div>
           <q-slide-transition>
-            <div v-if="showFilters" class="overflow-hidden">
+            <div
+              v-if="showFilters"
+              class="overflow-hidden"
+            >
               <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
               <div class="q-gutter-y-sm q-px-xs">
-
                 <SegmentedControl
                   v-model="alumni"
                   color="primary"
                   text-color="white"
                   class="q-mt-md"
                   :options="[
-                { name: 'all', label: 'All' },
-                { name: 'alumni', label: 'Alumni' },
-                { name: 'student coaches', label: 'Student Coaches'}
-              ]"
+                    { name: 'all', label: 'All' },
+                    { name: 'alumni', label: 'Alumni' },
+                    { name: 'student coaches', label: 'Student Coaches'}
+                  ]"
                   @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
@@ -163,7 +170,6 @@
           :thumb-style="thumbStyle"
           style="flex: 1; overflow: hidden;"
           @scroll="showShadow = $event.verticalPosition > 5"
-
         >
           <q-infinite-scroll
             ref="infiniteScroll"
@@ -197,12 +203,12 @@
         </q-scroll-area>
       </div>
 
-<!--      <q-inner-loading-->
-<!--        :showing="studentStore.isLoading"-->
-<!--        label="Please wait..."-->
-<!--        label-class="text-teal"-->
-<!--        label-style="font-size: 1.1em"-->
-<!--      />-->
+      <!--      <q-inner-loading-->
+      <!--        :showing="studentStore.isLoading"-->
+      <!--        label="Please wait..."-->
+      <!--        label-class="text-teal"-->
+      <!--        label-style="font-size: 1.1em"-->
+      <!--      />-->
 
       <div
         class="absolute"
@@ -214,9 +220,9 @@
           shadow-strength="1"
           color="yellow"
           :icon="!miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = !miniState"
           :style="`transform: translate(${showDrawer ? 0 : -50}%)`"
           style="transition: translate ease 500ms;"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -233,23 +239,27 @@ import {useQuasar} from "quasar";
 import {Student} from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
+import { wsBaseUrl } from '../utils/baseUrl';
+import { useProjectStore } from '../stores/useProjectStore';
 
 export default defineComponent({
+  name: 'SideBar',
   components: {
     StudentSkillChip,
     StudentCard,
     SegmentedControl,
   },
-  name: 'SideBar',
   setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
+    const projectStore = useProjectStore()
 
     const $q = useQuasar()
 
     return {
       studentStore,
       skillStore,
+      projectStore,
       $q,
       thumbStyle: {
         right: '0px',
@@ -258,6 +268,7 @@ export default defineComponent({
         width: '4px',
       },
       stati,
+      socket: new WebSocket(wsBaseUrl),
     }
   },
   data() {
@@ -273,9 +284,6 @@ export default defineComponent({
       status: ref(''),
       skills: ref([])
     }
-  },
-  async mounted() {
-    this.skillStore.loadSkills()
   },
   computed: {
     onProjectsPage(): boolean {
@@ -311,9 +319,28 @@ export default defineComponent({
       return this.onProjectsPage || this.onStudentsPage
     }
   },
+  async mounted() {
+    await this.skillStore.loadSkills()
+
+    this.socket.onmessage = async (event: { data: string }) => {
+      const data = JSON.parse(event.data)
+
+      if (data.hasOwnProperty('suggestion')) {
+        await this.studentStore.receiveSuggestion(data.suggestion)
+      } else if (data.hasOwnProperty('remove_suggestion')) {
+        this.studentStore.removeSuggestion(data.remove_suggestion)
+      } else if (data.hasOwnProperty('final_decision')) {
+        this.studentStore.receiveFinalDecision(data.final_decision)
+      } else if (data.hasOwnProperty('remove_final_decision')) {
+        this.studentStore.removeFinalDecision(data.remove_final_decision)
+      } else if (data.hasOwnProperty('suggest_student'))
+        this.projectStore.receiveSuggestion(data.suggest_student, this.onProject)
+      else if (data.hasOwnProperty('remove_student'))
+        this.projectStore.removeReceivedSuggestion(data.remove_student, this.onProject)
+    }
+  },
   methods: {
     // Saves the component id and user name in the dataTransfer.
-    // TODO: send id of user instead of name.
     /**
      * Saves the component id and user name in the dataTransfer.
      * @param e drag event

@@ -4,7 +4,8 @@ import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
-import qs from "qs";
+import { baseUrl } from '../utils/baseUrl'
+import qs from 'qs'
 
 interface State {
   skills: Array<Skill>
@@ -40,7 +41,7 @@ export const useStudentStore = defineStore('user/student', {
       if (student2) return student2
 
       const newstudent = new Student(data)
-      this.students.push(newstudent)
+      this.students.unshift(newstudent)
       return newstudent
     },
     async deleteStudent(url: string, success: Function, fail: Function) {
@@ -73,7 +74,9 @@ export const useStudentStore = defineStore('user/student', {
       student.skills = skills
 
       if (student.finalDecision) {
-        student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
+        student.finalDecision.suggestion = parseInt(
+          student.finalDecision.suggestion
+        )
       }
 
       for (const suggestion of student.suggestions) {
@@ -90,19 +93,20 @@ export const useStudentStore = defineStore('user/student', {
 
       if (index === 1) this.students = []
 
-      const {data} = await instance
-          .get(`students/?page=${index}`, {
-            params: filters,
-            paramsSerializer: params => {
-              return qs.stringify(params, {arrayFormat: "repeat"})
-            }
-          })
+      const { data } = await instance.get(`students/?page=${index}`, {
+        params: filters,
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: 'repeat' })
+        },
+      })
 
       for (const student of data.results) {
         await this.transformStudent(student)
       }
 
-      this.students.push(...data.results.map((student: Student) => new Student(student)))
+      this.students.push(
+        ...data.results.map((student: Student) => new Student(student))
+      )
 
       done(data.next === null)
       this.isLoading = false
@@ -114,12 +118,14 @@ export const useStudentStore = defineStore('user/student', {
     async loadStudent(studentId: number, fail: Function) {
       this.isLoading = true
 
-      await instance.get(`students/${studentId}/`).then(async ({ data }) => {
-        await this.transformStudent(data)
+      await instance
+        .get(`students/${studentId}/`)
+        .then(async ({ data }) => {
+          await this.transformStudent(data)
 
-        this.currentStudent = new Student(data as Student)
-      })
-          .catch(() => fail())
+          this.currentStudent = new Student(data as Student)
+        })
+        .catch(() => fail())
 
       this.isLoading = false
     },
@@ -128,7 +134,11 @@ export const useStudentStore = defineStore('user/student', {
      * @param studentId the id of the student
      * @param reason the reason to do the suggestion
      */
-    async updateSuggestion(studentId: number, possibleSuggestion: number, reason: string) {
+    async updateSuggestion(
+      studentId: number,
+      possibleSuggestion: number,
+      reason: string
+    ) {
       this.isLoading = true
 
       // check if -1 is selected to delete suggestion
@@ -272,7 +282,7 @@ export const useStudentStore = defineStore('user/student', {
      * @param suggestion the suggestion that was made
      * @param reason the reason why this suggestion was made
      */
-    receiveFinalDecision({
+    async receiveFinalDecision({
       student_id,
       suggestion,
       coach,
@@ -289,19 +299,25 @@ export const useStudentStore = defineStore('user/student', {
       const studentId = Number.parseInt(student_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
-
+      const finalDecision = {
+        student: studentId,
+        coach: coach,
+        suggestion: Number.parseInt(suggestion),
+        reason,
+      }
 
       // We found the corresponding student
       if (student) {
-        const finalDecision = {
-          student: studentId,
-          coach: coach,
-          suggestion: Number.parseInt(suggestion),
-          reason,
-        }
         student.finalDecision = finalDecision
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
+      } else {
+        const newStudent = await this.getStudent(
+          `${baseUrl}/students/${studentId}`
+        )
+
+        newStudent.finalDecision = finalDecision
+        this.students.push(newStudent)
       }
 
       this.isLoading = false
