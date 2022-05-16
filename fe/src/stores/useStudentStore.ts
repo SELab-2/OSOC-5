@@ -14,6 +14,7 @@ interface State {
   students: Array<Student>
   isLoading: boolean
   currentStudent: Student | null
+  counts: {yes: number, no: number, maybe: number, undecided: number, none: number}
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -24,6 +25,7 @@ export const useStudentStore = defineStore('user/student', {
     students: [],
     isLoading: false,
     currentStudent: null,
+    counts: {yes: 0, no: 0, maybe: 0, undecided: 0, none: 0},
   }),
   actions: {
     /**
@@ -91,7 +93,18 @@ export const useStudentStore = defineStore('user/student', {
     async loadNext(index: number, done: Function, filters: Object) {
       this.isLoading = true
 
-      if (index === 1) this.students = []
+      if (index === 1) {
+        this.students = []
+        const { data } = await instance.get('students/count/')
+
+        let sum = 0
+        for (const value of Object.values(data.counts) as number[]) {
+          sum += value
+        }
+
+        data.counts.total = sum
+        this.counts = data.counts
+      }
 
       const { data } = await instance.get(`students/?page=${index}`, {
         params: filters,

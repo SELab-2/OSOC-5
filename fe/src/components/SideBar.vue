@@ -77,13 +77,7 @@
                   v-model="suggestion"
                   color="primary"
                   no-padding
-                  :options="[
-                { name: 'yes', label: 'Yes', amount: 1 },
-                { name: 'maybe', label: 'Maybe', amount: 1 },
-                { name: 'no', label: 'No', amount: 1 },
-                { name: 'none', label: 'Undecided', amount: 1 },
-                { name: 'nofilter', label: 'None', amount: 1 },
-              ]"
+                  :options="options"
                   @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
@@ -314,6 +308,15 @@ export default defineComponent({
       if (this.skills.length > 0) filter.skills = this.skills.map((skill: { id: number }) => skill.id)
 
       return filter
+    },
+    options(): Array<{ name: string, label: string, amount: number }> {
+      return [
+        { name: 'yes', label: 'Yes', amount: this.studentStore.counts.yes },
+        { name: 'maybe', label: 'Maybe', amount: this.studentStore.counts.maybe },
+        { name: 'no', label: 'No', amount: this.studentStore.counts.no },
+        { name: 'undecided', label: 'Undecided', amount: this.studentStore.counts.undecided },
+        { name: 'none', label: 'None', amount: this.studentStore.counts.none },
+      ]
     },
     showDrawer(): boolean {
       return this.onProjectsPage || this.onStudentsPage
