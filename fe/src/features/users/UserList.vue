@@ -77,6 +77,7 @@
         table-header-style="user-table"
         :rows="coachStore.users"
         :columns="userColumns"
+        :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
         row-key="id"
         separator="horizontal"
         :loading="coachStore.isLoading"
@@ -186,23 +187,6 @@ import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import router from "../../router";
 import roles from "../../models/UserRoles";
 
-const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
-  let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
-
-  formatted =
-    formatted === void 0 || formatted === null ? '' : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-  /**
-   * Excel accepts \n and \r in strings, but some other CSV parsers do not
-   * Uncomment the next two lines to escape new lines
-   */
-  // .split('\n').join('\\n')
-  // .split('\r').join('\\r')
-
-  return `"${formatted}"`
-}
-
 export default defineComponent({
   components: {AddUser, SegmentedControl, DeleteDialog },
   name: 'Users',
@@ -250,7 +234,7 @@ export default defineComponent({
       }
 
       if (this.filter) filter.search = this.filter
-      if (this.pagination.rowsPerPage > 0) filter.page_size = this.pagination.rowsPerPage
+      filter.page_size = this.pagination.rowsPerPage
       filter.page = this.pagination.page
       if (this.roleFilter === 'inactive') filter.is_active = false
       if (this.roleFilter === 'admin') {
