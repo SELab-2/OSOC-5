@@ -185,7 +185,7 @@
               :draggable="onProjectsPage"
               :must-hover="onProjectsPage"
               :student="student"
-              :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
+              :active="studentStore.currentStudent?.id === student.id && onStudentsPage"
               @click="$router.push(`/students/${student.id}`)"
               @dragstart="onDragStart($event, student)"
             />

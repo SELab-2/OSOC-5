@@ -270,6 +270,7 @@ export default defineComponent ({
      * Retrieve the current selected student from the store
      */
     student(): Student | null {
+      console.log(this.studentStore.currentStudent)
       return this.studentStore.currentStudent
       // return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
@@ -397,3 +398,12 @@ export default defineComponent ({
   },
 })
 </script>
+
+<style>
+.studentcol {
+  padding: 5px;
+}
+.cornered {
+  border-radius: 10px !important
+}
+</style>
