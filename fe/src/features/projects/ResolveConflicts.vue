@@ -23,7 +23,7 @@
             class="rounded-borders"
           >
             <q-item
-              v-for="conflict in conflicts"
+              v-for="conflict in projectConflictStore.conflicts"
               :key="conflict.student.url"
               v-ripple
               clickable
@@ -100,27 +100,25 @@ import { defineComponent, ref } from 'vue'
 import { Project } from '../../models/Project'
 import { Student } from '../../models/Student'
 import router from '../../router'
-import { useProjectStore } from '../../stores/useProjectStore'
-import { useStudentStore } from '../../stores/useStudentStore'
-import { instance } from '../../utils/axios'
+import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
 import ProjectConflictCard from "./components/ProjectConflictCard.vue"
 
 export default defineComponent({
     components: { ProjectConflictCard },
     setup() {
       const $q = useQuasar()
+      const projectConflictStore = useProjectConflictStore()
 
       return {
           q: $q,
           selectedConflict: ref({student: {}} as { student: Student; projects: Project[] }),
           showShadow: ref(false),
           selectedProjectId: ref(-1),
-          conflicts: ref([] as { student: Student; projects: Project[]; }[]),
-          nextPage: ref("")
+          projectConflictStore
       }
     },
-    async mounted() {
-     await this.loadConflicts()
+    mounted() {
+      this.loadConflicts()
     },
     methods: {
      selectedProject() {
@@ -129,70 +127,17 @@ export default defineComponent({
      async loadConflicts() {
        this.selectedConflict = {student: {}} as { student: Student; projects: Project[] }
        this.selectedProjectId = -1
-       const projects = await this.getConflictingProjects()
-       this.conflicts = projects.conflicts
-       this.nextPage = projects.nextPage
+       await this.projectConflictStore.getConflictingProjects()
      },
-     async getConflictingProjects(url?: string) {
-      const studentStore = useStudentStore()
-      const projectStore = useProjectStore()
-
-      const { data } = await instance.get(
-        url ?? 'projects/get_conflicting_projects'
-      )
-
-      const conflicts = data.results as Array<{
-        student: string
-        projects: Array<string>
-      }>
-
-      const resConflicts = []
-      for (const conflict of conflicts) {
-        const student = await studentStore.getStudent(conflict.student)
-        const projects = await Promise.all(
-          conflict.projects.map(
-            async (project: string) =>
-              await projectStore.getOrFetchProject(project)
-          )
-        )
-
-        resConflicts.push({ student, projects })
-      }
-
-      return {conflicts: resConflicts, nextPage: data.next}
-      },
       fullName(user: { firstName: string; lastName: string }) {
         return `${user.firstName} ${user.lastName}`
       },
       async resolveConflict() {
         try {
-          const suggestions = this.selectedProject().suggestedStudents?.filter(
-            ({ student }) => student.id === this.selectedConflict.student.id
-           )
+          this.projectConflictStore.resolveConflict(this.selectedProject(), this.selectedConflict)
+          await this.loadConflicts()
 
-          if (!suggestions) throw new Error('An unexpected error has occured')
-
-          if (suggestions?.length > 1)
-            throw new Error(
-              'Please delete the assignment to skills until only 1 is left'
-            )
-
-          const suggestion = suggestions[0]
-
-          await instance.post('/projects/resolve_conflicts/', [
-            {
-              project: this.selectedProject().url,
-              student: this.selectedConflict.student.url,
-              coach: suggestion.coach.url,
-              skill: suggestion.skill.url,
-          },
-        ])
-
-        const projectStore = useProjectStore()
-        await projectStore.loadProjects() 
-        await this.loadConflicts()
-
-        if(this.conflicts.length == 0) router.push("/projects")
+          if(this.projectConflictStore.conflicts.length == 0) router.push("/projects")
         } catch(error) {
           this.q.notify({
               icon: 'warning',
@@ -203,8 +148,8 @@ export default defineComponent({
         }
       },
       async onLoad(index: number, done: () => unknown) {
-        if (this.nextPage !== null)
-          await this.getConflictingProjects(this.nextPage)
+        if (this.projectConflictStore.nextPage !== null)
+          await this.projectConflictStore.getConflictingProjects(this.projectConflictStore.nextPage)
         
         done()
       }
