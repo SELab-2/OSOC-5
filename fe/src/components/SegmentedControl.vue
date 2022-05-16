@@ -14,7 +14,7 @@
       :name="option.name"
       :label="option.label"
     >
-    <div v-if="option.amount" class="text-caption" color="red" floating>{{ option.amount! }}</div>
+    <div v-if="option.amount !== undefined" class="text-caption" color="red" floating>{{ option.amount! }}</div>
     </q-tab>
   </q-tabs>
 </template>
