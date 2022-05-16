@@ -251,60 +251,66 @@ export const useProjectStore = defineStore('project', {
           suggestion.skill.url === skill && suggestion.student.url === student
       )
 
-      if (!alreadyExists) {
-        const studentStore = useStudentStore()
-        const coachStore = useCoachStore()
-        const skillStore = useSkillStore()
+      const studentStore = useStudentStore()
 
-        const studentObj = await studentStore.getStudent(student)
-        const coachObj = await coachStore.getUser(coach)
-        const skillObj = await skillStore.getSkill(skill)
-        project.suggestedStudents?.push(
-          new NewProjectSuggestion(
-            {
-              student: studentObj,
-              coach: coachObj,
-              skill: skillObj,
-              reason,
-            },
-            true
-          )
-        )
-        console.log(onProject)
-        console.log(studentStore.students.some(({ url }) => url === student))
-
+      if (alreadyExists) {
         if (onProject === 'false')
           studentStore.students = studentStore.students.filter(
             ({ url }) => url !== student
           )
-        else if (
-          onProject === 'true' &&
-          !studentStore.students.some(({ url }) => url === student)
-        ) {
-          const studentObject = await studentStore.getStudent(student)
-          studentStore.students.unshift(studentObject)
-        }
 
-        // Remove the "New" badge from the new suggestion after a short period.
-        setTimeout(
-          () =>
-            ((
-              project.suggestedStudents?.find(
-                (s) =>
-                  s.student.url === studentObj.url &&
-                  s.coach.url === coachObj.url &&
-                  s.skill.url === skillObj.url
-              ) as NewProjectSuggestion
-            ).fromWebsocket = false),
-          5000
-        )
+        return
       }
+
+      const coachStore = useCoachStore()
+      const skillStore = useSkillStore()
+
+      const studentObj = await studentStore.getStudent(student)
+      const coachObj = await coachStore.getUser(coach)
+      const skillObj = await skillStore.getSkill(skill)
+
+      console.log(studentStore.students)
+      project.suggestedStudents?.push(
+        new NewProjectSuggestion(
+          {
+            student: studentObj,
+            coach: coachObj,
+            skill: skillObj,
+            reason,
+          },
+          true
+        )
+      )
+
+      if (onProject === 'false')
+        studentStore.students = studentStore.students.filter(
+          ({ url }) => url !== student
+        )
+      else if (
+        onProject === 'true' &&
+        !studentStore.students.some(({ url }) => url === student)
+      )
+        await studentStore.getStudent(student)
+
+      // Remove the "New" badge from the new suggestion after a short period.
+      setTimeout(
+        () =>
+          ((
+            project.suggestedStudents?.find(
+              (s) =>
+                s.student.url === studentObj.url &&
+                s.coach.url === coachObj.url &&
+                s.skill.url === skillObj.url
+            ) as NewProjectSuggestion
+          ).fromWebsocket = false),
+        5000
+      )
     },
     /**
      * Called when we receive a remove suggestion from the websocket
      * @param param0 object received from the websocket
      */
-    removeReceivedSuggestion(
+    async removeReceivedSuggestion(
       {
         skill,
         student,
@@ -336,6 +342,11 @@ export const useProjectStore = defineStore('project', {
             studentStore.students = studentStore.students.filter(
               ({ url }) => url !== student
             )
+          else if (
+            onProject === 'false' &&
+            !studentStore.students.some(({ url }) => url === student)
+          )
+            await studentStore.getStudent(student)
 
           project.suggestedStudents?.splice(suggestionIndex, 1)
         }
