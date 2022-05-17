@@ -314,11 +314,9 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
         return {field: self.validated_data.get(field, '') for field in fields} # pylint: disable=no-member
 
 
-"""
 # the following serializer classes are used in the export_csv endpoints
 # these serializers do not have url fields, and all fields are transformed to text
 # for example: all foreign keys are changed from an id to a string representation (such as a name)
-"""
 
 
 class CSVStudentSerializer(serializers.ModelSerializer):
