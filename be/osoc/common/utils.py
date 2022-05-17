@@ -2,7 +2,9 @@
 Utilities.
 """
 import csv
-from django.http import HttpResponse
+from io import BytesIO, StringIO
+from zipfile import ZIP_DEFLATED, ZipFile
+from django.http import FileResponse
 from django.utils import timezone
 from django.utils.http import urlencode
 from rest_framework.reverse import reverse
@@ -56,20 +58,32 @@ def string_to_datetime_tz(string):
     except ValueError:
         return timezone.make_aware(timezone.datetime.strptime(string, "%Y-%m-%d"))
 
-def export_to_csv(queryset, filename, fields='all'):
+def export_to_csv(queryset, filename, serializer):
     """
-    export a queryset to a csv file
+    export a queryset to a csv StringIO object
     """
-    response = HttpResponse(
-        content_type='text/csv',
-        headers={'Content-Disposition': f'attachment; filename="{filename}.csv"'},
-    )
-    writer = csv.writer(response)
-    if fields == 'all':
-        fields = queryset.model._meta.fields
-    field_names = [field.name for field in fields]
-    headers = [field.verbose_name for field in fields]
-    writer.writerow(headers)
-    for item in queryset.values_list(*field_names):
-        writer.writerow(item)
-    return response
+    csv_data = StringIO()
+    writer = csv.writer(csv_data)
+
+    # write header
+    writer.writerow(serializer.Meta.fields)
+    # write objects
+    for item in queryset:
+        writer.writerow(serializer(item).data.values())
+
+    csv_data.name = filename
+    csv_data.seek(0)
+    return csv_data
+
+def create_zipfile_response(filename, files):
+    """
+    create a zipfile that contains given csv files
+    returns a HTTP File Reponse with zip file attachment
+    """
+    zipped_file = BytesIO()
+    with ZipFile(zipped_file, 'w', ZIP_DEFLATED) as zipped:
+        for file in files:
+            zipped.writestr(f'{file.name}.csv', file.read())
+    zipped_file.seek(0)
+    return FileResponse(zipped_file, content_type='application/zip', 
+                        headers={'Content-Disposition': f'attachment; filename="{filename}.zip"'})

@@ -312,3 +312,140 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
         super().get_cleaned_data()
         fields = ['password1', 'password2', 'email', 'first_name', 'last_name']
         return {field: self.validated_data.get(field, '') for field in fields} # pylint: disable=no-member
+
+
+class CSVStudentSerializer(serializers.ModelSerializer):
+
+    gender = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    final_decision = serializers.SerializerMethodField()
+    skills = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Student
+        fields = ['id', 'first_name', 'last_name', 'call_name', 'email', 'gender', 'pronouns', 'phone_number',
+                  'language', 'english_rating', 'employment_agreement', 'hinder_work', 'cv', 'portfolio',
+                  'motivation', 'fun_fact', 'school_name', 'degree', 'degree_duration', 'degree_current_year',
+                  'studies', 'alum', 'student_coach', 'status', 'best_skill', 'final_decision', 'skills']
+
+    def get_status(self, obj):
+        return Student.Status(obj.status).label
+
+    def get_gender(self, obj):
+        return Student.Gender(obj.gender).label
+
+    def get_final_decision(self, obj):
+        if obj.final_decision:
+            return Suggestion.Suggestion(obj.final_decision.suggestion).label
+        return 'Undecided'
+
+    def get_skills(self, obj):
+        return f"[{', '.join([str(skill) for skill in obj.skills.all()])}]"
+
+
+class CSVSuggestionSerializer(serializers.ModelSerializer):
+
+    student = serializers.SerializerMethodField()
+    coach = serializers.SerializerMethodField()
+    suggestion = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Suggestion
+        fields = ['id', 'student', 'coach', 'suggestion', 'reason', 'final']
+
+    def get_student(self, obj):
+        return str(obj.student)
+
+    def get_coach(self, obj):
+        return str(obj.coach)
+
+    def get_suggestion(self, obj):
+        return Suggestion.Suggestion(obj.suggestion).label
+
+
+class CSVCoachSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Coach
+        fields = ['id', 'first_name', 'last_name', 'email', 'is_admin', 'is_active', 'is_superuser', 'date_joined']
+
+
+class CSVProjectSerializer(serializers.ModelSerializer):
+
+    coaches = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Project
+        fields = ['id', 'name', 'partner_name', 'extra_info', 'coaches']
+
+    def get_coaches(self, obj):
+        return f"[{', '.join([str(coach) for coach in obj.coaches.all()])}]"
+
+
+class CSVRequiredSkillSerializer(serializers.ModelSerializer):
+
+    project = serializers.SerializerMethodField()
+    skill = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RequiredSkills
+        fields = ['id', 'project', 'skill', 'amount', 'comment']
+
+    def get_project(self, obj):
+        return str(obj.project)
+
+    def get_skill(self, obj):
+        return str(obj.skill)
+
+
+class CSVProjectSuggestionSerializer(serializers.ModelSerializer):
+
+    project = serializers.SerializerMethodField()
+    student = serializers.SerializerMethodField()
+    skill = serializers.SerializerMethodField()
+    coach = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['id', 'project', 'student', 'skill', 'coach', 'reason']
+
+    def get_project(self, obj):
+        return str(obj.project)
+
+    def get_student(self, obj):
+        return str(obj.student)
+
+    def get_skill(self, obj):
+        return str(obj.skill)
+
+    def get_coach(self, obj):
+        return str(obj.coach)
+
+
+class CSVSkillSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Skill
+        fields = ['id', 'name', 'color']
+
+
+class CSVSentEmailSerializer(serializers.ModelSerializer):
+
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SentEmail
+        fields = ['id', 'sender', 'receiver', 'time', 'info', 'type']
+
+    def get_sender(self, obj):
+        return str(obj.sender)
+
+    def get_receiver(self, obj):
+        return str(obj.receiver)
+
+    def get_type(self, obj):
+        if obj.type is not None:
+            return Student.Status(obj.type).label
+        return 'None'

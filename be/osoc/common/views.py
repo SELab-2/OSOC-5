@@ -13,15 +13,15 @@ from rest_auth.registration.views import RegisterView, SocialLoginView
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from .utils import export_to_csv
+from .utils import export_to_csv, create_zipfile_response
 from .pagination import StandardPagination
 from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
-from .serializers import BulkStatusSerializer, Conflict, ConflictSerializer, \
+from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSerializer, CSVProjectSuggestionSerializer, CSVRequiredSkillSerializer, CSVSentEmailSerializer, CSVSkillSerializer, CSVStudentSerializer, CSVSuggestionSerializer, Conflict, ConflictSerializer, \
     ResolveConflictSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, \
     ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
-from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
+from .models import RequiredSkills, Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
 from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
@@ -239,9 +239,14 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def export_csv(self, request):
         """
-        endpoint to export students table to csv
+        endpoint to export students information to csv
+        returns a HTTP response with a zip file containing the following files:
+            students.csv
+            suggestions.csv
         """
-        return export_to_csv(self.get_queryset(), 'students')
+        students = export_to_csv(self.get_queryset(), 'students', CSVStudentSerializer)
+        suggestions = export_to_csv(Suggestion.objects.all().order_by('id'), 'suggestions', CSVSuggestionSerializer)
+        return create_zipfile_response('student', [students, suggestions])
 
 
 class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestors
@@ -327,12 +332,12 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def export_csv(self, request):
         """
-        endpoint to export coaches table to csv
+        endpoint to export coach information to csv
+        returns a HTTP response with a zip file containing the following files:
+            coaches.csv
         """
-        # don't save password and other unnecessary fields
-        fields = [Coach._meta.get_field(f) for f in
-            ['id', 'email', 'first_name', 'last_name', 'is_admin', 'is_active', 'is_superuser', 'date_joined']]
-        return export_to_csv(self.get_queryset(), 'coaches', fields=fields)
+        coaches = export_to_csv(self.get_queryset(), 'coaches', CSVCoachSerializer)
+        return create_zipfile_response('coach', [coaches])
 
 
 class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -516,9 +521,16 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def export_csv(self, request):
         """
-        endpoint to export projects table to csv
+        endpoint to export project information to csv
+        returns a HTTP response with a zip file containing the following files:
+            projects.csv
+            required_skills.csv
+            suggested_students.csv
         """
-        return export_to_csv(self.get_queryset(), 'projects')
+        projects = export_to_csv(self.get_queryset(), 'projects', CSVProjectSerializer)
+        required_skills = export_to_csv(RequiredSkills.objects.all(), 'required_skills', CSVRequiredSkillSerializer)
+        suggested_students = export_to_csv(ProjectSuggestion.objects.all(), 'suggested_students', CSVProjectSuggestionSerializer)
+        return create_zipfile_response('project', [projects, required_skills, suggested_students])
 
 
 class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -557,9 +569,12 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def export_csv(self, request):
         """
-        endpoint to export skills table to csv
+        endpoint to export skill information to csv
+        returns a HTTP response with a zip file containing the following files:
+            skills.csv
         """
-        return export_to_csv(self.get_queryset(), 'skills')
+        skills = export_to_csv(self.get_queryset(), 'skills', CSVSkillSerializer)
+        return create_zipfile_response('skill', [skills])
 
 
 class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -605,9 +620,12 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def export_csv(self, request):
         """
-        endpoint to export emails table to csv
+        endpoint to export email information to csv
+        returns a HTTP response with a zip file containing the following files:
+            emails.csv
         """
-        return export_to_csv(self.get_queryset(), 'emails')
+        emails = export_to_csv(self.get_queryset(), 'emails', CSVSentEmailSerializer)
+        return create_zipfile_response('email', [emails])
 
 
 class GithubLogin(SocialLoginView):
