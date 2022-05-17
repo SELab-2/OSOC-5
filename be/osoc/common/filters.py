@@ -62,7 +62,7 @@ class StudentSuggestedByUserFilter(filters.BaseFilterBackend):
 class StudentFinalDecisionFilter(filters.BaseFilterBackend):
     """
     filters students based on final decision
-    query parameter 'suggestion' should be one of ['yes', 'no', 'maybe', 'none'] or ['0', '1', '2', '3']
+    query parameter 'suggestion' should be one of ['yes', 'no', 'maybe', 'undecided'] or ['0', '1', '2', '3']
     """
     param2enum = {'yes': Suggestion.Suggestion.YES,
                   'no': Suggestion.Suggestion.NO,
@@ -76,7 +76,7 @@ class StudentFinalDecisionFilter(filters.BaseFilterBackend):
         if param is not None:
             if param.lower() in self.param2enum:
                 return queryset.filter(final_decision__suggestion=self.param2enum[param])
-            if param.lower() in ['none', '3']:
+            if param.lower() in ['undecided', '3']:
                 return queryset.filter(final_decision=None)
         return queryset
 
