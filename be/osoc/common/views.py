@@ -15,7 +15,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .pagination import StandardPagination
 from .filters import MultipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
-    StudentFinalDecisionFilter, EmailDateTimeFilter
+    StudentFinalDecisionFilter, EmailDateTimeFilter, ProjectFullFilter
 from .serializers import BulkStatusSerializer, Conflict, ConflictSerializer, \
     ResolveConflictSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, \
     ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
@@ -364,6 +364,7 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         * ?required_skills=:id:,
         * ?coaches=:id:,
         * ?suggested_students=:id:
+        * ?full=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
     - Sort projects with the ?ordering=[name, partner_name] query parameter.
         * Use ?ordering=-... to sort in descending order
@@ -377,8 +378,8 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
-    filter_backends = [filters.SearchFilter,
-                       filters.OrderingFilter, DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter,
+                       ProjectFullFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
     ordering_fields = ['name', 'partner_name']
