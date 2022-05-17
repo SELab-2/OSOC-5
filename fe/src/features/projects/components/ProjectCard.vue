@@ -110,7 +110,7 @@
               @drop="onDrop($event, skill)"
               :key="skill.skill.id"
               :skill="skill"
-              :occupied="groupedStudents[skill.skill.id]?.length"
+              :occupied="groupedStudents[skill.skill.id]?.length ?? (editable ? 0 : undefined)"
             />
           </div>
         </div>
