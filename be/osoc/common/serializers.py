@@ -315,9 +315,9 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
 
 
 """
-the following serializer classes are used in the export_csv endpoints
-these serializers do not have url fields, and all fields are transformed to text
-for example: all foreign keys are changed from an id to a string representation (such as a name)
+# the following serializer classes are used in the export_csv endpoints
+# these serializers do not have url fields, and all fields are transformed to text
+# for example: all foreign keys are changed from an id to a string representation (such as a name)
 """
 
 
@@ -338,17 +338,30 @@ class CSVStudentSerializer(serializers.ModelSerializer):
                   'studies', 'alum', 'student_coach', 'status', 'best_skill', 'final_decision', 'skills']
 
     def get_status(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of status
+        """
         return Student.Status(obj.status).label
 
     def get_gender(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of gender
+        """
         return Student.Gender(obj.gender).label
 
     def get_final_decision(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of final decision
+        if final_decision is None, return Undecided
+        """
         if obj.final_decision:
             return Suggestion.Suggestion(obj.final_decision.suggestion).label
         return 'Undecided'
 
     def get_skills(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of skills
+        """
         return f"[{', '.join([str(skill) for skill in obj.skills.all()])}]"
 
 
@@ -365,12 +378,21 @@ class CSVSuggestionSerializer(serializers.ModelSerializer):
         fields = ['id', 'student', 'coach', 'suggestion', 'reason', 'final']
 
     def get_student(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of student
+        """
         return str(obj.student)
 
     def get_coach(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of coach
+        """
         return str(obj.coach)
 
     def get_suggestion(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of suggestion
+        """
         return Suggestion.Suggestion(obj.suggestion).label
 
 
@@ -394,6 +416,9 @@ class CSVProjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'partner_name', 'extra_info', 'coaches']
 
     def get_coaches(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of coaches
+        """
         return f"[{', '.join([str(coach) for coach in obj.coaches.all()])}]"
 
 
@@ -409,9 +434,15 @@ class CSVRequiredSkillSerializer(serializers.ModelSerializer):
         fields = ['id', 'project', 'skill', 'amount', 'comment']
 
     def get_project(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of project
+        """
         return str(obj.project)
 
     def get_skill(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of skill
+        """
         return str(obj.skill)
 
 
@@ -429,15 +460,27 @@ class CSVProjectSuggestionSerializer(serializers.ModelSerializer):
         fields = ['id', 'project', 'student', 'skill', 'coach', 'reason']
 
     def get_project(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of project
+        """
         return str(obj.project)
 
     def get_student(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of student
+        """
         return str(obj.student)
 
     def get_skill(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of skill
+        """
         return str(obj.skill)
 
     def get_coach(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of coach
+        """
         return str(obj.coach)
 
 
@@ -463,12 +506,22 @@ class CSVSentEmailSerializer(serializers.ModelSerializer):
         fields = ['id', 'sender', 'receiver', 'time', 'info', 'type']
 
     def get_sender(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of sender
+        """
         return str(obj.sender)
 
     def get_receiver(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of receiver
+        """
         return str(obj.receiver)
 
     def get_type(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of type
+        if type is None, return 'None'
+        """
         if obj.type is not None:
             return Student.Status(obj.type).label
         return 'None'
