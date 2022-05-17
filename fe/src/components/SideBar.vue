@@ -371,3 +371,9 @@ export default defineComponent({
   padding: 8px 8px !important;
 }
 </style>
+
+<style>
+.q-checkbox__bg {
+  border-radius: 6px !important
+}
+</style>
