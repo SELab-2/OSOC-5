@@ -93,7 +93,7 @@ class StudentFilterTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data['count'], 1)
 
-        url = reverse_querystring("student-list", query_kwargs=({"suggestion": "none"}))
+        url = reverse_querystring("student-list", query_kwargs=({"suggestion": "undecided"}))
         response = self.client.get(url)
         self.assertEqual(response.data['count'], 2)
 
