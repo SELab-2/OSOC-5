@@ -1,5 +1,11 @@
 <template>
-	<!-- <div> -->
+	<q-splitter
+		v-model="splitterModel"
+		:limits="[40,80]"
+		style="height: 100%;"
+		emit-immediately
+	>
+	<template #before>
 	<q-stepper
 		v-if="project"
 		v-model="step"
@@ -49,36 +55,51 @@
 		>
 			<ProjectSkills :skills="project.requiredSkills"/>
 		</q-step>
-
-		<q-step
-			:name="3"
-			title="Overview"
-			icon="r_receipt_long"
-			:disable="!allDone"
-			:caption="visitedSteps[3] && !allDone ? 'Empty Fields Left' : ''"
-		>
-			<overview :project="project"/>
-		</q-step>
 	</q-stepper>
-	<q-page-sticky position="bottom-right" :offset="[18, 18]">
+	<btn
+		v-if="step > 0"
+		style="position: absolute; left: 0; bottom:0"
+		class="q-ma-md"
+		@click="step -= 1"
+		padding="10px"
+		icon="arrow_back"
+		label="Previous"
+		color="yellow"
+		shadow-color="orange"
+	/>
+	<btn
+		style="position: absolute; right: 0; bottom:0"
+		@click="next"
+		v-if="step < 2"
+		padding="10px"
+		class="q-ma-md"
+		icon-right="arrow_forward"
+		label="Next"
+		color="yellow"
+		shadow-color="orange"
+	>
+	<q-tooltip v-if="step === 2 && !allDone" style="width: 300px">
+		<span class="text-body2">
+		Some data is missing.<br/>Please check if you filled in a name and partner name.
+		</span>
+	</q-tooltip>
+	</btn>
+	</template>
+	<template #after>
+		<div style="max-width: 400px; margin: auto" class="row fit justify-center items-center content-center">
+			<div class="text-h6 text-bold">Preview</div>
+			<project-card :project="project"/>
+		</div>
+	</template>
+	</q-splitter>
 		<btn
-			fab
-			v-if="id && step < 3"
+			style="position: absolute; right: 0; bottom:0"
+			class="q-ma-md"
+			v-if="basicInfoDone"
 			@click="submit"
 			padding="10px"
 			icon-right="check"
-			label="Update"
-			color="yellow"
-			shadow-color="orange"
-			class="q-mr-sm"
-		/>
-		<btn
-			fab
-			@click="next"
-			padding="10px"
-			:icon-right="step < 3 ? 'arrow_forward' : 'check'"
-			:label="step < 3 ? 'Next' : (id ? 'Update' : 'Submit')"
-			:disable="step === 2 && !allDone"
+			:label="id ? 'Update' : 'Publish'"
 			color="yellow"
 			shadow-color="orange"
 		>
@@ -88,19 +109,6 @@
 			</span>
 		</q-tooltip>
 		</btn>
-	</q-page-sticky>
-	<q-page-sticky position="bottom-left" :offset="[18, 18]">
-		<btn
-			v-if="step > 0"
-			fab
-			@click="step -= 1"
-			padding="10px"
-			icon="arrow_back"
-			label="Previous"
-			color="yellow"
-			shadow-color="orange"
-		/>
-	</q-page-sticky>
 	<!-- </div> -->
 </template>
 
@@ -115,10 +123,11 @@ import { useProjectStore } from '../../stores/useProjectStore'
 import { Project } from '../../models/Project'
 import Overview from "./components/CreateOverview.vue"
 import router from '../../router'
+import ProjectCard from "./components/ProjectCard.vue"
 
 export default defineComponent({
 	name: 'CreateProject',
-	components: { BasicInfo, ProjectCoaches, ProjectSkills, Overview },
+	components: { BasicInfo, ProjectCoaches, ProjectSkills, Overview, ProjectCard },
 	props: {
 		id: {
 			type: String,
@@ -134,7 +143,8 @@ export default defineComponent({
 			skillStore: useSkillStore(),
 			coachStore: useCoachStore(),
 			projectStore: useProjectStore(),
-			project
+			project,
+			splitterModel: ref(70)
 		}
 	},
 	async created() {
