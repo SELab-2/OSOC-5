@@ -14,8 +14,8 @@
         v-else
         class="column"
       >
-        <SuggestionRow :suggestion="decision" />
-        <q-separator spaced />
+        <SuggestionRow v-if="decision" :suggestion="decision" />
+        <q-separator v-if="decision" spaced />
         <div
           v-for="(suggestion, key) in suggestions"
           :key="key"
@@ -34,7 +34,6 @@ import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import {defineComponent, PropType} from "vue";
 import {Suggestion} from "../../../models/Suggestion"
-import DecisionIcon from "../../../components/DecisionIcon.vue";
 import SuggestionRow from "./SuggestionRow.vue";
 
 export default defineComponent( {
