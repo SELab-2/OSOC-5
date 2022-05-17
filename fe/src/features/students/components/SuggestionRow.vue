@@ -24,7 +24,7 @@
 <script lang="ts">
 import {Suggestion} from "../../../models/Suggestion";
 import DecisionIcon from "../../../components/DecisionIcon.vue";
-import {defineComponent} from "vue";
+import {defineComponent, PropType} from "vue";
 
 export default defineComponent ({
   components: {
@@ -32,7 +32,7 @@ export default defineComponent ({
   },
   props: {
     suggestion: {
-      type: Suggestion,
+      type: Object as PropType<Suggestion|null>,
       required: true
     }
   }
