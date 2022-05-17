@@ -15,7 +15,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .utils import export_to_csv, create_zipfile_response
 from .pagination import StandardPagination
-from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
+from .filters import MultipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
 from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSerializer, \
     CSVProjectSuggestionSerializer, CSVRequiredSkillSerializer, CSVSentEmailSerializer, \
@@ -65,11 +65,11 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
                        StudentOnProjectFilter, StudentSuggestedByUserFilter,
-                       StudentFinalDecisionFilter, ]
+                       StudentFinalDecisionFilter, MultipleStatusFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',
-                        'student_coach', 'english_rating', 'status']
+                        'student_coach', 'english_rating']
     ordering_fields = ['first_name', 'last_name', 'email', 'status']
 
     @action(detail=True, methods=['post'], serializer_class=SuggestionSerializer)
@@ -250,6 +250,31 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         suggestions = export_to_csv(Suggestion.objects.all().order_by('id'), 'suggestions', CSVSuggestionSerializer)
         return create_zipfile_response('student', [students, suggestions])
 
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all students
+        """
+        Student.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['get'],
+            filter_backends=[filters.SearchFilter, DjangoFilterBackend,
+            StudentOnProjectFilter, StudentSuggestedByUserFilter, MultipleStatusFilter])
+    def count(self, request):
+        """
+        endpoint to count how many students are in the 'yes', 'maybe' and 'no' categories
+        this also takes current filters (except the suggestion filter) into account
+        """
+        students = self.filter_queryset(self.get_queryset())
+        counts = {
+            "yes": students.filter(final_decision__suggestion=Suggestion.Suggestion.YES).count(),
+            "no": students.filter(final_decision__suggestion=Suggestion.Suggestion.NO).count(),
+            "maybe": students.filter(final_decision__suggestion=Suggestion.Suggestion.MAYBE).count(),
+            "undecided": students.filter(final_decision=None).count()
+        }
+        return Response({"counts": counts})
+
 
 class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestors
                    mixins.ListModelMixin,
@@ -340,6 +365,14 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
         """
         coaches = export_to_csv(self.get_queryset(), 'coaches', CSVCoachSerializer)
         return create_zipfile_response('coach', [coaches])
+
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all coaches, !except admins and superusers!
+        """
+        Coach.objects.filter(is_admin=False).filter(is_superuser=False).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -534,6 +567,14 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         suggested_students = export_to_csv(ProjectSuggestion.objects.all(), 'suggested_students', CSVProjectSuggestionSerializer)
         return create_zipfile_response('project', [projects, required_skills, suggested_students])
 
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all projects
+        """
+        Project.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     """
@@ -577,6 +618,28 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
         """
         skills = export_to_csv(self.get_queryset(), 'skills', CSVSkillSerializer)
         return create_zipfile_response('skill', [skills])
+
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):
+        """
+        delete all skills, some skills can't be deleted when they are used in a projectsuggestion
+        returns HTTP response:
+            204 NO CONTENT: all skills were deleted
+            202 ACCEPTED: some skills were deleted, some were not, see response data
+        """
+        not_deleted = set()
+        for skill in self.get_queryset():
+            try:
+                skill.delete()
+            except RestrictedError:
+                not_deleted.add(SkillSerializer(skill, context={'request': request}).data['url'])
+        if not_deleted:
+            returndata = {
+                "detail": "can't delete some skills, because they are used in a project suggestion",
+                "skills": not_deleted
+            }
+            return Response(returndata, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -628,6 +691,14 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
         """
         emails = export_to_csv(self.get_queryset(), 'emails', CSVSentEmailSerializer)
         return create_zipfile_response('email', [emails])
+
+    @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def delete_all(self, request):  # pylint: disable=no-self-use
+        """
+        delete all emails
+        """
+        SentEmail.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GithubLogin(SocialLoginView):

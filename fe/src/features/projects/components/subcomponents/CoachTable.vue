@@ -4,7 +4,7 @@
     class="table shadow-4"
     :rows="coachStore.users"
     :columns="columnsCoaches"
-    :loading="coachStore.isLoadingUsers"
+    :loading="coachStore.isLoading"
     row-key="url"
     selection="multiple"
     :filter="projectStore.filterCoaches"

@@ -3,9 +3,9 @@ import { instance } from '../utils/axios'
 import { User } from '../models/User'
 import { Student, StudentInterface } from '../models/Student'
 import { Skill } from '../models/Skill'
-import qs from "qs";
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
-import { useCoachStore } from './useCoachStore'
+import { baseUrl } from '../utils/baseUrl'
+import qs from 'qs'
 
 interface State {
   skills: Array<Skill>
@@ -13,9 +13,8 @@ interface State {
   coaches: Map<string, User>
   students: Array<Student>
   isLoading: boolean
-  possibleSuggestion: number
   currentStudent: Student | null
-  nextPage: string | null
+  counts: {yes: number, no: number, maybe: number, undecided: number, none: number}
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -25,9 +24,8 @@ export const useStudentStore = defineStore('user/student', {
     coaches: new Map(),
     students: [],
     isLoading: false,
-    possibleSuggestion: -1,
     currentStudent: null,
-    nextPage: '',
+    counts: {yes: 0, no: 0, maybe: 0, undecided: 0, none: 0},
   }),
   actions: {
     /**
@@ -45,10 +43,10 @@ export const useStudentStore = defineStore('user/student', {
       if (student2) return student2
 
       const newstudent = new Student(data)
-      this.students.push(newstudent)
+      this.students.unshift(newstudent)
       return newstudent
     },
-    async deleteStudent(url: string, success: any, fail: any) {
+    async deleteStudent(url: string, success: Function, fail: Function) {
       await instance
         .delete(url)
         .then(() => success())
@@ -78,7 +76,9 @@ export const useStudentStore = defineStore('user/student', {
       student.skills = skills
 
       if (student.finalDecision) {
-        student.finalDecision.suggestion = parseInt(student.finalDecision.suggestion)
+        student.finalDecision.suggestion = parseInt(
+          student.finalDecision.suggestion
+        )
       }
 
       for (const suggestion of student.suggestions) {
@@ -88,25 +88,41 @@ export const useStudentStore = defineStore('user/student', {
       student.gender = parseInt(student.gender)
       student.language = parseInt(student.language)
       student.englishRating = parseInt(student.englishRating)
+      student.status = parseInt(student.status)
+    },
+    async loadYesMaybeNo() {
+      const { data } = await instance.get('students/count/')
+
+      let sum = 0
+      for (const value of Object.values(data.counts) as number[]) {
+        sum += value
+      }
+
+      data.counts.none = sum
+      this.counts = data.counts
     },
     async loadNext(index: number, done: Function, filters: Object) {
       this.isLoading = true
 
-      if (index === 1) this.students = []
+      if (index === 1) {
+        this.students = []
+        await this.loadYesMaybeNo()
+      }
 
-      const {data} = await instance
-          .get(`students/?page=${index}`, {
-            params: filters,
-            paramsSerializer: params => {
-              return qs.stringify(params, {arrayFormat: "repeat"})
-            }
-          })
+      const { data } = await instance.get(`students/?page=${index}`, {
+        params: filters,
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: 'repeat' })
+        },
+      })
 
       for (const student of data.results) {
         await this.transformStudent(student)
       }
 
-      this.students.push(...data.results.map((student: Student) => new Student(student)))
+      this.students.push(
+        ...data.results.map((student: Student) => new Student(student))
+      )
 
       done(data.next === null)
       this.isLoading = false
@@ -115,14 +131,17 @@ export const useStudentStore = defineStore('user/student', {
      * Load a student by its id
      * @param studentId the id of the student
      */
-    async loadStudent(studentId: number) {
+    async loadStudent(studentId: number, fail: Function) {
       this.isLoading = true
 
-      await instance.get(`students/${studentId}/`).then(async ({ data }) => {
-        await this.transformStudent(data)
+      await instance
+        .get(`students/${studentId}/`)
+        .then(async ({ data }) => {
+          await this.transformStudent(data)
 
-        this.currentStudent = new Student(data as Student)
-      })
+          this.currentStudent = new Student(data as Student)
+        })
+        .catch(() => fail())
 
       this.isLoading = false
     },
@@ -131,20 +150,25 @@ export const useStudentStore = defineStore('user/student', {
      * @param studentId the id of the student
      * @param reason the reason to do the suggestion
      */
-    async updateSuggestion(studentId: number, reason: string) {
+    async updateSuggestion(
+      studentId: number,
+      possibleSuggestion: number,
+      reason: string
+    ) {
       this.isLoading = true
 
       // check if -1 is selected to delete suggestion
-      if (this.possibleSuggestion === -1) {
+      if (possibleSuggestion === -1) {
         await instance.delete(`students/${studentId}/remove_suggestion/`)
       } else {
         await instance.post(`students/${studentId}/make_suggestion/`, {
-          suggestion: this.possibleSuggestion,
+          suggestion: possibleSuggestion,
           reason: reason,
         })
       }
 
-      await this.loadStudent(studentId)
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      await this.loadStudent(studentId, () => {})
 
       this.isLoading = false
     },
@@ -274,7 +298,7 @@ export const useStudentStore = defineStore('user/student', {
      * @param suggestion the suggestion that was made
      * @param reason the reason why this suggestion was made
      */
-    receiveFinalDecision({
+    async receiveFinalDecision({
       student_id,
       suggestion,
       coach,
@@ -288,22 +312,30 @@ export const useStudentStore = defineStore('user/student', {
     }) {
       this.isLoading = true
 
+      await this.loadYesMaybeNo()
+
       const studentId = Number.parseInt(student_id)
 
       const student = this.students.filter(({ id }) => id === studentId)[0]
-
+      const finalDecision = {
+        student: studentId,
+        coach: coach,
+        suggestion: Number.parseInt(suggestion),
+        reason,
+      }
 
       // We found the corresponding student
       if (student) {
-        const finalDecision = {
-          student: studentId,
-          coach: coach,
-          suggestion: Number.parseInt(suggestion),
-          reason,
-        }
         student.finalDecision = finalDecision
 
         if (this.currentStudent?.id === studentId) this.currentStudent = student
+      } else {
+        const newStudent = await this.getStudent(
+          `${baseUrl}/students/${studentId}`
+        )
+
+        newStudent.finalDecision = finalDecision
+        this.students.push(newStudent)
       }
 
       this.isLoading = false
@@ -313,12 +345,14 @@ export const useStudentStore = defineStore('user/student', {
      * @param student to remove the suggestion from
      * @param coach from who the suggestion is deleted
      */
-    removeFinalDecision({ student_id }: { student_id: string }) {
+    async removeFinalDecision({student_id}: { student_id: string }) {
       this.isLoading = true
+
+      await this.loadYesMaybeNo()
 
       const studentId = Number.parseInt(student_id)
 
-      const student = this.students.filter(({ id }) => id === studentId)[0]
+      const student = this.students.filter(({id}) => id === studentId)[0]
 
       // We found the corresponding student
       if (student) {

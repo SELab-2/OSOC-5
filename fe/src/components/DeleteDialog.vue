@@ -13,7 +13,7 @@
           Are you sure you want to delete "{{ name }}"?
         </div>
         <div class="text text-grey">
-          This student will be permanently deleted. 
+          This {{ type }} will be permanently deleted.
           You cannot undo this action.
         </div>
       </q-card-section>
@@ -43,12 +43,16 @@
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import { useStudentStore } from "../../../stores/useStudentStore";
+import { useStudentStore } from "../stores/useStudentStore";
 
 export default defineComponent ({
   props: {
     delete: {
       type: Function,
+      required: true
+    },
+    type: {
+      type: String,
       required: true
     },
     name: {
