@@ -85,10 +85,12 @@
        
     </template>
     <template #after>
-      <div id="scroll-target-id" style="float: right; text-align: right" @scroll="(e) => onLoad(e)">
+      <div id="scroll-target-id" style="float: right; text-align: right; width: 100%; height: 100%; overflow: auto;">
         <q-infinite-scroll
+          ref="scroll"
           @load="(i,done) => skillStore.loadNext(i, done, {})"
           scroll-target="#scroll-target-id"
+          :offset="250"
         >
           <q-chip
             v-for="skill in skillStore.skills"
@@ -149,6 +151,9 @@ export default defineComponent ({
       editMode: ref(false),
       splitterModel: ref(70)
     }
+  },
+  mounted() {
+    this.$refs.scroll.trigger()
   },
   methods: {
     addSkillToProject(skill: Skill) {
