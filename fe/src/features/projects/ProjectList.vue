@@ -205,17 +205,16 @@ export default defineComponent({
       }
     },
     expanded: {
-      get() {
-        if (this.projects.length === 0) return false
+      get(): boolean {
+        if (this.projects.length === 0 || this.projects.some(p => !p.requiredSkills)) return false
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (this as any).projects.every(
+        return (this as any).projects.filter(p => p.requiredSkills?.length > 0).every(
           (p: { selectedRoles: any }) =>
             Object.values(p.selectedRoles ?? { k: false }).every((r) => r)
         )
       },
-      set(newValue) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.projects.forEach((p: any) => {
+      set(newValue: boolean) {
+        this.projects.forEach(p => {
           for (let r in p.selectedRoles) {
             p.selectedRoles[r] = newValue
           }
