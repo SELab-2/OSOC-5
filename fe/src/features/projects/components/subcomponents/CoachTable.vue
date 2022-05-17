@@ -8,7 +8,33 @@
     row-key="url"
     selection="multiple"
     :filter="projectStore.filterCoaches"
-  />
+  >
+    <template #body-cell-isAdmin="row">
+      <q-td>
+        <q-icon
+          v-if="row.row.isAdmin === true"
+          name="mdi-check"
+        />
+        <q-icon
+          v-else
+          name="mdi-close"
+        />
+      </q-td>
+    </template>
+
+    <template #body-cell-isActive="row">
+      <q-td>
+        <q-icon
+          v-if="row.row.isActive === true"
+          name="mdi-check"
+        />
+        <q-icon
+          v-else
+          name="mdi-close"
+        />
+      </q-td>
+    </template>
+  </q-table>
 </template>
 
 <script lang="ts">
