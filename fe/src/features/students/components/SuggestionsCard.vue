@@ -50,7 +50,8 @@ export default defineComponent( {
     },
     decision: {
       type: Suggestion,
-      required: true
+      required: false,
+      default: null
     }
   },
   setup() {
