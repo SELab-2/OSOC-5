@@ -181,6 +181,7 @@ import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from '../../stores/useStudentStore'
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
+
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
 import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
@@ -189,22 +190,15 @@ export default defineComponent({
   name: 'ProjectList',
   components: { ProjectCard },
   setup() {
-    const baseURL =
-      process.env.NODE_ENV == 'development'
-        ? 'ws://localhost:8000/ws/socket_server/'
-        : 'wss://sel2-5.ugent.be/ws/socket_server/'
-        
-    const { loadNext, receiveSuggestion, removeReceivedSuggestion} = useProjectStore()
+    const { loadNext } = useProjectStore()
+    
     return {
       ...storeToRefs(useProjectStore()),
       loadNext,
-      receiveSuggestion,
-      removeReceivedSuggestion,
       studentStore: useStudentStore(),
       authenticationStore: useAuthenticationStore(),
       projectConlictStore: useProjectConflictStore(),
       skillStore: useSkillStore(),
-      socket: new WebSocket(baseURL),
     }
   },
   data() {
@@ -254,26 +248,6 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.socket.onmessage = async (event: { data: string }) => {
-      const data = JSON.parse(event.data)
-
-      if (data.hasOwnProperty('suggestion')) {
-        await this.studentStore.receiveSuggestion(data.suggestion)
-      } else if (data.hasOwnProperty('remove_suggestion')) {
-        this.studentStore.removeSuggestion(data.remove_suggestion)
-      } else if (data.hasOwnProperty('final_decision')) {
-        this.studentStore.receiveFinalDecision(data.final_decision)
-      } else if (data.hasOwnProperty('remove_final_decision')) {
-        this.studentStore.removeFinalDecision(data.remove_final_decision)
-      } else if (data.hasOwnProperty('suggest_student')) {
-        this.receiveSuggestion(data.suggest_student)
-        this.projectConlictStore.getConflictingProjects()
-      } else if (data.hasOwnProperty('remove_student')) {
-        this.removeReceivedSuggestion(data.remove_student)
-        this.projectConlictStore.getConflictingProjects()
-      }
-    }
-
     this.projectConlictStore.getConflictingProjects()
   },  
 })

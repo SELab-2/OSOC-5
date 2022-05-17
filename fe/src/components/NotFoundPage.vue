@@ -1,13 +1,23 @@
 <template>
-  <h1 >404: Page not found.</h1>
+  <div class="fixed-center">
+        <Vue3Lottie :animationLink="options[Math.floor(Math.random() * options.length)]" :height="400" :width="400" />
+  </div>
 </template>
 
 <script lang="ts">
-export default {
-  name: "NotFoundPage"
-}
+import { defineComponent } from 'vue'
+const options = [
+  "https://assets8.lottiefiles.com/packages/lf20_GIyuXJ.json",
+  "https://assets1.lottiefiles.com/packages/lf20_zyu0ctqb.json",
+  "https://assets1.lottiefiles.com/packages/lf20_a3kesdek.json"
+]
+
+export default defineComponent({
+  data() {
+    return {
+      options
+    }
+  },
+})
+
 </script>
-
-<style>
-
-</style>

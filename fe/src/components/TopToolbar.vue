@@ -14,6 +14,7 @@
       <q-tabs
         class="centered-tabs"
         shrink
+        outside-arrows
       >
         <q-route-tab
           name="students"
