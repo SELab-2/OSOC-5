@@ -112,7 +112,7 @@ export const useStudentStore = defineStore('user/student', {
       const { data } = await instance.get(`students/?page=${index}`, {
         params: filters,
         paramsSerializer: (params) => {
-          return qs.stringify(params, { arrayFormat: 'repeat' })
+          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v && v.length > 0)), { arrayFormat: 'repeat' })
         },
       })
 
