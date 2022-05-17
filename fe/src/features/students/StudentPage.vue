@@ -271,9 +271,7 @@ export default defineComponent ({
      * Retrieve the current selected student from the store
      */
     student(): Student | null {
-      console.log(this.studentStore.currentStudent)
       return this.studentStore.currentStudent
-      // return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
     /**
      * Retrieve the possible suggestion from the store

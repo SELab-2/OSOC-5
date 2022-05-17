@@ -15,6 +15,7 @@ interface State {
   isLoading: boolean
   currentStudent: Student | null
   counts: {yes: number, no: number, maybe: number, undecided: number, none: number}
+  shouldRefresh: Boolean
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -26,6 +27,7 @@ export const useStudentStore = defineStore('user/student', {
     isLoading: false,
     currentStudent: null,
     counts: {yes: 0, no: 0, maybe: 0, undecided: 0, none: 0},
+    shouldRefresh: false
   }),
   actions: {
     /**
@@ -51,6 +53,8 @@ export const useStudentStore = defineStore('user/student', {
         .delete(url)
         .then(() => success())
         .catch(() => fail())
+
+      this.shouldRefresh = true
     },
     /**
      * Transform a student filling in its skills and transforming some strings to numbers
