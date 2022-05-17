@@ -213,6 +213,20 @@ export default defineComponent ({
       this.$refs.scroll.reset()
       this.$refs.scroll.resume()
       this.$refs.scroll.trigger()
+    },
+    editSkill: {
+      handler(newValue: Skill, oldValue: Skill) {
+      console.log(oldValue, newValue)
+      if (oldValue?.id === newValue?.id) {
+        this.skills.forEach(s => {
+          console.log(s)
+          if (s.skill.id === newValue.id) {
+            s.skill = newValue
+          }
+        })
+      }
+    },
+    deep: true
     }
   },
   computed: {
