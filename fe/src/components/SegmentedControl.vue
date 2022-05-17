@@ -1,18 +1,21 @@
 <template>
   <q-tabs
-    v-model="value"
     class="bg-white text-black shadow-2"
     :indicator-color="color"
     style="border-radius: 10px;"
+    v-bind="$attrs"
   >
     <q-tab
       v-for="(option, index) in options"
       :key="index"
       no-caps
+      :style="noPadding ? 'padding: 0px 0px !important;' : ''"
       :ripple="false"
       :name="option.name"
       :label="option.label"
-    />
+    >
+    <div v-if="option.amount !== undefined" class="text-caption" color="red" floating>{{ option.amount! }}</div>
+    </q-tab>
   </q-tabs>
 </template>
 
@@ -22,28 +25,16 @@
 
   export default defineComponent({
     props: {
-      modelValue: {
-        type: String,
-        required: true
-      }, 
       options: {
-        type:  [Object] as PropType<{name: string, label: string}[]>, 
+        type:  [Object] as PropType<{name: string|number, label: string, amount?: number}[]>, 
         required: true
       },
       color: {
         type: String,
         default: "yellow-4"
-      }
-    },
-    emits: ['update:modelValue'],
-    computed: {
-      value: {
-        get(): string {
-          return this.modelValue
-        },
-        set(value: string) {
-          this.$emit('update:modelValue', value)
-        }
+      },
+      noPadding: {
+        type: Boolean
       }
     }
   })

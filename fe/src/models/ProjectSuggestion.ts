@@ -13,7 +13,7 @@ export interface ProjectSuggestionInterface {
 
 export interface TempProjectSuggestion {
   student: string
-  coach: string
+  coach: User
   skill: string
   reason: string
   coachId: number
@@ -27,11 +27,20 @@ export class ProjectSuggestion implements ProjectSuggestionInterface {
   reason: string
   coachId?: number
   coachName?: string
-  
+
   constructor(data: ProjectSuggestionInterface) {
     Object.assign(this, data)
   }
 }
 
 // Extra class to differentiate new suggestions from existing suggestions.
-export class NewProjectSuggestion extends ProjectSuggestion {}
+export class NewProjectSuggestion extends ProjectSuggestion {
+  fromWebsocket: boolean
+  fromLocal: boolean
+
+  constructor(data: ProjectSuggestionInterface, fromWebsocket: boolean) {
+    super(data)
+    this.fromWebsocket = fromWebsocket
+    this.fromLocal = !fromWebsocket
+  }
+}

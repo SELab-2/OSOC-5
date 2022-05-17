@@ -21,7 +21,7 @@ WORKDIR /src
 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
-    pip install gunicorn
+    pip install daphne
 
 CMD \
     chmod 755 ./docker/wait-for-it.sh && \
@@ -29,6 +29,5 @@ CMD \
     python manage.py migrate && \
     python manage.py collectstatic --noinput && \
     python scripts/create_data_fixtures.py && \
-    python scripts/create_superuser_production.py \
-    && \
-    gunicorn osoc.wsgi -b 0.0.0.0:8000 --access-logfile 'accesslogs' --error-logfile 'errorlogs'
+    python scripts/create_superuser_production.py && \
+    daphne osoc.asgi:application -b 0.0.0.0 -p 8000 > logs

@@ -219,6 +219,39 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_student_bulk_status(self):
+        """
+        test POST /students/bulk_status
+        """
+        student_status = '2'
+        url = reverse("student-bulk-status")
+        data = {
+            "status": student_status,
+            "students": [reverse("student-detail", args=(student.id,)) for student in Student.objects.all()]
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(all(student.status == student_status for student in Student.objects.all()))
+
+    def test_student_bulk_status_bad_request(self):
+        """
+        test POST /students/bulk_status with bad request
+        """
+        url = reverse("student-bulk-status")
+        response = self.client.post(url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /students/delete_all without permission
+        """
+        url = reverse("student-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class StudentTestsAdmin(APITestCase):
     """
@@ -281,6 +314,16 @@ class StudentTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(before_count, after_count+1)
+
+    def test_delete_all(self):
+        """
+        test DELETE /students/delete_all
+        """
+        url = reverse("student-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Student.objects.count(), 0)
 
 
 class CoachTestsCoach(APITestCase):
@@ -376,6 +419,15 @@ class CoachTestsCoach(APITestCase):
         """
         coach = Coach.objects.first()
         url = reverse("coach-detail", args=(coach.id,))
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /coaches/delete_all without permission
+        """
+        url = reverse("coach-delete-all")
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -498,6 +550,16 @@ class CoachTestsAdmin(APITestCase):
         self.assertEqual(response.data["first_name"], data["first_name"])
         # Is it possible to update 'coach' variable with latest info from database?
         self.assertEqual(coach.first_name, data["first_name"])
+
+    def test_delete_all(self):
+        """
+        test DELETE /coaches/delete_all
+        """
+        url = reverse("coach-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Coach.objects.filter(is_admin=False).count(), 0)
 
 
 class ProjectTestsCoach(APITestCase):
@@ -675,6 +737,7 @@ class ProjectTestsCoach(APITestCase):
         """
         test GET /projects/get_conflicting_projects
         """
+        # create conflict
         student = Student.objects.first()
         for project in Project.objects.all():
             url = reverse("project-suggest-student", args=(project.id,))
@@ -688,7 +751,87 @@ class ProjectTestsCoach(APITestCase):
         url = reverse("project-get-conflicting-projects")
         response = self.client.get(url, format="json")
 
-        self.assertEqual(len(response.data["conflicts"]), 1)
+        self.assertEqual(response.data['count'], 1)
+
+    def test_project_resolve_conflicts(self):
+        """
+        test POST /projects/resolve_conflicts
+        """
+        # create conflict
+        student = Student.objects.first()
+        for project in Project.objects.all():
+            url = reverse("project-suggest-student", args=(project.id,))
+            skill = project.required_skills.first()
+            data = {
+                "student": reverse("student-detail", args=(student.id,)),
+                "skill": reverse("skill-detail", args=(skill.id,))
+            }
+            self.client.post(url, data, format="json")
+
+        # resolve conflict
+        url = reverse("project-resolve-conflicts")
+        project = Project.objects.first()
+        skill = project.required_skills.first()
+        data = [{
+            "project": reverse("project-detail", args=(project.id,)),
+            "student": reverse("student-detail", args=(student.id,)),
+            "skill": reverse("skill-detail", args=(skill.id,)),
+            "coach": reverse("coach-detail", args=(self.user.id,))
+        }]
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # check there are no conflicts
+        url = reverse("project-get-conflicting-projects")
+        response = self.client.get(url)
+
+        self.assertEqual(response.data['count'], 0)
+
+    def test_project_resolve_conflicts_students_not_unique(self):
+        """
+        test POST /projects/resolve_conflicts with same students
+        """
+        url = reverse("project-resolve-conflicts")
+        student = Student.objects.first()
+        project = Project.objects.first()
+        skill = project.required_skills.first()
+        data = [{
+            "project": reverse("project-detail", args=(project.id,)),
+            "student": reverse("student-detail", args=(student.id,)),
+            "skill": reverse("skill-detail", args=(skill.id,)),
+            "coach": reverse("coach-detail", args=(self.user.id,))
+        },
+        {
+            "project": reverse("project-detail", args=(project.id,)),
+            "student": reverse("student-detail", args=(student.id,)),
+            "skill": reverse("skill-detail", args=(skill.id,)),
+            "coach": reverse("coach-detail", args=(self.user.id,))
+        }]
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_project_resolve_conflicts_bad_request(self):
+        """
+        test POST /projects/resolve_conflicts with same students
+        """
+        url = reverse("project-resolve-conflicts")
+        data = [{
+            "project": "not an url"
+        }]
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /projects/delete_all without permission
+        """
+        url = reverse("project-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class ProjectTestsAdmin(APITestCase):
@@ -777,6 +920,16 @@ class ProjectTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(project.name, data["name"])
+
+    def test_delete_all(self):
+        """
+        test DELETE /projects/delete_all
+        """
+        url = reverse("project-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Project.objects.count(), 0)
 
 
 class SkillTestsCoach(APITestCase):
@@ -874,6 +1027,15 @@ class SkillTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /skills/delete_all without permission
+        """
+        url = reverse("skill-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class SkillTestsAdmin(APITestCase):
     """
@@ -932,8 +1094,40 @@ class SkillTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_all(self):
+        """
+        test DELETE /skills/delete_all
+        """
+        url = reverse("skill-delete-all")
+        response = self.client.delete(url)
 
-class SentEmailTests(APITestCase):
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Skill.objects.count(), 0)
+
+    def test_delete_all_some_used(self):
+        """
+        test DELETE /skills/delete_all while some skills are used in a projectsuggestion
+        """
+        skill = SkillFactory(name="used skill")
+        project = ProjectFactory()
+        # add skill to project such that a projectsuggestion can be made
+        project.required_skills.add(skill)
+        student = StudentFactory()
+        # add student to projectsuggestions, now the skill is "used" in this project
+        ProjectSuggestion.objects.create(
+            project=project,
+            student=student,
+            skill=skill,
+            coach=self.admin
+        )
+        url = reverse("skill-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(Skill.objects.count(), 1)
+
+
+class SentEmailTestsCoach(APITestCase):
     """
     test class for testing sentemail model
     """
@@ -1045,3 +1239,174 @@ class SentEmailTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(email.info, data["info"])
+
+    def test_delete_all_forbidden(self):
+        """
+        test DELETE /sentemails/delete_all without permission
+        """
+        url = reverse("sentemail-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class SentEmailTestsAdmin(APITestCase):
+    """
+    test class for testing sentemail model by admin user (all permissions)
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        student = StudentFactory()
+        admin = AdminFactory()
+        self.client.force_authenticate(admin)
+        SentEmailFactory(sender=admin, receiver=student)
+
+    def test_delete_all(self):
+        """
+        test DELETE /sentemails/delete_all
+        """
+        url = reverse("sentemail-delete-all")
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(SentEmail.objects.count(), 0)
+
+
+class RegisterTests(APITestCase):
+    """
+    test class for testing register functionality
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        self.admin = AdminFactory()
+        self.client.force_authenticate(self.admin)
+
+    def test_register(self):
+        """
+        test POST /auth/register
+        """
+        url = reverse("register")
+        data = {
+            "email": "test.user@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "password*&^%"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_register_passwords_dont_match(self):
+        """
+        test POST /auth/register with two different passwords
+        """
+        url = reverse("register")
+        data = {
+            "email": "test.user@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "wrong"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_register_email_exists(self):
+        """
+        test POST /auth/register with an existing email
+        """
+        url = reverse("register")
+        data = {
+            "email": self.admin.email,
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "password*&^%"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class LoginTests(APITestCase):
+    """
+    test class for testing login functionality
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        admin = AdminFactory()
+        self.client.force_authenticate(admin)
+        # create user with register endpoint so that the password is hashed and can be used to log in
+        self.user_data = {
+            "email": "test.user@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password1": "password*&^%",
+            "password2": "password*&^%"
+        }
+        url = reverse("register")
+        self.client.post(url, self.user_data, format="json")
+        # set coach active to be able to log in
+        coach = Coach.objects.get(email=self.user_data["email"])
+        coach.is_active = True
+        coach.save()
+
+    def test_login(self):
+        """
+        test POST /api-auth/login/
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": self.user_data["email"],
+            "password": self.user_data["password1"]
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_login_user_doenst_exist(self):
+        """
+        test POST /api-auth/login/ with a non-existing user
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": "non_existing_email",
+            "password": "password"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_wrong_password(self):
+        """
+        test POST /api-auth/login/ with a wrong password
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": self.user_data["email"],
+            "password": "wrong_password"
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_bad_request(self):
+        """
+        test POST /api-auth/login/ with data missing
+        """
+        url = reverse("rest_login")
+        data = {
+            "email": self.user_data["email"],
+            "password": ""
+        }
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

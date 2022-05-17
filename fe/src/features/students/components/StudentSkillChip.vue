@@ -7,9 +7,15 @@
       name === bestSkill ? 6 : 8
     }px`"
   >
-    <template v-slot:default>
-      <div class="row" style="display: flex; align-items: center">
-        <q-icon v-if="name === bestSkill" name="mdi-crown" />
+    <template #default>
+      <div
+        class="row"
+        style="display: flex; align-items: center"
+      >
+        <q-icon
+          v-if="name === bestSkill"
+          name="mdi-crown"
+        />
         <div
           class="text-weight-medium"
           style="color: black; padding-left: 2px"

@@ -17,6 +17,17 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name']
 
+
+class ProjectPartialSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer to show some fields of the project model
+    used in coach serializer
+    """
+    class Meta:
+        model = Project
+        fields = ['id', 'url', 'name']
+
+
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the Suggestion model
@@ -50,7 +61,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     suggestions and final_decision are read-only
     """
     suggestions = SuggestionSerializer(
-        many=True, source='suggestion_set', read_only=True)
+        many=True, source='filtered_suggestions', read_only=True)
     final_decision = SuggestionSerializer(read_only=True)
 
     class Meta:
@@ -69,17 +80,39 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         return expanded_fields
 
 
+class BulkStatusSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for the bulk_status endpoint
+    expects a status and a list of students
+    """
+    students = serializers.HyperlinkedRelatedField(
+        view_name='student-detail', queryset=Student.objects.all(), many=True)
+
+    class Meta:
+        model = Student
+        fields = ['status', 'students']
+
+
 class CoachSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the coach model
     fields: first_name, last_name, email, is_admin and is_active
     is_admin and is_active are read-only
     """
+    projects = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name',
-                  'email', 'is_admin', 'is_active']
+                  'email', 'is_admin', 'is_active', 'projects']
         read_only_fields = ['is_admin', 'is_active']
+
+    def get_projects(self, obj):
+        """
+        get all projects the current coach is assigned to and return a list of urls
+        """
+        projects = obj.project_set.all()
+        return ProjectPartialSerializer(projects, many=True, context={"request": self.context.get("request")}).data
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
@@ -164,20 +197,33 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        override create method to be able to create/update/remove RequiredSkills objects,
+        override update method to be able to create/update/remove RequiredSkills objects,
         this is needed because required_skills is a many-to-many field with a through model
         (because it needs an extra 'amount' field)
         """
         # first update required skills
         skills_data = validated_data.pop('requiredskills_set')
+
         # update or create skills from request
+        keep_skills = []
+        keep_students = []
         for skill_data in skills_data:
-            RequiredSkills.objects.update_or_create(
-                project=instance, **skill_data)
+            # update or create given skill
+            created_or_updated, _ = RequiredSkills.objects\
+                .update_or_create(project=instance, **skill_data)
+            # keep track of skill
+            keep_skills.append(created_or_updated.id)
+            # keep track of all students who were suggested for this skill
+            keep_students += ProjectSuggestion.objects\
+                .filter(project=instance, skill=created_or_updated.skill)\
+                .values_list('id', flat=True)
+
         # delete skills not in request
-        skills = [skill_data['skill'] for skill_data in skills_data]
-        RequiredSkills.objects.filter(
-            project=instance).exclude(skill__in=skills).delete()
+        RequiredSkills.objects.filter(project=instance)\
+            .exclude(id__in=keep_skills).delete()
+        # delete all projectsuggestions that use a removed skill
+        ProjectSuggestion.objects.filter(project=instance)\
+            .exclude(id__in=keep_students).delete()
         return super().update(instance, validated_data)
 
 
@@ -186,6 +232,34 @@ class ProjectGetSerializer(ProjectSerializer):
     serializer class to show coach info in project list and project instance, but not in post, put, etc
     """
     coaches = CoachPartialSerializer(many=True)
+
+
+class Conflict(): # pylint: disable=too-few-public-methods
+    """
+    conflict class, only used to initialize ConflictSerializer
+    a conflict has a student which is assigned to more than 1 project
+    """
+    def __init__(self, student, projects):
+        self.student = student
+        self.projects = projects
+
+class ConflictSerializer(serializers.Serializer): # pylint: disable=abstract-method
+    """
+    serializer class for conflicts
+    """
+    student = serializers.HyperlinkedRelatedField(
+        view_name='student-detail', queryset=Student.objects.all())
+    projects = serializers.HyperlinkedRelatedField(
+        view_name='project-detail', queryset=Project.objects.all(), many=True)
+
+
+class ResolveConflictSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    serializer for resolving conflicts
+    """
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['project', 'student', 'coach', 'skill']
 
 
 class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
@@ -198,7 +272,7 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
     sender = CoachPartialSerializer(read_only=True)
     class Meta:
         model = SentEmail
-        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info']
+        fields = ['url', 'id', 'sender', 'receiver', 'time', 'info', 'type']
         read_only_fields = ['time']
         extra_kwargs = {'receiver': {'required': True, 'allow_null': False}}
 
@@ -268,9 +342,8 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
     username = None
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-    is_admin = serializers.BooleanField()
-    is_active = serializers.BooleanField()
+
     def get_cleaned_data(self):
         super().get_cleaned_data()
-        fields = ['password1', 'password2', 'email', 'first_name', 'last_name', 'is_admin', 'is_active']
+        fields = ['password1', 'password2', 'email', 'first_name', 'last_name']
         return {field: self.validated_data.get(field, '') for field in fields} # pylint: disable=no-member

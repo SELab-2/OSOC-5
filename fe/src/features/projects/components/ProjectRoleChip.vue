@@ -3,14 +3,17 @@
   <!-- A Custom implementation of the icon is used, since a chip always reserves place for an icon, even when we don't want it. -->
   <q-chip
     clickable
-    @click="enabled = !enabled"
     outline
     :color="`${skill.skill.color}-${enabled ? 8 : 4}`"
     :class="`bg-${skill.skill.color}-${enabled ? 4 : 1}`"
     :style="`border-width: 1.5px; padding-right: 8px; padding-left: ${skill.comment ? 2 : 8}px`"
+    @click="enabled = !enabled"
   >
-    <template v-slot:default>
-      <div class="row" style="display: flex; align-items: center">
+    <template #default>
+      <div
+        class="row"
+        style="display: flex; align-items: center"
+      >
         <q-icon
           v-if="skill.comment"
           name="info"
@@ -38,8 +41,9 @@
           class="text-black shadow-2"
           anchor="bottom middle"
           self="center middle"
-          >{{ skill.comment }}</q-tooltip
         >
+          {{ skill.comment }}
+        </q-tooltip>
       </div>
     </template>
   </q-chip>
@@ -47,7 +51,7 @@
 
 
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 import { ProjectSkill } from '../../../models/Skill'
 
 export default defineComponent({
@@ -58,13 +62,14 @@ export default defineComponent({
     },
     occupied: {
       type: Number,
-      required: false
+      required: true
     },
     modelValue: {
       type: Boolean,
       required: false,
     },
   },
+  emits: ['update:modelValue'],
   computed: {
     enabled: {
       get() {

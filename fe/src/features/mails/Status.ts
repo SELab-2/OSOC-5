@@ -1,28 +1,28 @@
-const status = [
+const stati = [
     {
         label: 'Applied',
-        value: '0'
+        value: 0
     },
     {
         label: 'Awaiting project',
-        value: '1'
+        value: 1
     },
     {
         label: 'Approved',
-        value: '2'
+        value: 2
     },
     {
         label: 'Contract confirmed',
-        value: '3'
+        value: 3
     },
     {
         label: 'Contract declined',
-        value: '4'
+        value: 4
     },
     {
         label: 'Rejected',
-        value: '5'
+        value: 5
     }
 ]
 
-export default status;
+export default stati;

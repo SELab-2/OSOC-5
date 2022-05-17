@@ -1,17 +1,24 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
-import { ProjectTableSkill, Skill } from '../models/Skill'
+import { ProjectTableSkill, Skill, TempProjectSkill } from '../models/Skill'
+import { User } from '../models/User'
 
 interface State {
   skills: Array<ProjectTableSkill>
   isLoadingSkills: boolean
+  popupName: string
+  popupColor: string
+  popupID: number
 }
 
 export const useSkillStore = defineStore('skills', {
   state: (): State => ({
     skills: [],
     isLoadingSkills: false,
+    popupName: '',
+    popupColor: '',
+    popupID: -1,
   }),
   actions: {
     async getSkill(url: string): Promise<Skill> {
@@ -41,11 +48,12 @@ export const useSkillStore = defineStore('skills', {
       // start the loading animation
       this.isLoadingSkills = true
       this.skills = []
-      instance
-        .get('skills/')
+      // console.log('LOAD SKILLS')
+      return instance
+        .get('skills/?page_size=500')
         .then(({ data }) => {
           // set the skill of the store
-          for (const skill of data as Skill[]) {
+          for (const skill of data['results'] as Skill[]) {
             this.skills.push({
               name: skill.name,
               amount: 0,
@@ -55,46 +63,70 @@ export const useSkillStore = defineStore('skills', {
               comment: '',
             })
           }
-
         })
         .catch((error) => {
           console.log(error)
-        }).finally( () => this.isLoadingSkills = false)
+        })
+        .finally(() => (this.isLoadingSkills = false))
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async addSkill(newSkillName: string, color: string, callback: any) {
-
+    async addSkill(callback: any) {
       // Process the new skill
-      console.log(`Adding new skill: ${newSkillName}.`)
+      if (
+        this.popupName &&
+        this.popupName.length > 0 &&
+        this.popupColor.length > 0
+      ) {
+        if (this.popupID >= 0) {
+          // skill already exists so we update it
+          instance
+            .patch(`skills/${this.popupID}/`, {
+              name: this.popupName,
+              color: this.popupColor,
+            })
+            .then(() => {
+              for (const skill of this.skills) {
+                if (skill.id === this.popupID) {
+                  skill.color = this.popupColor
+                  skill.name = this.popupName
+                }
+              }
 
-      instance
-        .post('skills/', {
-          name: newSkillName,
-          color: color,
-        })
-        .then((response) => {
-          console.log(response['data'])
-
-          // ON SUCCESS ADD THIS TO THE LOCAL STORE
-          this.skills.push({
-            name: response['data']['name'],
-            amount: 0,
-            url: response['data']['url'],
-            color: response['data']['color'],
-            id: response['data']['id'],
-            comment: '',
-          })
-          // When finished run the callback so the popup closes.
-          callback(true)
-        })
-        .catch(error => {
-          this.isLoadingSkills = false
-          console.log(error)
-          callback(false)
-        })
+              return callback(0)
+            })
+            .catch(() => callback(1))
+        } else {
+          // make new skill
+          instance
+            .post('skills/', {
+              name: this.popupName,
+              color: this.popupColor,
+            })
+            .then((response) => {
+              // ON SUCCESS ADD THIS TO THE LOCAL STORE
+              this.skills.push({
+                name: response['data']['name'],
+                amount: 0,
+                url: response['data']['url'],
+                color: response['data']['color'],
+                id: response['data']['id'],
+                comment: '',
+              })
+              // When finished run the callback so the popup closes.
+              callback(0)
+            })
+            .catch(() => {
+              this.isLoadingSkills = false
+              callback(1)
+            })
+        }
+      } else {
+        callback(2)
+      }
     },
-    async deleteSkill(deletedSkillId: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async deleteSkill(deletedSkillId: number, callback: any) {
       // delete in database
       await instance
         .delete(`skills/${deletedSkillId}/`)
@@ -104,9 +136,28 @@ export const useSkillStore = defineStore('skills', {
             (skill) => skill.id === deletedSkillId
           )
           this.skills.splice(index, 1)
+          callback(true)
         })
-        .catch(() => console.log('Failed to delete'))
-      // TODO: when skill is linked to project delete doesnt work but it does say successful to user
+        .catch((error) => {
+          console.log(error)
+          callback(false)
+        })
+    },
+    async setSkills(projectSkills: TempProjectSkill[]) {
+      // first load all the existing skills back into the store
+      await this.loadSkills()
+      // now go over each of the skills that the project contains and
+      // fill in the amount and comment
+      for (const projectSkill of projectSkills) {
+        for (const skill of this.skills) {
+          if (skill.url === projectSkill.skill) {
+            // this means u found match
+            // console.log("match " + skill.url)
+            skill.amount = projectSkill.amount
+            skill.comment = projectSkill.comment
+          }
+        }
+      }
     },
   },
 })

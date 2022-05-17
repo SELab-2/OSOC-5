@@ -61,11 +61,8 @@ class CoachManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('is_admin', True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
 
@@ -352,6 +349,7 @@ class Project(models.Model):
     )
     extra_info = models.TextField(
         _('extra info'),
+        blank=True
     )
     required_skills = models.ManyToManyField(
         Skill,
@@ -402,7 +400,7 @@ class Suggestion(models.Model):
     """
     class Suggestion(models.TextChoices):
         """
-        suggestion type enum, suggestion type can be Yesm No or Maybe
+        suggestion type enum, suggestion type can be Yes, No or Maybe
         when a coach selects 'undecided' for a suggestion, the suggestion is removed in the backend
         """
         YES = '0', _('Yes')
@@ -476,6 +474,7 @@ class SentEmail(models.Model):
     """
     Information about which emails have been sent to which students
     """
+
     sender = models.ForeignKey(
         Coach,
         on_delete=models.SET_NULL,
@@ -496,6 +495,13 @@ class SentEmail(models.Model):
         max_length=255,
         blank=True,
         default=""
+    )
+    type = models.CharField(
+        _("type"),
+        max_length=1,
+        choices=Student.Status.choices,
+        null=True,
+        blank=True
     )
 
     def __str__(self):

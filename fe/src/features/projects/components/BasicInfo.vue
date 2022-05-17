@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3'"
-  >
+  <div class="projectcol col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
     <div class="text-h4 q-my-md">
       Basic Info
     </div>
@@ -12,10 +10,10 @@
       lazy-rules
       class="inputfield"
       :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the name of the project.',
-              ]"
+        (val) =>
+          (val && val.length > 0) ||
+          'Please enter the name of the project.',
+      ]"
     />
     <q-input
       v-model="projectStore.projectPartnerName"
@@ -24,10 +22,10 @@
       lazy-rules
       class="inputfield"
       :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the name of the partner.',
-              ]"
+        (val) =>
+          (val && val.length > 0) ||
+          'Please enter the name of the partner.',
+      ]"
     />
     <q-input
       v-model="projectStore.projectLink"
@@ -35,19 +33,18 @@
       label="Project URL"
       lazy-rules
       class="inputfield"
-      type="url"
       :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Please enter the URL of the project.',
-              ]"
+        (val) =>
+          (val && val.length > 0) ||
+          'Please enter the URL of the project.',
+      ]"
     />
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent} from "@vue/runtime-core";
-import {useProjectStore} from "../../../stores/useProjectStore";
+import { defineComponent } from '@vue/runtime-core'
+import { useProjectStore } from '../../../stores/useProjectStore'
 
 export default defineComponent({
   setup() {
@@ -56,6 +53,6 @@ export default defineComponent({
     return {
       projectStore,
     }
-  }
+  },
 })
 </script>
