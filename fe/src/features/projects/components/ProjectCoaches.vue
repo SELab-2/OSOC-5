@@ -6,7 +6,7 @@
       </div>
       <q-space/>
       <q-input
-        v-model="projectStore.filterCoaches"
+        v-model="search"
         class="inputfield q-mb-sm"
         outlined
         dense
@@ -32,7 +32,21 @@
     <div class="text-h6 row">
       <div>Selected Coaches</div>
       <q-space/>
-      <div>Available Coaches</div>
+      <div>
+        <btn flat round size="sm" @click="ascending = !ascending">
+          <q-icon
+            size="2em"
+            name="arrow_downward"
+            :class="ascending ? 'rotate180' : ''"
+            style="
+              transition: transform ease 300ms !important;
+              align-self: center;
+              justify-self: center;
+            "
+          />
+        </btn>
+        Available Coaches
+      </div>
     </div>
     <q-splitter
         v-model="splitterModel"
@@ -158,6 +172,8 @@ export default defineComponent({
     return {
       coachStore: useCoachStore(),
       splitterModel: ref(50),
+      ascending: ref(true),
+      search: ref(''),
       allCoaches
     }
   },
@@ -177,11 +193,26 @@ export default defineComponent({
       return this.getColor(i)
     },
     async loadNext(i: number, done: Function) {
-      let newUsers = await this.coachStore.loadNext(i, done, {})
+      let newUsers = await this.coachStore.loadNext(i, done, this.filters)
       if (i === 1) {
         this.allCoaches = []
       }
       this.allCoaches.push(...newUsers)
+    }
+  },
+  computed: {
+    filters() {
+      return {
+        search: this.search,
+        ordering: `${this.ascending ? '' : '-'}first_name`
+      }
+    }
+  },
+  watch: {
+    filters() {
+      this.$refs.scroll.reset()
+      this.$refs.scroll.resume()
+      this.$refs.scroll.trigger()
     }
   },
 })

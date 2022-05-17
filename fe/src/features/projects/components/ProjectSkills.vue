@@ -57,7 +57,21 @@
     <div class="row text-h6">
       <div>Selected Skills</div>
       <q-space/>
-      <div>{{ editMode ? 'Select a skill to edit' : 'Available Skills' }}</div>
+      <div class="row">
+        <btn flat round size="sm" @click="ascending = !ascending">
+          <q-icon
+            size="2em"
+            name="arrow_downward"
+            :class="ascending ? 'rotate180' : ''"
+            style="
+              transition: transform ease 300ms !important;
+              align-self: center;
+              justify-self: center;
+            "
+          />
+        </btn>
+        {{ editMode ? 'Select a skill to edit' : 'Available Skills'}}
+      </div>
     </div>
     <q-splitter
       v-model="splitterModel"
@@ -88,7 +102,7 @@
       <div id="scroll-target-id" style="float: right; text-align: right; width: 100%; height: 100%; overflow: auto;">
         <q-infinite-scroll
           ref="scroll"
-          @load="(i,done) => skillStore.loadNext(i, done, {})"
+          @load="(i,done) => skillStore.loadNext(i, done, filters)"
           scroll-target="#scroll-target-id"
           :offset="250"
         >
@@ -142,11 +156,13 @@ export default defineComponent ({
   },
   data() {
     let editSkill: Ref<Skill | null> = ref(null)
+    
     return {
       skillStore: useSkillStore(),
       filterSkills: ref(''),
       newSkillPrompt: ref(false),
       editSkill,
+      ascending: ref(true),
       showDialog: ref(false),
       editMode: ref(false),
       splitterModel: ref(70)
@@ -192,6 +208,21 @@ export default defineComponent ({
       return Math.floor(Math.random() * 10) / 5;
     }
   },
+  watch: {
+    filters() {
+      this.$refs.scroll.reset()
+      this.$refs.scroll.resume()
+      this.$refs.scroll.trigger()
+    }
+  },
+  computed: {
+    filters() {
+      return {
+        search: this.filterSkills,
+        ordering: `${this.ascending ? '' : '-'}name`
+      }
+    }
+  }
 })
 </script>
 
