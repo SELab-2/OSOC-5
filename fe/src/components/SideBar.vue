@@ -281,7 +281,7 @@ export default defineComponent({
     onStudentsPage(): boolean {
       return this.$route.name === "Students" || this.$route.name === "Student Page";
     },
-    filters() {
+    filters(): Object {
       return {
         search: this.search,
         alum: this.alumni === "alumni",
