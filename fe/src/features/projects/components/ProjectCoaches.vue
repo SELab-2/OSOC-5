@@ -189,7 +189,7 @@ export default defineComponent({
       return this.quasarColors[i%this.quasarColors.length]
     },
     getColorFromCoach(coach: User) {
-      const i = this.coachStore.users.findIndex(c => c.id === coach.id)
+      const i = this.allCoaches.findIndex(c => c.id === coach.id)
       return this.getColor(i)
     },
     async loadNext(i: number, done: Function) {
