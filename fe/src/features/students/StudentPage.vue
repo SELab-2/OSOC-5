@@ -141,6 +141,7 @@
           <SuggestionsCard
             title="Suggestions"
             :suggestions="student?.suggestions"
+            :decision="student?.finalDecision"
           />
         </div>
         <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">

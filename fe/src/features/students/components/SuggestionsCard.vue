@@ -14,30 +14,14 @@
         v-else
         class="column"
       >
+        <SuggestionRow :suggestion="decision" />
+        <q-separator spaced />
         <div
           v-for="(suggestion, key) in suggestions"
           :key="key"
         >
           <div class="row">
-            <DecisionIcon
-              v-if="studentStore.currentStudent"
-              :decision="suggestion.suggestion"
-            />
-            <label class="q-pl-xs">
-              {{ `${suggestion.coach.firstName} ${suggestion.coach.lastName}` }}
-            </label>
-            <q-icon
-              v-if="suggestion.reason"
-              class="tooltip-icon"
-              name="mdi-information-outline"
-            >
-              <q-tooltip
-                anchor="center right"
-                self="center start"
-              >
-                {{ suggestion.reason }}
-              </q-tooltip>
-            </q-icon>
+            <SuggestionRow :suggestion="suggestion" />
           </div>
         </div>
       </div>
@@ -51,9 +35,10 @@ import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import {defineComponent, PropType} from "vue";
 import {Suggestion} from "../../../models/Suggestion"
 import DecisionIcon from "../../../components/DecisionIcon.vue";
+import SuggestionRow from "./SuggestionRow.vue";
 
 export default defineComponent( {
-  components: {DecisionIcon, LoadingSpinner},
+  components: {SuggestionRow, LoadingSpinner},
   props: {
     title: {
       type: String,
@@ -61,6 +46,10 @@ export default defineComponent( {
     },
     suggestions: {
       type: [Object] as PropType<Suggestion[]>,
+      required: true
+    },
+    decision: {
+      type: Suggestion,
       required: true
     }
   },
