@@ -52,6 +52,7 @@
       class="text-primary"
     >
       <btn
+        v-if="skill.id !== -1"
         flat
         color="red"
         label="Delete"

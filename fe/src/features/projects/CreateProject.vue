@@ -20,7 +20,7 @@
 			title="Project Info"
 			icon="r_info"
 			:done="basicInfoDone"
-			:caption="visitedSteps[0] && !basicInfoDone ? 'Empty Fields Left' : ''"
+			:caption="visitedSteps[0] && !basicInfoDone ? 'Empty Fields Left' : project?.name"
 			
 		>
 			<BasicInfo
@@ -35,7 +35,7 @@
 			title="Coaches"
 			icon="r_group"
 			:done="coachesDone"
-			:caption="visitedSteps[1] && !coachesDone ? 'No Coaches Selected' : ''"
+			:caption="`${project?.coaches.length} Coach${project?.coaches.length !== 1 ? 'es' : ''} Selected`"
 		>
 			<ProjectCoaches :coaches="project.coaches"/>
 		</q-step>
@@ -45,7 +45,7 @@
 			title="Skills"
 			icon="r_build"
 			:done="skillsDone"
-			:caption="visitedSteps[2] && !skillsDone ? 'No Skills Selected' : ''"
+			:caption="`${project?.requiredSkills.length} Skill${project?.requiredSkills.length !== 1 ? 's' : ''} Selected`"
 		>
 			<ProjectSkills :skills="project.requiredSkills"/>
 		</q-step>
@@ -63,7 +63,18 @@
 	<q-page-sticky position="bottom-right" :offset="[18, 18]">
 		<btn
 			fab
-			@click="next()"
+			v-if="id && step < 3"
+			@click="submit"
+			padding="10px"
+			icon-right="check"
+			label="Update"
+			color="yellow"
+			shadow-color="orange"
+			class="q-mr-sm"
+		/>
+		<btn
+			fab
+			@click="next"
 			padding="10px"
 			:icon-right="step < 3 ? 'arrow_forward' : 'check'"
 			:label="step < 3 ? 'Next' : (id ? 'Update' : 'Submit')"
@@ -73,7 +84,7 @@
 		>
 		<q-tooltip v-if="step === 2 && !allDone" style="width: 300px">
 			<span class="text-body2">
-			Some data is missing.<br/>Please check if you filled in a name, partner name, info, and have selected at least one skill and coach.
+			Some data is missing.<br/>Please check if you filled in a name and partner name.
 			</span>
 		</q-tooltip>
 		</btn>
@@ -144,32 +155,35 @@ export default defineComponent({
 		this.coachStore.loadUsers()
 	},
 	methods: {
-		async next() {
+		next() {
 			if (this.step < 3) {
 				this.step += 1
 			} else {
-				const mappedProject = {
-					name: this.project.name,
-					partnerName: this.project.partnerName,
-					extraInfo: this.project.extraInfo,
-					requiredSkills: this.project.requiredSkills.map(s => {
-						return {
-							amount: s.amount,
-							comment: s.comment,
-							skill: s.skill.url
-						}
-					}),
-					coaches: this.project.coaches.map(c => c.url),					
-				}
-				if (this.id) {
-					await this.projectStore.updateProject(mappedProject, this.project.id)
-				} else {
-					await this.projectStore.addProject(mappedProject)
-				}
-				this.projectStore.shouldRefresh = true
-				router.replace('/projects')
+				this.submit()
 			}
 		},
+		async submit() {
+			const mappedProject = {
+				name: this.project.name,
+				partnerName: this.project.partnerName,
+				extraInfo: this.project.extraInfo,
+				requiredSkills: this.project.requiredSkills.map(s => {
+					return {
+						amount: s.amount,
+						comment: s.comment,
+						skill: s.skill.url
+					}
+				}),
+				coaches: this.project.coaches.map(c => c.url),					
+			}
+			if (this.id) {
+				await this.projectStore.updateProject(mappedProject, this.project.id)
+			} else {
+				await this.projectStore.addProject(mappedProject)
+			}
+			this.projectStore.shouldRefresh = true
+			router.replace('/projects')
+		}
 	},
 	watch: {
 		step(newValue, oldValue) {
@@ -178,7 +192,7 @@ export default defineComponent({
 	},
 	computed: {
 		basicInfoDone() {
-			return this.project.name.length > 0 && this.project.partnerName.length > 0
+			return this.project.name.length > 0 && this.project.partnerName.length > 0 && this.project.extraInfo.length > 0
 		},
 		coachesDone() {
 			return this.project.coaches.length > 0
@@ -187,7 +201,7 @@ export default defineComponent({
 			return this.project.requiredSkills.length > 0
 		},
 		allDone() {
-			return this.basicInfoDone && this.coachesDone && this.skillsDone
+			return this.basicInfoDone
 		}
 	}
 })

@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card shadow-4 q-ma-sm" flat bordered>
+  <q-card class="my-card shadow-4 q-ma-sm" flat bordered style="border-radius: 10px !important">
     <q-card-section class="column">
       <div class="row">
         <h5 class="text-bold q-mt-none q-mb-none">

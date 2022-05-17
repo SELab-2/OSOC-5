@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<project-card :project="project"/>
+		<project-card :project="project" style="max-width: 400px; margin: auto"/>
 	</div>
 </template>
 
