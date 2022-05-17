@@ -132,7 +132,7 @@
               key="assignedto"
             >
             <q-scroll-area :thumb-style="thumbStyle" style="height: 20px; width: 250px;">
-              {{ props.row.projects.map((project: {name: Array}) => project.name).join(', ') }}
+              {{ props.row.projects.map((p: {name: string}) => p.name).join(', ') }}
             </q-scroll-area>
             </q-td>
             <q-td

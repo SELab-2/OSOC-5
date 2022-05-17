@@ -5,7 +5,7 @@ import {
   TempProjectSuggestion,
   NewProjectSuggestion,
 } from '../models/ProjectSuggestion'
-import { User } from '../models/User'
+import { User, UserInterface } from '../models/User'
 import {
   ProjectSkill,
   ProjectSkillInterface,
@@ -237,7 +237,7 @@ export const useProjectStore = defineStore('project', {
       }: {
         project_id: string
         reason: string
-        coach: { id: number; firstName: string; lastName: string; url: string }
+        coach: UserInterface
         student: string
         skill: string
       },
