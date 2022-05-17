@@ -17,7 +17,9 @@ from .utils import export_to_csv, create_zipfile_response
 from .pagination import StandardPagination
 from .filters import StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter
-from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSerializer, CSVProjectSuggestionSerializer, CSVRequiredSkillSerializer, CSVSentEmailSerializer, CSVSkillSerializer, CSVStudentSerializer, CSVSuggestionSerializer, Conflict, ConflictSerializer, \
+from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSerializer, \
+    CSVProjectSuggestionSerializer, CSVRequiredSkillSerializer, CSVSentEmailSerializer, \
+    CSVSkillSerializer, CSVStudentSerializer, CSVSuggestionSerializer, Conflict, ConflictSerializer, \
     ResolveConflictSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, \
     ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer

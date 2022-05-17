@@ -85,5 +85,5 @@ def create_zipfile_response(filename, files):
         for file in files:
             zipped.writestr(f'{file.name}.csv', file.read())
     zipped_file.seek(0)
-    return FileResponse(zipped_file, content_type='application/zip', 
-                        headers={'Content-Disposition': f'attachment; filename="{filename}.zip"'})
+    return FileResponse(zipped_file, content_type='application/zip',
+        headers={'Content-Disposition': f'attachment; filename="{filename}.zip"'})
