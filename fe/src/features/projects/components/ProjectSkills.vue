@@ -153,6 +153,8 @@ export default defineComponent ({
     }
   },
   mounted() {
+    // Force q-infinite-scroll to request new data, so old data gets deleted.
+    // This is needed because it uses skillStore.skills, which is shared between views.
     this.$refs.scroll.trigger()
   },
   methods: {

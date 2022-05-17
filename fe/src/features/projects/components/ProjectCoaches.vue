@@ -85,36 +85,43 @@
          
       </template>
       <template #after>
-        <div style="float: right; text-align: right">
-          <q-chip 
-            v-for="(coach,i) in coachStore.users"
-            :key="coach.id"
-            v-show="!coaches.some(c => c.id === coach.id)"
-            outline
-            clickable
-            :color="getColor(i)"
-            :class="`bg-${getColor(i)}-1`"
-            style="border-width: 1.5px;"
-            @click="addCoachToProject(coach)"
+        <div id="scroll-target-id" style="float: right; text-align: right; width: 100%; height: 100%; overflow: auto;">
+          <q-infinite-scroll
+            ref="scroll"
+            @load="loadNext"
+            scroll-target="#scroll-target-id"
+            :offset="250"
           >
-            <div class="row" style="display: flex; align-items: center">
-              <q-icon
-                style="margin-left: -11px"
-                v-if="coach.projects.length > 0"
-                name="info"
-                size="sm"
-                :color="`${getColor(i)}-6`"
-              >
-              <q-tooltip v-if="coach.projects.length > 0" class="text-subtitle2 text-black bg-grey-1 shadow-5 cornered">
-                <span>Already assigned to the projects:</span>
-                <span v-for="project in coach.projects"><br/>{{ project.name }}</span>
-              </q-tooltip>
-              </q-icon>
-              <span class="text-subtitle1 text-black">{{ coach.fullName }}</span>
-            </div>
-            
-            
-          </q-chip>
+            <q-chip 
+              v-for="(coach,i) in allCoaches"
+              :key="coach.id"
+              v-show="!coaches.some(c => c.id === coach.id)"
+              outline
+              clickable
+              :color="getColor(i)"
+              :class="`bg-${getColor(i)}-1`"
+              style="border-width: 1.5px;"
+              @click="addCoachToProject(coach)"
+            >
+              <div class="row" style="display: flex; align-items: center">
+                <q-icon
+                  style="margin-left: -11px"
+                  v-if="coach.projects.length > 0"
+                  name="info"
+                  size="sm"
+                  :color="`${getColor(i)}-6`"
+                >
+                <q-tooltip v-if="coach.projects.length > 0" class="text-subtitle2 text-black bg-grey-1 shadow-5 cornered">
+                  <span>Already assigned to the projects:</span>
+                  <span v-for="project in coach.projects"><br/>{{ project.name }}</span>
+                </q-tooltip>
+                </q-icon>
+                <span class="text-subtitle1 text-black">{{ coach.fullName }}</span>
+              </div>
+              
+              
+            </q-chip>
+          </q-infinite-scroll>
         </div>
       </template>
     </q-splitter>
@@ -123,7 +130,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import {defineComponent, ref, Ref} from "vue";
 import {useProjectStore} from "../../../stores/useProjectStore";
 import {useCoachStore} from "../../../stores/useCoachStore";
 import { User } from "../../../models/User"
@@ -147,9 +154,11 @@ export default defineComponent({
     }
   },
   data() {
+    const allCoaches: Ref<User[]> = ref([])
     return {
       coachStore: useCoachStore(),
-      splitterModel: ref(50)
+      splitterModel: ref(50),
+      allCoaches
     }
   },
   methods: {
@@ -166,6 +175,13 @@ export default defineComponent({
     getColorFromCoach(coach: User) {
       const i = this.coachStore.users.findIndex(c => c.id === coach.id)
       return this.getColor(i)
+    },
+    async loadNext(i: number, done: Function) {
+      let newUsers = await this.coachStore.loadNext(i, done, {})
+      if (i === 1) {
+        this.allCoaches = []
+      }
+      this.allCoaches.push(...newUsers)
     }
   },
 })
