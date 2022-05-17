@@ -280,7 +280,7 @@ export default defineComponent({
       if (this.search) filter.search = this.search
       filter.page_size = this.pagination.rowsPerPage
       filter.page = this.pagination.page
-      const order = this.pagination.descending ? '-' : '+'
+      const order = this.pagination.descending ? '-' : ''
       if (this.pagination.sortBy === 'name') {
           filter.ordering = `${order}first_name,${order}last_name`
       } else if (this.pagination.sortBy !== null) {

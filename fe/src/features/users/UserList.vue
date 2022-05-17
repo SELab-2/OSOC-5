@@ -248,11 +248,11 @@ export default defineComponent({
         filter.is_active = true
         filter.is_admin = false
       }
-      const order = this.pagination.descending ? '-' : '+'
+      const order = this.pagination.descending ? '-' : ''
       if (this.pagination.sortBy === 'name') {
         filter.ordering = `${order}first_name,${order}last_name`
       } else if (this.pagination.sortBy === 'role') {
-        const order = this.pagination.descending ? '+' : '-'
+        const order = this.pagination.descending ? '' : '-'
         filter.ordering = `${order}is_admin,${order}is_active`
       } else if (this.pagination.sortBy !== null) {
         filter.ordering = `${order}${this.pagination.sortBy}`
