@@ -88,37 +88,36 @@
                 <!-- <q-checkbox label="My project" /> -->
                 <!-- <q-checkbox label="Students needed" /> -->
               </div>
-              <!-- <div>
-                <q-select
-                  v-model="studentStore.skills"
-                  rounded
-                  outlined
-                  dense
-                  multiple
-                  color="primary"
-                  bg-color="white"
-                  :options="skillStore.skills"
-                  :option-label="(opt) => opt.name"
-                  :option-value="(opt) => opt.id"
-                  label="Skills"
-                  style="width: 200px"
-                >
-                  <template #selected>
-                    <div
-                      class="full-width"
-                      style="max-height: 15vh; overflow-y: auto"
-                    >
-                      <StudentSkillChip
-                        v-for="skill of studentStore.skills"
-                        :key="skill.id"
-                        :color="skill.color"
-                        :name="skill.name"
-                        best-skill=""
-                      />
-                    </div>
-                  </template>
-                </q-select>
-              </div> -->
+              <q-select
+                v-model="skillFilter"
+                clearable
+                rounded
+                outlined
+                dense
+                multiple
+                color="primary"
+                bg-color="white"
+                :options="skillStore.skills"
+                :option-label="opt => opt.name"
+                :option-value="opt => opt.id"
+                label="Skills"
+                emit-value
+              >
+                <template #selected>
+                  <div
+                    class="full-width"
+                    style="max-height: 15vh; overflow-y: auto"
+                  >
+                    <StudentSkillChip
+                      v-for="skill of skillFilter"
+                      :key="(skill as any).id"
+                      :color="(skill as any).color"
+                      :name="(skill as any).name"
+                      best-skill=""
+                    />
+                  </div>
+                </template>
+              </q-select>
             </div>
           </q-card-section>
         </div>
@@ -203,12 +202,14 @@ export default defineComponent({
       showShadow: ref(false),
       showFilters: ref(false),
       projectNameFilter: ref(''),
+      skillFilter: ref([])
     }
   },
   computed: {
     filters(): Object {
       return {
         search: this.projectNameFilter,
+        required_skills: this.skillFilter
       }
     },
     expanded: {
@@ -231,7 +232,7 @@ export default defineComponent({
     },
   },
   watch: {
-    projectNameFilter: {
+    filters: {
       handler() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const infscroll = this.$refs.infinite as any;

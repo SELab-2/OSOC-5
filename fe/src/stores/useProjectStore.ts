@@ -22,6 +22,7 @@ import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
 import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
+import qs from 'qs'
 
 interface State {
   projects: Array<Project>
@@ -190,7 +191,12 @@ export const useProjectStore = defineStore('project', {
       const { results, next } = (
         await instance.get<{ results: TempProject[]; next: string }>(
           `projects/?page=${index}`,
-          { params: filters }
+          { 
+            params: filters,
+            paramsSerializer: (params) => {
+              return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v.length > 0)), { arrayFormat: 'repeat' })
+            },
+          }
         )
       ).data
 
