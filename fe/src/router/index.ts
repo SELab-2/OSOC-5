@@ -5,8 +5,7 @@ import LoginFormVue from '../features/authentication/LoginForm.vue'
 import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
 import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
-import EditProject from '../features/projects/EditProject.vue'
-import CreateProjects from '../features/projects/CreateProject.vue'
+import CreateProject from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
 import MailList from '../features/mails/MailList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
@@ -60,7 +59,7 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         props: true,
-        component: EditProject,
+        component: CreateProject,
       },
       {
         path: '/projects/create',
@@ -68,7 +67,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        component: CreateProjects,
+        component: CreateProject,
       },
       {
         path: '/users',
@@ -100,9 +99,6 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const studentStore = useStudentStore()
-  studentStore.currentStudent = null
-
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.

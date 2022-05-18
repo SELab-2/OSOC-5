@@ -78,13 +78,15 @@ export const UrlMockMappingPost = {
   }
 export const UrlMockMappingGet = {
     'coaches/?page_size=500': {data:{results: [coach1]}},
+    'coaches/?page=1': {data: {results: [coach1, coach2], next: null}},
     'coaches/1': {data:coach1},
     'coaches/2': {data:coach2},
     'coaches/': {data:{results: [coach1], count: 1}},
     'students/1/': {data: student
     },
     'students/?page=1': {data: {results: [student]}},
-    "skills/2": {data: {name: "uitstelgedrag", id: 1, color: "green", url: "skills/2"}}
+    "skills/2": {data: {name: "uitstelgedrag", id: 1, color: "green", url: "skills/2"}},
+    'students/count/': {data: {counts: {yes: 2, no: 0, maybe: 1, undecided: 0, none: 0}}}
   }
 
 export const UrlMockMappingPut = {

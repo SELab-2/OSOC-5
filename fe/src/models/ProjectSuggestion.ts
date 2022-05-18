@@ -27,7 +27,7 @@ export class ProjectSuggestion implements ProjectSuggestionInterface {
   reason: string
   coachId?: number
   coachName?: string
-  
+
   constructor(data: ProjectSuggestionInterface) {
     Object.assign(this, data)
   }
@@ -35,9 +35,9 @@ export class ProjectSuggestion implements ProjectSuggestionInterface {
 
 // Extra class to differentiate new suggestions from existing suggestions.
 export class NewProjectSuggestion extends ProjectSuggestion {
-  fromWebsocket: Boolean
-  fromLocal: Boolean
-  
+  fromWebsocket: boolean
+  fromLocal: boolean
+
   constructor(data: ProjectSuggestionInterface, fromWebsocket: boolean) {
     super(data)
     this.fromWebsocket = fromWebsocket

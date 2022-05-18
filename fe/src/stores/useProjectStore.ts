@@ -5,11 +5,10 @@ import {
   TempProjectSuggestion,
   NewProjectSuggestion,
 } from '../models/ProjectSuggestion'
-import { User } from '../models/User'
+import { User, UserInterface } from '../models/User'
 import {
   ProjectSkill,
   ProjectSkillInterface,
-  ProjectTableSkill,
   Skill,
   TempProjectSkill,
 } from '../models/Skill'
@@ -25,21 +24,16 @@ import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>
-  projectName: string
-  projectPartnerName: string
-  projectLink: string
-  filterCoaches: string
-  selectedCoaches: Array<User>
+  
+  // Flag so projectlist can determine if it should reset the pagination and reload all the projects or not.
+  // Is used e.g. when a conflict is resolved, or a project is created/updated.
+  shouldRefresh: Boolean
 }
 
 export const useProjectStore = defineStore('project', {
   state: (): State => ({
     projects: [],
-    projectName: '',
-    projectPartnerName: '',
-    projectLink: '',
-    filterCoaches: '',
-    selectedCoaches: [],
+    shouldRefresh: false
   }),
   actions: {
     /**
@@ -92,11 +86,16 @@ export const useProjectStore = defineStore('project', {
       skillUrl: string,
       reason: string
     ) {
-      return await instance.post(`projects/${projectId}/suggest_student/`, {
-        student: studentUrl,
-        skill: skillUrl,
-        reason: reason,
-      })
+      const response = await instance.post(
+        `projects/${projectId}/suggest_student/`,
+        {
+          student: studentUrl,
+          skill: skillUrl,
+          reason: reason,
+        }
+      )
+
+      return response
     },
     /**
      * Gets a skill
@@ -111,8 +110,9 @@ export const useProjectStore = defineStore('project', {
      * Gets a project
      * @param project the project to get
      */
-    async getProject(project: TempProject) {
+    async getProject(id: number): Promise<Project> {
       console.log('Loading')
+      const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
@@ -125,8 +125,7 @@ export const useProjectStore = defineStore('project', {
         await this.fetchSuggestedStudents(project.suggestedStudents)
 
       // Is added to projects here because we do not want to await on each project.
-      this.projects = this.projects.concat([
-        new Project(
+      return new Project(
           project.name,
           project.partnerName,
           project.extraInfo,
@@ -134,8 +133,8 @@ export const useProjectStore = defineStore('project', {
           skills,
           coaches,
           students
-        ),
-      ])
+        )
+      
     },
     /**
      * Loads the projects
@@ -143,7 +142,7 @@ export const useProjectStore = defineStore('project', {
     async loadProjects() {
       try {
         const { results } = (
-          await instance.get<{ results: TempProject[] }>(`projects/`)
+          await instance.get<{ results: TempProject[] }>('projects/')
         ).data
         this.projects = results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
@@ -191,10 +190,11 @@ export const useProjectStore = defineStore('project', {
 
       let base = this.projects.length
 
-      this.projects = [...this.projects,...
-        results.map(
+      this.projects = [
+        ...this.projects,
+        ...results.map(
           (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
-        )
+        ),
       ]
 
       results.forEach(async (project, i) => {
@@ -221,19 +221,22 @@ export const useProjectStore = defineStore('project', {
      * Called when we recieve a suggestion from the websocket
      * @param param0 object received from the websocket
      */
-    async receiveSuggestion({
-      project_id,
-      reason,
-      coach,
-      student,
-      skill,
-    }: {
-      project_id: string
-      reason: string
-      coach: { id: number; firstName: string; lastName: string; url: string }
-      student: string
-      skill: string
-    }) {
+    async receiveSuggestion(
+      {
+        project_id,
+        reason,
+        coach,
+        student,
+        skill,
+      }: {
+        project_id: string
+        reason: string
+        coach: UserInterface
+        student: string
+        skill: string
+      },
+      onProject: string
+    ) {
       const projectId = Number.parseInt(project_id)
       const project = this.projects.filter(({ id }) => id === projectId)[0]
 
@@ -242,54 +245,77 @@ export const useProjectStore = defineStore('project', {
           suggestion.skill.url === skill && suggestion.student.url === student
       )
 
-      if (!alreadyExists) {
-        const studentStore = useStudentStore()
-        const coachStore = useCoachStore()
-        const skillStore = useSkillStore()
+      const studentStore = useStudentStore()
 
-        const studentObj = await studentStore.getStudent(student)
-        const coachObj = await coachStore.getUser(coach)
-        const skillObj = await skillStore.getSkill(skill)
-        project.suggestedStudents?.push(
-          new NewProjectSuggestion(
-            {
-              student: studentObj,
-              coach: coachObj,
-              skill: skillObj,
-              reason,
-            },
-            true
+      if (alreadyExists) {
+        if (onProject === 'false')
+          studentStore.students = studentStore.students.filter(
+            ({ url }) => url !== student
           )
-        )
 
-        // Remove the "New" badge from the new suggestion after a short period.
-        setTimeout(
-          () =>
-            ((
-              project.suggestedStudents?.find(
-                (s) =>
-                  s.student.url === studentObj.url &&
-                  s.coach.url === coachObj.url &&
-                  s.skill.url === skillObj.url
-              ) as NewProjectSuggestion
-            ).fromWebsocket = false),
-          5000
-        )
+        return
       }
+
+      const coachStore = useCoachStore()
+      const skillStore = useSkillStore()
+
+      const studentObj = await studentStore.getStudent(student)
+      const coachObj = await coachStore.getUser(coach)
+      const skillObj = await skillStore.getSkill(skill)
+
+      console.log(studentStore.students)
+      project.suggestedStudents?.push(
+        new NewProjectSuggestion(
+          {
+            student: studentObj,
+            coach: coachObj,
+            skill: skillObj,
+            reason,
+          },
+          true
+        )
+      )
+
+      if (onProject === 'false')
+        studentStore.students = studentStore.students.filter(
+          ({ url }) => url !== student
+        )
+      else if (
+        onProject === 'true' &&
+        !studentStore.students.some(({ url }) => url === student)
+      )
+        await studentStore.getStudent(student)
+
+      // Remove the "New" badge from the new suggestion after a short period.
+      setTimeout(
+        () =>
+          ((
+            project.suggestedStudents?.find(
+              (s) =>
+                s.student.url === studentObj.url &&
+                s.coach.url === coachObj.url &&
+                s.skill.url === skillObj.url
+            ) as NewProjectSuggestion
+          ).fromWebsocket = false),
+        5000
+      )
     },
     /**
      * Called when we receive a remove suggestion from the websocket
      * @param param0 object received from the websocket
      */
-    removeReceivedSuggestion({
-      skill,
-      student,
-      project_id,
-    }: {
-      skill: string
-      student: string
-      project_id: string
-    }) {
+    async removeReceivedSuggestion(
+      {
+        skill,
+        student,
+        project_id,
+      }: {
+        skill: string
+        student: string
+        project_id: string
+      },
+      onProject: string
+    ) {
       const projectId = Number.parseInt(project_id)
       const project = this.projects.filter(({ id }) => id === projectId)[0]
 
@@ -303,65 +329,65 @@ export const useProjectStore = defineStore('project', {
           project.suggestedStudents &&
           suggestionIndex < project.suggestedStudents.length &&
           project.suggestedStudents[suggestionIndex].student.url === student
-        )
-          project.suggestedStudents?.splice(suggestionIndex, 1)
-      }
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    formatProjectData(skills: any) {
-      const skillsList: Array<TempProjectSkill> = []
+        ) {
+          const studentStore = useStudentStore()
 
-      // filter out the used skills
-      for (const skill of skills) {
-        if (skill.amount > 0) {
-          skillsList.push({
-            skill: skill.url,
-            amount: skill.amount,
-            comment: skill.comment,
-          })
+          if (onProject === 'true')
+            studentStore.students = studentStore.students.filter(
+              ({ url }) => url !== student
+            )
+          else if (
+            onProject === 'false' &&
+            !studentStore.students.some(({ url }) => url === student)
+          )
+            await studentStore.getStudent(student)
+
+          project.suggestedStudents?.splice(suggestionIndex, 1)
         }
       }
+    },
 
-      const coachList: Array<string> = []
-
-      // add the selected coaches to data object
-      this.selectedCoaches.forEach((coach: User) => coachList.push(coach.url))
-
-      return {
-        name: this.projectName,
-        partnerName: this.projectPartnerName,
-        extraInfo: this.projectLink,
-        requiredSkills: skillsList,
-        coaches: coachList,
+    async addProject(project: Project) {
+      try {
+        const mappedProject = {
+          name: project.name,
+          partnerName: project.partnerName,
+          extraInfo: project.extraInfo,
+          requiredSkills: project.requiredSkills?.map(s => {
+            return {
+              amount: s.amount,
+              comment: s.comment,
+              skill: s.skill.url
+            }
+          }),
+          coaches: project.coaches?.map(c => c.url),					
+        }
+        await instance.post('projects/', convertObjectKeysToSnakeCase(mappedProject))
+        return true
+      } catch (error) {
+        return false
       }
     },
-    submitProject(
-      skills: Array<ProjectTableSkill>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      callback: any
-    ) {
-      const projectData = this.formatProjectData(skills)
-      instance
-        .post('projects/', convertObjectKeysToSnakeCase(projectData))
-        .then(() => {
-          this.loadProjects()
-          callback(true)
-        })
-        .catch(() => {
-          callback(false)
-        })
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async getAndSetProject(id: string, callback: any) {
-      return instance.get('projects/' + id).then((data) => {
-        const project = data.data
-        this.projectName = project.name
-        this.projectPartnerName = project.partnerName
-        this.projectLink = project.extraInfo
-        this.selectedCoaches = project.coaches
-        // skills
-        callback(project.requiredSkills)
-      })
+    async updateProject(project: Project, id: number) {
+      try {
+        const mappedProject = {
+          name: project.name,
+          partnerName: project.partnerName,
+          extraInfo: project.extraInfo,
+          requiredSkills: project.requiredSkills?.map(s => {
+            return {
+              amount: s.amount,
+              comment: s.comment,
+              skill: s.skill.url
+            }
+          }),
+          coaches: project.coaches?.map(c => c.url),					
+        }
+        await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(mappedProject))
+        return true
+      } catch (error) {
+        return false
+      }
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async deleteProject(id: number, callback: any) {
@@ -373,32 +399,6 @@ export const useProjectStore = defineStore('project', {
         .catch(() => {
           callback(false)
         })
-    },
-    async updateProject(
-      id: string,
-      skills: Array<ProjectTableSkill>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      callback: any
-    ) {
-      const projectData = this.formatProjectData(skills)
-
-      // POST request to make a project
-      return instance
-        .patch(`projects/${id}/`, convertObjectKeysToSnakeCase(projectData))
-        .then(() => {
-          this.loadProjects()
-          callback(true)
-        })
-        .catch(() => {
-          callback(false)
-        })
-    },
-    editProject(project: Project) {
-      this.projectName = project.name
-      this.projectPartnerName = project.partnerName
-      this.projectLink = project.extraInfo
-      this.selectedCoaches = []
-      // skills
     },
   },
 })

@@ -73,6 +73,7 @@
         :rows="mailStore.mailStudents"
         :columns="mailsColumns"
         :loading="mailStore.isLoading"
+        :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
         row-key="url"
         selection="multiple"
         separator="horizontal"

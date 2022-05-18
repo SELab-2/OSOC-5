@@ -17,6 +17,17 @@ class CoachPartialSerializer(serializers.HyperlinkedModelSerializer):
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name']
 
+
+class ProjectPartialSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    a serializer to show some fields of the project model
+    used in coach serializer
+    """
+    class Meta:
+        model = Project
+        fields = ['id', 'url', 'name']
+
+
 class SuggestionSerializer(serializers.HyperlinkedModelSerializer):
     """
     serializer for the Suggestion model
@@ -88,11 +99,20 @@ class CoachSerializer(serializers.HyperlinkedModelSerializer):
     fields: first_name, last_name, email, is_admin and is_active
     is_admin and is_active are read-only
     """
+    projects = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Coach
         fields = ['url', 'id', 'first_name', 'last_name',
-                  'email', 'is_admin', 'is_active']
+                  'email', 'is_admin', 'is_active', 'projects']
         read_only_fields = ['is_admin', 'is_active']
+
+    def get_projects(self, obj):
+        """
+        get all projects the current coach is assigned to and return a list of urls
+        """
+        projects = obj.project_set.all()
+        return ProjectPartialSerializer(projects, many=True, context={"request": self.context.get("request")}).data
 
 
 class SkillSerializer(serializers.HyperlinkedModelSerializer):
@@ -176,7 +196,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        override create method to be able to create/update/remove RequiredSkills objects,
+        override update method to be able to create/update/remove RequiredSkills objects,
         this is needed because required_skills is a many-to-many field with a through model
         (because it needs an extra 'amount' field)
         """
@@ -184,15 +204,25 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         skills_data = validated_data.pop('requiredskills_set')
 
         # update or create skills from request
-        to_keep = []
+        keep_skills = []
+        keep_students = []
         for skill_data in skills_data:
+            # update or create given skill
             created_or_updated, _ = RequiredSkills.objects\
                 .update_or_create(project=instance, **skill_data)
-            to_keep.append(created_or_updated)
+            # keep track of skill
+            keep_skills.append(created_or_updated.id)
+            # keep track of all students who were suggested for this skill
+            keep_students += ProjectSuggestion.objects\
+                .filter(project=instance, skill=created_or_updated.skill)\
+                .values_list('id', flat=True)
 
         # delete skills not in request
         RequiredSkills.objects.filter(project=instance)\
-            .exclude(id__in=[s.id for s in to_keep]).delete()
+            .exclude(id__in=keep_skills).delete()
+        # delete all projectsuggestions that use a removed skill
+        ProjectSuggestion.objects.filter(project=instance)\
+            .exclude(id__in=keep_students).delete()
         return super().update(instance, validated_data)
 
 

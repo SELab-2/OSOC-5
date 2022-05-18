@@ -1,11 +1,9 @@
 import axios, { AxiosInstance } from 'axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
+import { baseUrl } from './baseUrl'
 
 export const instance: AxiosInstance = axios.create({
-  baseURL:
-    process.env.NODE_ENV == 'development'
-      ? 'http://127.0.0.1:8000/api/'
-      : 'https://sel2-5.ugent.be/api/',
+  baseURL: baseUrl,
 })
 
 instance.interceptors.request.use(

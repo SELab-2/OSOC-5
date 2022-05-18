@@ -32,6 +32,15 @@ describe("Project Store", () => {
     expect(studentStore.students).toHaveLength(1)
   })
 
+  it("yesMaybeNo", async () => {
+    const studentStore = useStudentStore()
+    expect(studentStore.counts.yes).toBe(0)
+    await studentStore.loadYesMaybeNo()
+    expect(studentStore.counts.yes).toBe(2)
+    expect(studentStore.counts.none).toBe(3)
+    expect(getcall_i).toBeCalledTimes(1)
+  })
+
   it("deleteStudent", async () => {
     const studentStore = useStudentStore()
     await studentStore.deleteStudent('students/1/', () => true, () => false)
@@ -97,7 +106,7 @@ describe("Project Store", () => {
     await studentStore.getStudent('students/1/')
     expect(studentStore.students).toHaveLength(1)
     expect(studentStore.students[0].suggestions).toHaveLength(2)
-    studentStore.removeSuggestion({student_id: "1", coach_id: 2})
+    await studentStore.removeSuggestion({student_id: "1", coach_id: 2})
     expect(studentStore.students[0].suggestions).toHaveLength(1)
   })
 
@@ -107,7 +116,7 @@ describe("Project Store", () => {
     expect(studentStore.students).toHaveLength(1)
     expect(studentStore.students[0].finalDecision).toBeUndefined()
     var {data} = Object(await instance.get<UserInterface>('coaches/1'))
-    studentStore.receiveFinalDecision({student_id: "1", coach: data, suggestion: "0", reason: "test"})
+    await studentStore.receiveFinalDecision({student_id: "1", coach: data, suggestion: "0", reason: "test"})
     expect(studentStore.students[0].finalDecision).toBeDefined()
   })
 
@@ -115,9 +124,9 @@ describe("Project Store", () => {
     const studentStore = useStudentStore()
     await studentStore.getStudent('students/1/')
     var {data} = Object(await instance.get<UserInterface>('coaches/1'))
-    studentStore.receiveFinalDecision({student_id: "1", coach: data, suggestion: "0", reason: "test"})
+    await studentStore.receiveFinalDecision({student_id: "1", coach: data, suggestion: "0", reason: "test"})
     expect(studentStore.students[0].finalDecision).toBeDefined()
-    studentStore.removeFinalDecision({student_id:"1"})
+    await studentStore.removeFinalDecision({student_id:"1"})
     expect(studentStore.students[0].finalDecision).toBe(null)
   })
 

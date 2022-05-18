@@ -13,15 +13,17 @@
         style="height: 100%; overflow: hidden;"
         class="fit column"
       >
-        <div :class="`${showShadow ? 'shadow-2' : ''}`" style="z-index: 1; transition: box-shadow ease 500ms"
-             class="q-px-sm">
+        <div
+          :class="`${showShadow ? 'shadow-2' : ''}`"
+          style="z-index: 1; transition: box-shadow ease 500ms"
+          class="q-px-sm"
+        >
           <div class="text-bold text-h5 q-py-sm">
             Students
           </div>
           <div class="row no-wrap q-pb-sm">
             <q-input
               v-model="search"
-              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
               debounce="300"
               class="fit q-mr-sm"
               dense
@@ -30,8 +32,11 @@
               label="Search Students"
               hide-bottom-space
             >
-              <template v-slot:append>
-                <q-icon name="search" color="teal-4"/>
+              <template #append>
+                <q-icon
+                  name="search"
+                  color="teal-4"
+                />
               </template>
             </q-input>
             <btn
@@ -45,37 +50,32 @@
               icon="tune"
               @click="showFilters = !showFilters"
             />
-
           </div>
           <q-slide-transition>
-            <div v-if="showFilters" class="overflow-hidden">
+            <div
+              v-if="showFilters"
+              class="overflow-hidden"
+            >
               <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
               <div class="q-gutter-y-sm q-px-xs">
-
                 <SegmentedControl
                   v-model="alumni"
                   color="primary"
                   text-color="white"
                   class="q-mt-md"
                   :options="[
-                { name: 'all', label: 'All' },
-                { name: 'alumni', label: 'Alumni' },
-                { name: 'student coaches', label: 'Student Coaches'}
-              ]"
-                  @click="async () => await loadStudents($refs.infiniteScroll)"
+                    { name: 'all', label: 'All' },
+                    { name: 'alumni', label: 'Alumni' },
+                    { name: 'student coaches', label: 'Student Coaches'}
+                  ]"
                 />
 
                 <label>Suggestion:</label>
                 <SegmentedControl
                   v-model="suggestion"
                   color="primary"
-                  :options="[
-                { name: 'yes', label: 'Yes' },
-                { name: 'maybe', label: 'Maybe' },
-                { name: 'no', label: 'No' },
-                { name: 'none', label: 'None' },
-              ]"
-                  @click="async () => await loadStudents($refs.infiniteScroll)"
+                  no-padding
+                  :options="options"
                 />
 
                 <q-select
@@ -91,7 +91,7 @@
                   :option-label="opt => opt.name"
                   :option-value="opt => opt.id"
                   label="Skills"
-                  @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
+                  emit-value
                 >
                   <template #selected>
                     <div
@@ -123,32 +123,30 @@
                   label="Status"
                   emit-value
                   map-options
-                  @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
                 <div class="row q-gutter-x-md">
                   <q-checkbox
                     v-model="byMe"
                     toggle-indeterminate
-                    false-value="maybe"
+                    false-value=""
+                    true-value="true"
                     indeterminate-value="false"
                     toggle-order="tf"
                     color="primary"
                     label="Suggested by you"
                     right-label
-                    @click="async () => await loadStudents($refs.infiniteScroll)"
                   />
                   <q-checkbox
                     v-model="onProject"
                     toggle-indeterminate
                     true-value="true"
-                    false-value="maybe"
+                    false-value=""
                     indeterminate-value="false"
                     toggle-order="tf"
                     color="primary"
                     label="On project"
                     right-label
-                    @click="async () => await loadStudents($refs.infiniteScroll)"
                   />
                 </div>
               </div>
@@ -161,7 +159,6 @@
           :thumb-style="thumbStyle"
           style="flex: 1; overflow: hidden;"
           @scroll="showShadow = $event.verticalPosition > 5"
-
         >
           <q-infinite-scroll
             ref="infiniteScroll"
@@ -179,7 +176,7 @@
               :draggable="onProjectsPage"
               :must-hover="onProjectsPage"
               :student="student"
-              :active="studentStore.currentStudent ? student.email === studentStore.currentStudent.email : false"
+              :active="studentStore.currentStudent?.id === student.id && onStudentsPage"
               @click="$router.push(`/students/${student.id}`)"
               @dragstart="onDragStart($event, student)"
             />
@@ -195,12 +192,12 @@
         </q-scroll-area>
       </div>
 
-<!--      <q-inner-loading-->
-<!--        :showing="studentStore.isLoading"-->
-<!--        label="Please wait..."-->
-<!--        label-class="text-teal"-->
-<!--        label-style="font-size: 1.1em"-->
-<!--      />-->
+      <!--      <q-inner-loading-->
+      <!--        :showing="studentStore.isLoading"-->
+      <!--        label="Please wait..."-->
+      <!--        label-class="text-teal"-->
+      <!--        label-style="font-size: 1.1em"-->
+      <!--      />-->
 
       <div
         class="absolute"
@@ -212,9 +209,9 @@
           shadow-strength="1"
           color="yellow"
           :icon="!miniState? 'chevron_left' : 'chevron_right'"
-          @click="miniState = !miniState"
           :style="`transform: translate(${showDrawer ? 0 : -50}%)`"
           style="transition: translate ease 500ms;"
+          @click="miniState = !miniState"
         />
       </div>
     </q-drawer>
@@ -231,23 +228,27 @@ import {useQuasar} from "quasar";
 import {Student} from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
+import { wsBaseUrl } from '../utils/baseUrl';
+import { useProjectStore } from '../stores/useProjectStore';
 
 export default defineComponent({
+  name: 'SideBar',
   components: {
     StudentSkillChip,
     StudentCard,
     SegmentedControl,
   },
-  name: 'SideBar',
   setup() {
     const studentStore = useStudentStore()
     const skillStore = useSkillStore()
+    const projectStore = useProjectStore()
 
     const $q = useQuasar()
 
     return {
       studentStore,
       skillStore,
+      projectStore,
       $q,
       thumbStyle: {
         right: '0px',
@@ -256,6 +257,7 @@ export default defineComponent({
         width: '4px',
       },
       stati,
+      socket: new WebSocket(wsBaseUrl),
     }
   },
   data() {
@@ -266,14 +268,11 @@ export default defineComponent({
       search: ref(''),
       alumni: ref('all'),
       suggestion: ref('none'),
-      byMe: ref('maybe'),
-      onProject: ref('maybe'),
+      byMe: ref(''),
+      onProject: ref(''),
       status: ref(''),
       skills: ref([])
     }
-  },
-  async mounted() {
-    this.skillStore.loadSkills()
   },
   computed: {
     onProjectsPage(): boolean {
@@ -282,36 +281,58 @@ export default defineComponent({
     onStudentsPage(): boolean {
       return this.$route.name === "Students" || this.$route.name === "Student Page";
     },
-    filters() {
-      let filter = {} as {
-        search: string
-        alum: boolean
-        student_coach: boolean
-        suggestion: string
-        suggested_by_user: string
-        on_project: string
-        status: string
-        skills: Array<number>
+    filters(): Object {
+      return {
+        search: this.search,
+        alum: this.alumni === "alumni",
+        student_coach: this.alumni === "student coaches",
+        suggestion: this.suggestion,
+        suggested_by_user: this.byMe,
+        on_project: this.onProject,
+        status: this.status,
+        skills: this.skills
       }
-
-      if (this.search) filter.search = this.search
-      if (this.alumni === 'alumni') filter.alum = true
-      if (this.alumni === 'student coaches') filter.student_coach = true
-      if (this.suggestion !== 'none') filter.suggestion = this.suggestion
-      if (this.byMe !== 'maybe') filter.suggested_by_user = this.byMe
-      if (this.onProject !== 'maybe') filter.on_project = this.onProject
-      if (this.status) filter.status = this.status
-      if (this.skills.length > 0) filter.skills = this.skills.map((skill: { id: number }) => skill.id)
-
-      return filter
+    },
+    options(): Array<{ name: string, label: string, amount: number }> {
+      return [
+        { name: 'yes', label: 'Yes', amount: this.studentStore.counts.yes },
+        { name: 'maybe', label: 'Maybe', amount: this.studentStore.counts.maybe },
+        { name: 'no', label: 'No', amount: this.studentStore.counts.no },
+        { name: 'undecided', label: 'Undecided', amount: this.studentStore.counts.undecided },
+        { name: 'none', label: 'All', amount: this.studentStore.counts.none },
+      ]
     },
     showDrawer(): boolean {
       return this.onProjectsPage || this.onStudentsPage
     }
   },
+  watch: {
+    filters() {
+      this.loadStudents()
+    }
+  },
+  async mounted() {
+    await this.skillStore.loadSkills()
+
+    this.socket.onmessage = async (event: { data: string }) => {
+      const data = JSON.parse(event.data)
+
+      if (data.hasOwnProperty('suggestion')) {
+        await this.studentStore.receiveSuggestion(data.suggestion)
+      } else if (data.hasOwnProperty('remove_suggestion')) {
+        this.studentStore.removeSuggestion(data.remove_suggestion)
+      } else if (data.hasOwnProperty('final_decision')) {
+        this.studentStore.receiveFinalDecision(data.final_decision)
+      } else if (data.hasOwnProperty('remove_final_decision')) {
+        this.studentStore.removeFinalDecision(data.remove_final_decision)
+      } else if (data.hasOwnProperty('suggest_student'))
+        this.projectStore.receiveSuggestion(data.suggest_student, this.onProject)
+      else if (data.hasOwnProperty('remove_student'))
+        this.projectStore.removeReceivedSuggestion(data.remove_student, this.onProject)
+    }
+  },
   methods: {
     // Saves the component id and user name in the dataTransfer.
-    // TODO: send id of user instead of name.
     /**
      * Saves the component id and user name in the dataTransfer.
      * @param e drag event
@@ -331,7 +352,8 @@ export default defineComponent({
      * Load all students and make the infinite scroll reload
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async loadStudents(scroll: any) {
+    loadStudents() {
+      const scroll = this.$refs.infiniteScroll as any;
       scroll.reset()
       scroll.resume()
       scroll.trigger()
@@ -347,5 +369,11 @@ export default defineComponent({
 
 :deep(.q-item) {
   padding: 8px 8px !important;
+}
+</style>
+
+<style>
+.q-checkbox__bg {
+  border-radius: 6px !important
 }
 </style>

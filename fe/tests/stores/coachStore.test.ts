@@ -50,6 +50,14 @@ describe("Coach Store", () => {
 
   });
 
+  it("loadNext", async () => {
+
+    const coachStore = useCoachStore();
+    const list = await coachStore.loadNext(1, () => true, {"test": "test"})
+    expect(list).toHaveLength(2)
+
+  });
+
   it("updateRole", async () => {
 
     const coachStore = useCoachStore();
