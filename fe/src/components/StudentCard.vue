@@ -23,14 +23,14 @@
           <q-chip
             v-if="student.alum"
             size="8px"
-            dark="false"
+            :dark="false"
           >
             Alumni
           </q-chip>
           <q-chip
             v-if="student.studentCoach"
             size="8px"
-            dark="false"
+            :dark="false"
           >
             Student Coach
           </q-chip>

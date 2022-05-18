@@ -8,7 +8,7 @@
       :breakpoint="100"
       class="shadow-4"
       :class="`bg-${$q.dark.isActive ? 'dark2' : 'grey-1'}`"
-      dark="false"
+      :dark="false"
     >
       <div
         :style="!miniState? '' : 'display: none'"

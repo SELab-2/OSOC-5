@@ -6,7 +6,7 @@
     <q-toolbar class="shadow-2" :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'osoc-blue'}`">
       <btn flat round href="https://www.osoc.be">
         <q-avatar size="42px">
-          <img src="../assets/logo.svg">
+          <img :src="`/src/assets/logo${$q.dark.isActive ? '_dark' : ''}.svg`">
         </q-avatar>
       </btn>
 
@@ -93,7 +93,7 @@
           </q-item>
         </q-list>
         <q-separator/>
-        <div class="text-caption text-bold q-ml-xs">Color Scheme</div>
+        <div class="text-caption text-bold q-ml-xs q-mt-xs">Color Scheme</div>
         <SegmentedControl
           no-shadow
           color="yellow"
@@ -247,7 +247,7 @@ export default defineComponent({
     immediate: true
     },
     'authenticationStore.colorScheme': {
-      handler(newValue: string) {
+      handler(newValue: boolean | 'auto') {
         this.$q.dark.set(newValue)
       },
       immediate: true

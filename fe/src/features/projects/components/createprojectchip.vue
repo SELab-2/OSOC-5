@@ -40,7 +40,7 @@
             dense
             autogrow
             outlined
-            dark="false"
+            :dark="false"
             v-model="_skill.comment"
             :color="_skill.skill.color"
             label="Comment"

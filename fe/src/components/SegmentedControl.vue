@@ -9,11 +9,10 @@
     <q-tab
       v-for="(option, index) in options"
       :key="index"
-      @click="current = option.name"
       no-caps
       :style="noPadding ? 'padding: 0px 0px !important;' : ''"
       :ripple="false"
-      :name="option.name"
+      :name="option.name as any"
       :label="option.label"
     >
     <div v-if="option.amount !== undefined" class="text-caption" color="red" floating>{{ option.amount! }}</div>
@@ -28,7 +27,7 @@
   export default defineComponent({
     props: {
       options: {
-        type:  [Object] as PropType<{name: string|number, label: string, amount?: number}[]>, 
+        type:  [Object] as PropType<{name: string|number|boolean, label: string, amount?: number}[]>, 
         required: true
       },
       color: {

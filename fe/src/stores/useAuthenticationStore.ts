@@ -12,7 +12,7 @@ const baseURL =
 
 interface State {
   loggedInUser: UserInterface | null
-  colorScheme: string
+  colorScheme: boolean | 'auto'
 }
 
 /**
