@@ -364,11 +364,6 @@ export default defineComponent ({
       if (this.student) {
         await this.studentStore.deleteStudent(this.student.url,
           () => {
-            this.$q.notify({
-              icon: 'done',
-              color: 'positive',
-              message: 'Successfully deleted!',
-            })
             router.push(`/students`)
           },
           () => this.$q.notify({
