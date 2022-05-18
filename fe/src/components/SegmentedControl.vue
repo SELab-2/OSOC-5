@@ -1,7 +1,6 @@
 <template>
   <q-tabs
-    :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-white text-black'"
-    class="shadow-2"
+    :class="`bg-${$q.dark.isActive? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'black'} ${noShadow ? '' : 'shadow-2'}`"
     :indicator-color="color"
     style="border-radius: 10px;"
     :active-class="$q.dark.isActive ? 'text-black' : ''"
@@ -37,6 +36,9 @@
         default: "yellow"
       },
       noPadding: {
+        type: Boolean
+      },
+      noShadow: {
         type: Boolean
       }
     }

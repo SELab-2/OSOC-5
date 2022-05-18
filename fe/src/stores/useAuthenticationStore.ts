@@ -12,6 +12,7 @@ const baseURL =
 
 interface State {
   loggedInUser: UserInterface | null
+  colorScheme: string
 }
 
 /**
@@ -39,6 +40,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
   persist: true,
   state: (): State => ({
     loggedInUser: null,
+    colorScheme: 'auto'
   }),
   actions: {
     /**
