@@ -67,7 +67,7 @@
             project.suggestedStudents
           "
         >
-          <div v-if="project.coaches.length > 0" class="text-caption text-grey">
+          <div v-if="project.coaches && project.coaches.length > 0" class="text-caption text-grey">
             Coaches:
           </div>
           <div v-else>There are no coaches assigned to this project.</div>
