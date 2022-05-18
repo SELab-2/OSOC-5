@@ -29,14 +29,12 @@
       />
       <q-input
         v-model="filterSkills"
-        style="max-width: 190px"
         outlined
         dense
         debounce="300"
-        color="green"
+        color="teal"
         class="inputfield q-mb-sm"
         placeholder="Search"
-        @keydown.enter.prevent=""
       >
         <template #append>
           <q-icon
