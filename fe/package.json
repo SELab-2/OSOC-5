@@ -26,8 +26,9 @@
     "vue": "^3.2.33",
     "vue-meta": "^2.4.0",
     "vue-router": "^4.0.14",
-    "vue-tsc": "^0.34.15",
-    "vue3-lottie": "^2.1.0"
+    "vue-tsc": "^0.33.9",
+    "vue3-lottie": "^2.1.0",
+    "vue3-markdown-it": "^1.0.10"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",

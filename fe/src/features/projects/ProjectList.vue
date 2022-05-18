@@ -5,7 +5,7 @@
   >
     <div
       :class="`${showShadow ? 'shadow-2' : ''}`"
-      style="z-index: 1; transition: box-shadow ease 500ms;"
+      style="z-index: 1; transition: box-shadow ease 500ms"
     >
       <q-toolbar
         style="overflow: visible; padding: 8px"
@@ -73,9 +73,7 @@
           shadow-strength="2"
           no-wrap
         >
-          <div class="ellipsis">
-            Conflicts
-          </div>
+          <div class="ellipsis">Conflicts</div>
         </btn>
       </q-toolbar>
 
@@ -127,6 +125,7 @@
 
     <div
       id="scroll-target-id"
+      ref="scroll"
       style="flex: 1; overflow: auto"
       @scroll="showShadow = ($event.target as HTMLElement)?.scrollTop > 5"
     >
@@ -141,9 +140,10 @@
           :ssr-columns="1"
           :column-width="320"
           :gap="0"
+          :scrollTarget="$refs.scroll as any"
         >
           <template #default="{ item }">
-            <project-card :project="item" />
+            <project-card editable :project="item as any" />
           </template>
         </masonry-wall>
         <template #loading>
@@ -183,10 +183,11 @@ import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
+import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
   name: 'ProjectList',
-  components: { ProjectCard },
+  components: { ProjectCard, MasonryWall },
   setup() {
     const { loadNext } = useProjectStore()
     
@@ -212,19 +213,24 @@ export default defineComponent({
       }
     },
     expanded: {
-      get() {
-        if (this.projects.length === 0) return false
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (this as any).projects.every(
-          (p: { selectedRoles: any }) =>
-            Object.values(p.selectedRoles ?? { k: false }).every((r) => r)
+      get(): boolean {
+        if (
+          this.projects.length === 0 ||
+          this.projects.some((p) => !p.requiredSkills)
         )
-      },
-      set(newValue) {
+          return false
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.projects.forEach((p: any) => {
-          for (let r in p.selectedRoles) {
-            p.selectedRoles[r] = newValue
+        return (this as any).projects
+          .filter((p: any) => p.requiredSkills?.length > 0)
+          .every((p: { selectedRoles: any }) =>
+            Object.values(p.selectedRoles ?? { k: false }).every((r) => r)
+          )
+      },
+      set(newValue: boolean) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.projects.forEach((p) => {
+          for (let r in (p as any).selectedRoles) {
+            ;(p as any).selectedRoles[r] = newValue
           }
         })
       },
@@ -234,12 +240,23 @@ export default defineComponent({
     projectNameFilter: {
       handler() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const infscroll = this.$refs.infinite as any;
+        const infscroll = this.$refs.infinite as any
         infscroll.reset()
         infscroll.resume()
         infscroll.trigger()
       },
     },
+  },
+  activated() {
+    // Check if the projects list has been altered in another view.
+    // If this flag is set, the view resets the pagination and loads all the projects.
+    if (this.shouldRefresh) {
+      this.shouldRefresh = false
+      const infscroll = this.$refs.infinite as any
+      infscroll.reset()
+      infscroll.resume()
+      infscroll.trigger()
+    }
   },
 })
 </script>
@@ -251,8 +268,6 @@ export default defineComponent({
 </style>
 
 <style lang="sass" scoped>
-.my-card
-    border-radius: 10px !important
 
 :deep(.q-btn--rectangle)
     border-radius: 12px !important
