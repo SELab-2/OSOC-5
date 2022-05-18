@@ -10,6 +10,7 @@ from rest_framework.reverse import reverse
 from osoc.common.tests import AdminFactory, CoachFactory, SentEmailFactory, StudentFactory
 from osoc.common.models import Coach, SentEmail, Student
 
+
 class SentEmailTestsCoach(APITestCase):
     """
     test class for testing sentemail model
@@ -155,4 +156,3 @@ class SentEmailTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(SentEmail.objects.count(), 0)
-
