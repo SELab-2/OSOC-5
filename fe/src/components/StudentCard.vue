@@ -8,7 +8,7 @@
     <q-card
       flat
       class="full-width position"
-      :class="active? 'bg-teal-1' : ''"
+      :class="active ? $q.dark.isActive ? 'bg-cyan-10' : 'bg-teal-1' : ''"
       v-ripple
       style="max-width: 340px; box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px, rgba(0, 0, 0, 0.16) 0px 1px 4px !important;"
     >
@@ -23,12 +23,14 @@
           <q-chip
             v-if="student.alum"
             size="8px"
+            dark="false"
           >
             Alumni
           </q-chip>
           <q-chip
             v-if="student.studentCoach"
             size="8px"
+            dark="false"
           >
             Student Coach
           </q-chip>

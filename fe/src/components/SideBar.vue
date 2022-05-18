@@ -88,12 +88,12 @@
                   dense
                   multiple
                   color="primary"
-                  bg-color="white"
                   :options="skillStore.skills"
                   :option-label="opt => opt.name"
                   :option-value="opt => opt.id"
                   label="Skills"
                   emit-value
+                  :dark="$q.dark.isActive"
                 >
                   <template #selected>
                     <div
@@ -118,13 +118,13 @@
                   dense
                   clearable
                   color="primary"
-                  bg-color="white"
                   :options="stati"
                   :option-label="opt => opt.label"
                   :option-value="opt => opt.value"
                   label="Status"
                   emit-value
                   map-options
+                  :dark="$q.dark.isActive"
                 />
 
                 <div class="row q-gutter-x-md">

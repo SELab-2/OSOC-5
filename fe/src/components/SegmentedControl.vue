@@ -4,11 +4,13 @@
     class="shadow-2"
     :indicator-color="color"
     style="border-radius: 10px;"
+    :active-class="$q.dark.isActive ? 'text-black' : ''"
     v-bind="$attrs"
   >
     <q-tab
       v-for="(option, index) in options"
       :key="index"
+      @click="current = option.name"
       no-caps
       :style="noPadding ? 'padding: 0px 0px !important;' : ''"
       :ripple="false"
@@ -32,7 +34,7 @@
       },
       color: {
         type: String,
-        default: "yellow-4"
+        default: "yellow"
       },
       noPadding: {
         type: Boolean

@@ -427,7 +427,6 @@ export default defineComponent({
 
 .container {
   display: inline-block;
-  background-color: red;
   width: max-content;
 }
 .second {
