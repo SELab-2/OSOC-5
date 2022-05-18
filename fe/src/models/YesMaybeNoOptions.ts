@@ -25,7 +25,7 @@ const yesMaybeNoOptions = [
     },
     {
         name: -1,
-        label: 'Not decided',
+        label: 'Undecided',
         value: -1,
         color: 'grey',
         background: 'bg-grey',

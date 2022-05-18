@@ -132,65 +132,68 @@
       </q-dialog>
     </div>
 
-  <div v-if="student" class="q-gutter-sm q-pa-lg">
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SuggestionsCard
-          title="Suggestions"
-          :suggestions="student?.suggestions"
-        />
+    <div
+      v-if="student"
+      class="q-gutter-sm q-pa-lg"
+    >
+      <div class="row">
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <SuggestionsCard
+            title="Suggestions"
+            :suggestions="student?.suggestions"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <AcademiaCard
+            :is-loading="studentStore.isLoading"
+            :school-name="student?.schoolName"
+            :studies="student?.studies"
+            :degree="student?.degree"
+            :degree-duration="student?.degreeDuration"
+            :degree-current-year="student?.degreeCurrentYear"
+            title="Academia"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <SkillsCard
+            :is-loading="studentStore.isLoading"
+            :skills="student?.skills as any"
+            :best-skill="student?.bestSkill"
+            title="Skills"
+          />
+        </div>
       </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <AcademiaCard
-          :is-loading="studentStore.isLoading"
-          :school-name="student?.schoolName"
-          :studies="student?.studies"
-          :degree="student?.degree"
-          :degree-duration="student?.degreeDuration"
-          :degree-current-year="student?.degreeCurrentYear"
-          title="Academia"
-        />
+      <div class="row">
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <LanguageCard
+            title="Language"
+            :is-loading="studentStore.isLoading"
+            :language="student?.language"
+            :english-rating="student?.englishRating"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <ExtraInfoCard
+            title="Hinder for work"
+            :content="student?.hinderWork ?? ''"
+          />
+        </div>
+        <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <ExtraInfoCard
+            title="Fun fact"
+            :content="student?.funFact ?? ''"
+          />
+        </div>
       </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <SkillsCard
-          :is-loading="studentStore.isLoading"
-          :skills="student?.skills as any"
-          :best-skill="student?.bestSkill"
-          title="Skills"
-        />
+      <div class="row">
+        <div class="studentcol col-12">
+          <ExtraInfoCard
+            title="Motivation"
+            :content="student?.motivation ?? ''"
+          />
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <LanguageCard
-          title="Language"
-          :is-loading="studentStore.isLoading"
-          :language="student?.language"
-          :english-rating="student?.englishRating"
-        />
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <ExtraInfoCard
-          title="Hinder for work"
-          :content="student?.hinderWork ?? ''"
-        />
-      </div>
-      <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
-        <ExtraInfoCard
-          title="Fun fact"
-          :content="student?.funFact ?? ''"
-        />
-      </div>
-    </div>
-    <div class="row">
-      <div class="studentcol col-12">
-        <ExtraInfoCard
-          title="Motivation"
-          :content="student?.motivation ?? ''"
-        />
-      </div>
-    </div>
-  </div>
   </div>
 </template>
 
@@ -209,6 +212,7 @@ import LanguageCard from "./components/LanguageCard.vue";
 import DeleteDialog from "../../components/DeleteDialog.vue";
 import DecisionCard from "./components/DecisionCard.vue";
 import InfoDiv from "./components/InfoDiv.vue";
+import { wsBaseUrl } from "../../utils/baseUrl";
 import DecisionIcon from "../../components/DecisionIcon.vue";
 import yesMaybeNoOptions from "../../models/YesMaybeNoOptions";
 import genderOptions from "../../models/GenderOptions";
@@ -234,13 +238,9 @@ export default defineComponent ({
     },
   },
   setup() {
-    const baseURL =
-    process.env.NODE_ENV == 'development'
-      ? 'ws://localhost:8000/ws/socket_server/'
-      : 'wss://sel2-5.ugent.be/ws/socket_server/'
     const authenticationStore = useAuthenticationStore()
     const studentStore = useStudentStore()
-    const socket = new WebSocket(baseURL)
+    const socket = new WebSocket(wsBaseUrl)
 
     return {
       authenticationStore,
@@ -270,6 +270,7 @@ export default defineComponent ({
      * Retrieve the current selected student from the store
      */
     student(): Student | null {
+      console.log(this.studentStore.currentStudent)
       return this.studentStore.currentStudent
       // return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
@@ -320,21 +321,10 @@ export default defineComponent ({
       this.socket.onmessage = async (event: { data: string }) => {
           const data = JSON.parse(event.data)
 
-          if(data.hasOwnProperty('suggestion'))
-            await this.studentStore.receiveSuggestion(data.suggestion)
-          else if(data.hasOwnProperty('remove_suggestion'))
-            this.studentStore.removeSuggestion(data.remove_suggestion)
-          else if(data.hasOwnProperty('final_decision')) {
-            this.studentStore.receiveFinalDecision(data.final_decision)
-
-            if(this.student && this.student.finalDecision)
+          if(data.hasOwnProperty('final_decision') && this.student && this.student.finalDecision)
              this.possibleFinalDecision = this.student.finalDecision.suggestion
-          } else if(data.hasOwnProperty('remove_final_decision')) {
-            this.studentStore.removeFinalDecision(data.remove_final_decision)
-
-            if(this.student && this.student.finalDecision) {
+          else if(data.hasOwnProperty('remove_final_decision') && this.student && this.student.finalDecision) {
               this.possibleFinalDecision = this.student.finalDecision.suggestion
-            }
           }
       }
 
@@ -408,3 +398,12 @@ export default defineComponent ({
   },
 })
 </script>
+
+<style>
+.studentcol {
+  padding: 5px;
+}
+.cornered {
+  border-radius: 10px !important
+}
+</style>

@@ -349,6 +349,7 @@ class Project(models.Model):
     )
     extra_info = models.TextField(
         _('extra info'),
+        blank=True
     )
     required_skills = models.ManyToManyField(
         Skill,
