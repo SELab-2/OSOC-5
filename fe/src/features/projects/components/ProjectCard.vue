@@ -1,6 +1,6 @@
 <template>
   <q-card class="my-card shadow-4 q-ma-sm" flat bordered style="border-radius: 10px !important;">
-    <q-card-section class="column">
+    <q-card-section>
       <div class="row">
         <h5 class="text-bold q-mt-none q-mb-none">
           {{ project.name }}
@@ -45,10 +45,9 @@
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="showInfo" >
+        <div v-if="showInfo" style="" >
           <div class="text-h6">Info</div>
-          <!-- <markdown-viewer style="overflow: hidden" v-model:text="project.extraInfo"></markdown-viewer> -->
-          <div>fghkgchfnxhhcgjvkb.hvcghxfghcjhvkj.blhkhvcghxfgcjhvkjblhvgchmfgjvkb</div>
+          <markdown-viewer style="overflow: hidden; overflow-wrap: break-word;" v-model:text="project.extraInfo"></markdown-viewer>
           <q-separator inset spaced="10px" />
         </div>
       </q-slide-transition>

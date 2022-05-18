@@ -2,7 +2,10 @@
   <div
 	ref="wall"
 	class="masonry-wall"
-	:style="{ display: 'flex', gap: `${gap}px` }"
+	:style="{ display: 'grid', gap: `${gap}px`,
+  'grid-auto-columns': 'minmax(0, 1fr)',
+  'grid-auto-flow': 'column'
+}"
   >
 	<div
 	  v-for="(column, columnIndex) in columns"
@@ -11,8 +14,9 @@
 	  :data-index="columnIndex"
 	  :style="{
 		display: 'flex',
-		'flex-direction': 'column',
-		flex: '1 1 0px',
+		'flex-basis': 0,
+    'flex-direction': 'column',
+    'flex-grow': 1,
 		height: ['-webkit-max-content', '-moz-max-content', 'max-content'],
 		gap: `${gap}px`,
 	  }"
