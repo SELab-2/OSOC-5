@@ -11,8 +11,8 @@ describe('Skill Store', () => {
         setActivePinia(createPinia())
     })
 // 
-//     it('loadSkills', () => {
-// 
+    it('loadSkills', () => {
+
 //         // create a new skillstore
 //         const skillStore = useSkillStore()
 // 
@@ -25,9 +25,9 @@ describe('Skill Store', () => {
 // 
 //         // check if it's loading skills
 //         expect(skillStore.isLoadingSkills).toBe(true)
-// 
-// 
-//     });
+
+
+    });
 //     it('addSkill', () => {
 // 
 //         // create a new skillstore
