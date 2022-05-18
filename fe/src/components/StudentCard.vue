@@ -128,7 +128,7 @@ export default defineComponent({
     mySuggestion(): number {
       const mySuggestions = this.student.suggestions.filter((suggestion: Suggestion) => {
         if (this.authenticationStore.loggedInUser != null) {
-          return suggestion.coach.id === this.authenticationStore.loggedInUser.id
+          return suggestion.coach ? suggestion.coach.id === this.authenticationStore.loggedInUser.id : false
         }
       })
 

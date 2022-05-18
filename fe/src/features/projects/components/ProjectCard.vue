@@ -67,13 +67,11 @@
             :key="coach.id"
             icon="person"
           >
-            {{ coach.firstName }}
-            {{
-              coach.lastName
-                .split(' ')
-                .map((res) => res.charAt(0))
-                .join('')
-            }}.
+            {{ coach ? `${coach.firstName} ${coach.lastName
+                                      .split(' ')
+                                      .map((res) => res.charAt(0))
+                                      .join('')}` : ''
+            }}
           </q-chip>
           <div class="row" style="display: flex; align-items: center">
             <div

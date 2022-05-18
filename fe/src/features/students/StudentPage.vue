@@ -302,7 +302,7 @@ export default defineComponent ({
      */
     mySuggestion(): number {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach.id === this.authenticationStore.loggedInUser?.id)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach ? suggestion.coach.id === this.authenticationStore.loggedInUser?.id : false)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
