@@ -4,6 +4,10 @@
       <div class="text-h6">
         {{ title }}
       </div>
+      <div v-if="decision">
+        <div class="text-subtitle2">Final decision</div>
+        <SuggestionRow :suggestion="decision" />
+      </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
       <div v-if="studentStore.isLoading">
@@ -14,8 +18,6 @@
         v-else
         class="column"
       >
-        <SuggestionRow v-if="decision" :suggestion="decision" />
-        <q-separator v-if="decision" spaced />
         <div
           v-for="(suggestion, key) in suggestions"
           :key="key"
