@@ -112,6 +112,55 @@ class StudentFilterTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data['count'], 2)
 
+    def test_student_conflict_filter(self):
+        """
+        test GET /students/?conflicting=
+        """
+        project1 = ProjectFactory()
+        project2 = ProjectFactory(name="project2")
+        skill = SkillFactory()
+        project1.required_skills.add(skill)
+        project2.required_skills.add(skill)
+
+        student1 = Student.objects.first()
+        student2 = Student.objects.exclude(id=student1.id).first()
+
+        # assign a student to 2 different projects
+        ProjectSuggestion.objects.create(
+            project=project1,
+            student=student1,
+            skill=skill,
+            coach=self.user
+        )
+        ProjectSuggestion.objects.create(
+            project=project2,
+            student=student1,
+            skill=skill,
+            coach=self.user
+        )
+        # assign a student twice to the same project
+        ProjectSuggestion.objects.create(
+            project=project1,
+            student=student2,
+            skill=skill,
+            coach=self.user
+        )
+        skill2 = SkillFactory(name="skill2")
+        ProjectSuggestion.objects.create(
+            project=project1,
+            student=student2,
+            skill=skill2,
+            coach=self.user
+        )
+
+        url = reverse_querystring("student-list", query_kwargs=({"conflicting": "true"}))
+        response = self.client.get(url)
+        self.assertEqual(response.data['count'], 2)
+
+        url = reverse_querystring("student-list", query_kwargs=({"conflicting": "false"}))
+        response = self.client.get(url)
+        self.assertEqual(response.data['count'], 1)
+
 
 class EmailFilterTests(APITestCase):
     """
