@@ -6,8 +6,8 @@
     style="border-radius: 10px !important"
   >
     <q-card-section>
-      <div class="row">
-        <h5 class="text-bold q-mt-none q-mb-none">
+      <div class="row no-wrap">
+        <h5 class="text-bold q-mt-none q-mb-none" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis">
           {{ project.name }}
         </h5>
         <q-spinner
@@ -117,11 +117,11 @@
               :modelValue="
                 selectedRoles[skill.skill.id] || hovered === skill.skill.id
               "
-              @update:modelValue="selectedRoles[skill.skill.id] = $event"
+              @update:modelValue="editable ? selectedRoles[skill.skill.id] = $event : ''"
               v-for="skill in project.requiredSkills"
-              @dragleave="onDragLeave($event, skill)"
-              @dragover="checkDrag($event, skill)"
-              @drop="onDrop($event, skill)"
+              @dragleave="editable ? onDragLeave($event, skill) : false"
+              @dragover="editable ? checkDrag($event, skill) : false"
+              @drop="editable ? onDrop($event, skill) : false"
               :key="skill.skill.id"
               :skill="skill"
               :occupied="

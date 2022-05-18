@@ -157,7 +157,7 @@ import { ref, Ref, PropType } from 'vue'
 import NewSkillDialog from './subcomponents/NewSkillDialog.vue'
 import { useSkillStore } from '../../../stores/useSkillStore'
 import { Skill, ProjectSkill } from '../../../models/Skill'
-import CreateProjectChip from './createprojectchip.vue'
+import CreateProjectChip from './CreateProjectChip.vue'
 import LottieAnimation from '../../../components/LottieAnimation.vue'
 
 export default defineComponent({
