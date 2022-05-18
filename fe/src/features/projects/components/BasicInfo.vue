@@ -6,28 +6,31 @@
     <q-input
       v-model="_name"
       outlined
+      color="teal"
       label="Project name"
       lazy-rules
       :rules="[
         (val) =>
           (val && val.length > 0) ||
-          'Please enter the name of the project.',
+          'Provide the name of the project.',
       ]"
     />
     <q-input
       v-model="_partnerName"
       outlined
+      color="teal"
       label="Partner name"
       lazy-rules
       :rules="[
         (val) =>
           (val && val.length > 0) ||
-          'Please enter the name of the partner.',
+          'Provide the name of the partner.',
       ]"
     />
     <q-input
       v-model="_info"
       outlined
+      color="teal"
       label="Project Info"
       type="textarea"
     />
