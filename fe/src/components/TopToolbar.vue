@@ -4,9 +4,16 @@
     height-hint="98"
   >
     <q-toolbar class="text-osoc-blue bg-white shadow-2">
-      <btn flat round href="https://www.osoc.be">
+      <btn
+        flat
+        round
+        href="https://www.osoc.be"
+      >
         <q-avatar size="42px">
-          <img src="../assets/logo.svg">
+          <img
+            src="../assets/logo.svg"
+            alt="OSOC logo"
+          >
         </q-avatar>
       </btn>
 
@@ -99,110 +106,24 @@
     v-model="display_popup"
     persistent
   >
-    <q-card style="min-width: 350px">
-      <q-card-section>
-        <div class="text-h6">
-          Change Password
-        </div>
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <q-input
-          v-model="password1"
-          outlined
-          autofocus
-          :type="isPwd1 ? 'password' : 'text'"
-          class="inputfield"
-          label="New Password 1"
-          lazy-rules
-          :rules="[(val) => (val && val.length > 7) || 'Password is too short.']"
-        />
-        <q-icon
-          :name="isPwd1 ? 'visibility_off' : 'visibility'"
-          class="cursor-pointer"
-          @click="isPwd1 = !isPwd1"
-        />
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <q-input
-          v-model="password2"
-          outlined
-          autofocus
-          :type="isPwd2 ? 'password' : 'text'"
-          class="inputfield"
-          label="New Password 2"
-        />
-        <q-icon
-          :name="isPwd2 ? 'visibility_off' : 'visibility'"
-          class="cursor-pointer"
-          @click="isPwd2 = !isPwd2"
-        />
-      </q-card-section>
-      <q-card-actions
-        align="right"
-        class="text-primary"
-      >
-        <q-btn
-          v-close-popup
-          flat
-          label="Cancel"
-        />
-        <q-btn
-          flat
-          label="Submit Password Change"
-          @click="change_password_confirm"
-        />
-      </q-card-actions>
-    </q-card>
+    <ChangePasswordDialog :callback="() => display_popup = false" />
   </q-dialog>
 </template>
 
 <script lang="ts">
 import {defineComponent, ref, Ref} from 'vue'
-import { useQuasar } from 'quasar'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
-import { useStudentStore } from '../stores/useStudentStore'
+import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 export default defineComponent({
+  components: { ChangePasswordDialog },
   setup() {
-    const $q = useQuasar()
     const authenticationStore = useAuthenticationStore()
-    const password1 = ref('')
-    const password2 = ref('')
     const display_popup = ref(false)
     return {
-      studentStore: useStudentStore(),
-      isPwd1: ref(true),
-      isPwd2: ref(true),
-      password1,
-      password2,
       display_popup,
       authenticationStore,
       on_dropdown_click() {
         display_popup.value = true
-      },
-      change_password_confirm() {
-        if (password1.value == password2.value) {
-          display_popup.value = false
-          authenticationStore.changePassword({p1:password1.value, p2:password2.value}).then(() => {
-            $q.notify({
-              icon: 'done',
-              color: 'positive',
-              message: 'Password was successfully changed',
-            })
-          }).
-          catch((error) => {
-            $q.notify({
-            icon: 'warning',
-            color: 'warning',
-            message: `Error ${error} while changing password, please try again`,
-            textColor: 'black'
-          });
-        })
-        } else {
-          $q.notify({
-            color: 'negative',
-            message: 'Passwords do not match'
-          })
-        }
       },
     } 
   },
@@ -222,6 +143,11 @@ export default defineComponent({
       ],
     }
   },
+  computed: {
+    fullName(): string {
+      return this.authenticationStore.loggedInUser?.firstName + ' ' + this.authenticationStore.loggedInUser?.lastName
+    }
+  },
   watch: {
     $route: {
       handler(newValue) {
@@ -230,11 +156,6 @@ export default defineComponent({
       }
     },
     immediate: true
-    }
-  },
-  computed: {
-    fullName(): string {
-      return this.authenticationStore.loggedInUser?.firstName + ' ' + this.authenticationStore.loggedInUser?.lastName
     }
   },
 })
