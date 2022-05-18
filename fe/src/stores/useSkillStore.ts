@@ -5,19 +5,11 @@ import { Skill } from '../models/Skill'
 
 interface State {
   skills: Array<Skill>
-  isLoadingSkills: boolean
-  popupName: string
-  popupColor: string
-  popupID: number
 }
 
 export const useSkillStore = defineStore('skills', {
   state: (): State => ({
     skills: [],
-    isLoadingSkills: false,
-    popupName: '',
-    popupColor: '',
-    popupID: -1,
   }),
   actions: {
     async getSkill(url: string): Promise<Skill> {
