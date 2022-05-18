@@ -13,26 +13,8 @@ describe("Project Store", () => {
     setActivePinia(createPinia());
   });
 
-  it("removeSuggestion", () => {
+  it("fetchSuggestedStudents", async () => {
 
-    const projectStore = useProjectStore();
+  })
 
-    expect(projectStore.isLoadingProjects).toBe(false);
-    test.concurrent("remove suggestion and wait", async () => {
-
-      const project: Project =
-        {
-          "name": "name",
-          "partnerName": "partnerName",
-          "extraInfo": "extraInfo",
-          "id": 0
-        };
-
-      // @ts-ignore
-      projectStore.removeSuggestion(project, undefined);
-
-    });
-
-
-  });
 });
