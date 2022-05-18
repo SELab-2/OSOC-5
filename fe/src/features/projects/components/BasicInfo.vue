@@ -8,7 +8,6 @@
       outlined
       label="Project name"
       lazy-rules
-      class="inputfield"
       :rules="[
         (val) =>
           (val && val.length > 0) ||
@@ -20,7 +19,6 @@
       outlined
       label="Partner name"
       lazy-rules
-      class="inputfield"
       :rules="[
         (val) =>
           (val && val.length > 0) ||
@@ -30,14 +28,8 @@
     <q-input
       v-model="_info"
       outlined
-      label="Project URL"
-      lazy-rules
-      class="inputfield"
-      :rules="[
-        (val) =>
-          (val && val.length > 0) ||
-          'Please enter the URL of the project.',
-      ]"
+      label="Project Info"
+      type="textarea"
     />
   </div>
 </template>

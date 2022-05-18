@@ -119,6 +119,7 @@
 
     <div
       id="scroll-target-id"
+      ref="scroll"
       style="flex: 1; overflow: auto"
       @scroll="showShadow = ($event.target as HTMLElement)?.scrollTop > 5"
     >
@@ -133,6 +134,7 @@
           :ssr-columns="1"
           :column-width="320"
           :gap="0"
+          :scrollTarget="$refs.scroll"
         >
           <template #default="{ item }">
             <project-card editable :project="item" />
@@ -169,10 +171,11 @@ import { useStudentStore } from '../../stores/useStudentStore'
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
+import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
   name: 'ProjectList',
-  components: { ProjectCard },
+  components: { ProjectCard, MasonryWall },
   setup() {
     const baseURL =
       process.env.NODE_ENV == 'development'

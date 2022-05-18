@@ -332,7 +332,20 @@ export const useProjectStore = defineStore('project', {
     },
     async addProject(project: Project) {
       try {
-        await instance.post('projects/', convertObjectKeysToSnakeCase(project))
+        const mappedProject = {
+          name: project.name,
+          partnerName: project.partnerName,
+          extraInfo: project.extraInfo,
+          requiredSkills: project.requiredSkills?.map(s => {
+            return {
+              amount: s.amount,
+              comment: s.comment,
+              skill: s.skill.url
+            }
+          }),
+          coaches: project.coaches?.map(c => c.url),					
+        }
+        await instance.post('projects/', convertObjectKeysToSnakeCase(mappedProject))
         return true
       } catch (error) {
         return false
@@ -340,7 +353,20 @@ export const useProjectStore = defineStore('project', {
     },
     async updateProject(project: Project, id: number) {
       try {
-        await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(project))
+        const mappedProject = {
+          name: project.name,
+          partnerName: project.partnerName,
+          extraInfo: project.extraInfo,
+          requiredSkills: project.requiredSkills?.map(s => {
+            return {
+              amount: s.amount,
+              comment: s.comment,
+              skill: s.skill.url
+            }
+          }),
+          coaches: project.coaches?.map(c => c.url),					
+        }
+        await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(mappedProject))
         return true
       } catch (error) {
         return false

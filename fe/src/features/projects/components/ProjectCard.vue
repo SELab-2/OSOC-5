@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card shadow-4 q-ma-sm" flat bordered style="border-radius: 10px !important">
+  <q-card class="my-card shadow-4 q-ma-sm" flat bordered style="border-radius: 10px !important;">
     <q-card-section class="column">
       <div class="row">
         <h5 class="text-bold q-mt-none q-mb-none">
@@ -45,12 +45,10 @@
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="showInfo">
-          <btn icon="r_link"/>
+        <div v-if="showInfo" >
           <div class="text-h6">Info</div>
-          <div class="text-body2">
-            {{ project.extraInfo }}
-          </div>
+          <!-- <markdown-viewer style="overflow: hidden" v-model:text="project.extraInfo"></markdown-viewer> -->
+          <div>fghkgchfnxhhcgjvkb.hvcghxfghcjhvkj.blhkhvcghxfgcjhvkjblhvgchmfgjvkb</div>
           <q-separator inset spaced="10px" />
         </div>
       </q-slide-transition>
@@ -158,7 +156,7 @@ import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-
+import MarkdownViewer from './MarkdownViewer.vue'
 export default defineComponent({
   props: {
     project: {
@@ -170,7 +168,7 @@ export default defineComponent({
       required: false,
     }
   },
-  components: { ProjectRoleChip, ProjectCardSuggestion },
+  components: { ProjectRoleChip, ProjectCardSuggestion, MarkdownViewer },
   setup() {
     return {
       authenticationStore: useAuthenticationStore(),
@@ -197,6 +195,11 @@ export default defineComponent({
                 {}
               )
       },
+    },
+    'project.extraInfo': {
+      handler() {
+        this.projectStore.updateProject(this.project, this.project.id)
+      }
     },
   },
 
@@ -381,5 +384,14 @@ export default defineComponent({
 <style>
 .rotate180 {
   transform: rotate(180deg) !important;
+}
+
+.container {
+    display: inline-block;
+    background-color: red;
+    width: max-content;
+}
+.second {
+    max-width: fit-content;
 }
 </style>

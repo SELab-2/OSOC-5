@@ -86,9 +86,9 @@
 	</btn>
 	</template>
 	<template #after>
-		<div style="max-width: 400px; margin: auto" class="row fit justify-center items-center content-center">
+		<div v-if="project" class="column fit justify-center items-center content-center">
 			<div class="text-h6 text-bold">Preview</div>
-			<project-card :project="project"/>
+			<project-card style="width: 90%; max-width: 400px" :project="project"/>
 		</div>
 	</template>
 	</q-splitter>
@@ -173,23 +173,10 @@ export default defineComponent({
 			}
 		},
 		async submit() {
-			const mappedProject = {
-				name: this.project.name,
-				partnerName: this.project.partnerName,
-				extraInfo: this.project.extraInfo,
-				requiredSkills: this.project.requiredSkills.map(s => {
-					return {
-						amount: s.amount,
-						comment: s.comment,
-						skill: s.skill.url
-					}
-				}),
-				coaches: this.project.coaches.map(c => c.url),					
-			}
 			if (this.id) {
-				await this.projectStore.updateProject(mappedProject, this.project.id)
+				await this.projectStore.updateProject(this.project, this.project.id)
 			} else {
-				await this.projectStore.addProject(mappedProject)
+				await this.projectStore.addProject(this.project)
 			}
 			this.projectStore.shouldRefresh = true
 			router.replace('/projects')
@@ -202,17 +189,8 @@ export default defineComponent({
 	},
 	computed: {
 		basicInfoDone() {
-			return this.project.name.length > 0 && this.project.partnerName.length > 0 && this.project.extraInfo.length > 0
+			return this.project?.name.length > 0 && this.project?.partnerName.length > 0 && this.project?.extraInfo.length > 0
 		},
-		coachesDone() {
-			return this.project.coaches.length > 0
-		},
-		skillsDone() {
-			return this.project.requiredSkills.length > 0
-		},
-		allDone() {
-			return this.basicInfoDone
-		}
 	}
 })
 </script>
