@@ -3,7 +3,7 @@ Filters used in views.py
 """
 
 from rest_framework import filters
-from .models import Project, Student, Suggestion
+from .models import Project, ProjectSuggestion, Student, Suggestion
 from .utils import string_to_datetime_tz
 
 true_strings = ['true', '1', 'yes', 't', 'y']
@@ -78,6 +78,28 @@ class StudentFinalDecisionFilter(filters.BaseFilterBackend):
                 return queryset.filter(final_decision__suggestion=self.param2enum[param])
             if param.lower() in ['undecided', '3']:
                 return queryset.filter(final_decision=None)
+        return queryset
+
+
+class StudentConflictFilter(filters.BaseFilterBackend):
+    """
+    filters students that are assigned to a project multiple times
+    """
+    def filter_queryset(self, request, queryset, view):
+        param = request.query_params.get('conflicting')
+        if param is not None:
+
+            has_conflict = []
+            # loop over students
+            for student in queryset:
+                # check if student is suggested/assigned to a project more than once
+                if ProjectSuggestion.objects.filter(student=student).count() > 1:
+                    has_conflict.append(student.id)
+
+            if param.lower() in true_strings:
+                return queryset.filter(id__in=has_conflict)
+            if param.lower() in false_strings:
+                return queryset.exclude(id__in=has_conflict)
         return queryset
 
 
