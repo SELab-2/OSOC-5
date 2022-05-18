@@ -55,6 +55,7 @@
           <markdown-viewer
             style="overflow: hidden; overflow-wrap: break-word"
             v-model:text="project.extraInfo"
+            :editable="me.isAdmin"
           ></markdown-viewer>
         </div>
       </q-slide-transition>
@@ -203,7 +204,6 @@ export default defineComponent({
   data() {
     return {
       hovered: ref(-1),
-      showInfo: ref(!this.editable ?? false),
     }
   },
 
@@ -333,11 +333,6 @@ export default defineComponent({
           false
         )
       )
-
-      // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
-      if (!this.expanded) {
-        // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
-      }
     },
 
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
@@ -403,13 +398,13 @@ export default defineComponent({
     },
     _showInfo: {
       get(): boolean {
-        return this.expandedInfo ?? this.showInfo
+        return this.expandedInfo ?? (this.project as any).showInfo ?? false
       },
       set(n: boolean) {
         if (this.expandedInfo !== undefined) {
           this.$emit('update:expandedInfo', n)
         } else {
-          this.showInfo = n
+          (this.project as any).showInfo = n
         }
       },
     },

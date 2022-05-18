@@ -2,7 +2,7 @@
   <div>
     <markdown
       :source="text"
-      :tasklists="{ enabled: true }"
+      :tasklists="{ enabled: editable }"
       ref="md"
       breaks
       v-bind="$attrs"
@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Markdown from 'vue3-markdown-it'
-// const Markdown = require('vue3-markdown-it')
+import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 let checkboxes: HTMLElement[] = []
 
 export default defineComponent({
@@ -22,6 +22,9 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    editable: {
+      type: Boolean
+    }
   },
   components: { Markdown },
   destroyed() {
