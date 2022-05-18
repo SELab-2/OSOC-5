@@ -33,9 +33,9 @@
         outlined
         dense
         debounce="300"
-        color="green"
+        color="teal"
         class="inputfield q-mb-sm"
-        placeholder="Search"
+        label="Search"
         @keydown.enter.prevent=""
       >
         <template #append>
@@ -70,7 +70,7 @@
     </div>
     <q-splitter
       v-model="splitterModel"
-      style="flex: 1; overflow: auto"
+      style="flex: 1; overflow: auto;"
       :limits="[20, 80]"
     >
       <template #before>
@@ -269,4 +269,5 @@ export default defineComponent({
     transform: translateX(3px);
   }
 }
+
 </style>
