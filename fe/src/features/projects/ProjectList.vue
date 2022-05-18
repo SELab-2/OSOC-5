@@ -87,7 +87,7 @@
               <!-- <q-checkbox label="My project" /> -->
               <!-- <q-checkbox label="Students needed" /> -->
               
-              <div class="col-6">
+              <div style="min-width: 50%">
                 <q-select
                   v-model="skillFilter"
                   clearable
@@ -95,7 +95,7 @@
                   outlined
                   dense
                   multiple
-                  color="primary"
+                  color="teal"
                   bg-color="white"
                   :options="skillStore.skills"
                   :option-label="opt => opt.name"
@@ -118,9 +118,9 @@
                   </template>
                 </q-select>
               </div>
-              <div class="col-1" />
+              
               <div
-                class="column"
+                class="column q-mx-md"
               >
                 <div class="col">
                   <q-checkbox 
@@ -128,7 +128,7 @@
                     rounded
                     outlined
                     dense
-                    color="primary"
+                    color="teal"
                     bg-color="white"
                     label="Only show non-full projects"
                   />
@@ -139,7 +139,7 @@
                     rounded
                     outlined
                     dense
-                    color="primary"
+                    color="teal"
                     bg-color="white"
                     label="Only show full projects"
                   />
