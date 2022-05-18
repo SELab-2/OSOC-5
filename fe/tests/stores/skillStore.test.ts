@@ -3,13 +3,13 @@ import {createPinia, setActivePinia} from 'pinia'
 import {useSkillStore} from "../../src/stores/useSkillStore";
 
 
-// describe('Skill Store', () => {
-//     beforeEach(() => {
-//         // creates a fresh pinia and make it active so it's automatically picked
-//         // up by any useStore() call without having to pass it to it:
-//         // `useStore(pinia)`
-//         setActivePinia(createPinia())
-//     })
+describe('Skill Store', () => {
+    beforeEach(() => {
+        // creates a fresh pinia and make it active so it's automatically picked
+        // up by any useStore() call without having to pass it to it:
+        // `useStore(pinia)`
+        setActivePinia(createPinia())
+    })
 // 
 //     it('loadSkills', () => {
 // 
@@ -63,4 +63,4 @@ import {useSkillStore} from "../../src/stores/useSkillStore";
 //         skillStore.deleteSkill(-1)
 // 
 //     })
-// })
+})
