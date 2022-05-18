@@ -31,7 +31,6 @@
               color="teal"
               label="Search Students"
               hide-bottom-space
-              @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
             >
               <template #append>
                 <q-icon
@@ -69,7 +68,6 @@
                     { name: 'alumni', label: 'Alumni' },
                     { name: 'student coaches', label: 'Student Coaches'}
                   ]"
-                  @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
                 <label>Suggestion:</label>
@@ -78,7 +76,6 @@
                   color="primary"
                   no-padding
                   :options="options"
-                  @click="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
                 <q-select
@@ -94,7 +91,7 @@
                   :option-label="opt => opt.name"
                   :option-value="opt => opt.id"
                   label="Skills"
-                  @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
+                  emit-value
                 >
                   <template #selected>
                     <div
@@ -126,32 +123,30 @@
                   label="Status"
                   emit-value
                   map-options
-                  @update:model-value="async () => await loadStudents($refs.infiniteScroll)"
                 />
 
                 <div class="row q-gutter-x-md">
                   <q-checkbox
                     v-model="byMe"
                     toggle-indeterminate
-                    false-value="maybe"
+                    false-value=""
+                    true-value="true"
                     indeterminate-value="false"
                     toggle-order="tf"
                     color="primary"
                     label="Suggested by you"
                     right-label
-                    @click="async () => await loadStudents($refs.infiniteScroll)"
                   />
                   <q-checkbox
                     v-model="onProject"
                     toggle-indeterminate
                     true-value="true"
-                    false-value="maybe"
+                    false-value=""
                     indeterminate-value="false"
                     toggle-order="tf"
                     color="primary"
                     label="On project"
                     right-label
-                    @click="async () => await loadStudents($refs.infiniteScroll)"
                   />
                 </div>
               </div>
@@ -273,8 +268,8 @@ export default defineComponent({
       search: ref(''),
       alumni: ref('all'),
       suggestion: ref('none'),
-      byMe: ref('maybe'),
-      onProject: ref('maybe'),
+      byMe: ref(''),
+      onProject: ref(''),
       status: ref(''),
       skills: ref([])
     }
@@ -286,28 +281,17 @@ export default defineComponent({
     onStudentsPage(): boolean {
       return this.$route.name === "Students" || this.$route.name === "Student Page";
     },
-    filters() {
-      let filter = {} as {
-        search: string
-        alum: boolean
-        student_coach: boolean
-        suggestion: string
-        suggested_by_user: string
-        on_project: string
-        status: string
-        skills: Array<number>
+    filters(): Object {
+      return {
+        search: this.search,
+        alum: this.alumni === "alumni",
+        student_coach: this.alumni === "student coaches",
+        suggestion: this.suggestion,
+        suggested_by_user: this.byMe,
+        on_project: this.onProject,
+        status: this.status,
+        skills: this.skills
       }
-
-      if (this.search) filter.search = this.search
-      if (this.alumni === 'alumni') filter.alum = true
-      if (this.alumni === 'student coaches') filter.student_coach = true
-      if (this.suggestion !== 'none') filter.suggestion = this.suggestion
-      if (this.byMe !== 'maybe') filter.suggested_by_user = this.byMe
-      if (this.onProject !== 'maybe') filter.on_project = this.onProject
-      if (this.status) filter.status = this.status
-      if (this.skills.length > 0) filter.skills = this.skills.map((skill: { id: number }) => skill.id)
-
-      return filter
     },
     options(): Array<{ name: string, label: string, amount: number }> {
       return [
@@ -315,11 +299,16 @@ export default defineComponent({
         { name: 'maybe', label: 'Maybe', amount: this.studentStore.counts.maybe },
         { name: 'no', label: 'No', amount: this.studentStore.counts.no },
         { name: 'undecided', label: 'Undecided', amount: this.studentStore.counts.undecided },
-        { name: 'none', label: 'None', amount: this.studentStore.counts.none },
+        { name: 'none', label: 'All', amount: this.studentStore.counts.none },
       ]
     },
     showDrawer(): boolean {
       return this.onProjectsPage || this.onStudentsPage
+    }
+  },
+  watch: {
+    filters() {
+      this.loadStudents()
     }
   },
   async mounted() {
@@ -363,7 +352,8 @@ export default defineComponent({
      * Load all students and make the infinite scroll reload
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async loadStudents(scroll: any) {
+    loadStudents() {
+      const scroll = this.$refs.infiniteScroll as any;
       scroll.reset()
       scroll.resume()
       scroll.trigger()
@@ -379,5 +369,11 @@ export default defineComponent({
 
 :deep(.q-item) {
   padding: 8px 8px !important;
+}
+</style>
+
+<style>
+.q-checkbox__bg {
+  border-radius: 6px !important
 }
 </style>

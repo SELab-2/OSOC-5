@@ -16,7 +16,7 @@ from channels.layers import get_channel_layer
 from .utils import export_to_csv, create_zipfile_response
 from .pagination import StandardPagination
 from .filters import MultipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
-    StudentFinalDecisionFilter, EmailDateTimeFilter
+    StudentFinalDecisionFilter, EmailDateTimeFilter, StudentConflictFilter, ProjectFullFilter
 from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSerializer, \
     CSVProjectSuggestionSerializer, CSVRequiredSkillSerializer, CSVSentEmailSerializer, \
     CSVSkillSerializer, CSVStudentSerializer, CSVSuggestionSerializer, Conflict, ConflictSerializer, \
@@ -42,7 +42,8 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         * ?status=[0-5]
         * ?on_project=[true, false]
         * ?suggested_by_user=[true, false]
-        * ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
+        * ?suggestion=[yes, no, maybe, undecided, 0, 1, 2, 3]
+        * ?conflicting=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
     - Sort students with the ?ordering=[first_name, last_name, email, status] query parameter.
         * Use ?ordering=-... to sort in descending order
@@ -65,7 +66,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
                        StudentOnProjectFilter, StudentSuggestedByUserFilter,
-                       StudentFinalDecisionFilter, MultipleStatusFilter]
+                       StudentFinalDecisionFilter, MultipleStatusFilter, StudentConflictFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',
@@ -389,6 +390,7 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         * ?required_skills=:id:,
         * ?coaches=:id:,
         * ?suggested_students=:id:
+        * ?full=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
     - Sort projects with the ?ordering=[name, partner_name] query parameter.
         * Use ?ordering=-... to sort in descending order
@@ -402,8 +404,8 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
-    filter_backends = [filters.SearchFilter,
-                       filters.OrderingFilter, DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter,
+                       ProjectFullFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
     ordering_fields = ['name', 'partner_name']
