@@ -17,13 +17,13 @@
       >
         <template #append>
           <q-icon
-            v-if="projectStore.filterCoaches !== ''"
+            v-if="search !== ''"
             name="close"
             class="cursor-pointer"
-            @click="projectStore.filterCoaches = ''"
+            @click="search = ''"
           />
           <q-icon
-            v-if="projectStore.filterCoaches === ''"
+            v-else
             name="search"
           />
         </template>
@@ -78,7 +78,6 @@
                v-if="coach.projects.length > 0"
                name="info"
                size="sm"
-               :color="`${getColor(i)}-6`"
              >
              <q-tooltip v-if="coach.projects.length > 0" class="text-subtitle2 text-black bg-grey-1 shadow-5 cornered">
                <span>Already assigned to the projects:</span>
@@ -144,7 +143,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref, Ref} from "vue";
+import {defineComponent, ref, Ref, PropType} from "vue";
 import {useProjectStore} from "../../../stores/useProjectStore";
 import {useCoachStore} from "../../../stores/useCoachStore";
 import { User } from "../../../models/User"
@@ -210,9 +209,11 @@ export default defineComponent({
   },
   watch: {
     filters() {
-      this.$refs.scroll.reset()
-      this.$refs.scroll.resume()
-      this.$refs.scroll.trigger()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const scroll = this.$refs.scroll as any;
+      scroll.reset()
+      scroll.resume()
+      scroll.trigger()
     }
   },
 })

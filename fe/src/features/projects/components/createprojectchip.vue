@@ -8,8 +8,7 @@
 		class="q-pt-none q-px-sm"
 		:class="`bg-${skill.skill.color}-1`"
 		style="border-width: 1.5px; height: fit-content;"
-		:style="`box-shadow: ${colors.getPaletteColor(skill.skill.color,0)} 0px 8px 20px -12px;`"
-		@click="enabled = !enabled"
+		:style="`box-shadow: ${colors.getPaletteColor(skill.skill.color)} 0px 8px 20px -12px;`"
 	>
 		<template #default>
 			<div class="column">
@@ -31,8 +30,8 @@
 					borderless
 					min="1" 
 					style="max-width: 50px"
-					:input-style="{'text-align': 'right'}"
-					:input-class="`text-bold text-${enabled ? 'white' : `${skill.skill.color}-8`}`"
+					:input-style="`{'text-align': 'right'}`"
+					:input-class="`text-bold text-${skill.skill.color}-8`"
 				/>
 				<btn
 					class="q-px-xs"
@@ -57,7 +56,7 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import {defineComponent, ref} from "vue";
 import { Skill, ProjectSkill } from "../../../models/Skill"
 import ProjectRoleChip from './ProjectRoleChip.vue'
@@ -83,7 +82,7 @@ export default defineComponent({
 			get() {
 				return this.skill
 			},
-			set(n) {
+			set(n: Skill) {
 				this.$emit('update:skill', n)
 			}
 		}

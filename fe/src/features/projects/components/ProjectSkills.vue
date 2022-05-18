@@ -131,18 +131,17 @@
       <NewSkillDialog
         v-model="showDialog"
         v-model:skill="editSkill"
-        @submit="editSkill.id > 0 ? updateSkill() : addSkill()"
+        @submit="editSkill!.id > 0 ? updateSkill() : addSkill()"
       />
     </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "@vue/runtime-core";
-import { ref, PropType } from "vue";
+import { ref, Ref, PropType } from "vue";
 import NewSkillDialog from "./subcomponents/NewSkillDialog.vue";
 import { useSkillStore } from "../../../stores/useSkillStore";
 import { Skill, ProjectSkill } from "../../../models/Skill"
-import ProjectRoleChip from "./ProjectRoleChip"
 import CreateProjectChip from "./createprojectchip.vue"
 import LottieAnimation from '../../../components/LottieAnimation.vue'
 
@@ -155,7 +154,7 @@ export default defineComponent ({
     }
   },
   data() {
-    let editSkill: Ref<Skill | null> = ref(null)
+    let editSkill: Ref<Skill | undefined> = ref(undefined)
     
     return {
       skillStore: useSkillStore(),
@@ -171,7 +170,8 @@ export default defineComponent ({
   mounted() {
     // Force q-infinite-scroll to request new data, so old data gets deleted.
     // This is needed because it uses skillStore.skills, which is shared between views.
-    this.$refs.scroll.trigger()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.$refs.scroll as any).trigger()
   },
   methods: {
     addSkillToProject(skill: Skill) {
@@ -182,12 +182,9 @@ export default defineComponent ({
       console.log(i)
       this.skills.splice(i,1)
     },
-    onLoad(index) {
-      console.log(index)
-    },
     
     addSkill() {
-      this.skillStore.addSkill(this.editSkill, (success: boolean) => {
+      this.skillStore.addSkill(this.editSkill!, (success: boolean) => {
         this.$q.notify({
           icon: success ? 'done' : 'close',
           color: success ? 'positive' : 'negative',
@@ -196,7 +193,7 @@ export default defineComponent ({
       })
     },
     updateSkill() {
-      this.skillStore.updateSkill(this.editSkill, () => {
+      this.skillStore.updateSkill(this.editSkill!, () => {
         this.$q.notify({
           icon: 'close',
           color: 'negative',
@@ -210,9 +207,11 @@ export default defineComponent ({
   },
   watch: {
     filters() {
-      this.$refs.scroll.reset()
-      this.$refs.scroll.resume()
-      this.$refs.scroll.trigger()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const scroll = this.$refs.scroll as any;
+      scroll.reset()
+      scroll.resume()
+      scroll.trigger()
     },
     editSkill: {
       handler(newValue: Skill, oldValue: Skill) {

@@ -5,11 +5,10 @@ import {
   TempProjectSuggestion,
   NewProjectSuggestion,
 } from '../models/ProjectSuggestion'
-import { User } from '../models/User'
+import { User, UserInterface } from '../models/User'
 import {
   ProjectSkill,
   ProjectSkillInterface,
-  ProjectTableSkill,
   Skill,
   TempProjectSkill,
 } from '../models/Skill'
@@ -108,7 +107,7 @@ export const useProjectStore = defineStore('project', {
      */
     async getProject(id: number): Promise<Project> {
       console.log('Loading')
-      const project: Project = (await instance.get<Project>(`projects/${id}/`)).data
+      const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
       )
@@ -225,7 +224,7 @@ export const useProjectStore = defineStore('project', {
     }: {
       project_id: string
       reason: string
-      coach: { id: number; firstName: string; lastName: string; url: string }
+      coach: UserInterface
       student: string
       skill: string
     }) {
@@ -302,34 +301,7 @@ export const useProjectStore = defineStore('project', {
           project.suggestedStudents?.splice(suggestionIndex, 1)
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    formatProjectData(skills: any) {
-      const skillsList: Array<TempProjectSkill> = []
 
-      // filter out the used skills
-      for (const skill of skills) {
-        if (skill.amount > 0) {
-          skillsList.push({
-            skill: skill.url,
-            amount: skill.amount,
-            comment: skill.comment,
-          })
-        }
-      }
-
-      const coachList: Array<string> = []
-
-      // add the selected coaches to data object
-      this.selectedCoaches.forEach((coach: User) => coachList.push(coach.url))
-
-      return {
-        name: this.projectName,
-        partnerName: this.projectPartnerName,
-        extraInfo: this.projectLink,
-        requiredSkills: skillsList,
-        coaches: coachList,
-      }
-    },
     async addProject(project: Project) {
       try {
         const mappedProject = {
@@ -372,34 +344,6 @@ export const useProjectStore = defineStore('project', {
         return false
       }
     },
-    submitProject(
-      skills: Array<ProjectTableSkill>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      callback: any
-    ) {
-      const projectData = this.formatProjectData(skills)
-      instance
-        .post('projects/', convertObjectKeysToSnakeCase(projectData))
-        .then(() => {
-          this.loadProjects()
-          callback(true)
-        })
-        .catch(() => {
-          callback(false)
-        })
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async getAndSetProject(id: string, callback: any) {
-      return instance.get('projects/' + id).then((data) => {
-        const project = data.data
-        this.projectName = project.name
-        this.projectPartnerName = project.partnerName
-        this.projectLink = project.extraInfo
-        this.selectedCoaches = project.coaches
-        // skills
-        callback(project.requiredSkills)
-      })
-    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async deleteProject(id: number, callback: any) {
       await instance
@@ -410,14 +354,6 @@ export const useProjectStore = defineStore('project', {
         .catch(() => {
           callback(false)
         })
-    },
-    
-    editProject(project: Project) {
-      this.projectName = project.name
-      this.projectPartnerName = project.partnerName
-      this.projectLink = project.extraInfo
-      this.selectedCoaches = []
-      // skills
     },
   },
 })

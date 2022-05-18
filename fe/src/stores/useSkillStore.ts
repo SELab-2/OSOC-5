@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
 import { instance } from '../utils/axios'
 
-import { ProjectTableSkill, Skill, TempProjectSkill, ProjectSkill } from '../models/Skill'
-import { User } from '../models/User'
+import { Skill } from '../models/Skill'
 
 interface State {
   skills: Array<Skill>
@@ -91,22 +90,6 @@ export const useSkillStore = defineStore('skills', {
           console.log(error)
           callback(false)
         })
-    },
-    async setSkills(projectSkills: TempProjectSkill[]) {
-      // first load all the existing skills back into the store
-      await this.loadSkills()
-      // now go over each of the skills that the project contains and
-      // fill in the amount and comment
-      for (const projectSkill of projectSkills) {
-        for (const skill of this.skills) {
-          if (skill.url === projectSkill.skill) {
-            // this means u found match
-            // console.log("match " + skill.url)
-            skill.amount = projectSkill.amount
-            skill.comment = projectSkill.comment
-          }
-        }
-      }
     },
   },
 })

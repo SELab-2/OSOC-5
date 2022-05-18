@@ -77,7 +77,7 @@ export default defineComponent ({
       get() {
         return this.visible
       },
-      set(n) {
+      set(n: boolean) {
         this.$emit('update:visible', n)
       }
     }

@@ -8,14 +8,14 @@
   justify-content: center;">
     <q-card-section>
       <div class="text-h6">
-        {{ `${_skill.id === -1 ? 'New' : 'Edit'} Skill` }}
+        {{ `${_skill?.id === -1 ? 'New' : 'Edit'} Skill` }}
       </div>
     </q-card-section>
 
     
       <q-input
         style="width: 90%;"
-        v-model="_skill.name"
+        v-model="_skill!.name"
         outlined
         autofocus
         class="inputfield"
@@ -31,15 +31,15 @@
         <q-chip
           v-for="color in quasarColors"
           :key="color"
-          @click="_skill.color = color"
+          @click="_skill!.color = color"
           outline
           clickable
-          :color="`${color}-${_skill.color === color ? 8 : 4}`"
-          :class="`bg-${color}-${_skill.color === color ? 4 : 1}`"
+          :color="`${color}-${_skill?.color === color ? 8 : 4}`"
+          :class="`bg-${color}-${_skill?.color === color ? 4 : 1}`"
           style="border-width: 1.5px;"
         >
         <div 
-          v-if="_skill.color === color" 
+          v-if="_skill?.color === color" 
           class="bg-white" 
           style="width: 8px; height: 8px; border-radius: 30px; position: absolute; margin-left: auto;margin-right: auto;left: 0;right: 0;"
         />
@@ -52,7 +52,7 @@
       class="text-primary"
     >
       <btn
-        v-if="skill.id !== -1"
+        v-if="skill?.id !== -1"
         flat
         color="red"
         label="Delete"
@@ -63,23 +63,23 @@
         flat
         label="Cancel"
         glow-color="#C0FFF4"
-        @click="_skill.name = backup.name; _skill.color = backup.color; _visible = false"
+        @click="_skill!.name = backup!.name; _skill!.color = backup!.color; _visible = false"
       />
       <btn
         v-close-popup
         flat
-        :label="_skill.id === -1 ? 'Add' : 'Update'"
+        :label="_skill?.id === -1 ? 'Add' : 'Update'"
         glow-color="#C0FFF4"
         @click="$emit('submit'); _visible = false"
       />
     </q-card-actions>
   </q-card>
   </q-dialog>
-  <DeleteSkillDialog :deleteSkillId="_skill.id" :deleteSkillName="_skill.name" v-model:visible="showDelete"/>
+  <DeleteSkillDialog :deleteSkillId="_skill?.id ?? -1" :deleteSkillName="_skill?.name ?? ''" v-model:visible="showDelete"/>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from '@vue/runtime-core'
+import { defineComponent, ref, Ref } from '@vue/runtime-core'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import quasarColors from '../../../../models/QuasarColors'
 import { Skill } from "../../../../models/Skill"
@@ -98,9 +98,10 @@ export default defineComponent({
   },
   components: { DeleteSkillDialog },
   data() {
+    const backup: Ref<Skill | null> = ref(null)
     return {
       skillStore: useSkillStore(),
-      backup: null,
+      backup,
       quasarColors,
       showDelete: ref(false)
     }
@@ -118,15 +119,15 @@ export default defineComponent({
         this.$emit('update:skill', new Skill('', -1, '', ''))
         return new Skill('', -1, '', '')
       },
-      set(n) {
+      set(n: Skill) {
         this.$emit('update:skill', n)
       }
     },
     _visible: {
-      get() {
+      get(): boolean {
         return this.modelValue
       },
-      set(n) {
+      set(n: boolean) {
         this.$emit('update:modelValue', n)
       }
     }

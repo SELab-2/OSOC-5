@@ -4,24 +4,16 @@
   <div
 	ref="wall"
 	class="masonry-wall"
-	:style="{ display: 'grid', gap: `${gap}px`,
-  'grid-auto-columns': 'minmax(0, 1fr)',
-  'grid-auto-flow': 'column'
-}"
+  style="display: grid; grid-auto-columns: minmax(0,1fr); grid-auto-flow: column"
+  :style="`gap: ${gap}px`"
   >
 	<div
 	  v-for="(column, columnIndex) in columns"
 	  :key="columnIndex"
 	  class="masonry-column"
 	  :data-index="columnIndex"
-	  :style="{
-		display: 'flex',
-		'flex-basis': 0,
-    'flex-direction': 'column',
-    'flex-grow': 1,
-		height: ['-webkit-max-content', '-moz-max-content', 'max-content'],
-		gap: `${gap}px`,
-	  }"
+    style="display: flex; flex-basis: 0; flex-direction: column; flex-grow: 1; height: max-content;"
+    :style="`gap: ${gap}px`"
 	>
 	  <div v-for="itemIndex in column" :key="itemIndex" class="masonry-item">
 		<slot :item="items[itemIndex]" :index="itemIndex">
@@ -96,7 +88,7 @@ async function fillColumns(itemIndex: number) {
 	return
   }
   await nextTick()
-  const columnDivs = [...wall.value.children] as HTMLDivElement[]
+  const columnDivs = [...wall.value.children as any] as HTMLDivElement[]
   if (rtl.value) {
 	columnDivs.reverse()
   }
@@ -117,7 +109,7 @@ async function redraw(force = false) {
   columns.value = createColumns(columnCount())
   const scrollY = scrollTarget?.value?.scrollTop ?? window.scrollY
   await fillColumns(0);
-  if (scrollTarget) {
+  if (scrollTarget?.value) {
 	  scrollTarget.value.scrollTo({ top: scrollY})
   } else {
 	  window.scrollTo({ top: scrollY })

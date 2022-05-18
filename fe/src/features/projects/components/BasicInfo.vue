@@ -53,7 +53,7 @@ export default defineComponent({
     },
     info: {
       type: String,
-      required: false
+      required: true
     }
   },
   computed: {

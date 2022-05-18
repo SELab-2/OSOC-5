@@ -45,20 +45,20 @@
 			:name="1"
 			title="Coaches"
 			icon="r_group"
-			:done="coachesDone"
-			:caption="`${project?.coaches.length} Coach${project?.coaches.length !== 1 ? 'es' : ''} Selected`"
+			:done="visitedSteps[1]"
+			:caption="`${project?.coaches?.length} Coach${project?.coaches?.length !== 1 ? 'es' : ''} Selected`"
 		>
-			<ProjectCoaches :coaches="project.coaches"/>
+			<ProjectCoaches :coaches="project!.coaches!"/>
 		</q-step>
 
 		<q-step
 			:name="2"
 			title="Skills"
 			icon="r_build"
-			:done="skillsDone"
-			:caption="`${project?.requiredSkills.length} Skill${project?.requiredSkills.length !== 1 ? 's' : ''} Selected`"
+			:done="visitedSteps[2]"
+			:caption="`${project?.requiredSkills?.length} Skill${project?.requiredSkills?.length !== 1 ? 's' : ''} Selected`"
 		>
-			<ProjectSkills :skills="project.requiredSkills"/>
+			<ProjectSkills :skills="project!.requiredSkills!"/>
 		</q-step>
 	</q-stepper>
 	<btn
@@ -83,7 +83,7 @@
 		color="yellow"
 		shadow-color="orange"
 	>
-	<q-tooltip v-if="step === 2 && !allDone" style="width: 300px">
+	<q-tooltip v-if="step === 2 && !basicInfoDone" style="width: 300px">
 		<span class="text-body2">
 		Some data is missing.<br/>Please check if you filled in a name and partner name.
 		</span>
@@ -108,7 +108,7 @@
 			color="yellow"
 			shadow-color="orange"
 		>
-		<q-tooltip v-if="step === 2 && !allDone" style="width: 300px">
+		<q-tooltip v-if="step === 2 && !basicInfoDone" style="width: 300px">
 			<span class="text-body2">
 			Some data is missing.<br/>Please check if you filled in a name and partner name.
 			</span>
@@ -117,8 +117,8 @@
 	<!-- </div> -->
 </template>
 
-<script>
-import { ref, defineComponent } from 'vue'
+<script lang="ts">
+import { ref, Ref, defineComponent } from 'vue'
 import BasicInfo from "./components/BasicInfo.vue";
 import ProjectCoaches from "./components/ProjectCoaches.vue";
 import ProjectSkills from "./components/ProjectSkills.vue";
@@ -126,24 +126,23 @@ import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { Project } from '../../models/Project'
-import Overview from "./components/CreateOverview.vue"
 import router from '../../router'
 import ProjectCard from "./components/ProjectCard.vue"
 
 export default defineComponent({
 	name: 'CreateProject',
-	components: { BasicInfo, ProjectCoaches, ProjectSkills, Overview, ProjectCard },
+	components: { BasicInfo, ProjectCoaches, ProjectSkills, ProjectCard },
 	props: {
 		id: {
-			type: String,
+			type: Number,
 			required: false
 		}
 	},
 	data() {
-    let timeout;
+    let timeout: any | null = null
 
 		const projectStore = useProjectStore();
-		const project = ref(null);
+		const project: Ref<Project | null> = ref(null);
 		return {
 			step: ref(0),
 			visitedSteps: ref([false, false, false, false]),
@@ -158,17 +157,18 @@ export default defineComponent({
 		}
 	},
 	async created() {
-		let project;
+		let project: Project;
 		if (this.id) {
 			try {
 				project = await this.projectStore.getProject(this.id)
 			} catch (error) {
 				router.replace('/notfound')
+        return
 			}
 		} else {
 			project = new Project('','','',0,[],[],[])
 		}
-		return this.project = project
+		this.project = project
 	},
 	mounted(){
 		this.skillStore.loadSkills()
@@ -184,14 +184,14 @@ export default defineComponent({
 		},
 		async submit() {
 			if (this.id) {
-				await this.projectStore.updateProject(this.project, this.project.id)
+				await this.projectStore.updateProject(this.project!, this.project!.id)
 			} else {
-				await this.projectStore.addProject(this.project)
+				await this.projectStore.addProject(this.project!)
 			}
 			this.projectStore.shouldRefresh = true
 			router.replace('/projects')
 		},
-    onResize(e) {
+    onResize(e: {width: number}) {
       this.width = e.width
     },
     disable() {
@@ -209,14 +209,15 @@ export default defineComponent({
 		}
 	},
 	computed: {
-		basicInfoDone() {
-			return this.project?.name.length > 0 && this.project?.partnerName.length > 0 && this.project?.extraInfo.length > 0
+		basicInfoDone(): boolean {
+      if (!this.project) return false
+			return this.project.name.length > 0 && this.project.partnerName.length > 0
 		},
 		showInfo: {
-			get() {
+			get(): boolean {
 				return this.step === 0
 			},
-			set(n) {
+			set(n: boolean) {
 				this.step = 0
 			}
 		},
@@ -224,10 +225,10 @@ export default defineComponent({
       return this.width > 1200 || this.step === 0
     },
     _splitterModel: {
-      get() {
+      get(): number {
         return this.showPreview ? (this.step === 0 ? 50 : this.splitterModel) : 100
       },
-      set(n) {
+      set(n: number) {
         if (n > 80) return
         this.splitterModel = n
       }

@@ -1,14 +1,14 @@
 <template>
 	<div>
-		<markdown :source="this.text" :tasklists="{enabled: true}" ref="md" breaks v-bind="$attrs"/>
+		<markdown :source="text" :tasklists="{enabled: true}" ref="md" breaks v-bind="$attrs"/>
 	</div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Markdown from 'vue3-markdown-it'
-
-let checkboxes = [];
+// const Markdown = require('vue3-markdown-it')
+let checkboxes: HTMLElement[] = [];
 
 export default defineComponent({
 	props: {
@@ -19,7 +19,7 @@ export default defineComponent({
 	},
 	components: { Markdown },
 	destroyed() {
-		checkboxes.forEach(c => c.removeEventListener('click', this.onClick))
+		checkboxes.forEach(c => c.removeEventListener('click', this.onClick as any))
 	},
 	methods: {
 		onClick(i: number) {
@@ -38,8 +38,9 @@ export default defineComponent({
 		text: {
 			handler() {
 				this.$nextTick(() => {
-					checkboxes.forEach(c => c.removeEventListener('click', this.onClick))
-					checkboxes = this.$refs.md.$el.querySelectorAll(".task-list-item-checkbox")
+					checkboxes.forEach(c => c.removeEventListener('click', this.onClick as any))
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					checkboxes = (this.$refs.md as any).$el.querySelectorAll(".task-list-item-checkbox")
 					checkboxes.forEach((c, i) => {
 						c.addEventListener('click', () => this.onClick(i))
 				})

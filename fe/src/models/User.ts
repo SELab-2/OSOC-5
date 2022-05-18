@@ -13,11 +13,11 @@ export interface UserInterface {
   hasProjects?: Array<Project>
   suggestions?: Array<Suggestion>
   isActive?: boolean
-  project: {
+  projects: {
     id: number,
     url: String,
     name: string
-  }
+  }[]
 }
 
 export class User implements UserInterface {
@@ -31,11 +31,11 @@ export class User implements UserInterface {
   hasProjects?: Project[]
   suggestions?: Suggestion[]
   isActive?: boolean
-  project: {
+  projects: {
     id: number,
     url: String,
     name: string
-  }
+  }[]
   
   constructor(data: UserInterface) {
     Object.assign(this, data)

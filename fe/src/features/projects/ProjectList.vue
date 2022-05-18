@@ -134,10 +134,10 @@
           :ssr-columns="1"
           :column-width="320"
           :gap="0"
-          :scrollTarget="$refs.scroll"
+          :scrollTarget="$refs.scroll as any"
         >
           <template #default="{ item }">
-            <project-card editable :project="item" />
+            <project-card editable :project="item as any" />
           </template>
         </masonry-wall>
         <template v-slot:loading>
@@ -211,15 +211,16 @@ export default defineComponent({
       get(): boolean {
         if (this.projects.length === 0 || this.projects.some(p => !p.requiredSkills)) return false
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (this as any).projects.filter(p => p.requiredSkills?.length > 0).every(
+        return (this as any).projects.filter((p: any) => p.requiredSkills?.length > 0).every(
           (p: { selectedRoles: any }) =>
             Object.values(p.selectedRoles ?? { k: false }).every((r) => r)
         )
       },
       set(newValue: boolean) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.projects.forEach(p => {
-          for (let r in p.selectedRoles) {
-            p.selectedRoles[r] = newValue
+          for (let r in (p as any).selectedRoles) {
+            (p as any).selectedRoles[r] = newValue
           }
         })
       },
