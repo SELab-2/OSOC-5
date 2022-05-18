@@ -41,9 +41,10 @@
         <q-tooltip
           v-if="skill.comment"
           :class="`bg-${skill.skill.color}-2`"
-          class="text-black shadow-2"
+          class="text-black text-body2 shadow-2"
           anchor="bottom middle"
           self="center middle"
+          style="width: 400px; overflow-wrap: break-word"
         >
           {{ skill.comment }}
         </q-tooltip>

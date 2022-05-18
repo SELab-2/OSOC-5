@@ -60,7 +60,8 @@
       </q-card-section>
       <q-tooltip
         v-if="mustHover"
-        class="bg-grey-1 shadow-5 cornered"
+        class="shadow-5 cornered"
+        :class="$q.dark.isActive ? 'bg-dark2' : 'bg-grey-1'"
         max-width="300px"
         anchor="top middle"
         self="bottom middle"
