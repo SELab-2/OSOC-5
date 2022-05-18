@@ -10,7 +10,7 @@ import CreateProjects from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
 import MailList from '../features/mails/MailList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
-import {useStudentStore} from "../stores/useStudentStore";
+import AdvancedPage from '../components/AdvancedPage.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -85,6 +85,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: MailList,
+      },
+      {
+        path: '/advanced',
+        name: 'Advanced',
+        meta: {
+          requiresAuth: true,
+        },
+        component: AdvancedPage,
       },
     ],
   },

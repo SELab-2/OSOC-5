@@ -61,6 +61,28 @@
         <q-list separator>
           <q-item
             v-close-popup
+            v-ripple
+            clickable
+            tabindex="0"
+            :to="`/advanced`"
+          >
+            <q-item-section avatar>
+              <q-icon
+                size="xs"
+                name="priority_high"
+                color="negative"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label :lines="1">
+                Advanced Options
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            v-close-popup
+            v-ripple
             clickable
             tabindex="0"
             @click="on_dropdown_click()"
@@ -81,6 +103,7 @@
 
           <q-item
             v-close-popup
+            v-ripple
             clickable
             tabindex="0"
             @click="authenticationStore.logout()"
