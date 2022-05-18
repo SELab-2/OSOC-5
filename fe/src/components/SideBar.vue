@@ -89,7 +89,6 @@
                   bg-color="white"
                   :options="skillStore.skills"
                   :option-label="opt => opt.name"
-                  :option-value="opt => opt.id"
                   label="Skills"
                   emit-value
                 >
@@ -100,11 +99,11 @@
                     >
                       <StudentSkillChip
                         v-for="skill of skills"
-                        :key="(skill as any).id"
-                        :color="(skill as any).color"
-                        :name="(skill as any).name"
+                        :key="(skill as {id: number}).id"
+                        :color="(skill as {color: string}).color"
+                        :name="(skill as {name: string}).name"
                         best-skill=""
-                      />
+                      /> 
                     </div>
                   </template>
                 </q-select>
@@ -290,7 +289,7 @@ export default defineComponent({
         suggested_by_user: this.byMe,
         on_project: this.onProject,
         status: this.status,
-        skills: this.skills
+        skills: this.skills && this.skills.length ? this.skills.map(({id}) => id) : []
       }
     },
     options(): Array<{ name: string, label: string, amount: number }> {

@@ -73,7 +73,9 @@
           shadow-strength="2"
           no-wrap
         >
-          <div class="ellipsis">Conflicts</div>
+          <div class="ellipsis">
+            Conflicts
+          </div>
         </btn>
       </q-toolbar>
 
@@ -82,40 +84,67 @@
           <q-card-section>
             <span class="text-h5 text-bold">Filters</span><br>
             <div class="row">
-              <div class="column">
-                <!-- <q-checkbox label="My project" /> -->
-                <!-- <q-checkbox label="Students needed" /> -->
+              <!-- <q-checkbox label="My project" /> -->
+              <!-- <q-checkbox label="Students needed" /> -->
+              
+              <div class="col-6">
+                <q-select
+                  v-model="skillFilter"
+                  clearable
+                  rounded
+                  outlined
+                  dense
+                  multiple
+                  color="primary"
+                  bg-color="white"
+                  :options="skillStore.skills"
+                  :option-label="opt => opt.name"
+                  label="Skills"
+                  emit-value
+                >
+                  <template #selected>
+                    <div
+                      class="full-width"
+                      style="max-height: 15vh; overflow-y: auto"
+                    >
+                      <StudentSkillChip
+                        v-for="skill of skillFilter"
+                        :key="(skill as {id: number}).id"
+                        :color="(skill as {color: string}).color"
+                        :name="(skill as {name: string}).name"
+                        best-skill=""
+                      />
+                    </div>
+                  </template>
+                </q-select>
               </div>
-              <q-select
-                v-model="skillFilter"
-                clearable
-                rounded
-                outlined
-                dense
-                multiple
-                color="primary"
-                bg-color="white"
-                :options="skillStore.skills"
-                :option-label="opt => opt.name"
-                :option-value="opt => opt.id"
-                label="Skills"
-                emit-value
+              <div class="col-1" />
+              <div
+                class="column"
               >
-                <template #selected>
-                  <div
-                    class="full-width"
-                    style="max-height: 15vh; overflow-y: auto"
-                  >
-                    <StudentSkillChip
-                      v-for="skill of skillFilter"
-                      :key="(skill as any).id"
-                      :color="(skill as any).color"
-                      :name="(skill as any).name"
-                      best-skill=""
-                    />
-                  </div>
-                </template>
-              </q-select>
+                <div class="col">
+                  <q-checkbox 
+                    v-model="onlyNotFull"
+                    rounded
+                    outlined
+                    dense
+                    color="primary"
+                    bg-color="white"
+                    label="Only show non-full projects"
+                  />
+                </div>
+                <div class="col">
+                  <q-checkbox 
+                    v-model="onlyFull"
+                    rounded
+                    outlined
+                    dense
+                    color="primary"
+                    bg-color="white"
+                    label="Only show full projects"
+                  />
+                </div>
+              </div>
             </div>
           </q-card-section>
         </div>
@@ -139,10 +168,13 @@
           :ssr-columns="1"
           :column-width="320"
           :gap="0"
-          :scrollTarget="$refs.scroll as any"
+          :scroll-target="$refs.scroll as any"
         >
           <template #default="{ item }">
-            <project-card editable :project="item as any" />
+            <project-card
+              editable
+              :project="item as any"
+            />
           </template>
         </masonry-wall>
         <template #loading>
@@ -179,14 +211,14 @@ import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from '../../stores/useStudentStore'
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
-
+import StudentSkillChip from "../students/components/StudentSkillChip.vue"
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
 import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
   name: 'ProjectList',
-  components: { ProjectCard, MasonryWall },
+  components: { ProjectCard, MasonryWall, StudentSkillChip },
   setup() {
     const { loadNext } = useProjectStore()
     
@@ -203,15 +235,28 @@ export default defineComponent({
       showShadow: ref(false),
       showFilters: ref(false),
       projectNameFilter: ref(''),
-      skillFilter: ref([])
+      skillFilter: ref([]),
+      onlyNotFull: false,
+      onlyFull: false
     }
   },
   computed: {
     filters(): Object {
-      return {
+      const filters =  {
         search: this.projectNameFilter,
-        required_skills: this.skillFilter
-      }
+      } as { search: string; required_skills: never[]; full?: string }
+
+      if(this.skillFilter && this.skillFilter.length)
+        filters.required_skills = this.skillFilter.map(({id}) => id)
+      else
+        filters.required_skills = []
+
+      if(this.onlyNotFull)
+        filters.full = "false"
+      else if(this.onlyFull)
+        filters.full = "true"
+
+      return filters
     },
     expanded: {
       get(): boolean {
@@ -231,7 +276,7 @@ export default defineComponent({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.projects.forEach((p) => {
           for (let r in (p as any).selectedRoles) {
-            ;(p as any).selectedRoles[r] = newValue
+            (p as any).selectedRoles[r] = newValue
           }
         })
       },
@@ -247,6 +292,16 @@ export default defineComponent({
         infscroll.trigger()
       },
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onlyFull(newValue, _oldValue) {
+      if(newValue == true) 
+        this.onlyNotFull = false
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onlyNotFull(newValue, _oldValue) {
+      if(newValue == true) 
+        this.onlyFull = false
+    }
   },
   activated() {
     // Check if the projects list has been altered in another view.
