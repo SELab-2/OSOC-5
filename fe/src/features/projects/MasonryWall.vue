@@ -1,3 +1,5 @@
+<!-- Source: https://github.com/DerYeger/vue-masonry-wall -->
+<!-- A modified version of this package is used to fix bugs we had in our implementation. -->
 <template>
   <div
 	ref="wall"

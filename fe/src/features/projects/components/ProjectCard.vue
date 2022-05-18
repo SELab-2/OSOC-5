@@ -34,18 +34,18 @@
             size="12px"
             glow-color="teal-3"
             shadow-color="teal"
-            :shadow-strength="showInfo ? 2 : 5"
-            :color="showInfo ? 'teal' : 'white'"
-            :class="`text-${showInfo ? 'white' : 'teal'}`"
+            :shadow-strength="_showInfo ? 2 : 5"
+            :color="_showInfo ? 'teal' : 'white'"
+            :class="`text-${_showInfo ? 'white' : 'teal'}`"
             icon="info"
-            @click="showInfo = !showInfo"
+            @click="_showInfo = !_showInfo"
           />
         </div>
       </div>
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="showInfo" style="" >
+        <div v-if="_showInfo" style="" >
           <div class="text-h6">Info</div>
           <markdown-viewer style="overflow: hidden; overflow-wrap: break-word;" v-model:text="project.extraInfo"></markdown-viewer>
           <q-separator inset spaced="10px" />
@@ -165,6 +165,11 @@ export default defineComponent({
     editable: {
       type: Boolean,
       required: false,
+    },
+    expandedInfo: {
+      type: Boolean,
+      required: false,
+      default: undefined
     }
   },
   components: { ProjectRoleChip, ProjectCardSuggestion, MarkdownViewer },
@@ -376,6 +381,19 @@ export default defineComponent({
         return obj
       }, {})
     },
+    _showInfo: {
+      get(): boolean {
+        return this.expandedInfo ?? this.showInfo
+      },
+      set(n: boolean) {
+        console.log(this.expandedInfo)
+        if (this.expandedInfo !== undefined) {
+          this.$emit('update:expandedInfo', n)
+        } else {
+          this.showInfo = n
+        }
+      }
+    }
   },
 })
 </script>

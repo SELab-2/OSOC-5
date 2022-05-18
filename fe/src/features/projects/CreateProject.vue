@@ -88,7 +88,7 @@
 	<template #after>
 		<div v-if="project" class="column fit justify-center items-center content-center">
 			<div class="text-h6 text-bold">Preview</div>
-			<project-card style="width: 90%; max-width: 400px" :project="project"/>
+			<project-card style="width: 90%; max-width: 400px" v-model:expandedInfo="showInfo" :project="project"/>
 		</div>
 	</template>
 	</q-splitter>
@@ -191,6 +191,14 @@ export default defineComponent({
 		basicInfoDone() {
 			return this.project?.name.length > 0 && this.project?.partnerName.length > 0 && this.project?.extraInfo.length > 0
 		},
+		showInfo: {
+			get() {
+				return this.step === 0
+			},
+			set(n) {
+				this.step = 0
+			}
+		}
 	}
 })
 </script>
