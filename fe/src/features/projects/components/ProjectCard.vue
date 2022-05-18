@@ -7,7 +7,10 @@
   >
     <q-card-section>
       <div class="row no-wrap">
-        <h5 class="text-bold q-mt-none q-mb-none" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis">
+        <h5
+          class="text-bold q-mt-none q-mb-none"
+          style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+        >
           {{ project.name }}
         </h5>
         <q-spinner
@@ -67,7 +70,10 @@
             project.suggestedStudents
           "
         >
-          <div v-if="project.coaches && project.coaches.length > 0" class="text-caption text-grey">
+          <div
+            v-if="project.coaches && project.coaches.length > 0"
+            class="text-caption text-grey"
+          >
             Coaches:
           </div>
           <div v-else>There are no coaches assigned to this project.</div>
@@ -117,7 +123,9 @@
               :modelValue="
                 selectedRoles[skill.skill.id] || hovered === skill.skill.id
               "
-              @update:modelValue="editable ? selectedRoles[skill.skill.id] = $event : ''"
+              @update:modelValue="
+                editable ? (selectedRoles[skill.skill.id] = $event) : ''
+              "
               v-for="skill in project.requiredSkills"
               @dragleave="editable ? onDragLeave($event, skill) : false"
               @dragover="editable ? checkDrag($event, skill) : false"
@@ -301,43 +309,47 @@ export default defineComponent({
     async onDrop(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
       this.hovered = -1
-      this.selectedRoles[skill.skill.id] = true
       const target = <HTMLDivElement>e.target
       // don't drop on other draggables
       if (target.draggable === true) {
         return
       }
-      // TODO: additional checks that datatransfer is valid and not null
-      const data: { targetId: string; student: Student } = JSON.parse(
-        e.dataTransfer!.getData(e.dataTransfer!.types[0])
-      )
-
-      // Add a student to the project.
-      let coach = this.authenticationStore.loggedInUser as User
-      if (!coach) {
-        this.q.notify({
-          icon: 'warning',
-          color: 'warning',
-          message: 'You are not logged in.',
-          textColor: 'black',
-        })
-        return
-      }
-      this.project.suggestedStudents?.push(
-        new NewProjectSuggestion(
-          {
-            coach: this.me,
-            reason: '',
-            skill: skill.skill,
-            student: data.student,
-          },
-          false
+      
+      // Try to parse the datatransfer.
+      try {
+        const data: { targetId: string; student: Student } = JSON.parse(
+          e.dataTransfer!.getData(e.dataTransfer!.types[0])
         )
-      )
+        this.selectedRoles[skill.skill.id] = true
+        // Add a student to the project.
+        let coach = this.authenticationStore.loggedInUser as User
+        if (!coach) {
+          this.q.notify({
+            icon: 'warning',
+            color: 'warning',
+            message: 'You are not logged in.',
+            textColor: 'black',
+          })
+          return
+        }
+        this.project.suggestedStudents?.push(
+          new NewProjectSuggestion(
+            {
+              coach: this.me,
+              reason: '',
+              skill: skill.skill,
+              student: data.student,
+            },
+            false
+          )
+        )
 
-      // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
-      if (!this.expanded) {
-        // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
+        // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
+        if (!this.expanded) {
+          // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
+        }
+      } catch (error) {
+        return
       }
     },
 
