@@ -363,9 +363,8 @@ export const useProjectStore = defineStore('project', {
           coaches: project.coaches?.map(c => c.url),					
         }
         await instance.post('projects/', convertObjectKeysToSnakeCase(mappedProject))
-        return true
       } catch (error) {
-        return false
+        return error
       }
     },
     async updateProject(project: Project, id: number) {
@@ -384,21 +383,16 @@ export const useProjectStore = defineStore('project', {
           coaches: project.coaches?.map(c => c.url),					
         }
         await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(mappedProject))
-        return true
       } catch (error) {
-        return false
+        return error
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async deleteProject(id: number, callback: any) {
-      await instance
-        .delete(`projects/${id}/`)
-        .then(() => {
-          callback(true)
-        })
-        .catch(() => {
-          callback(false)
-        })
+    async deleteProject(id: number) {
+      try {
+        await instance.delete(`projects/${id}/`)
+      } catch (e: any) {
+        return e
+      }
     },
   },
 })

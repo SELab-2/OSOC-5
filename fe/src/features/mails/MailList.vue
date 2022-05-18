@@ -60,7 +60,7 @@
             <btn
               padding="7px"
               color="yellow"
-              shadow-color="amber"
+              shadow-color="orange"
               shadow-strength=2
               no-wrap
               @click="updateStatusStudents"
@@ -147,7 +147,7 @@
             </q-td>
             <q-td style="align-content: flex-end">
               <btn
-                dense color="yellow" flat icon="forward_to_inbox" @click="reset"
+                dense color="yellow" glow-size="250px" flat icon="forward_to_inbox" @click="reset"
               >
                 <q-menu>
                   <q-list>
@@ -188,7 +188,7 @@
                           type="textarea"
                         />
 
-                        <btn color="yellow" shadow-color="yellow" @click="() => sendMail(props.row)" v-close-popup>
+                        <btn color="yellow" shadow-color="orange" @click="() => sendMail(props.row)" v-close-popup>
                           Send
                         </btn>
                       </div>
