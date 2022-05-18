@@ -49,7 +49,7 @@
           <q-space />
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser :created="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)" />
+              <AddUser :created="async () =>{ newUserDialog = false; await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count); }" />
             </q-card>
           </q-dialog>
           <q-input
@@ -304,7 +304,7 @@ export default defineComponent({
     // The method filter to the elements which pass both filters.
     useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: unknown, arg1: unknown) => string) {
       const lowerTerms = this.filter?.toLowerCase() ?? ''
-      
+
       return rows.filter((row: unknown) =>
         (terms == 'all' || cellValue(cols[1], row) == terms) &&
         cols.some((col: unknown) => {
@@ -331,7 +331,7 @@ export default defineComponent({
           this.coachStore.users.find((u: User) => u.id === user.id)!.role = oldRole
         })
       })
-      
+
     }
   },
 })

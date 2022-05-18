@@ -59,7 +59,7 @@
         type="email"
         lazy-rules
         :rules="[
-          (val) => (val && val.length > 0) || 'This field cannot be empty',
+          (val) => (val && val.length > 0) || 'This field cannot be empty', isValidEmail,
         ]"
       />
       <div :class="generate ? 'q-pb-xl' : ''">
@@ -70,10 +70,8 @@
           class="inputfield"
           clearable
           clear-icon="close"
-          lazy-rules
           :rules="[
-            (val) => (val && val.length > 0) || 'This field cannot be empty',
-            (val) => (val.length >= 8) || 'Passwords must be longer then 7 characters',
+            (val) => (val && val.length >= 8) || 'Passwords must be longer then 7 characters',
           ]"
           @update:model-value="generate = false"
         >
@@ -108,7 +106,6 @@
     />
     <btn
       v-model="password"
-      v-close-popup
       flat
       :label="'Create ' + role"
       color="yellow"
@@ -170,6 +167,7 @@ export default defineComponent({
           is_active: this.role ? this.role != 'inactive' : true,
           is_admin: this.role ? this.role == 'admin' : false
       }).then(() => {
+        // run the 'callback'
         this.created()
 
         this.q.notify({
@@ -181,8 +179,8 @@ export default defineComponent({
       catch((error) => {
         this.q.notify({
         icon: 'warning',
-        color: 'warning',
-        message: `Error ${error} while creating user, please try again`,
+        color: 'negative',
+        message: `Error ${error.response.data.non_field_errors}`,
         textColor: 'black'
       });
       })
@@ -194,11 +192,15 @@ export default defineComponent({
     onGeneratePasswordToggle() {
       let result = ''
       const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-      for ( var i = 0; i < 12; i++ ) {
+      for (let i = 0; i < 12; i++ ) {
         result += characterSet.charAt(Math.floor(Math.random() * characterSet.length));
       }
       this.password = result
       this.generate = true
+    },
+    isValidEmail (val: string) {
+      const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
+      return emailPattern.test(val) || 'Invalid email';
     }
   }
 })
@@ -224,9 +226,7 @@ export default defineComponent({
 
 .warning {
   color: red;
-  margin: 10px;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin: 10px 20px;
 }
 
 .hint {
@@ -240,4 +240,7 @@ export default defineComponent({
   thead
     /* bg color is important for th; just specify one */
     background-color: $yellow-7
+
+.q-field__bottom
+  margin-bottom: 3px
 </style>
