@@ -76,6 +76,7 @@
         table-header-style="user-table"
         :rows="coachStore.users"
         :columns="userColumns"
+        :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
         row-key="id"
         separator="horizontal"
         :loading="coachStore.isLoading"
@@ -131,7 +132,9 @@
             <q-td
               key="assignedto"
             >
-              {{ props.row.assignedto }}
+            <q-scroll-area :thumb-style="thumbStyle" style="height: 20px; width: 250px;">
+              {{ props.row.projects.map((p: {name: string}) => p.name).join(', ') }}
+            </q-scroll-area>
             </q-td>
             <q-td
               key="email"
@@ -140,7 +143,6 @@
             </q-td>
             <q-td
               key="remove"
-              style="width: 10px"
             >
               <btn
                 v-if="authenticationStore.loggedInUser?.email !== props.row.email"
@@ -183,22 +185,6 @@ import userColumns from "../../models/UserColumns";
 import {useAuthenticationStore} from "../../stores/useAuthenticationStore";
 import router from "../../router";
 import roles from "../../models/UserRoles";
-const wrapCsvValue = (val: string, formatFn?: ((arg0: unknown) => unknown)|undefined) => {
-  let formatted = formatFn !== void 0 ? (formatFn(val) as string) : val
-
-  formatted =
-    formatted === void 0 || formatted === null ? '' : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-  /**
-   * Excel accepts \n and \r in strings, but some other CSV parsers do not
-   * Uncomment the next two lines to escape new lines
-   */
-  // .split('\n').join('\\n')
-  // .split('\r').join('\\r')
-
-  return `"${formatted}"`
-}
 
 export default defineComponent({
   components: {AddUser, SegmentedControl, DeleteDialog },
@@ -230,6 +216,11 @@ export default defineComponent({
     })
 
     return {
+      thumbStyle: {
+        borderRadius: '7px',
+        backgroundColor: 'black',
+        height: '4px'
+      },
       pagination,
       deleteDialog: ref(false),
       userId: ref(-1),

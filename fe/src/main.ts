@@ -16,7 +16,6 @@ import Vue3Lottie from 'vue3-lottie'
 
 import 'vue3-lottie/dist/style.css'
 
-import MasonryWall from '@yeger/vue-masonry-wall'
 import OsocButton from './components/OsocButton.vue'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
@@ -30,7 +29,6 @@ createApp(App)
     .component('btn', OsocButton)
     .use(pinia)
     .use(router)
-    .use(MasonryWall)
     .use(Vue3Lottie)
     .use(Quasar,
         {

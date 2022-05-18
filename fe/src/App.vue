@@ -11,7 +11,7 @@ import { useQuasar } from 'quasar'
 import { Dark } from 'quasar'
 
 (useQuasar().notify as any).setDefaults({
-  position: 'bottom-middle',
+  position: 'bottom',
   actions: [{ icon: 'close', color: 'white' }]
 })
 

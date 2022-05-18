@@ -1,6 +1,12 @@
 <template>
-  <q-card class="my-card shadow-4 q-ma-sm" flat bordered :dark="$q.dark.isActive">
-    <q-card-section class="column">
+  <q-card
+    class="my-card shadow-4 q-ma-sm"
+    flat
+    bordered
+    :dark="$q.dark.isActive"
+    style="border-radius: 10px !important"
+  >
+    <q-card-section>
       <div class="row">
         <h5 class="text-bold q-mt-none q-mb-none">
           {{ project.name }}
@@ -20,6 +26,7 @@
         <q-space />
         <div>
           <btn
+            v-if="editable"
             flat
             round
             size="12px"
@@ -33,23 +40,23 @@
             size="12px"
             glow-color="teal-3"
             shadow-color="teal"
-            :shadow-strength="showInfo ? 2 : 5"
-            :color="showInfo ? 'teal' : 'transparent'"
-            :class="`text-${showInfo ? 'white' : 'teal'}`"
+            :shadow-strength="_showInfo ? 2 : 5"
+            :color="_showInfo ? 'teal' : 'transparent'"
+            :class="`text-${_showInfo ? 'white' : 'teal'}`"
             icon="info"
-            @click="showInfo = !showInfo"
+            @click="_showInfo = !_showInfo"
           />
         </div>
       </div>
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="showInfo">
-          <btn icon="r_link"/>
+        <div v-if="_showInfo" style="">
           <div class="text-h6">Info</div>
-          <div class="text-body2">
-            {{ project.extraInfo }}
-          </div>
+          <markdown-viewer
+            style="overflow: hidden; overflow-wrap: break-word"
+            v-model:text="project.extraInfo"
+          ></markdown-viewer>
           <q-separator inset spaced="10px" />
         </div>
       </q-slide-transition>
@@ -61,7 +68,10 @@
             project.suggestedStudents
           "
         >
-          <div class="text-caption text-grey">Coaches:</div>
+          <div v-if="project.coaches && project.coaches.length > 0" class="text-caption text-grey">
+            Coaches:
+          </div>
+          <div v-else>There are no coaches assigned to this project.</div>
           <q-chip
             v-for="coach in project.coaches ?? []"
             :key="coach.id"
@@ -81,7 +91,13 @@
               class="row flex-center"
             >
               <div class="text-caption text-grey">Skills:</div>
-              <btn flat round size="sm" @click="expanded = !expanded">
+              <btn
+                flat
+                v-if="editable"
+                round
+                size="sm"
+                @click="expanded = !expanded"
+              >
                 <q-icon
                   size="2em"
                   name="expand_more"
@@ -109,20 +125,24 @@
               @drop="onDrop($event, skill)"
               :key="skill.skill.id"
               :skill="skill"
-              :occupied="groupedStudents[skill.skill.id]?.length"
+              :occupied="
+                groupedStudents[skill.skill.id]?.length ??
+                (editable ? 0 : undefined)
+              "
             />
           </div>
         </div>
       </q-slide-transition>
 
-      <div class="column" v-for="(role, index) in project.requiredSkills ?? []" :key="index">
+      <div
+        class="column"
+        v-for="(role, index) in project.requiredSkills ?? []"
+        :key="index"
+      >
         <q-slide-transition
           v-show="selectedRoles[role.skill.id] || hovered === role.skill.id"
         >
-          <div
-            class="text-bold"
-            :class="'text-' + role.skill.color + '-8'"
-          >
+          <div class="text-bold" :class="'text-' + role.skill.color + '-8'">
             {{ role.skill.name }}
           </div>
         </q-slide-transition>
@@ -157,15 +177,24 @@ import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-
+import MarkdownViewer from './MarkdownViewer.vue'
 export default defineComponent({
   props: {
     project: {
       type: Project,
       required: true,
     },
+    editable: {
+      type: Boolean,
+      required: false,
+    },
+    expandedInfo: {
+      type: Boolean,
+      required: false,
+      default: undefined,
+    },
   },
-  components: { ProjectRoleChip, ProjectCardSuggestion },
+  components: { ProjectRoleChip, ProjectCardSuggestion, MarkdownViewer },
   setup() {
     return {
       authenticationStore: useAuthenticationStore(),
@@ -176,7 +205,7 @@ export default defineComponent({
   data() {
     return {
       hovered: ref(-1),
-      showInfo: ref(false),
+      showInfo: ref(!this.editable ?? false),
     }
   },
 
@@ -191,6 +220,11 @@ export default defineComponent({
                 (obj: any, skill) => ((obj[skill.skill.id] = false), obj),
                 {}
               )
+      },
+    },
+    'project.extraInfo': {
+      handler() {
+        this.projectStore.updateProject(this.project, this.project.id)
       },
     },
   },
@@ -369,6 +403,19 @@ export default defineComponent({
         return obj
       }, {})
     },
+    _showInfo: {
+      get(): boolean {
+        return this.expandedInfo ?? this.showInfo
+      },
+      set(n: boolean) {
+        console.log(this.expandedInfo)
+        if (this.expandedInfo !== undefined) {
+          this.$emit('update:expandedInfo', n)
+        } else {
+          this.showInfo = n
+        }
+      },
+    },
   },
 })
 </script>
@@ -376,5 +423,14 @@ export default defineComponent({
 <style>
 .rotate180 {
   transform: rotate(180deg) !important;
+}
+
+.container {
+  display: inline-block;
+  background-color: red;
+  width: max-content;
+}
+.second {
+  max-width: fit-content;
 }
 </style>

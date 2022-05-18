@@ -53,6 +53,15 @@ export const useCoachStore = defineStore('user/coach', {
       this.users = results.map((user) => new User(user))
       this.isLoading = false
     },
+    
+    async loadNext(index: number, done: Function, filters: Object): Promise<Array<User>> {
+      
+      const { results, next } = (await instance.get<{ results: User[], next: string }>(`coaches/?page=${index}`, { params: filters })).data
+      
+      done(next === null)
+      return results.map(u => new User(u))
+    },
+    
     async loadUsersCoaches(filters: Object, setNumberOfRows: Function) {
       this.isLoading = true
 
