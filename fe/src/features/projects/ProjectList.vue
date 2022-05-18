@@ -2,7 +2,7 @@
   <div style="overflow: hidden" class="fit column">
     <div
       :class="`${showShadow ? 'shadow-2' : ''}`"
-      style="z-index: 1; transition: box-shadow ease 500ms;"
+      style="z-index: 1; transition: box-shadow ease 500ms"
     >
       <q-toolbar
         style="overflow: visible; padding: 8px"
@@ -65,9 +65,7 @@
           shadow-strength="2"
           no-wrap
         >
-          <div class="ellipsis">
-            Conflicts
-          </div>
+          <div class="ellipsis">Conflicts</div>
         </btn>
       </q-toolbar>
 
@@ -181,8 +179,9 @@ export default defineComponent({
       process.env.NODE_ENV == 'development'
         ? 'ws://localhost:8000/ws/socket_server/'
         : 'wss://sel2-5.ugent.be/ws/socket_server/'
-        
-    const { loadNext, receiveSuggestion, removeReceivedSuggestion} = useProjectStore()
+
+    const { loadNext, receiveSuggestion, removeReceivedSuggestion } =
+      useProjectStore()
     return {
       ...storeToRefs(useProjectStore()),
       loadNext,
@@ -209,18 +208,23 @@ export default defineComponent({
     },
     expanded: {
       get(): boolean {
-        if (this.projects.length === 0 || this.projects.some(p => !p.requiredSkills)) return false
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (this as any).projects.filter((p: any) => p.requiredSkills?.length > 0).every(
-          (p: { selectedRoles: any }) =>
-            Object.values(p.selectedRoles ?? { k: false }).every((r) => r)
+        if (
+          this.projects.length === 0 ||
+          this.projects.some((p) => !p.requiredSkills)
         )
+          return false
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (this as any).projects
+          .filter((p: any) => p.requiredSkills?.length > 0)
+          .every((p: { selectedRoles: any }) =>
+            Object.values(p.selectedRoles ?? { k: false }).every((r) => r)
+          )
       },
       set(newValue: boolean) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.projects.forEach(p => {
+        this.projects.forEach((p) => {
           for (let r in (p as any).selectedRoles) {
-            (p as any).selectedRoles[r] = newValue
+            ;(p as any).selectedRoles[r] = newValue
           }
         })
       },
@@ -230,7 +234,7 @@ export default defineComponent({
     projectNameFilter: {
       handler() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const infscroll = this.$refs.infinite as any;
+        const infscroll = this.$refs.infinite as any
         infscroll.reset()
         infscroll.resume()
         infscroll.trigger()
@@ -238,18 +242,17 @@ export default defineComponent({
     },
   },
   activated() {
-    // Check if the projects list has been altered in another view. 
+    // Check if the projects list has been altered in another view.
     // If this flag is set, the view resets the pagination and loads all the projects.
     if (this.shouldRefresh) {
       this.shouldRefresh = false
-      const infscroll = this.$refs.infinite as any;
+      const infscroll = this.$refs.infinite as any
       infscroll.reset()
       infscroll.resume()
       infscroll.trigger()
     }
   },
   mounted() {
-
     this.socket.onmessage = async (event: { data: string }) => {
       const data = JSON.parse(event.data)
 

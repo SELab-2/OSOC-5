@@ -1,8 +1,6 @@
 <template>
   <div class="variable">
-    <div class="text-h4 q-my-md">
-      Basic Info
-    </div>
+    <div class="text-h4 q-my-md">Basic Info</div>
     <q-input
       v-model="_name"
       outlined
@@ -10,9 +8,7 @@
       label="Project name"
       lazy-rules
       :rules="[
-        (val) =>
-          (val && val.length > 0) ||
-          'Provide the name of the project.',
+        (val) => (val && val.length > 0) || 'Provide the name of the project.',
       ]"
     />
     <q-input
@@ -22,9 +18,7 @@
       label="Partner name"
       lazy-rules
       :rules="[
-        (val) =>
-          (val && val.length > 0) ||
-          'Provide the name of the partner.',
+        (val) => (val && val.length > 0) || 'Provide the name of the partner.',
       ]"
     />
     <q-input
@@ -33,7 +27,9 @@
       color="teal"
       label="Project Info"
       type="textarea"
-    />
+      hint="Supports markdown"
+    >
+    </q-input>
   </div>
 </template>
 
@@ -45,16 +41,16 @@ export default defineComponent({
   props: {
     name: {
       type: String,
-      required: true
+      required: true,
     },
     partnerName: {
       type: String,
-      required: true
+      required: true,
     },
     info: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     _name: {
@@ -63,7 +59,7 @@ export default defineComponent({
       },
       set(n: string) {
         this.$emit('update:name', n)
-      }
+      },
     },
     _partnerName: {
       get(): string {
@@ -71,7 +67,7 @@ export default defineComponent({
       },
       set(n: string) {
         this.$emit('update:partnerName', n)
-      }
+      },
     },
     _info: {
       get(): string {
@@ -79,20 +75,18 @@ export default defineComponent({
       },
       set(n: string) {
         this.$emit('update:info', n)
-      }
-    }
-  }
+      },
+    },
+  },
 })
 </script>
 
 <style scoped>
-
 @media only screen and (min-width: 800px) {
   .variable {
     margin: auto;
     width: 80%;
-    max-width: 600px
+    max-width: 600px;
   }
 }
-
 </style>
