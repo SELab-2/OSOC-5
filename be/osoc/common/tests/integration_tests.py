@@ -252,6 +252,22 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_students_count(self):
+        """
+        test GET /students/count
+        """
+        counts = {
+            "yes": Student.objects.filter(final_decision__suggestion=Suggestion.Suggestion.YES).count(),
+            "no": Student.objects.filter(final_decision__suggestion=Suggestion.Suggestion.NO).count(),
+            "maybe": Student.objects.filter(final_decision__suggestion=Suggestion.Suggestion.MAYBE).count(),
+            "undecided": Student.objects.filter(final_decision=None).count()
+        }
+
+        url = reverse("student-count")
+        response = self.client.get(url)
+
+        self.assertEqual(response.data['counts'], counts)
+
 
 class StudentTestsAdmin(APITestCase):
     """
