@@ -112,7 +112,9 @@ export const useStudentStore = defineStore('user/student', {
       const { data } = await instance.get(`students/?page=${index}`, {
         params: filters,
         paramsSerializer: (params) => {
-          return qs.stringify(params, { arrayFormat: 'repeat' })
+          // Remove unused filters and map lists to correct queries
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v && ((v as any).length > 0 || v === true))), { arrayFormat: 'repeat' })
         },
       })
 

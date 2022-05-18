@@ -123,3 +123,32 @@ class EmailDateTimeFilter(filters.BaseFilterBackend):
             # return default queryset when a ValueError is raised (a wrong format was used)
             pass
         return queryset
+
+
+class ProjectFullFilter(filters.BaseFilterBackend):
+    """
+    filters projects that are full (all required skills are filled) or not
+    query parameter 'full' should be included in the url
+    """
+    def filter_queryset(self, request, queryset, view):
+        param = request.query_params.get('full')
+        if param is not None:
+
+            full_projects = []
+            for project in queryset:
+                req_skills = project.requiredskills_set.all()
+                students = project.projectsuggestion_set.all()
+
+                full = True
+                for req_skill in req_skills:
+                    if req_skill.amount > students.filter(skill=req_skill.skill).count():
+                        full = False
+                        break
+                if full:
+                    full_projects.append(project.id)
+
+            if param.lower() in true_strings:
+                return queryset.filter(id__in=full_projects)
+            if param.lower() in false_strings:
+                return queryset.exclude(id__in=full_projects)
+        return queryset

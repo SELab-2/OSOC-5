@@ -10,7 +10,7 @@
 import { useQuasar } from 'quasar'
 
 (useQuasar().notify as any).setDefaults({
-  position: 'bottom-right',
+  position: 'bottom',
   actions: [{ icon: 'close', color: 'white' }]
 })
 
