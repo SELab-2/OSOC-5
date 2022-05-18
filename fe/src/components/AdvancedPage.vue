@@ -114,59 +114,62 @@
 <script lang="ts">
 import { ref } from 'vue'
 import { instance } from '../utils/axios'
-import { useQuasar } from "quasar";
 
 export default {
   setup() {
-    const q = useQuasar()
-    const deleteItems = ref([])
-    const display_popup = ref(false)
-    const deleteConfirm = ref('')
-    const deleteConfirmItems = ref({})
     return {
-      q,
-      deleteItems,
-      display_popup,
-      deleteConfirm,
-      deleteConfirmItems,
-      checkIfValid() {
-        for (const item of deleteItems.value as Array<string>) {
-          // @ts-ignore
-          if (`DELETE ${item.toUpperCase()}` !== deleteConfirmItems[item]) {
-            return false
-          }
-        }
-        return true
-      },
-      deleteSelected() {
-        if (this.checkIfValid()) {
-          console.log(deleteItems)
-          const items = deleteItems.value as Array<string>
-          for (const item of items) {
-            instance.delete(`${item.toLowerCase()}/delete_all`)
-          }
-
-          q.notify({
-            icon: 'done',
-            color: 'positive',
-            message: `Deleted ${items.join(', ')} successfully!`,
-          })
-
-          display_popup.value = false
-          deleteItems.value = []
-          deleteConfirm.value = ''
-          deleteConfirmItems.value = {}
-        } else {
-          q.notify({
-            icon: 'warning',
-            color: 'negative',
-            message: `Error: confirmation field(s) are not valid!`,
-            textColor: 'black',
-          })
-        }
-      },
+      deleteItems: ref([]),
+      display_popup: ref(false),
+      deleteConfirm: ref(''),
+      deleteConfirmItems: ref({}),
     }
   },
+  methods: {
+    checkIfValid(){
+      // @ts-ignore
+      for(const item of this.deleteItems){
+        // @ts-ignore
+        if (`DELETE ${item.toUpperCase()}` !== this.deleteConfirmItems[item]){
+          return false
+        }
+      }
+      return true
+    },
+    deleteSelected(){
+      if (this.checkIfValid()){
+        // @ts-ignore
+        console.log(this.deleteItems)
+        // @ts-ignore
+        for(const item of this.deleteItems){
+          instance.delete(`${item.toLowerCase()}/delete_all`)
+          // console.log(`${item.toLowerCase()}/delete_all`)
+        }
+        // @ts-ignore
+        this.$q.notify({
+          icon: 'done',
+          color: 'positive',
+          // @ts-ignore
+          message: `Deleted ${this.deleteItems.join(', ')} successfully!`,
+        })
+        // @ts-ignore
+        this.display_popup = false
+        // @ts-ignore
+        this.deleteItems = []
+        // @ts-ignore
+        this.deleteConfirm = ''
+        // @ts-ignore
+        this.deleteConfirmItems = {}
+      } else {
+        // @ts-ignore
+        this.$q.notify({
+          icon: 'warning',
+          color: 'negative',
+          message: `Error: confirmation field(s) are not valid!`,
+          textColor: 'black'
+        });
+      }
+    },
+  }
 }
 </script>
 <style lang="sass">
