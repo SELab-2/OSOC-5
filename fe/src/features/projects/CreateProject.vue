@@ -1,12 +1,17 @@
 <template>
 	<q-splitter
-		v-model="splitterModel"
-		:limits="[40,80]"
+		v-model="_splitterModel"
+		:limits="step === 0 ? [50,50] : showPreview ? [40,80] : [100,100]"
+    emit-immediately
 		style="height: 100%;"
-		emit-immediately
+    :before-class="disabled ? '' : 'resize-container'"
+    @update:modelValue="showPreview ? disable() : ''"
 	>
+  <q-resize-observer @resize="onResize" />
+
 	<template #before>
 	<q-stepper
+  
 		v-if="project"
 		v-model="step"
 		class="column"
@@ -86,7 +91,7 @@
 	</btn>
 	</template>
 	<template #after>
-		<div v-if="project" class="column fit justify-center items-center content-center">
+		<div v-if="project && showPreview" class="column fit justify-center items-center content-center">
 			<div class="text-h6 text-bold">Preview</div>
 			<project-card style="width: 90%; max-width: 400px" v-model:expandedInfo="showInfo" :project="project"/>
 		</div>
@@ -135,6 +140,8 @@ export default defineComponent({
 		}
 	},
 	data() {
+    let timeout;
+
 		const projectStore = useProjectStore();
 		const project = ref(null);
 		return {
@@ -144,7 +151,10 @@ export default defineComponent({
 			coachStore: useCoachStore(),
 			projectStore: useProjectStore(),
 			project,
-			splitterModel: ref(70)
+			splitterModel: ref(70),
+      width: ref(0),
+      disabled: ref(false),
+      timeout
 		}
 	},
 	async created() {
@@ -180,7 +190,18 @@ export default defineComponent({
 			}
 			this.projectStore.shouldRefresh = true
 			router.replace('/projects')
-		}
+		},
+    onResize(e) {
+      this.width = e.width
+    },
+    disable() {
+      console.log("Hello")
+      this.disabled = true
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        this.disabled = false
+      }, 200)
+    }
 	},
 	watch: {
 		step(newValue, oldValue) {
@@ -198,10 +219,27 @@ export default defineComponent({
 			set(n) {
 				this.step = 0
 			}
-		}
+		},
+    showPreview() {
+      return this.width > 1200 || this.step === 0
+    },
+    _splitterModel: {
+      get() {
+        return this.showPreview ? (this.step === 0 ? 50 : this.splitterModel) : 100
+      },
+      set(n) {
+        if (n > 80) return
+        this.splitterModel = n
+      }
+    }
 	}
 })
 </script>
+
+<style lang="sass">
+.resize-container
+  transition: all .3s
+</style>
 
 <style scoped>
 
@@ -213,5 +251,8 @@ export default defineComponent({
 	height: 100%
 }
 
+/* :deep(.q-splitter__panel) {
+  transition: width .1s;
+} */
 
 </style>

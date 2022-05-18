@@ -87,7 +87,8 @@ export default defineComponent({
 @media only screen and (min-width: 800px) {
   .variable {
     margin: auto;
-    width: 40%
+    width: 80%;
+    max-width: 600px
   }
 }
 
