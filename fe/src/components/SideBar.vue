@@ -299,7 +299,7 @@ export default defineComponent({
         { name: 'maybe', label: 'Maybe', amount: this.studentStore.counts.maybe },
         { name: 'no', label: 'No', amount: this.studentStore.counts.no },
         { name: 'undecided', label: 'Undecided', amount: this.studentStore.counts.undecided },
-        { name: 'none', label: 'None', amount: this.studentStore.counts.none },
+        { name: 'none', label: 'All', amount: this.studentStore.counts.none },
       ]
     },
     showDrawer(): boolean {
