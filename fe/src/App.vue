@@ -31,4 +31,8 @@ console.log(Dark.isActive)
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  overflow: hidden;
+}
+
 </style>
