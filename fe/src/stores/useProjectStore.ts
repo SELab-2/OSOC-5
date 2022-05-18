@@ -111,7 +111,6 @@ export const useProjectStore = defineStore('project', {
      * @param project the project to get
      */
     async getProject(id: number): Promise<Project> {
-      console.log('Loading')
       const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))

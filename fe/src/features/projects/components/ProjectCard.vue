@@ -25,7 +25,7 @@
         <q-space />
         <div>
           <btn
-            v-if="editable"
+            v-if="editable && me.isAdmin"
             flat
             round
             size="12px"
@@ -50,13 +50,12 @@
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="_showInfo" style="">
+        <div v-if="_showInfo">
           <div class="text-h6">Info</div>
           <markdown-viewer
             style="overflow: hidden; overflow-wrap: break-word"
             v-model:text="project.extraInfo"
           ></markdown-viewer>
-          <q-separator inset spaced="10px" />
         </div>
       </q-slide-transition>
       <q-slide-transition>
@@ -407,7 +406,6 @@ export default defineComponent({
         return this.expandedInfo ?? this.showInfo
       },
       set(n: boolean) {
-        console.log(this.expandedInfo)
         if (this.expandedInfo !== undefined) {
           this.$emit('update:expandedInfo', n)
         } else {
