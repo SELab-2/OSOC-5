@@ -201,6 +201,7 @@ class SkillTestsAdmin(APITestCase):
         project.required_skills.add(skill)
         student = StudentFactory()
         # add student to projectsuggestions, now the skill is "used" in this project
+        # pylint: disable=duplicate-code
         ProjectSuggestion.objects.create(
             project=project,
             student=student,

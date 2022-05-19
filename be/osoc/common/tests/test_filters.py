@@ -7,6 +7,7 @@ from osoc.common.tests import AdminFactory, CoachFactory, ProjectFactory, SentEm
 from osoc.common.utils import reverse_querystring
 from osoc.common.models import Project, ProjectSuggestion, Skill, Suggestion, Student
 
+
 class StudentFilterTests(APITestCase):
     """
     test class for testing custom student filters

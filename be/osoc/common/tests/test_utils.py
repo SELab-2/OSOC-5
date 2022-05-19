@@ -114,5 +114,5 @@ class UtilityTestCases(TestCase):
             lines = csv.readlines()
             self.assertEqual(lines[0].strip().split(','), serializer.Meta.fields)
             self.assertEqual(len(lines), model.objects.count()+1)
-            self.assertEqual(lines[1].strip().split(','), 
+            self.assertEqual(lines[1].strip().split(','),
                 ['' if i is None else str(i) for i in serializer(model.objects.first()).data.values()])

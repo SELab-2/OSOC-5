@@ -5,8 +5,6 @@ each test simulates an API call to one endpoint and checks if the response data 
 these tests test serializers.py and views.py and the API endpoints as a whole
 """
 import json
-from typing import ItemsView
-from django.http import FileResponse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
