@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative-position container flex justify-center"
+    class="relative-position flex justify-center"
     style="width: 100vw"
   >
     <div
@@ -72,8 +72,7 @@
              This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
       <q-table
         v-model:pagination="pagination"
-        class="my-table user-table shadow-4"
-        table-header-style="user-table"
+        class="cornered shadow-4"
         :rows="coachStore.users"
         :columns="userColumns"
         :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
@@ -81,10 +80,13 @@
         separator="horizontal"
         :loading="coachStore.isLoading"
         @request="onRequest"
+        :table-class="$q.dark.isActive ? 'bg-dark2' : ''"
+        :table-header-class="`${$q.dark.isActive ? 'text-black' : ''} bg-yellow`"
       >
         <template #body="props">
           <q-tr
-            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+            :class="props.rowIndex % 2 == 1 && !$q.dark.isActive ? 'bg-yellow-1' : ''"
+            :style="`background-color: ${props.rowIndex % 2 == 1 && $q.dark.isActive ? colors.lighten(colors.getPaletteColor('yellow'),-75) : ''}`"
           >
             <q-td
               key="name"
@@ -175,7 +177,7 @@
 import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
-import {useQuasar} from 'quasar'
+import {exportFile, useQuasar, colors} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
@@ -201,7 +203,8 @@ export default defineComponent({
       userColumns,
       roles,
       coachStore,
-      q
+      q,
+      colors
     }
   },
   data() {
@@ -350,14 +353,4 @@ export default defineComponent({
 :deep(.q-menu) {
   border-radius: 10px !important;
 }
-
-.user-table {
-  border-radius: 10px;
-}
-</style>
-
-<style lang="sass">
-.my-table
-  /* bg color is important for th; just specify one */
-  background-color: $yellow-7
 </style>

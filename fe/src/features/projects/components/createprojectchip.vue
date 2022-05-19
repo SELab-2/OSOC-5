@@ -9,7 +9,7 @@
     style="border-width: 1.5px; height: fit-content"
     :style="`box-shadow: ${colors.getPaletteColor(
       skill.skill.color
-    )} 0px 8px 20px -12px;`"
+    )} 0px 8px 20px ${$q.dark.isActive ? -6 : -12}px;`"
   >
     <template #default>
       <div class="column">
@@ -40,6 +40,7 @@
             dense
             autogrow
             outlined
+            :dark="false"
             v-model="_skill.comment"
             :color="_skill.skill.color"
             label="Comment"

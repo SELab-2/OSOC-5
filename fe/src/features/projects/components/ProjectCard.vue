@@ -3,6 +3,7 @@
     class="my-card shadow-4 q-ma-sm"
     flat
     bordered
+    :dark="$q.dark.isActive"
     style="border-radius: 10px !important"
   >
     <q-card-section>
@@ -40,7 +41,7 @@
             glow-color="teal-3"
             shadow-color="teal"
             :shadow-strength="_showInfo ? 2 : 5"
-            :color="_showInfo ? 'teal' : 'white'"
+            :color="_showInfo ? 'teal' : 'transparent'"
             :class="`text-${_showInfo ? 'white' : 'teal'}`"
             icon="info"
             @click="_showInfo = !_showInfo"
@@ -426,7 +427,6 @@ export default defineComponent({
 
 .container {
   display: inline-block;
-  background-color: red;
   width: max-content;
 }
 .second {
