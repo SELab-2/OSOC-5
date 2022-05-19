@@ -22,6 +22,7 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (res) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return convertObjectKeysToCamelCase(res as any)
   },
   async (err) => {
@@ -32,10 +33,12 @@ instance.interceptors.response.use(
         originalConfig._retry = true
         try {
           const rs = await refreshToken(instance)
+          // @ts-ignore
           const { access } = rs.data
           localStorage.setItem('accessToken', access)
           instance.defaults.headers.common.Authorization = `Bearer ${access}`
           return instance(originalConfig)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (_error: any) {
           if (_error.response && _error.response.data) {
             return Promise.reject(_error.response.data)
