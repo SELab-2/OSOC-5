@@ -4,7 +4,7 @@ import { useStudentStore } from "../../src/stores/useStudentStore";
 import axios, { AxiosRequestConfig } from "axios"
 import { instance } from '../../src/utils/axios'
 import {UrlMockMappingPost, UrlMockMappingGet, UrlMockMappingDelete} from '../mockUrlMappings'
-import { StudentInterface, Student } from '../../src/models/Student'
+import { StudentInterface} from '../../src/models/Student'
 import { UserInterface } from '../../src/models/User'
 
 const getcall_i = vi.spyOn(instance, 'get').mockImplementation((url: string, data?: unknown, config?:

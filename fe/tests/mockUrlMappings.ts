@@ -69,24 +69,79 @@ let coach2 = {
   last_name: "V",
   role: "nope",
 }
+let skill1 = {
+  name: "uitstelgedrag",
+  id: 1, 
+  color: "green", 
+  url: "skills/2"
+}
+let skill2 = {
+  name: "Zuid-Afrikaanse Salamander kweker",
+  id: 2, 
+  color: "green", 
+  url: "skills/3"
+}
+let mail1 = {
+  id: 1,
+  info: "test",
+  type: 1,
+  receiver: "NOPE",
+  sender: 'coaches/1',
+  time: new Date("2019-01-16"),
+  url: "emails/1"
+}
+let projectSuggestion = {
+  student: 'students/1/',
+  coach: coach1,
+  skill: "skills/2",
+  reason: "woop woop",
+  coachId: 1,
+  coachName: "test",
+}
+
+let project = {
+  name: "YUPPERS",
+  partnerName: "regen",
+  extraInfo: "liever niet",
+  requiredSkills: [{amount: 2, comment: "test", skill: 'proj_skills/1'}],
+  coaches: [coach1],
+  id: 1
+}
+
 export const UrlMockMappingPost = {
     'auth/password/change/': {data: {succes: true}},
     'auth/login/': {data:{user:{pk:1}, refresh_token: "funky", access_token: "fresh"}},
     'auth/register/': {data: {user: "User was created!"}},
     'students/1/make_suggestion/': {data: {succes: true}},
     'students/${studentId}/make_final_decision/': {data: {succes: true}},
+    'skills/': {data: {skill: "Skill was created!"}},
+    'students/bulk_status/': {data: {user: "Users were updated!"}},
+    'emails/': {data: {email: "Emails were updated!"}},
+    'projects/1/remove_student/': {data: {student: "removed suggestion!"}}
   }
+
 export const UrlMockMappingGet = {
     'coaches/?page_size=500': {data:{results: [coach1]}},
     'coaches/?page=1': {data: {results: [coach1, coach2], next: null}},
     'coaches/1': {data:coach1},
     'coaches/2': {data:coach2},
     'coaches/': {data:{results: [coach1], count: 1}},
-    'students/1/': {data: student
-    },
+    'students/1/': {data: student},
     'students/?page=1': {data: {results: [student]}},
-    "skills/2": {data: {name: "uitstelgedrag", id: 1, color: "green", url: "skills/2"}},
-    'students/count/': {data: {counts: {yes: 2, no: 0, maybe: 1, undecided: 0, none: 0}}}
+    'students/': {data: {results: [student], count: 1}},
+    "skills/2": {data: skill1},
+    "skills/3": {data: skill2},
+    'students/count/': {data: {counts: {yes: 2, no: 0, maybe: 1, undecided: 0, none: 0}}},
+    'skills/?page_size=500': {data: {results: [skill1, skill2]}},
+    'skills/?page=1': {data: {results: [skill1, skill2]}},
+    'emails/': {data: {results: [mail1]}},
+    'emails/1': {data: mail1},
+    'projects_sug/1': {data: projectSuggestion},
+    'projects/': {data: {results: [project]}},
+    'projects/1': {data: project},
+    'projects/1/': {data: project},
+    'projects/?page=1': {data: {results: [project], next: null}},
+    'proj_skills/1': {data: {amount:2, comment: "test", skill: "skills/2"}}
   }
 
 export const UrlMockMappingPut = {
@@ -98,4 +153,10 @@ export const UrlMockMappingDelete = {
     'coaches/1/': {data: {succes: true}},
     'student/1': {data: {succes: true}},
     'students/1/remove_final_decision/': {data: {succes: true}},
+    'skills/1/': {data: {succes: true}},
+  }
+
+export const UrlMockMappingPatch = {
+    "skills/1/": {data: {succes: true}},
+    'students/1/': {data: {succes: true}},
   }

@@ -45,14 +45,16 @@ export const useProjectStore = defineStore('project', {
       students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
       const newStudents: ProjectSuggestionInterface[] = []
-      for (const student of students) {
-        const newStudent = new ProjectSuggestion({
-          student: (await instance.get(student.student)).data as Student,
-          coach: await useCoachStore().getUser(student.coach),
-          skill: (await instance.get(student.skill)).data as Skill,
-          reason: student.reason,
-        })
-        newStudents.push(newStudent)
+      if (students) {
+        for (const student of students) {
+          const newStudent = new ProjectSuggestion({
+            student: (await instance.get(student.student)).data as Student,
+            coach: await useCoachStore().getUser(student.coach),
+            skill: (await instance.get(student.skill)).data as Skill,
+            reason: student.reason,
+          })
+          newStudents.push(newStudent)
+        }
       }
       return newStudents
     },
@@ -111,7 +113,7 @@ export const useProjectStore = defineStore('project', {
      * @param project the project to get
      */
     async getProject(id: number): Promise<Project> {
-      console.log('Loading')
+
       const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
@@ -263,7 +265,6 @@ export const useProjectStore = defineStore('project', {
       const coachObj = await coachStore.getUser(coach)
       const skillObj = await skillStore.getSkill(skill)
 
-      console.log(studentStore.students)
       project.suggestedStudents?.push(
         new NewProjectSuggestion(
           {
