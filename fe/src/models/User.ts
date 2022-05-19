@@ -13,6 +13,7 @@ export interface UserInterface {
   hasProjects?: Array<Project>
   suggestions?: Array<Suggestion>
   isActive?: boolean
+  projects: Array<{id: number, name: string, url: string}>
 }
 
 export class User implements UserInterface {
@@ -26,13 +27,14 @@ export class User implements UserInterface {
   hasProjects?: Project[]
   suggestions?: Suggestion[]
   isActive?: boolean
+  projects: Array<{id: number, name: string, url: string}>
 
   constructor(data: UserInterface) {
     Object.assign(this, data)
   }
 
   get fullName(): string {
-    return this.firstName + ' ' + this.lastName
+    return this.firstName ? this.firstName + ' ' + this.lastName : 'Deleted user'
   }
 
   get role(): string {

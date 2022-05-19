@@ -3,7 +3,7 @@ import App from './App.vue'
 // @ts-ignore
 import router from './router'
 import { createPinia } from 'pinia'
-import { Quasar, Notify, Meta } from 'quasar'
+import { Quasar, Notify, Meta, Dark } from 'quasar'
 import '@quasar/extras/roboto-font-latin-ext/roboto-font-latin-ext.css'
 import '@quasar/extras/material-icons/material-icons.css'
 import '@quasar/extras/material-icons-outlined/material-icons-outlined.css'
@@ -16,7 +16,6 @@ import Vue3Lottie from 'vue3-lottie'
 
 import 'vue3-lottie/dist/style.css'
 
-import MasonryWall from '@yeger/vue-masonry-wall'
 import OsocButton from './components/OsocButton.vue'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
@@ -30,13 +29,13 @@ createApp(App)
     .component('btn', OsocButton)
     .use(pinia)
     .use(router)
-    .use(MasonryWall)
     .use(Vue3Lottie)
     .use(Quasar,
         {
-            plugins: { Notify, Meta },
+            plugins: { Notify, Meta, Dark },
             config: {
-                notify: {}
+                notify: {},
+                dark: 'auto'
             }
         }
     )

@@ -4,23 +4,6 @@
       <div class="text-bold text-h4">
         Create user
       </div>
-      <q-space />
-      <q-select
-        v-model="role"
-        v-ripple
-        borderless
-        dense
-        class="bg-yellow"
-        color="yellow"
-        style="padding-left:10px; border-radius: 5px; position: relative; width: 80px"
-        :options="roles"
-        transition-show="jump-down"
-        transition-hide="jump-up"
-        transition-duration="300"
-        behavior="menu"
-        map-options
-        emit-value
-      />
     </div>
   </q-card-section>
   <q-card-section>
@@ -110,7 +93,7 @@
       v-model="password"
       v-close-popup
       flat
-      :label="'Create ' + role"
+      label="Create user"
       color="yellow"
       :disabled="password.length <= 8"
       @click="onSubmit"
@@ -151,7 +134,6 @@ export default defineComponent({
       firstName,
       lastName,
       roles,
-      role: ref(roles.at(1)?.value || 'inactive'),
       filter: ref(''),
       roleFilter: ref('all'),
       q,
@@ -166,9 +148,7 @@ export default defineComponent({
           lastName: this.lastName,
           email: this.email,
           password1: this.password,
-          password2: this.password,
-          is_active: this.role ? this.role != 'inactive' : true,
-          is_admin: this.role ? this.role == 'admin' : false
+          password2: this.password
       }).then(() => {
         this.created()
 
