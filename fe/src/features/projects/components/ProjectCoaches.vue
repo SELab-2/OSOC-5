@@ -14,11 +14,6 @@
         :options="options"
       />
       <q-space />
-      <q-checkbox
-        v-model="showInactive"
-        label="Show inactive"
-      />
-      <q-space />
       <q-input
         v-model="search"
         class="inputfield q-mb-sm"
@@ -145,7 +140,7 @@
             @load="loadNext"
           >
             <q-chip
-              v-for="(coach, i) in filteredCoaches"
+              v-for="(coach, i) in allCoaches"
               v-show="!coaches.some((c) => c.id === coach.id)"
               :key="coach.id"
               outline
@@ -220,34 +215,29 @@ export default defineComponent({
       search: ref(''),
       allCoaches,
       userType: 'all',
-      showInactive:  ref(false)
     }
   },
   computed: {
     filters() {
-      return {
+      const filters =  {
         search: this.search,
         ordering: `${this.ascending ? '' : '-'}first_name`,
-      }
-    },
-    filteredCoaches() {
-      const localCoaches = this.allCoaches
+      } as { search: string; ordering: string; is_admin?: string; is_active?: string }
 
-      if(!this.showInactive)
-        localCoaches.filter(({isActive}) => isActive === true)
+      if(this.userType === 'inactive')
+        filters.is_active = "false"
+      else if(this.userType === 'admin')
+        filters.is_admin = "true"
+      else if(this.userType === 'coach')
+        filters.is_admin = "false"
 
-      if(this.userType === 'admin')
-        return localCoaches.filter(({isAdmin}) => isAdmin === true)
-      
-      if(this.userType === 'coach')
-        return localCoaches.filter(({isAdmin}) => isAdmin === false)
-
-      return localCoaches
+      return filters
     },
     options(): Array<{ name: string, label: string }> {
       return [
         { name: 'admin', label: 'Admins'},
         { name: 'coach', label: 'Coaches' },
+        { name: 'inactive', label: 'Inactive' },
         { name: 'all', label: 'All' },
       ]
     },
