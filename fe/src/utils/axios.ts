@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { baseUrl } from './baseUrl'
-import router from "../router";
+import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 
 export const instance: AxiosInstance = axios.create({
   baseURL: baseUrl,
@@ -55,7 +55,9 @@ instance.interceptors.response.use(
 )
 
 function refreshToken(instance: AxiosInstance) {
-  return instance.post('/auth/token/refresh/', {
-    refresh: localStorage.getItem('refreshToken'),
-  }).catch(() => router.push('/login'))
+  return instance
+    .post('/auth/token/refresh/', {
+      refresh: localStorage.getItem('refreshToken'),
+    })
+    .catch(() => useAuthenticationStore().logout)
 }
