@@ -36,11 +36,11 @@ export default defineComponent({
     onClick(i: number) {
       var nth = 0
       const newText = this.text.replace(
-        /[-][ ]+[\[][ x][\]]/g,
+        /([-]|([1-9][.]))[ ]+[\[][ x][\]]/g,
         (match, _, original) => {
           nth++
           if (nth === i + 1) {
-            return match.slice(-2) === 'x]' ? '- [ ]' : '- [x]'
+            return match.slice(0,-2) + (match.slice(-2) === 'x]' ? ' ]' : 'x]')
           }
           return match
         }

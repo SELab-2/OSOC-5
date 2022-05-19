@@ -1,6 +1,10 @@
 """
 Utilities.
 """
+import csv
+from io import BytesIO, StringIO
+from zipfile import ZIP_DEFLATED, ZipFile
+from django.http import FileResponse
 from django.utils import timezone
 from django.utils.http import urlencode
 from rest_framework.reverse import reverse
@@ -53,3 +57,33 @@ def string_to_datetime_tz(string):
         return timezone.make_aware(timezone.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S"))
     except ValueError:
         return timezone.make_aware(timezone.datetime.strptime(string, "%Y-%m-%d"))
+
+def export_to_csv(queryset, filename, serializer):
+    """
+    export a queryset to a csv StringIO object
+    """
+    csv_data = StringIO()
+    writer = csv.writer(csv_data)
+
+    # write header
+    writer.writerow(serializer.Meta.fields)
+    # write objects
+    for item in queryset:
+        writer.writerow(serializer(item).data.values())
+
+    csv_data.name = filename
+    csv_data.seek(0)
+    return csv_data
+
+def create_zipfile_response(filename, files):
+    """
+    create a zipfile that contains given csv files
+    returns a HTTP File Reponse with zip file attachment
+    """
+    zipped_file = BytesIO()
+    with ZipFile(zipped_file, 'w', ZIP_DEFLATED) as zipped:
+        for file in files:
+            zipped.writestr(f'{file.name}.csv', file.read())
+    zipped_file.seek(0)
+    return FileResponse(zipped_file, content_type='application/zip',
+        headers={'Content-Disposition': f'attachment; filename="{filename}.zip"'})
