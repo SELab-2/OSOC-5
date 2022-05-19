@@ -73,6 +73,7 @@
         :rows="mailStore.mailStudents"
         :columns="mailsColumns"
         :loading="mailStore.isLoading"
+        :pagination="pagination"
         :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
         row-key="url"
         selection="multiple"
@@ -276,7 +277,7 @@ export default defineComponent({
         ordering: string
         status: string
       }
-
+      console.log(this.pagination)
       if (this.search) filter.search = this.search
       filter.page_size = this.pagination.rowsPerPage
       filter.page = this.pagination.page
