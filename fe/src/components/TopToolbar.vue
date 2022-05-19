@@ -142,10 +142,11 @@
 import {defineComponent, ref, Ref} from 'vue'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 import { useStudentStore } from '../stores/useStudentStore'
+import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 import SegmentedControl from './SegmentedControl.vue'
 
 export default defineComponent({
-  components: { SegmentedControl },
+  components: { SegmentedControl, ChangePasswordDialog },
   setup() {
     const authenticationStore = useAuthenticationStore()
     const display_popup = ref(false)
