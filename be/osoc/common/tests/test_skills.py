@@ -4,6 +4,7 @@ Integration tests for skill API endpoints.
 each test simulates an API call to one endpoint and checks if the response data and status code are correct
 these tests test serializers.py and views.py and the API endpoints as a whole
 """
+# pylint: disable=duplicate-code
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
@@ -201,7 +202,6 @@ class SkillTestsAdmin(APITestCase):
         project.required_skills.add(skill)
         student = StudentFactory()
         # add student to projectsuggestions, now the skill is "used" in this project
-        # pylint: disable=duplicate-code
         ProjectSuggestion.objects.create(
             project=project,
             student=student,
