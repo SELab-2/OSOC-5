@@ -6,7 +6,9 @@
       :mini-width="30"
       :width="370"
       :breakpoint="100"
-      class="bg-grey-1 shadow-4"
+      class="shadow-4"
+      :class="`bg-${$q.dark.isActive ? 'dark2' : 'grey-1'}`"
+      :dark="false"
     >
       <div
         :style="!miniState? '' : 'display: none'"
@@ -86,11 +88,11 @@
                   dense
                   multiple
                   color="primary"
-                  bg-color="white"
                   :options="skillStore.skills"
                   :option-label="opt => opt.name"
                   label="Skills"
                   emit-value
+                  :dark="$q.dark.isActive"
                 >
                   <template #selected>
                     <div
@@ -115,13 +117,13 @@
                   dense
                   clearable
                   color="primary"
-                  bg-color="white"
                   :options="stati"
                   :option-label="opt => opt.label"
                   :option-value="opt => opt.value"
                   label="Status"
                   emit-value
                   map-options
+                  :dark="$q.dark.isActive"
                 />
 
                 <div class="row q-gutter-x-md">
@@ -190,13 +192,6 @@
           </q-infinite-scroll>
         </q-scroll-area>
       </div>
-
-      <!--      <q-inner-loading-->
-      <!--        :showing="studentStore.isLoading"-->
-      <!--        label="Please wait..."-->
-      <!--        label-class="text-teal"-->
-      <!--        label-style="font-size: 1.1em"-->
-      <!--      />-->
 
       <div
         class="absolute"

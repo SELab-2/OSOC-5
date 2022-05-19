@@ -3,7 +3,7 @@
     v-model="_splitterModel"
     :limits="step === 0 ? [50, 50] : showPreview ? [40, 80] : [100, 100]"
     emit-immediately
-    style="height: 100%"
+    style="height: 100%; overflow: hidden"
     :before-class="disabled ? '' : 'resize-container'"
     @update:modelValue="showPreview ? disable() : ''"
   >
@@ -19,7 +19,7 @@
         error-icon="none"
         done-color="teal"
         active-color="teal"
-        error-color="yellow"
+        error-color="teal"
         animated
         keep-alive
         header-nav
@@ -75,27 +75,20 @@
         padding="10px"
         icon="arrow_back"
         label="Previous"
-        color="yellow"
-        shadow-color="orange"
+        color="teal"
+        shadow-color="teal"
       />
       <btn
         style="position: absolute; right: 0; bottom: 0"
         @click="next"
-        v-if="step < 2"
+        v-if="step < 2 && (showPreview || id === undefined)"
         padding="10px"
         class="q-ma-md"
         icon-right="arrow_forward"
         label="Next"
-        color="yellow"
-        shadow-color="orange"
-      >
-        <q-tooltip v-if="step === 2 && !basicInfoDone" style="width: 300px">
-          <span class="text-body2">
-            Some data is missing.<br />Please check if you filled in a name and
-            partner name.
-          </span>
-        </q-tooltip>
-      </btn>
+        color="teal"
+        shadow-color="teal"
+      />
     </template>
     <template #after>
       <div
@@ -108,28 +101,43 @@
           v-model:expandedInfo="showInfo"
           :project="project"
         />
+        <q-slide-transition>
+          <div v-if="showDelete" style="width: 70%; text-align: center;" >
+          <div class="q-gutter-sm q-mb-md" >
+            <div class="text-subtitle2 text-bold text-red">Are you sure you want to delete this project?<br/>This action cannot be undone.</div>
+            <div>Please type the name of the project to confirm:</div>
+            <div class="row justify-center q-gutter-sm">
+              <q-input type="text" outlined color="red" v-model="deleteConfirmation" dense :placeholder="project!.name"/>
+              <btn label="confirm" @click="deleteProject" dense color="red" shadow-color="red" :disabled="deleteConfirmation !== project.name" shadow-strength="2"/>
+            </div>
+          </div>
+          </div>
+        </q-slide-transition>
       </div>
     </template>
   </q-splitter>
-  <btn
-    style="position: absolute; right: 0; bottom: 0"
-    class="q-ma-md"
-    v-if="basicInfoDone"
-    @click="submit"
-    padding="10px"
-    icon-right="check"
-    :label="id ? 'Update' : 'Publish'"
-    color="yellow"
-    shadow-color="orange"
-  >
-    <q-tooltip v-if="step === 2 && !basicInfoDone" style="width: 300px">
-      <span class="text-body2">
-        Some data is missing.<br />Please check if you filled in a name and
-        partner name.
-      </span>
-    </q-tooltip>
-  </btn>
-  <!-- </div> -->
+  <div style="position: absolute; right: 0; bottom: 0" class="q-gutter-md q-ma-md">
+    <btn
+      v-if="id"
+      @click="showDelete = !showDelete; deleteConfirmation = ''; showInfo = true"
+      padding="10px"
+      icon="delete"
+      label="Delete"
+      glow-color="red"
+      glow-size="1500px"
+      color="teal"
+      shadow-color="teal"
+    />
+    <btn
+      v-if="basicInfoDone"
+      @click="showPreview ? submit() : next()"
+      padding="10px"
+      :icon-right="!showPreview && step < 2 ? 'arrow_forward' : 'check'"
+      :label="!showPreview && step < 2 ? 'Next' : id !== undefined ? 'Update' : 'Publish'"
+      color="teal"
+      shadow-color="teal"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -140,6 +148,7 @@ import ProjectSkills from './components/ProjectSkills.vue'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { useProjectStore } from '../../stores/useProjectStore'
+import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 import { Project } from '../../models/Project'
 import router from '../../router'
 import ProjectCard from './components/ProjectCard.vue'
@@ -169,10 +178,18 @@ export default defineComponent({
       width: ref(0),
       disabled: ref(false),
       timeout,
+      showDelete: ref(false),
+      deleteConfirmation: ref('')
     }
   },
-  async created() {
+  async mounted() {
+    if (!useAuthenticationStore().loggedInUser?.isAdmin) {
+      router.replace('/notfound')
+      return
+    }
     let project: Project
+    this.skillStore.loadSkills()
+    this.coachStore.loadUsers()
     if (this.id) {
       try {
         project = await this.projectStore.getProject(this.id)
@@ -185,10 +202,6 @@ export default defineComponent({
     }
     this.project = project
   },
-  mounted() {
-    this.skillStore.loadSkills()
-    this.coachStore.loadUsers()
-  },
   methods: {
     next() {
       if (this.step < 3) {
@@ -199,12 +212,36 @@ export default defineComponent({
     },
     async submit() {
       if (this.id) {
-        await this.projectStore.updateProject(this.project!, this.project!.id)
+        let error = await this.projectStore.updateProject(this.project!, this.project!.id)
+        this.displayErrorOr(error, () => {
+          this.projectStore.shouldRefresh = true
+          router.push('/projects')
+        })
       } else {
-        await this.projectStore.addProject(this.project!)
+        let error = await this.projectStore.addProject(this.project!)
+        this.displayErrorOr(error, () => {
+          this.projectStore.shouldRefresh = true
+          router.replace('/projects')
+        })
       }
-      this.projectStore.shouldRefresh = true
-      router.replace('/projects')
+    },
+    async deleteProject() {
+      let error = await this.projectStore.deleteProject(this.project!.id)
+      this.displayErrorOr(error, () => {
+        this.projectStore.shouldRefresh = true
+        router.replace('/projects')
+      })
+    },
+    displayErrorOr(error: any, other: Function) {
+      if (error) {
+        this.$q.notify({
+          icon: 'error',
+          color: 'warning',
+          message: error.detail,
+        })
+      } else {
+        other()
+      }
     },
     onResize(e: { width: number }) {
       this.width = e.width
@@ -230,7 +267,7 @@ export default defineComponent({
     },
     showInfo: {
       get(): boolean {
-        return this.step === 0
+        return this.step === 0 || this.showDelete
       },
       set(n: boolean) {
         this.step = 0
@@ -271,7 +308,4 @@ export default defineComponent({
   height: 100%;
 }
 
-/* :deep(.q-splitter__panel) {
-  transition: width .1s;
-} */
 </style>

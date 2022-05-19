@@ -34,7 +34,7 @@ export class User implements UserInterface {
   }
 
   get fullName(): string {
-    return this.firstName + ' ' + this.lastName
+    return this.firstName ? this.firstName + ' ' + this.lastName : 'Deleted user'
   }
 
   get role(): string {

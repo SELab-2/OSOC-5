@@ -29,14 +29,12 @@
       />
       <q-input
         v-model="filterSkills"
-        style="max-width: 190px"
         outlined
         dense
         debounce="300"
-        color="green"
+        color="teal"
         class="inputfield q-mb-sm"
         placeholder="Search"
-        @keydown.enter.prevent=""
       >
         <template #append>
           <q-icon
@@ -70,7 +68,7 @@
     </div>
     <q-splitter
       v-model="splitterModel"
-      style="flex: 1; overflow: auto"
+      style="flex: 1; overflow: auto;"
       :limits="[20, 80]"
     >
       <template #before>
@@ -157,7 +155,7 @@ import { ref, Ref, PropType } from 'vue'
 import NewSkillDialog from './subcomponents/NewSkillDialog.vue'
 import { useSkillStore } from '../../../stores/useSkillStore'
 import { Skill, ProjectSkill } from '../../../models/Skill'
-import CreateProjectChip from './createprojectchip.vue'
+import CreateProjectChip from './CreateProjectChip.vue'
 import LottieAnimation from '../../../components/LottieAnimation.vue'
 
 export default defineComponent({
@@ -269,4 +267,5 @@ export default defineComponent({
     transform: translateX(3px);
   }
 }
+
 </style>

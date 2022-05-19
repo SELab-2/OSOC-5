@@ -8,11 +8,13 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
+import { Dark } from 'quasar'
 
 (useQuasar().notify as any).setDefaults({
   position: 'bottom',
   actions: [{ icon: 'close', color: 'white' }]
 })
+
 
 </script>
 
@@ -24,6 +26,10 @@ import { useQuasar } from 'quasar'
   font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow: hidden;
 }
 
 </style>
