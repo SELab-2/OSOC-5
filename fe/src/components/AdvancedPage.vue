@@ -94,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import {ref} from 'vue'
+import {Ref, ref} from 'vue'
 import {useStudentStore} from '../stores/useStudentStore'
 import {instance} from '../utils/axios'
 import {useProjectStore} from "../stores/useProjectStore";
@@ -102,14 +102,18 @@ import {useSkillStore} from "../stores/useSkillStore";
 import {useCoachStore} from "../stores/useCoachStore";
 import {useMailStore} from "../stores/useMailStore";
 import {exportFile} from 'quasar';
+import {defineComponent} from "@vue/runtime-core";
 
-export default {
+export default defineComponent({
   setup() {
+    const deleteItems: Ref = ref([] as Array<string>)
+    const deleteConfirmItems: Ref = ref({} as { Skills: string, Students: string, Emails: string, Coaches: string, Projects: string })
+
     return {
-      deleteItems: ref([]),
+      deleteItems,
       display_popup: ref(false),
       deleteConfirm: ref(''),
-      deleteConfirmItems: ref({}),
+      deleteConfirmItems
     }
   },
   data() {
@@ -134,12 +138,10 @@ export default {
   methods: {
     async getCSV(title: string, csv: Function) {
       const data = await csv()
-      exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.zip', data.data, data.headers)
+      exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.zip', data.data)
     },
     checkIfValid() {
-      // @ts-ignore
       for (const item of this.deleteItems) {
-        // @ts-ignore
         if (`DELETE ${item.toUpperCase()}` !== this.deleteConfirmItems[item]) {
           return false
         }
@@ -148,30 +150,19 @@ export default {
     },
     deleteSelected() {
       if (this.checkIfValid()) {
-        // @ts-ignore
-        console.log(this.deleteItems)
-        // @ts-ignore
         for (const item of this.deleteItems) {
           instance.delete(`${item.toLowerCase()}/delete_all`)
-          // console.log(`${item.toLowerCase()}/delete_all`)
         }
-        // @ts-ignore
         this.$q.notify({
           icon: 'done',
           color: 'positive',
-          // @ts-ignore
           message: `Deleted ${this.deleteItems.join(', ')} successfully!`,
         })
-        // @ts-ignore
         this.display_popup = false
-        // @ts-ignore
         this.deleteItems = []
-        // @ts-ignore
         this.deleteConfirm = ''
-        // @ts-ignore
         this.deleteConfirmItems = {}
       } else {
-        // @ts-ignore
         this.$q.notify({
           icon: 'warning',
           color: 'negative',
@@ -181,7 +172,7 @@ export default {
       }
     },
   }
-}
+})
 </script>
 <style lang="sass">
 .q-field__bottom
