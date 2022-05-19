@@ -8,10 +8,9 @@
         class="inputfield q-mb-sm"
         outlined
         dense
+        color="teal"
         debounce="300"
-        color="green"
         placeholder="Search"
-        @keydown.enter.prevent=""
       >
         <template #append>
           <q-icon
