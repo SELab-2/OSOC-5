@@ -21,10 +21,11 @@ import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
 import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
+import qs from 'qs'
 
 interface State {
   projects: Array<Project>
-  
+
   // Flag so projectlist can determine if it should reset the pagination and reload all the projects or not.
   // Is used e.g. when a conflict is resolved, or a project is created/updated.
   shouldRefresh: Boolean
@@ -33,7 +34,7 @@ interface State {
 export const useProjectStore = defineStore('project', {
   state: (): State => ({
     projects: [],
-    shouldRefresh: false
+    shouldRefresh: false,
   }),
   actions: {
     /**
@@ -125,15 +126,14 @@ export const useProjectStore = defineStore('project', {
 
       // Is added to projects here because we do not want to await on each project.
       return new Project(
-          project.name,
-          project.partnerName,
-          project.extraInfo,
-          project.id,
-          skills,
-          coaches,
-          students
-        )
-      
+        project.name,
+        project.partnerName,
+        project.extraInfo,
+        project.id,
+        skills,
+        coaches,
+        students
+      )
     },
     /**
      * Loads the projects
@@ -183,7 +183,20 @@ export const useProjectStore = defineStore('project', {
       const { results, next } = (
         await instance.get<{ results: TempProject[]; next: string }>(
           `projects/?page=${index}`,
-          { params: filters }
+          {
+            params: filters,
+            paramsSerializer: (params) => {
+              return qs.stringify(
+                Object.fromEntries(
+                  Object.entries(params).filter(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ([_, v]) => (v as any).length > 0
+                  )
+                ),
+                { arrayFormat: 'repeat' }
+              )
+            },
+          }
         )
       ).data
 
@@ -352,14 +365,14 @@ export const useProjectStore = defineStore('project', {
           name: project.name,
           partnerName: project.partnerName,
           extraInfo: project.extraInfo,
-          requiredSkills: project.requiredSkills?.map(s => {
+          requiredSkills: project.requiredSkills?.map((s) => {
             return {
               amount: s.amount,
               comment: s.comment,
-              skill: s.skill.url
+              skill: s.skill.url,
             }
           }),
-          coaches: project.coaches?.map(c => c.url),					
+          coaches: project.coaches?.map((c) => c.url),
         }
         await instance.post('projects/', convertObjectKeysToSnakeCase(mappedProject))
       } catch (error) {
@@ -372,14 +385,14 @@ export const useProjectStore = defineStore('project', {
           name: project.name,
           partnerName: project.partnerName,
           extraInfo: project.extraInfo,
-          requiredSkills: project.requiredSkills?.map(s => {
+          requiredSkills: project.requiredSkills?.map((s) => {
             return {
               amount: s.amount,
               comment: s.comment,
-              skill: s.skill.url
+              skill: s.skill.url,
             }
           }),
-          coaches: project.coaches?.map(c => c.url),					
+          coaches: project.coaches?.map((c) => c.url),
         }
         await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(mappedProject))
       } catch (error) {
