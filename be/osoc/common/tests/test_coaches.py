@@ -117,6 +117,15 @@ class CoachTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_export_csv_forbidden(self):
+        """
+        test GET /coaches/export_csv without permission
+        """
+        url = reverse("coach-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class CoachTestsAdmin(APITestCase):
     """
@@ -245,3 +254,13 @@ class CoachTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Coach.objects.filter(is_admin=False).count(), 0)
+
+    def test_export_csv(self):
+        """
+        test GET /coaches/export_csv
+        """
+        url = reverse("coach-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')

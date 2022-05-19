@@ -282,6 +282,14 @@ class ProjectTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_export_csv_forbidden(self):
+        """
+        test GET /projects/export_csv without permission
+        """
+        url = reverse("project-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class ProjectTestsAdmin(APITestCase):
     """
@@ -379,3 +387,13 @@ class ProjectTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Project.objects.count(), 0)
+
+    def test_export_csv(self):
+        """
+        test GET /projects/export_csv
+        """
+        url = reverse("project-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')

@@ -115,6 +115,14 @@ class SkillTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_export_csv_forbidden(self):
+        """
+        test GET /skills/export_csv without permission
+        """
+        url = reverse("skill-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class SkillTestsAdmin(APITestCase):
     """
@@ -204,3 +212,13 @@ class SkillTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
         self.assertEqual(Skill.objects.count(), 1)
+
+    def test_export_csv(self):
+        """
+        test GET /skills/export_csv
+        """
+        url = reverse("skill-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')

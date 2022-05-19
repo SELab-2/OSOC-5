@@ -133,6 +133,14 @@ class SentEmailTestsCoach(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_export_csv_forbidden(self):
+        """
+        test GET /sentemails/export_csv without permission
+        """
+        url = reverse("sentemail-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class SentEmailTestsAdmin(APITestCase):
     """
@@ -156,3 +164,13 @@ class SentEmailTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(SentEmail.objects.count(), 0)
+
+    def test_export_csv(self):
+        """
+        test GET /sentemails/export_csv
+        """
+        url = reverse("sentemail-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')

@@ -5,6 +5,8 @@ each test simulates an API call to one endpoint and checks if the response data 
 these tests test serializers.py and views.py and the API endpoints as a whole
 """
 import json
+from typing import ItemsView
+from django.http import FileResponse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
@@ -268,6 +270,15 @@ class StudentTestsCoach(APITestCase):
 
         self.assertEqual(response.data['counts'], counts)
 
+    def test_export_csv_forbidden(self):
+        """
+        test GET /students/export_csv without permission
+        """
+        url = reverse("student-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class StudentTestsAdmin(APITestCase):
     """
@@ -340,3 +351,13 @@ class StudentTestsAdmin(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Student.objects.count(), 0)
+
+    def test_export_csv(self):
+        """
+        test GET /students/export_csv
+        """
+        url = reverse("student-export-csv")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')
