@@ -121,7 +121,7 @@ export default {
 
     const items = {
       'Students': async () => studentStore.csv(),
-      'Mails': async () => mailStore.csv(),
+      'Emails': async () => mailStore.csv(),
       'Coaches': async () => coachStore.csv(),
       'Projects': async () => projectStore.csv(),
       'Skills': async () => skillStore.csv()
@@ -134,7 +134,6 @@ export default {
   methods: {
     async getCSV(title: string, csv: Function) {
       const data = await csv()
-      console.log(data)
       exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.zip', data.data, data.headers)
     },
     checkIfValid() {
