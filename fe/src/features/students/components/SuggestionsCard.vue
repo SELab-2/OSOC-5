@@ -4,6 +4,11 @@
       <div class="text-h6">
         {{ title }}
       </div>
+      <div v-if="decision">
+        <div class="text-subtitle2">Final decision</div>
+        <SuggestionRow :suggestion="decision" />
+        <q-separator class="q-mt-sm" />
+      </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
       <div v-if="studentStore.isLoading">
@@ -19,25 +24,7 @@
           :key="key"
         >
           <div class="row">
-            <DecisionIcon
-              v-if="studentStore.currentStudent"
-              :decision="suggestion.suggestion"
-            />
-            <label class="q-pl-xs">
-              {{ suggestion.coach ? `${suggestion.coach.firstName} ${suggestion.coach.lastName}` : 'Deleted user' }}
-            </label>
-            <q-icon
-              v-if="suggestion.reason"
-              class="tooltip-icon"
-              name="mdi-information-outline"
-            >
-              <q-tooltip
-                anchor="center right"
-                self="center start"
-              >
-                {{ suggestion.reason }}
-              </q-tooltip>
-            </q-icon>
+            <SuggestionRow :suggestion="suggestion" />
           </div>
         </div>
       </div>
@@ -50,10 +37,10 @@ import {useStudentStore} from "../../../stores/useStudentStore";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import {defineComponent, PropType} from "vue";
 import {Suggestion} from "../../../models/Suggestion"
-import DecisionIcon from "../../../components/DecisionIcon.vue";
+import SuggestionRow from "./SuggestionRow.vue";
 
 export default defineComponent( {
-  components: {DecisionIcon, LoadingSpinner},
+  components: {SuggestionRow, LoadingSpinner},
   props: {
     title: {
       type: String,
@@ -61,6 +48,10 @@ export default defineComponent( {
     },
     suggestions: {
       type: [Object] as PropType<Suggestion[]>,
+      required: true
+    },
+    decision: {
+      type: Object as PropType<Suggestion|null>,
       required: true
     }
   },

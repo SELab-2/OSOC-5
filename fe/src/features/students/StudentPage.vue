@@ -141,6 +141,7 @@
           <SuggestionsCard
             title="Suggestions"
             :suggestions="student?.suggestions"
+            :decision="student?.finalDecision"
           />
         </div>
         <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -270,9 +271,7 @@ export default defineComponent ({
      * Retrieve the current selected student from the store
      */
     student(): Student | null {
-      console.log(this.studentStore.currentStudent)
       return this.studentStore.currentStudent
-      // return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
     /**
      * Retrieve the possible suggestion from the store
