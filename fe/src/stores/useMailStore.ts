@@ -110,5 +110,11 @@ export const useMailStore = defineStore('user/mail', {
         async deleteMail(mail: Mail) {
             await instance.delete(`/emails/${mail.id}`)
         },
+        /**
+         * Get a csv of all mails in database
+         */
+        async csv(): Promise<{data: string, headers: object}> {
+            return await instance.get('emails/export_csv')
+        }
     }
 })

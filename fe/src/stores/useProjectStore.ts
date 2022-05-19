@@ -406,5 +406,11 @@ export const useProjectStore = defineStore('project', {
         return e
       }
     },
+    /**
+     * Get a csv of all projects in database
+     */
+    async csv(): Promise<{data: string, headers: object}> {
+      return await instance.get('projects/export_csv')
+    }
   },
 })

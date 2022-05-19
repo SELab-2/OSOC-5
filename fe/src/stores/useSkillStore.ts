@@ -83,5 +83,11 @@ export const useSkillStore = defineStore('skills', {
           callback(false)
         })
     },
+    /**
+     * Get a csv of all skills in database
+     */
+    async csv(): Promise<{data: string, headers: object}> {
+      return await instance.get('skills/export_csv')
+    }
   },
 })
