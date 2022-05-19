@@ -72,20 +72,23 @@
       </div>
       <q-table
         v-model:selected="selectedStudents"
-        class="my-table mail-table shadow-4"
+        class="cornered shadow-4"
         :rows="mailStore.mailStudents"
         :columns="mailsColumns"
         :loading="mailStore.isLoading"
+        :pagination="pagination"
         :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
         row-key="url"
         selection="multiple"
         separator="horizontal"
         @request="onRequest"
+        :table-class="$q.dark.isActive ? 'bg-dark2' : ''"
+        :table-header-class="`${$q.dark.isActive ? 'text-black' : ''} bg-yellow`"
       >
         <template #body="props">
           <q-tr
-            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
-            :props="props"
+            :class="props.rowIndex % 2 == 1 && !$q.dark.isActive ? 'bg-yellow-1' : ''"
+            :style="`background-color: ${props.rowIndex % 2 == 1 && $q.dark.isActive ? colors.lighten(colors.getPaletteColor('yellow'),-75) : ''}`"
           >
             <q-td>
               <q-checkbox color="yellow" v-model="props.selected" />
@@ -142,7 +145,7 @@
             >
               <a
                 :href="'mailto:' + props.row.email"
-                style="color: black"
+                :class="`text-${$q.dark.isActive ? 'white' : 'black'}`"
               >{{ props.row.email }}</a>
             </q-td>
             <q-td style="align-content: flex-end">
@@ -219,7 +222,7 @@
 import {defineComponent} from "@vue/runtime-core";
 import {Ref, ref} from 'vue'
 import {Student} from "../../models/Student";
-import {useQuasar} from "quasar";
+import {useQuasar, colors} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
@@ -244,6 +247,7 @@ export default defineComponent({
       columnsMails,
       status,
       q,
+      colors
     }
   },
   data() {
@@ -280,7 +284,7 @@ export default defineComponent({
         ordering: string
         status: string
       }
-
+      console.log(this.pagination)
       if (this.search) filter.search = this.search
       filter.page_size = this.pagination.rowsPerPage
       filter.page = this.pagination.page
@@ -342,9 +346,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style scoped>
-.mail-table {
-  border-radius: 10px;
-}
-</style>

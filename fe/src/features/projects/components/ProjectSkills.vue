@@ -68,7 +68,7 @@
     </div>
     <q-splitter
       v-model="splitterModel"
-      style="flex: 1; overflow: auto"
+      style="flex: 1; overflow: auto;"
       :limits="[20, 80]"
     >
       <template #before>
@@ -267,4 +267,5 @@ export default defineComponent({
     transform: translateX(3px);
   }
 }
+
 </style>

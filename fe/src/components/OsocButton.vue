@@ -15,7 +15,7 @@
 
 <script lang="ts">
   import { ref, defineComponent } from 'vue'
-  import { colors } from 'quasar'
+  import { colors, getCssVar } from 'quasar'
 export default defineComponent({
   name: 'OsocButton',
   /**
@@ -79,7 +79,7 @@ export default defineComponent({
     shadow() {
       if (this.unelevated || this.flat) return 'transparent'
       var color: string = colors.getPaletteColor(`shadow-${this.color}`)
-      if (color !== "#000000") return color
+      if (color !== "#000000" && color !== "#ffffff") return color
       color = colors.getPaletteColor(this.shadowColor)
       return color === "#000000" ? this.shadowColor : color
     },

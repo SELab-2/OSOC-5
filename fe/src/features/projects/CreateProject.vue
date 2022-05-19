@@ -3,7 +3,7 @@
     v-model="_splitterModel"
     :limits="step === 0 ? [50, 50] : showPreview ? [40, 80] : [100, 100]"
     emit-immediately
-    style="height: 100%"
+    style="height: 100%; overflow: hidden"
     :before-class="disabled ? '' : 'resize-container'"
     @update:modelValue="showPreview ? disable() : ''"
   >
@@ -304,6 +304,5 @@ export default defineComponent({
 :deep(.q-stepper__step-inner) {
   height: 100%;
 }
-
 
 </style>
