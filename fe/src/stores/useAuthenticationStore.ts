@@ -85,7 +85,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     async logout() {
       localStorage.removeItem('refreshToken')
       localStorage.removeItem('accessToken')
-
+      this.loggedInUser = null;
       const studentStore = useStudentStore()
       studentStore.$reset()
       const skillStore = useStudentStore()
