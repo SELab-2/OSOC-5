@@ -12,6 +12,6 @@
     "lib": ["esnext", "dom"],
     "strictPropertyInitialization": false
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "decs.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

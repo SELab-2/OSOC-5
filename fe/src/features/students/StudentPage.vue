@@ -301,7 +301,7 @@ export default defineComponent ({
      */
     mySuggestion(): number {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach.id === this.authenticationStore.loggedInUser?.id)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach ? suggestion.coach.id === this.authenticationStore.loggedInUser?.id : false)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
@@ -363,11 +363,6 @@ export default defineComponent ({
       if (this.student) {
         await this.studentStore.deleteStudent(this.student.url,
           () => {
-            this.$q.notify({
-              icon: 'done',
-              color: 'positive',
-              message: 'Successfully deleted!',
-            })
             router.push(`/students`)
           },
           () => this.$q.notify({

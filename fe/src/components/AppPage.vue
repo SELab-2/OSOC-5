@@ -1,9 +1,9 @@
 <template>
   <TopToolbar />
   <SideBar />
-  <q-page-container style="height: 100%">
+  <q-page-container style="height: 100%; overflow: auto">
     <router-view v-slot="{ Component }">
-      <keep-alive exclude="EditProject">
+      <keep-alive exclude="CreateProject,StudentPlaceholder,NotFound">
         <component :is="Component" />
       </keep-alive>
     </router-view>

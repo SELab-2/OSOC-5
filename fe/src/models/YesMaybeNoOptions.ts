@@ -13,7 +13,7 @@ const yesMaybeNoOptions = [
         value: 2,
         color: 'yellow',
         background: 'bg-yellow',
-        icon: 'mdi-close'
+        icon: 'mdi-help'
     },
     {
         name: 1,
@@ -21,7 +21,7 @@ const yesMaybeNoOptions = [
         value: 1,
         color: 'red',
         background: 'bg-red',
-        icon: 'mdi-help'
+        icon: 'mdi-close'
     },
     {
         name: -1,

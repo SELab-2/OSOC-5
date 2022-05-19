@@ -349,6 +349,7 @@ class Project(models.Model):
     )
     extra_info = models.TextField(
         _('extra info'),
+        blank=True
     )
     required_skills = models.ManyToManyField(
         Skill,
@@ -412,7 +413,8 @@ class Suggestion(models.Model):
     )
     coach = models.ForeignKey(
         Coach,
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL,
+        null=True
     )
     suggestion = models.CharField(
         _('suggestion'),
@@ -454,11 +456,13 @@ class ProjectSuggestion(models.Model):
     )
     student = models.ForeignKey(
         Student,
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL,
+        null=True
     )
     coach = models.ForeignKey(
         Coach,
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL,
+        null=True
     )
     skill = models.ForeignKey(
         Skill,
@@ -473,11 +477,13 @@ class SentEmail(models.Model):
 
     sender = models.ForeignKey(
         Coach,
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL,
+        null=True
     )
     receiver = models.ForeignKey(
         Student,
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL,
+        null=True
     )
     time = models.DateTimeField(
         _("send date and time"),

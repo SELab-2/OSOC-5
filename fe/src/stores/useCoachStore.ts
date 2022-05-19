@@ -20,11 +20,11 @@ export const useCoachStore = defineStore('user/coach', {
      * @returns the requested user
      */
     async getUser(newUser: UserInterface): Promise<User> {
-      const user = this.users.find((user) => user.url === newUser.url)
+      const user = this.users.find((user) => (user && newUser) ? user.url === newUser.url : false)
 
       if (user) return user
       let fetchedUser: User
-      if (useAuthenticationStore().loggedInUser?.isAdmin) {
+      if (useAuthenticationStore().loggedInUser?.isAdmin && newUser) {
         // Logged in user is admin and can fetch users.
         const { data } = await instance.get<UserInterface>(newUser.url)
         fetchedUser = new User(data)
@@ -34,10 +34,10 @@ export const useCoachStore = defineStore('user/coach', {
       }
 
       // Check again if not present, it could be added in the meantime.
-      const user2 = this.users.find((user) => user.url === newUser.url)
+      const user2 = this.users.find((user) => (user && newUser) ? user.url === newUser.url : false)
       if (user2) return user2
 
-      this.users.push(fetchedUser)
+      if (fetchedUser) this.users.push(fetchedUser)
       return fetchedUser
     },
     /**
@@ -53,6 +53,15 @@ export const useCoachStore = defineStore('user/coach', {
       this.users = results.map((user) => new User(user))
       this.isLoading = false
     },
+    
+    async loadNext(index: number, done: Function, filters: Object): Promise<Array<User>> {
+      
+      const { results, next } = (await instance.get<{ results: User[], next: string }>(`coaches/?page=${index}`, { params: filters })).data
+      
+      done(next === null)
+      return results.map(u => new User(u))
+    },
+    
     async loadUsersCoaches(filters: Object, setNumberOfRows: Function) {
       this.isLoading = true
 

@@ -1,8 +1,17 @@
 <template>
-  <q-card class="my-card shadow-4 q-ma-sm" flat bordered>
-    <q-card-section class="column">
-      <div class="row">
-        <h5 class="text-bold q-mt-none q-mb-none">
+  <q-card
+    class="my-card shadow-4 q-ma-sm"
+    flat
+    bordered
+    :dark="$q.dark.isActive"
+    style="border-radius: 10px !important"
+  >
+    <q-card-section>
+      <div class="row no-wrap">
+        <h5
+          class="text-bold q-mt-none q-mb-none"
+          style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+        >
           {{ project.name }}
         </h5>
         <q-spinner
@@ -20,6 +29,7 @@
         <q-space />
         <div>
           <btn
+            v-if="editable && me.isAdmin"
             flat
             round
             size="12px"
@@ -33,24 +43,24 @@
             size="12px"
             glow-color="teal-3"
             shadow-color="teal"
-            :shadow-strength="showInfo ? 2 : 5"
-            :color="showInfo ? 'teal' : 'white'"
-            :class="`text-${showInfo ? 'white' : 'teal'}`"
+            :shadow-strength="_showInfo ? 2 : 5"
+            :color="_showInfo ? 'teal' : 'transparent'"
+            :class="`text-${_showInfo ? 'white' : 'teal'}`"
             icon="info"
-            @click="showInfo = !showInfo"
+            @click="_showInfo = !_showInfo"
           />
         </div>
       </div>
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="showInfo">
-          <btn icon="r_link"/>
+        <div v-if="_showInfo">
           <div class="text-h6">Info</div>
-          <div class="text-body2">
-            {{ project.extraInfo }}
-          </div>
-          <q-separator inset spaced="10px" />
+          <markdown-viewer
+            style="overflow: hidden; overflow-wrap: break-word"
+            v-model:text="project.extraInfo"
+            :editable="me.isAdmin"
+          ></markdown-viewer>
         </div>
       </q-slide-transition>
       <q-slide-transition>
@@ -61,19 +71,23 @@
             project.suggestedStudents
           "
         >
-          <div class="text-caption text-grey">Coaches:</div>
+          <div
+            v-if="project.coaches && project.coaches.length > 0"
+            class="text-caption text-grey"
+          >
+            Coaches:
+          </div>
+          <div v-else>There are no coaches assigned to this project.</div>
           <q-chip
             v-for="coach in project.coaches ?? []"
             :key="coach.id"
             icon="person"
           >
-            {{ coach.firstName }}
-            {{
-              coach.lastName
-                .split(' ')
-                .map((res) => res.charAt(0))
-                .join('')
-            }}.
+            {{ coach ? `${coach.firstName} ${coach.lastName
+                                      .split(' ')
+                                      .map((res) => res.charAt(0))
+                                      .join('')}` : ''
+            }}
           </q-chip>
           <div class="row" style="display: flex; align-items: center">
             <div
@@ -81,7 +95,13 @@
               class="row flex-center"
             >
               <div class="text-caption text-grey">Skills:</div>
-              <btn flat round size="sm" @click="expanded = !expanded">
+              <btn
+                flat
+                v-if="editable"
+                round
+                size="sm"
+                @click="expanded = !expanded"
+              >
                 <q-icon
                   size="2em"
                   name="expand_more"
@@ -102,27 +122,33 @@
               :modelValue="
                 selectedRoles[skill.skill.id] || hovered === skill.skill.id
               "
-              @update:modelValue="selectedRoles[skill.skill.id] = $event"
+              @update:modelValue="
+                editable ? (selectedRoles[skill.skill.id] = $event) : ''
+              "
               v-for="skill in project.requiredSkills"
-              @dragleave="onDragLeave($event, skill)"
-              @dragover="checkDrag($event, skill)"
-              @drop="onDrop($event, skill)"
+              @dragleave="editable ? onDragLeave($event, skill) : false"
+              @dragover="editable ? checkDrag($event, skill) : false"
+              @drop="editable ? onDrop($event, skill) : false"
               :key="skill.skill.id"
               :skill="skill"
-              :occupied="groupedStudents[skill.skill.id]?.length"
+              :occupied="
+                groupedStudents[skill.skill.id]?.length ??
+                (editable ? 0 : undefined)
+              "
             />
           </div>
         </div>
       </q-slide-transition>
 
-      <div class="column" v-for="(role, index) in project.requiredSkills ?? []" :key="index">
+      <div
+        class="column"
+        v-for="(role, index) in project.requiredSkills ?? []"
+        :key="index"
+      >
         <q-slide-transition
           v-show="selectedRoles[role.skill.id] || hovered === role.skill.id"
         >
-          <div
-            class="text-bold"
-            :class="'text-' + role.skill.color + '-8'"
-          >
+          <div class="text-bold" :class="'text-' + role.skill.color + '-8'">
             {{ role.skill.name }}
           </div>
         </q-slide-transition>
@@ -157,15 +183,24 @@ import { Student } from '../../../models/Student'
 import { User } from '../../../models/User'
 import { useAuthenticationStore } from '../../../stores/useAuthenticationStore'
 import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
-
+import MarkdownViewer from './MarkdownViewer.vue'
 export default defineComponent({
   props: {
     project: {
       type: Project,
       required: true,
     },
+    editable: {
+      type: Boolean,
+      required: false,
+    },
+    expandedInfo: {
+      type: Boolean,
+      required: false,
+      default: undefined,
+    },
   },
-  components: { ProjectRoleChip, ProjectCardSuggestion },
+  components: { ProjectRoleChip, ProjectCardSuggestion, MarkdownViewer },
   setup() {
     return {
       authenticationStore: useAuthenticationStore(),
@@ -176,7 +211,6 @@ export default defineComponent({
   data() {
     return {
       hovered: ref(-1),
-      showInfo: ref(false),
     }
   },
 
@@ -191,6 +225,11 @@ export default defineComponent({
                 (obj: any, skill) => ((obj[skill.skill.id] = false), obj),
                 {}
               )
+      },
+    },
+    'project.extraInfo': {
+      handler() {
+        this.projectStore.updateProject(this.project, this.project.id)
       },
     },
   },
@@ -268,43 +307,43 @@ export default defineComponent({
     async onDrop(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
       this.hovered = -1
-      this.selectedRoles[skill.skill.id] = true
       const target = <HTMLDivElement>e.target
       // don't drop on other draggables
       if (target.draggable === true) {
         return
       }
-      // TODO: additional checks that datatransfer is valid and not null
-      const data: { targetId: string; student: Student } = JSON.parse(
-        e.dataTransfer!.getData(e.dataTransfer!.types[0])
-      )
-
-      // Add a student to the project.
-      let coach = this.authenticationStore.loggedInUser as User
-      if (!coach) {
-        this.q.notify({
-          icon: 'warning',
-          color: 'warning',
-          message: 'You are not logged in.',
-          textColor: 'black',
-        })
-        return
-      }
-      this.project.suggestedStudents?.push(
-        new NewProjectSuggestion(
-          {
-            coach: this.me,
-            reason: '',
-            skill: skill.skill,
-            student: data.student,
-          },
-          false
+      
+      // Try to parse the datatransfer.
+      try {
+        const data: { targetId: string; student: Student } = JSON.parse(
+          e.dataTransfer!.getData(e.dataTransfer!.types[0])
         )
-      )
+        this.selectedRoles[skill.skill.id] = true
+        // Add a student to the project.
+        let coach = this.authenticationStore.loggedInUser as User
+        if (!coach) {
+          this.q.notify({
+            icon: 'warning',
+            color: 'warning',
+            message: 'You are not logged in.',
+            textColor: 'black',
+          })
+          return
+        }
+        this.project.suggestedStudents?.push(
+          new NewProjectSuggestion(
+            {
+              coach: this.me,
+              reason: '',
+              skill: skill.skill,
+              student: data.student,
+            },
+            false
+          )
+        )
 
-      // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
-      if (!this.expanded) {
-        // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
+      } catch (error) {
+        return
       }
     },
 
@@ -369,6 +408,18 @@ export default defineComponent({
         return obj
       }, {})
     },
+    _showInfo: {
+      get(): boolean {
+        return this.expandedInfo ?? (this.project as any).showInfo ?? false
+      },
+      set(n: boolean) {
+        if (this.expandedInfo !== undefined) {
+          this.$emit('update:expandedInfo', n)
+        } else {
+          (this.project as any).showInfo = n
+        }
+      },
+    },
   },
 })
 </script>
@@ -376,5 +427,13 @@ export default defineComponent({
 <style>
 .rotate180 {
   transform: rotate(180deg) !important;
+}
+
+.container {
+  display: inline-block;
+  width: max-content;
+}
+.second {
+  max-width: fit-content;
 }
 </style>

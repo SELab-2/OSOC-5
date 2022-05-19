@@ -13,14 +13,17 @@ from rest_auth.registration.views import RegisterView, SocialLoginView
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from .utils import export_to_csv, create_zipfile_response
 from .pagination import StandardPagination
 from .filters import MultipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
-    StudentFinalDecisionFilter, EmailDateTimeFilter
-from .serializers import BulkStatusSerializer, Conflict, ConflictSerializer, \
+    StudentFinalDecisionFilter, EmailDateTimeFilter, StudentConflictFilter, ProjectFullFilter
+from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSerializer, \
+    CSVProjectSuggestionSerializer, CSVRequiredSkillSerializer, CSVSentEmailSerializer, \
+    CSVSkillSerializer, CSVStudentSerializer, CSVSuggestionSerializer, Conflict, ConflictSerializer, \
     ResolveConflictSerializer, StudentSerializer, CoachSerializer, ProjectSerializer, \
     ProjectGetSerializer, SkillSerializer, SuggestionSerializer, ProjectSuggestionSerializer, \
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
-from .models import Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
+from .models import RequiredSkills, Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
 from .tally.tally import TallyForm
 from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
 
@@ -39,7 +42,8 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         * ?status=[0-5]
         * ?on_project=[true, false]
         * ?suggested_by_user=[true, false]
-        * ?suggestion=[yes, no, maybe, none, 0, 1, 2, 3]
+        * ?suggestion=[yes, no, maybe, undecided, 0, 1, 2, 3]
+        * ?conflicting=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
     - Sort students with the ?ordering=[first_name, last_name, email, status] query parameter.
         * Use ?ordering=-... to sort in descending order
@@ -62,7 +66,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     permission_classes = [permissions.IsAuthenticated, IsActive]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend,
                        StudentOnProjectFilter, StudentSuggestedByUserFilter,
-                       StudentFinalDecisionFilter, MultipleStatusFilter]
+                       StudentFinalDecisionFilter, MultipleStatusFilter, StudentConflictFilter]
     search_fields = ['first_name', 'last_name', 'call_name', 'email', 'degree',
                      'studies', 'motivation', 'school_name', 'employment_agreement', 'hinder_work']
     filterset_fields = ['alum', 'language', 'skills',
@@ -235,6 +239,18 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export students information to csv
+        returns a HTTP response with a zip file containing the following files:
+            students.csv
+            suggestions.csv
+        """
+        students = export_to_csv(self.get_queryset(), 'students', CSVStudentSerializer)
+        suggestions = export_to_csv(Suggestion.objects.all().order_by('id'), 'suggestions', CSVSuggestionSerializer)
+        return create_zipfile_response('student', [students, suggestions])
+
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
         """
@@ -341,6 +357,16 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
             return Response({"detail": "you can not update your own admin status"}, status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export coach information to csv
+        returns a HTTP response with a zip file containing the following files:
+            coaches.csv
+        """
+        coaches = export_to_csv(self.get_queryset(), 'coaches', CSVCoachSerializer)
+        return create_zipfile_response('coach', [coaches])
+
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
         """
@@ -364,6 +390,7 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         * ?required_skills=:id:,
         * ?coaches=:id:,
         * ?suggested_students=:id:
+        * ?full=[true, false]
     - Use a specific page size with ?page_size=[1-500] query parameter.
     - Sort projects with the ?ordering=[name, partner_name] query parameter.
         * Use ?ordering=-... to sort in descending order
@@ -377,8 +404,8 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
-    filter_backends = [filters.SearchFilter,
-                       filters.OrderingFilter, DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter,
+                       ProjectFullFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
     filterset_fields = ['required_skills', 'coaches', 'suggested_students']
     ordering_fields = ['name', 'partner_name']
@@ -528,6 +555,20 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             return Response({"detail": "students must be unique"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export project information to csv
+        returns a HTTP response with a zip file containing the following files:
+            projects.csv
+            required_skills.csv
+            suggested_students.csv
+        """
+        projects = export_to_csv(self.get_queryset(), 'projects', CSVProjectSerializer)
+        required_skills = export_to_csv(RequiredSkills.objects.all(), 'required_skills', CSVRequiredSkillSerializer)
+        suggested_students = export_to_csv(ProjectSuggestion.objects.all(), 'suggested_students', CSVProjectSuggestionSerializer)
+        return create_zipfile_response('project', [projects, required_skills, suggested_students])
+
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
         """
@@ -569,6 +610,16 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
                                 status=status.HTTP_403_FORBIDDEN)
             return Response(status=status.HTTP_204_NO_CONTENT)
         raise PermissionDenied()
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export skill information to csv
+        returns a HTTP response with a zip file containing the following files:
+            skills.csv
+        """
+        skills = export_to_csv(self.get_queryset(), 'skills', CSVSkillSerializer)
+        return create_zipfile_response('skill', [skills])
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):
@@ -632,6 +683,16 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
             serializer.save(sender=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv(self, request):
+        """
+        endpoint to export email information to csv
+        returns a HTTP response with a zip file containing the following files:
+            emails.csv
+        """
+        emails = export_to_csv(self.get_queryset(), 'emails', CSVSentEmailSerializer)
+        return create_zipfile_response('email', [emails])
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use

@@ -1,14 +1,21 @@
 <template>
-  <q-card class="create-skill-popup">
+  <q-dialog
+    v-model="_visible"
+    persistent
+    
+  >
+  <q-card class="create-skill-popup column" style="min-width: 400px; align-items: center;
+  justify-content: center;">
     <q-card-section>
       <div class="text-h6">
-        {{ dialogTitle }}
+        {{ `${_skill?.id === -1 ? 'New' : 'Edit'} Skill` }}
       </div>
     </q-card-section>
 
-    <q-card-section class="q-pt-none">
+    
       <q-input
-        v-model="skillStore.popupName"
+        style="width: 90%;"
+        v-model="_skill!.name"
         outlined
         autofocus
         class="inputfield"
@@ -18,160 +25,112 @@
           (val) => (val && val.length > 0) || 'Enter the name of the skill.',
         ]"
       />
-    </q-card-section>
-    <q-card-section class="q-pt-none">
-      <q-select
-        v-model="skillStore.popupColor"
-        filled
-        use-input
-        input-debounce="0"
-        label="Color picker"
-        :options="options"
-        style="width: 250px"
-        behavior="menu"
-        @filter="filterFn"
-      >
-        <template #option="scope">
-          <q-item v-bind="scope.itemProps">
-            <div class="row items-center">
-              <q-chip
-                clickable
-                :color="`${scope.opt}-8`"
-                :class="`bg-${scope.opt}-4`"
-                :style="`height: 25px; width:25px; border-radius: 50%; margin-right: 15px`"
-              />
-              <q-item-label>{{ scope.opt }}</q-item-label>
-            </div>
-          </q-item>
-        </template>
-        <template #no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
+    
+    <q-card-section>
+      <div class="row" style="max-width: 230px">
+        <q-chip
+          v-for="color in quasarColors"
+          :key="color"
+          @click="_skill!.color = color"
+          outline
+          clickable
+          :color="`${color}-${_skill?.color === color ? 8 : 4}`"
+          :class="`bg-${color}-${_skill?.color === color ? 4 : 1}`"
+          style="border-width: 1.5px;"
+        >
+        <div 
+          v-if="_skill?.color === color" 
+          class="bg-white" 
+          style="width: 8px; height: 8px; border-radius: 30px; position: absolute; margin-left: auto;margin-right: auto;left: 0;right: 0;"
+        />
+        </q-chip>
+
+      </div>
     </q-card-section>
     <q-card-actions
       align="right"
       class="text-primary"
     >
       <btn
-        v-close-popup
+        v-if="skill?.id !== -1"
         flat
-        label="Cancel"
-        glow-color="#C0FFF4"
-        @click="newSkillCancel"
+        color="red"
+        label="Delete"
+        @click="showDelete = true"
       />
       <btn
         v-close-popup
         flat
-        :label="submitText"
+        label="Cancel"
         glow-color="#C0FFF4"
-        @click="newSkillConfirm"
+        @click="_skill!.name = backup!.name; _skill!.color = backup!.color; _visible = false"
+      />
+      <btn
+        v-close-popup
+        flat
+        :label="_skill?.id === -1 ? 'Add' : 'Update'"
+        glow-color="#C0FFF4"
+        @click="$emit('submit'); _visible = false"
       />
     </q-card-actions>
   </q-card>
+  </q-dialog>
+  <DeleteSkillDialog :deleteSkillId="_skill?.id ?? -1" :deleteSkillName="_skill?.name ?? ''" v-model:visible="showDelete"/>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/runtime-core'
-import { ref } from 'vue'
+import { defineComponent, ref, Ref } from '@vue/runtime-core'
 import { useSkillStore } from '../../../../stores/useSkillStore'
 import quasarColors from '../../../../models/QuasarColors'
+import { Skill } from "../../../../models/Skill"
+import DeleteSkillDialog from './DeleteSkillDialog.vue'
 
 export default defineComponent({
   props: {
-    dialogTitle: {
-      type: String,
-      required: true,
+    skill: {
+      type: Skill,
+      required: false
     },
-    submitText: {
-      type: String,
-      required: true,
-    },
-    callback: {
-      type: Function,
-      required: true,
-    },
-  },
-  setup() {
-    const skillStore = useSkillStore()
-
-    const options = ref(quasarColors)
-
-    return {
-      skillStore,
-
-      options,
-
-      quasarColors,
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      filterFn(val: string, update: any) {
-        if (val === '') {
-          update(() => {
-            options.value = quasarColors
-          })
-          return
-        } else {
-          update(() => {
-            const needle = val.toLowerCase()
-            options.value = quasarColors.filter(
-              (v) => v.toLowerCase().indexOf(needle) > -1
-            )
-          })
-        }
-      },
+    modelValue: {
+      type: Boolean,
+      required: true
     }
   },
-  methods: {
-    newSkillConfirm() {
-      // when valid call the store object and add the skill
-      this.skillStore.addSkill(
-        // callback
-        (exitCode: number) => {
-          switch (exitCode) {
-            case 1: {
-              this.$q.notify({
-                icon: 'close',
-                color: 'negative',
-                message: 'Failed!',
-              })
-              break
-            }
-            case 2: {
-              this.$q.notify({
-                icon: 'close',
-                color: 'negative',
-                message: 'Invalid skill-name and/or color!',
-              })
-              break
-            }
-            default: {
-              this.$q.notify({
-                icon: 'done',
-                color: 'positive',
-                message: `Success!.`,
-                textColor: 'black',
-              })
-              this.skillStore.popupName = ''
-              this.skillStore.popupColor = ''
-              this.skillStore.popupID = -1
-              break
-            }
-          }
-          this.callback()
-        }
-      )
-    },
-    newSkillCancel() {
-      this.skillStore.popupName = ''
-      this.skillStore.popupColor = ''
-      this.skillStore.popupID = -1
-      this.callback()
-    },
+  components: { DeleteSkillDialog },
+  data() {
+    const backup: Ref<Skill | null> = ref(null)
+    return {
+      skillStore: useSkillStore(),
+      backup,
+      quasarColors,
+      showDelete: ref(false)
+    }
   },
+  watch: {
+    skill(newValue) {
+      this.backup = Object.assign({}, newValue)
+    }
+  },
+
+  computed: {
+    _skill: {
+      get(): Skill | null {
+        if (this.skill) return this.skill
+        this.$emit('update:skill', new Skill('', -1, '', ''))
+        return new Skill('', -1, '', '')
+      },
+      set(n: Skill) {
+        this.$emit('update:skill', n)
+      }
+    },
+    _visible: {
+      get(): boolean {
+        return this.modelValue
+      },
+      set(n: boolean) {
+        this.$emit('update:modelValue', n)
+      }
+    }
+  }
 })
 </script>
