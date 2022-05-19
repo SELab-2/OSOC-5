@@ -6,6 +6,7 @@ import { Skill } from '../models/Skill'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { baseUrl } from '../utils/baseUrl'
 import qs from 'qs'
+import {exportFile} from 'quasar';
 
 interface State {
   skills: Array<Skill>
@@ -369,7 +370,9 @@ export const useStudentStore = defineStore('user/student', {
      * Get a csv of all students in database
      */
     async csv(): Promise<{data: string, headers: object}> {
-      return await instance.get('students/export_csv')
+      let res = await instance.get('students/export_csv', { responseType: 'blob' })
+      exportFile('test.zip', new Blob([res.data]))
+      
     }
   },
 })

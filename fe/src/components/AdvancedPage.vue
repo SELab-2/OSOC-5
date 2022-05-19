@@ -63,17 +63,10 @@
             Type 'DELETE {{ item.toUpperCase() }}' in the field below to
             confirm.
             <q-input
+              color="red"
               v-model="deleteConfirmItems[item]"
               outlined
               autofocus
-              class="inputfield"
-              :rules="[
-                (val) =>
-                  (val &&
-                    val.length > 0 &&
-                    val === `DELETE ${item.toUpperCase()}`) ||
-                  `Input does not equal 'DELETE ${item.toUpperCase()}'!`,
-              ]"
             />
           </div>
         </q-card-section>
@@ -87,6 +80,7 @@
           label="Delete"
           glow-color="red-2"
           @click="deleteSelected"
+          :disabled="!deleteItems.every(i => Object.values(deleteConfirmItems).includes(`DELETE ${i.toUpperCase()}`))"
         />
       </q-card-actions>
     </q-card>
@@ -108,11 +102,9 @@ export default defineComponent({
   setup() {
     const deleteItems: Ref = ref([] as Array<string>)
     const deleteConfirmItems: Ref = ref({} as { Skills: string, Students: string, Emails: string, Coaches: string, Projects: string })
-
     return {
       deleteItems,
       display_popup: ref(false),
-      deleteConfirm: ref(''),
       deleteConfirmItems
     }
   },
@@ -124,11 +116,11 @@ export default defineComponent({
     const skillStore = useSkillStore()
 
     const items = {
-      'Students': async () => studentStore.csv(),
-      'Emails': async () => mailStore.csv(),
-      'Coaches': async () => coachStore.csv(),
-      'Projects': async () => projectStore.csv(),
-      'Skills': async () => skillStore.csv()
+      'Students': studentStore.csv,
+      'Emails': mailStore.csv,
+      'Coaches': coachStore.csv,
+      'Projects': projectStore.csv,
+      'Skills': skillStore.csv
     }
 
     return {
@@ -149,27 +141,17 @@ export default defineComponent({
       return true
     },
     deleteSelected() {
-      if (this.checkIfValid()) {
-        for (const item of this.deleteItems) {
-          instance.delete(`${item.toLowerCase()}/delete_all`)
-        }
-        this.$q.notify({
-          icon: 'done',
-          color: 'positive',
-          message: `Deleted ${this.deleteItems.join(', ')} successfully!`,
-        })
-        this.display_popup = false
-        this.deleteItems = []
-        this.deleteConfirm = ''
-        this.deleteConfirmItems = {}
-      } else {
-        this.$q.notify({
-          icon: 'warning',
-          color: 'negative',
-          message: `Error: confirmation field(s) are not valid!`,
-          textColor: 'black'
-        });
+      for (const item of this.deleteItems) {
+        instance.delete(`${item.toLowerCase()}/delete_all`)
       }
+      this.$q.notify({
+        icon: 'done',
+        color: 'positive',
+        message: `Deleted ${this.deleteItems.join(', ')} successfully!`,
+      })
+      this.display_popup = false
+      this.deleteItems = []
+      this.deleteConfirmItems = {}
     },
   }
 })
