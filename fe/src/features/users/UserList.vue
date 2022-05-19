@@ -127,6 +127,7 @@
                   </q-item>
                 </template>
               </q-select>
+              <div v-else>{{ roles.find(r => r.value === props.row.role).label }}</div>
             </q-td>
             <q-td
               key="assignedto"
