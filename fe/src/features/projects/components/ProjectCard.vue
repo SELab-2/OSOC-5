@@ -26,7 +26,7 @@
         <q-space />
         <div>
           <btn
-            v-if="editable"
+            v-if="editable && me.isAdmin"
             flat
             round
             size="12px"
@@ -51,13 +51,13 @@
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="_showInfo" style="">
+        <div v-if="_showInfo">
           <div class="text-h6">Info</div>
           <markdown-viewer
             style="overflow: hidden; overflow-wrap: break-word"
             v-model:text="project.extraInfo"
+            :editable="me.isAdmin"
           ></markdown-viewer>
-          <q-separator inset spaced="10px" />
         </div>
       </q-slide-transition>
       <q-slide-transition>
@@ -203,7 +203,6 @@ export default defineComponent({
   data() {
     return {
       hovered: ref(-1),
-      showInfo: ref(!this.editable ?? false),
     }
   },
 
@@ -333,11 +332,6 @@ export default defineComponent({
           false
         )
       )
-
-      // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
-      if (!this.expanded) {
-        // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
-      }
     },
 
     async confirmSuggestion(suggestion: NewProjectSuggestion) {
@@ -403,14 +397,13 @@ export default defineComponent({
     },
     _showInfo: {
       get(): boolean {
-        return this.expandedInfo ?? this.showInfo
+        return this.expandedInfo ?? (this.project as any).showInfo ?? false
       },
       set(n: boolean) {
-        console.log(this.expandedInfo)
         if (this.expandedInfo !== undefined) {
           this.$emit('update:expandedInfo', n)
         } else {
-          this.showInfo = n
+          (this.project as any).showInfo = n
         }
       },
     },

@@ -127,17 +127,13 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       lastName,
       email,
       password1,
-      password2,
-      is_admin,
-      is_active,
+      password2
     }: {
       firstName: string
       lastName: string
       email: string
       password1: string
       password2: string
-      is_admin: boolean
-      is_active: boolean
     }) {
       const config = {
         headers: {
@@ -151,8 +147,6 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         email: email,
         password1: password1,
         password2: password2,
-        is_active: is_active,
-        is_admin: is_admin,
       }
       await axios.post(baseURL + 'auth/register/', bodyParameters, config)
     },

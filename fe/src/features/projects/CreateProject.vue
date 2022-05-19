@@ -140,6 +140,7 @@ import ProjectSkills from './components/ProjectSkills.vue'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { useProjectStore } from '../../stores/useProjectStore'
+import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 import { Project } from '../../models/Project'
 import router from '../../router'
 import ProjectCard from './components/ProjectCard.vue'
@@ -171,8 +172,14 @@ export default defineComponent({
       timeout,
     }
   },
-  async created() {
+  async mounted() {
+    if (!useAuthenticationStore().loggedInUser?.isAdmin) {
+      router.replace('/notfound')
+      return
+    }
     let project: Project
+    this.skillStore.loadSkills()
+    this.coachStore.loadUsers()
     if (this.id) {
       try {
         project = await this.projectStore.getProject(this.id)
@@ -184,10 +191,6 @@ export default defineComponent({
       project = new Project('', '', '', 0, [], [], [])
     }
     this.project = project
-  },
-  mounted() {
-    this.skillStore.loadSkills()
-    this.coachStore.loadUsers()
   },
   methods: {
     next() {

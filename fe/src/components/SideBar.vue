@@ -194,13 +194,6 @@
         </q-scroll-area>
       </div>
 
-      <!--      <q-inner-loading-->
-      <!--        :showing="studentStore.isLoading"-->
-      <!--        label="Please wait..."-->
-      <!--        label-class="text-teal"-->
-      <!--        label-style="font-size: 1.1em"-->
-      <!--      />-->
-
       <div
         class="absolute"
         style="top: 15px; right: -17px; z-index: 2;"

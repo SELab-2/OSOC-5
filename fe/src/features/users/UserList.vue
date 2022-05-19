@@ -266,7 +266,7 @@ export default defineComponent({
   },
   beforeMount() {
     if (!this.authenticationStore.loggedInUser?.isAdmin) {
-      router.replace('/projects')
+      router.replace('/notfound')
     }
   },
   async mounted() {

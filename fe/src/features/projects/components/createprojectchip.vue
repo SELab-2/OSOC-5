@@ -66,7 +66,6 @@ export default defineComponent({
   },
   components: { ProjectRoleChip },
   data() {
-    console.log('created')
     return {
       open: ref(false),
       colors,
