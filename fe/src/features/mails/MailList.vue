@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative-position  flex justify-center"
+    class="relative-position flex justify-center"
     style="width: 100vw"
   >
     <div

@@ -1,10 +1,8 @@
 <template>
-  <div class="q-ma-sm">
-    <div class="text-bold text-h4">Advanced options</div>
-    <div
-      class="row"
-    >
-      <div class="q-gutter-md col-6 row" style="width: 1000px">
+  <div class="q-pt-lg flex relative-position justify-center">
+    <div>
+      <div class="text-bold text-h4">Advanced options</div>
+      <div class="row">
         <div class="column">
           <div class="text-bold text-h5">Bulk deletion</div>
           <div class="row">Select items to be deleted:</div>
@@ -28,20 +26,20 @@
             />
           </div>
         </div>
+        <q-separator vertical spaced inset />
         <div class="column">
-          <div class="col-6">
-            <div class="text-bold text-h5">Download CSV</div>
-            <div class="column q-gutter-sm">
-              <q-btn
-                v-for="(csv, title) in items"
-                :key="title"
-                color="primary"
-                icon-right="archive"
-                :label="title + ' (csv)'"
-                no-caps
-                @click="() => getCSV(title, csv)"
-              />
-            </div>
+          <div class="text-bold text-h5">Download CSV</div>
+          <div class="column q-gutter-sm">
+            <q-btn
+              v-for="(csv, title) in items"
+              :key="title"
+              color="primary"
+              style="width: 200px"
+              icon-right="archive"
+              :label="title + ' (csv)'"
+              no-caps
+              @click="() => getCSV(title, csv)"
+            />
           </div>
         </div>
       </div>
@@ -97,13 +95,13 @@
 
 <script lang="ts">
 import {ref} from 'vue'
-import { useStudentStore } from '../stores/useStudentStore'
+import {useStudentStore} from '../stores/useStudentStore'
 import {instance} from '../utils/axios'
 import {useProjectStore} from "../stores/useProjectStore";
 import {useSkillStore} from "../stores/useSkillStore";
 import {useCoachStore} from "../stores/useCoachStore";
 import {useMailStore} from "../stores/useMailStore";
-import { exportFile } from 'quasar';
+import {exportFile} from 'quasar';
 
 export default {
   setup() {
