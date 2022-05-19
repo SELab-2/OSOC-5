@@ -9,9 +9,12 @@
       </div>
       <q-space />
       <SegmentedControl
+        class="q-mt-xs"
         v-model="userType"
-        color="primary"
+        color="teal"
+        style="height: 40px"
         :options="options"
+        invert-text
       />
       <q-space />
       <q-input
@@ -200,11 +203,14 @@ export default defineComponent({
   },
   setup() {
     const projectStore = useProjectStore()
-
+    
     return {
       projectStore,
       quasarColors,
     }
+  },
+  mounted() {
+    useCoachStore().shouldRefresh = true
   },
   data() {
     const allCoaches: Ref<User[]> = ref([])
@@ -219,19 +225,13 @@ export default defineComponent({
   },
   computed: {
     filters() {
-      const filters =  {
+      return {
         search: this.search,
         ordering: `${this.ascending ? '' : '-'}first_name`,
-      } as { search: string; ordering: string; is_admin?: string; is_active?: string }
+        is_active: this.userType === 'all' ? null : this.userType !== 'inactive',
+        is_admin: this.userType === 'admin' ? true : this.userType === 'coach' ? false : null
+      }
 
-      if(this.userType === 'inactive')
-        filters.is_active = "false"
-      else if(this.userType === 'admin')
-        filters.is_admin = "true"
-      else if(this.userType === 'coach')
-        filters.is_admin = "false"
-
-      return filters
     },
     options(): Array<{ name: string, label: string }> {
       return [
@@ -262,9 +262,19 @@ export default defineComponent({
     getColor(i: number) {
       return this.quasarColors[i % this.quasarColors.length]
     },
-    getColorFromCoach(coach: User) {
+    getColorFromCoach(coach: User): string {
+      // Store the used color in the coach object, so the color is kept when allCoaches is changed.
       const i = this.allCoaches.findIndex((c) => c.id === coach.id)
-      return this.getColor(i)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(coach as any).color) {
+        const color = this.getColor(i);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (coach as any).color = color
+        return color
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (coach as any).color
+      }
     },
     async loadNext(i: number, done: Function) {
       let newUsers = await this.coachStore.loadNext(i, done, this.filters)

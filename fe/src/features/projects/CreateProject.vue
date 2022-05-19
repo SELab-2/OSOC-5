@@ -204,7 +204,7 @@ export default defineComponent({
   },
   methods: {
     next() {
-      if (this.step < 3) {
+      if (this.step < 2) {
         this.step += 1
       } else {
         this.submit()

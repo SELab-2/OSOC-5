@@ -3,7 +3,7 @@
     :class="`bg-${$q.dark.isActive? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'black'} ${noShadow ? '' : 'shadow-2'}`"
     :indicator-color="color"
     style="border-radius: 10px;"
-    :active-class="$q.dark.isActive ? 'text-black' : ''"
+    :active-class="`text-${invertText ? 'white' : 'black'}`"
     v-bind="$attrs"
   >
     <q-tab
@@ -38,6 +38,9 @@
         type: Boolean
       },
       noShadow: {
+        type: Boolean
+      },
+      invertText: {
         type: Boolean
       }
     }

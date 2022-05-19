@@ -30,7 +30,6 @@
             { name: 'coach', label: 'Coaches' },
             { name: 'inactive', label: 'Inactive' },
           ]"
-          @click="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
         />
 
         <q-space />
@@ -59,7 +58,6 @@
             debounce="300"
             color="yellow-4"
             placeholder="Search"
-            @update:modelValue="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
           >
             <template #append>
               <q-icon name="search" />
@@ -337,6 +335,16 @@ export default defineComponent({
       
     }
   },
+  watch: {
+    filters() {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
+  },
+  activated() {
+    if (this.coachStore.shouldRefresh) {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
+  }
 })
 </script>
 
