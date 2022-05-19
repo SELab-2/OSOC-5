@@ -1,69 +1,117 @@
 <template>
-  <div
-    class="relative-position container flex justify-center"
-    style="width: 100vw"
-  >
-    <div class="q-pa-md q-gutter-md" style="width: 1000px">
-      <div class="text-bold text-h4">Advanced options</div>
-      <div class="text-bold text-h5">Bulk deletion</div>
-      <div class="row">Select items to be deleted:</div>
-      <div class="row">
-        <q-checkbox
-          v-model="deleteItems"
-          color="red"
-          size="md"
-          val="Coaches"
-          label="Coaches"
-        />
+  <div class="q-ma-sm">
+    <div class="text-bold text-h4">Advanced options</div>
+    <div
+      class="row"
+    >
+      <div class="q-gutter-md col-6 row" style="width: 1000px">
+        <div class="column">
+          <div class="text-bold text-h5">Bulk deletion</div>
+          <div class="row">Select items to be deleted:</div>
+          <div class="row">
+            <q-checkbox
+              v-model="deleteItems"
+              color="red"
+              size="md"
+              val="Coaches"
+              label="Coaches"
+            />
+          </div>
+          <div class="row">
+            <q-checkbox
+              v-model="deleteItems"
+              color="red"
+              size="md"
+              val="Emails"
+              label="Emails"
+            />
+          </div>
+          <div class="row">
+            <q-checkbox
+              v-model="deleteItems"
+              color="red"
+              size="md"
+              val="Projects"
+              label="Projects"
+            />
+          </div>
+          <div class="row">
+            <q-checkbox
+              v-model="deleteItems"
+              color="red"
+              size="md"
+              val="Skills"
+              label="Skills"
+            />
+          </div>
+          <div class="row">
+            <q-checkbox
+              v-model="deleteItems"
+              color="red"
+              size="md"
+              val="Students"
+              label="Students"
+            />
+          </div>
+          <div class="row">
+            <q-btn
+              color="red"
+              icon="mdi-trash-can-outline"
+              icon-right="send"
+              label="DELETE"
+              :disable="deleteItems.length === 0"
+              @click="display_popup = true"
+            />
+          </div>
+        </div>
+      <div class="column">
+        <div class="col-6">
+          <div class="text-bold text-h5">Download CSV</div>
+          <div class="column q-gutter-sm">
+            <q-btn
+              color="primary"
+              icon-right="archive"
+              label="Students (csv)"
+              no-caps
+              @click="exportTable"
+            />
+            <q-btn
+              color="primary"
+              icon-right="archive"
+              label="Mails (csv)"
+              no-caps
+              @click="exportTable"
+            />
+            <q-btn
+              color="primary"
+              icon-right="archive"
+              label="Coaches (csv)"
+              no-caps
+              @click="exportTable"
+            />
+            <q-btn
+              color="primary"
+              icon-right="archive"
+              label="Projects (csv)"
+              no-caps
+              @click="exportTable"
+            />
+            <q-btn
+              color="primary"
+              icon-right="archive"
+              label="Skills (csv)"
+              no-caps
+              @click="exportTable"
+            />
+          </div>
       </div>
-      <div class="row">
-        <q-checkbox
-          v-model="deleteItems"
-          color="red"
-          size="md"
-          val="Emails"
-          label="Emails"
-        />
+
       </div>
-      <div class="row">
-        <q-checkbox
-          v-model="deleteItems"
-          color="red"
-          size="md"
-          val="Projects"
-          label="Projects"
-        />
-      </div>
-      <div class="row">
-        <q-checkbox
-          v-model="deleteItems"
-          color="red"
-          size="md"
-          val="Skills"
-          label="Skills"
-        />
-      </div>
-      <div class="row">
-        <q-checkbox
-          v-model="deleteItems"
-          color="red"
-          size="md"
-          val="Students"
-          label="Students"
-        />
-      </div>
-      <div class="row">
-        <q-btn
-          color="red"
-          icon="mdi-trash-can-outline"
-          icon-right="send"
-          label="DELETE"
-          :disable="deleteItems.length === 0"
-          @click="display_popup = true"
-        />
+
       </div>
     </div>
   </div>
+
   <q-dialog v-model="display_popup" persistent>
     <q-card style="min-width: 350px">
       <q-card-section horizontal>
