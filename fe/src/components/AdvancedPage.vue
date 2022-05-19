@@ -135,7 +135,7 @@ export default {
     async getCSV(title: string, csv: Function) {
       const data = await csv()
       console.log(data)
-      exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.zip', data.data, 'application/zip')
+      exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.zip', data.data, data.headers)
     },
     checkIfValid() {
       // @ts-ignore
