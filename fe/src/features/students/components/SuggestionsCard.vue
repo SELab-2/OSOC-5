@@ -24,7 +24,7 @@
               :decision="suggestion.suggestion"
             />
             <label class="q-pl-xs">
-              {{ `${suggestion.coach.firstName} ${suggestion.coach.lastName}` }}
+              {{ suggestion.coach ? `${suggestion.coach.firstName} ${suggestion.coach.lastName}` : 'Deleted user' }}
             </label>
             <q-icon
               v-if="suggestion.reason"

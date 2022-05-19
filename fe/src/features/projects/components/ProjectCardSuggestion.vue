@@ -1,10 +1,9 @@
 <template>
   <!-- appear only when a new entry is added. Otherwise, the suggestions may be glitchy when removing suggestions. -->
-  <q-slide-transition :appear="(fromLocal || fromWebsocket) && !suggestion.reason">
-    <div
-      v-if="show"
-      style="margin-left: 10px"
-    >
+  <q-slide-transition
+    :appear="(fromLocal || fromWebsocket) && !suggestion.reason"
+  >
+    <div v-if="show" style="margin-left: 10px">
       <div class="column full-width">
         <div
           :lines="1"
@@ -26,7 +25,7 @@
             :label="fromWebsocket ? 'New' : 'Draft'"
             class="q-ml-xs"
           />
-          
+
           <q-space />
           <div
             v-if="!removed"
@@ -51,12 +50,16 @@
               dense
               round
               icon="r_info"
-              @mouseover="() => {
-                if (progress === 0) progress = 3
-              }"
-              @mouseleave="() => {
-                if (progress === 3) progress = 0
-              }"
+              @mouseover="
+                () => {
+                  if (progress === 0) progress = 3
+                }
+              "
+              @mouseleave="
+                () => {
+                  if (progress === 3) progress = 0
+                }
+              "
               @click="disableHover = !disableHover"
             />
             <btn
@@ -67,10 +70,12 @@
               dense
               round
               icon="delete"
-              @click="() => {
-                removed = true
-                fromLocal ? remove() : prepareRemove()
-              }"
+              @click="
+                () => {
+                  removed = true
+                  fromLocal ? remove() : prepareRemove()
+                }
+              "
             />
           </div>
           <btn
@@ -82,20 +87,13 @@
           />
         </div>
         <q-slide-transition>
-          <div
-            v-if="progress === 3 || disableHover"
-            style="margin-left: 10px"
-          >
+          <div v-if="progress === 3 || disableHover" style="margin-left: 10px">
             <div>Assigned by {{ suggestion.coach.fullName }}</div>
             <div v-if="suggestion.reason">
-              <div class="text-bold">
-                Comment
-              </div>
+              <div class="text-bold">Comment</div>
               {{ suggestion.reason }}
             </div>
-            <div v-else>
-              No comment provided
-            </div>
+            <div v-else>No comment provided</div>
           </div>
         </q-slide-transition>
         <q-slide-transition v-if="progress >= 0">
@@ -118,30 +116,28 @@
                 padding="sm"
                 :loading="progress === 1"
                 :icon="progress === 0 ? 'r_send' : 'r_check'"
-                :glow-color="progress === 2 ? 'green-2' : `${suggestion.skill.color}-2`"
+                :glow-color="
+                  progress === 2 ? 'green-2' : `${suggestion.skill.color}-2`
+                "
                 @click="confirm"
               />
             </template>
           </q-input>
         </q-slide-transition>
-        <div
-          v-else
-          class="row justify-evenly items-center text-red full-width"
-        >
-          <q-icon
-            size="20px"
-            name="error"
-          />
+        <div v-else class="row justify-evenly items-center text-red full-width">
+          <q-icon size="20px" name="error" />
           <div>Cannot add suggestion.</div>
           <btn
             class="q-py-none"
             dense
             glow-color="red-2"
             label="retry"
-            @click="() => {
-              progress = 1
-              confirm()
-            }"
+            @click="
+              () => {
+                progress = 1
+                confirm()
+              }
+            "
           />
         </div>
       </div>
@@ -151,7 +147,10 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { ProjectSuggestion, NewProjectSuggestion } from '../../../models/ProjectSuggestion'
+import {
+  ProjectSuggestion,
+  NewProjectSuggestion,
+} from '../../../models/ProjectSuggestion'
 import { useProjectStore } from '../../../stores/useProjectStore'
 
 export default defineComponent({
@@ -179,7 +178,7 @@ export default defineComponent({
       removed: ref(false),
       disableHover: ref(false),
       timeout,
-      localSuggestion: this.suggestion
+      localSuggestion: this.suggestion,
     }
   },
   computed: {
@@ -190,8 +189,10 @@ export default defineComponent({
       return this.isNew && (this.suggestion as NewProjectSuggestion).fromLocal
     },
     fromWebsocket() {
-      return this.isNew && (this.suggestion as NewProjectSuggestion).fromWebsocket
-    }
+      return (
+        this.isNew && (this.suggestion as NewProjectSuggestion).fromWebsocket
+      )
+    },
   },
   beforeUnmount() {
     if (this.timeout) {
@@ -206,7 +207,7 @@ export default defineComponent({
       clearTimeout(this.timeout)
       this.timeout = null
     },
-    
+
     // This shows the undo button for a short period of time, and will call the actual remove method after a short period of time.
     prepareRemove() {
       this.timeout = setTimeout(() => {
@@ -214,7 +215,7 @@ export default defineComponent({
         this.timeout = null
       }, 2000)
     },
-    
+
     // Actually removes the suggestion from the server. If the suggestion is a draft, it only gets removed locally.
     remove() {
       this.show = false
@@ -233,6 +234,6 @@ export default defineComponent({
         this.progress = -1
       }
     },
-  }
+  },
 })
 </script>

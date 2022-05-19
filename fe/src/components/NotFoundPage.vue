@@ -1,23 +1,16 @@
 <template>
   <div class="fixed-center">
-        <Vue3Lottie :animationLink="options[Math.floor(Math.random() * options.length)]" :height="400" :width="400" />
+        <lottie-animation animationLink="https://assets8.lottiefiles.com/packages/lf20_GIyuXJ.json" :height="400" :width="400" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-const options = [
-  "https://assets8.lottiefiles.com/packages/lf20_GIyuXJ.json",
-  "https://assets1.lottiefiles.com/packages/lf20_zyu0ctqb.json",
-  "https://assets1.lottiefiles.com/packages/lf20_a3kesdek.json"
-]
+import LottieAnimation from './LottieAnimation.vue'
 
 export default defineComponent({
-  data() {
-    return {
-      options
-    }
-  },
+  name: 'NotFound',
+  components: { LottieAnimation },
 })
 
 </script>

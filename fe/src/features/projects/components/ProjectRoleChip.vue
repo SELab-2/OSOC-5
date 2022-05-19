@@ -2,7 +2,7 @@
   <!-- v-model:selected is not used here since this displays an icon, which we don't want. As an alternative, @click is used. -->
   <!-- A Custom implementation of the icon is used, since a chip always reserves place for an icon, even when we don't want it. -->
   <q-chip
-    clickable
+    :clickable="modelValue !== undefined"
     outline
     :color="`${skill.skill.color}-${enabled ? 8 : 4}`"
     :class="`bg-${skill.skill.color}-${enabled ? 4 : 1}`"
@@ -28,19 +28,23 @@
         >
           {{ skill.skill.name }}
         </div>
+        
         <div
           class="text-bold"
           style="padding-left: 3px"
           :class="`text-${enabled ? 'white' : `${skill.skill.color}-8`}`"
         >
-          {{ occupied ?? 0 }}/{{ skill.amount }}
+          <div v-if="occupied === undefined">{{ skill.amount }}</div>
+          <div v-else>{{ occupied ?? 0 }}/{{ skill.amount }}</div>
+          
         </div>
         <q-tooltip
           v-if="skill.comment"
           :class="`bg-${skill.skill.color}-2`"
-          class="text-black shadow-2"
+          class="text-black text-body2 shadow-2"
           anchor="bottom middle"
           self="center middle"
+          style="width: 400px; overflow-wrap: break-word"
         >
           {{ skill.comment }}
         </q-tooltip>
@@ -62,7 +66,7 @@ export default defineComponent({
     },
     occupied: {
       type: Number,
-      required: true
+      required: false
     },
     modelValue: {
       type: Boolean,

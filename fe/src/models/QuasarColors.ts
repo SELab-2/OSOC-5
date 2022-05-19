@@ -18,7 +18,6 @@ const quasarColors: Array<string> =
     "orange",
     "deep-orange",
     "brown",
-    "grey",
     "blue-grey"
   ];
 export default quasarColors;

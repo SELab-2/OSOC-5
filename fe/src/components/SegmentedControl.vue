@@ -1,8 +1,9 @@
 <template>
   <q-tabs
-    class="bg-white text-black shadow-2"
+    :class="`bg-${$q.dark.isActive? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'black'} ${noShadow ? '' : 'shadow-2'}`"
     :indicator-color="color"
     style="border-radius: 10px;"
+    :active-class="$q.dark.isActive ? 'text-black' : ''"
     v-bind="$attrs"
   >
     <q-tab
@@ -11,7 +12,7 @@
       no-caps
       :style="noPadding ? 'padding: 0px 0px !important;' : ''"
       :ripple="false"
-      :name="option.name"
+      :name="option.name as any"
       :label="option.label"
     >
     <div v-if="option.amount !== undefined" class="text-caption" color="red" floating>{{ option.amount! }}</div>
@@ -26,14 +27,17 @@
   export default defineComponent({
     props: {
       options: {
-        type:  [Object] as PropType<{name: string|number, label: string, amount?: number}[]>, 
+        type:  [Object] as PropType<{name: string|number|boolean, label: string, amount?: number}[]>, 
         required: true
       },
       color: {
         type: String,
-        default: "yellow-4"
+        default: "yellow"
       },
       noPadding: {
+        type: Boolean
+      },
+      noShadow: {
         type: Boolean
       }
     }

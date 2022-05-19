@@ -12,6 +12,7 @@
         class="text-weight-medium"
         animated
         @before-transition="adaptState"
+        :class="$q.dark.isActive ? 'bg-dark2' : ''"
       >
         <q-step
           v-for="step in steps"
