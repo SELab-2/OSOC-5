@@ -7,6 +7,7 @@
       <div v-if="decision">
         <div class="text-subtitle2">Final decision</div>
         <SuggestionRow :suggestion="decision" />
+        <q-separator class="q-mt-sm" />
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
