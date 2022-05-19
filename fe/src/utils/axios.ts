@@ -54,10 +54,13 @@ instance.interceptors.response.use(
   }
 )
 
-function refreshToken(instance: AxiosInstance) {
-  return instance
-    .post('/auth/token/refresh/', {
+async function refreshToken(instance: AxiosInstance) {
+  console.log("Expired!")
+  try {
+    await instance.post('/auth/token/refresh/', {
       refresh: localStorage.getItem('refreshToken'),
     })
-    .catch(useAuthenticationStore().logout)
+  } catch (e: any) {
+    useAuthenticationStore().logout()
+  }
 }
