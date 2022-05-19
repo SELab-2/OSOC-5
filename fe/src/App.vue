@@ -15,9 +15,6 @@ import { Dark } from 'quasar'
   actions: [{ icon: 'close', color: 'white' }]
 })
 
-// Dark.set(true)
-console.log(Dark.isActive)
-
 
 </script>
 
