@@ -102,9 +102,10 @@ import { Student } from '../../models/Student'
 import router from '../../router'
 import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
 import ProjectConflictCard from "./components/ProjectConflictCard.vue"
+import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
-    components: { ProjectConflictCard },
+    components: { ProjectConflictCard, MasonryWall },
     setup() {
       const $q = useQuasar()
       const projectConflictStore = useProjectConflictStore()
