@@ -123,7 +123,8 @@ export const useProjectStore = defineStore('project', {
       if (data.coaches)
         data.coaches = await Promise.all(
           data.coaches.map(
-            async (url) => await coachStore.loadUser(url as unknown as string)
+            async ({ url }) =>
+              await coachStore.loadUser(url as unknown as string)
           )
         )
 
