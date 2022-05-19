@@ -3,11 +3,15 @@
     class="my-card shadow-4 q-ma-sm"
     flat
     bordered
+    :dark="$q.dark.isActive"
     style="border-radius: 10px !important"
   >
     <q-card-section>
-      <div class="row">
-        <h5 class="text-bold q-mt-none q-mb-none">
+      <div class="row no-wrap">
+        <h5
+          class="text-bold q-mt-none q-mb-none"
+          style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+        >
           {{ project.name }}
         </h5>
         <q-spinner
@@ -25,7 +29,7 @@
         <q-space />
         <div>
           <btn
-            v-if="editable"
+            v-if="editable && me.isAdmin"
             flat
             round
             size="12px"
@@ -40,7 +44,7 @@
             glow-color="teal-3"
             shadow-color="teal"
             :shadow-strength="_showInfo ? 2 : 5"
-            :color="_showInfo ? 'teal' : 'white'"
+            :color="_showInfo ? 'teal' : 'transparent'"
             :class="`text-${_showInfo ? 'white' : 'teal'}`"
             icon="info"
             @click="_showInfo = !_showInfo"
@@ -50,13 +54,13 @@
 
       <div class="text-overline">{{ project.partnerName }}</div>
       <q-slide-transition>
-        <div v-if="_showInfo" style="">
+        <div v-if="_showInfo">
           <div class="text-h6">Info</div>
           <markdown-viewer
             style="overflow: hidden; overflow-wrap: break-word"
             v-model:text="project.extraInfo"
+            :editable="me.isAdmin"
           ></markdown-viewer>
-          <q-separator inset spaced="10px" />
         </div>
       </q-slide-transition>
       <q-slide-transition>
@@ -67,7 +71,10 @@
             project.suggestedStudents
           "
         >
-          <div v-if="project.coaches && project.coaches.length > 0" class="text-caption text-grey">
+          <div
+            v-if="project.coaches && project.coaches.length > 0"
+            class="text-caption text-grey"
+          >
             Coaches:
           </div>
           <div v-else>There are no coaches assigned to this project.</div>
@@ -76,13 +83,11 @@
             :key="coach.id"
             icon="person"
           >
-            {{ coach.firstName }}
-            {{
-              coach.lastName
-                .split(' ')
-                .map((res) => res.charAt(0))
-                .join('')
-            }}.
+            {{ coach ? `${coach.firstName} ${coach.lastName
+                                      .split(' ')
+                                      .map((res) => res.charAt(0))
+                                      .join('')}` : ''
+            }}
           </q-chip>
           <div class="row" style="display: flex; align-items: center">
             <div
@@ -117,11 +122,13 @@
               :modelValue="
                 selectedRoles[skill.skill.id] || hovered === skill.skill.id
               "
-              @update:modelValue="selectedRoles[skill.skill.id] = $event"
+              @update:modelValue="
+                editable ? (selectedRoles[skill.skill.id] = $event) : ''
+              "
               v-for="skill in project.requiredSkills"
-              @dragleave="onDragLeave($event, skill)"
-              @dragover="checkDrag($event, skill)"
-              @drop="onDrop($event, skill)"
+              @dragleave="editable ? onDragLeave($event, skill) : false"
+              @dragover="editable ? checkDrag($event, skill) : false"
+              @drop="editable ? onDrop($event, skill) : false"
               :key="skill.skill.id"
               :skill="skill"
               :occupied="
@@ -204,7 +211,6 @@ export default defineComponent({
   data() {
     return {
       hovered: ref(-1),
-      showInfo: ref(!this.editable ?? false),
     }
   },
 
@@ -301,43 +307,43 @@ export default defineComponent({
     async onDrop(e: DragEvent, skill: ProjectSkillInterface) {
       e.preventDefault()
       this.hovered = -1
-      this.selectedRoles[skill.skill.id] = true
       const target = <HTMLDivElement>e.target
       // don't drop on other draggables
       if (target.draggable === true) {
         return
       }
-      // TODO: additional checks that datatransfer is valid and not null
-      const data: { targetId: string; student: Student } = JSON.parse(
-        e.dataTransfer!.getData(e.dataTransfer!.types[0])
-      )
-
-      // Add a student to the project.
-      let coach = this.authenticationStore.loggedInUser as User
-      if (!coach) {
-        this.q.notify({
-          icon: 'warning',
-          color: 'warning',
-          message: 'You are not logged in.',
-          textColor: 'black',
-        })
-        return
-      }
-      this.project.suggestedStudents?.push(
-        new NewProjectSuggestion(
-          {
-            coach: this.me,
-            reason: '',
-            skill: skill.skill,
-            student: data.student,
-          },
-          false
+      
+      // Try to parse the datatransfer.
+      try {
+        const data: { targetId: string; student: Student } = JSON.parse(
+          e.dataTransfer!.getData(e.dataTransfer!.types[0])
         )
-      )
+        this.selectedRoles[skill.skill.id] = true
+        // Add a student to the project.
+        let coach = this.authenticationStore.loggedInUser as User
+        if (!coach) {
+          this.q.notify({
+            icon: 'warning',
+            color: 'warning',
+            message: 'You are not logged in.',
+            textColor: 'black',
+          })
+          return
+        }
+        this.project.suggestedStudents?.push(
+          new NewProjectSuggestion(
+            {
+              coach: this.me,
+              reason: '',
+              skill: skill.skill,
+              student: data.student,
+            },
+            false
+          )
+        )
 
-      // Hide the expanded list after dragging. If the list was already expanded by the user, don't hide it.
-      if (!this.expanded) {
-        // setTimeout(() => (this.selectedRoles[skill.skill.id] = false), 1000)
+      } catch (error) {
+        return
       }
     },
 
@@ -404,14 +410,13 @@ export default defineComponent({
     },
     _showInfo: {
       get(): boolean {
-        return this.expandedInfo ?? this.showInfo
+        return this.expandedInfo ?? (this.project as any).showInfo ?? false
       },
       set(n: boolean) {
-        console.log(this.expandedInfo)
         if (this.expandedInfo !== undefined) {
           this.$emit('update:expandedInfo', n)
         } else {
-          this.showInfo = n
+          (this.project as any).showInfo = n
         }
       },
     },
@@ -426,7 +431,6 @@ export default defineComponent({
 
 .container {
   display: inline-block;
-  background-color: red;
   width: max-content;
 }
 .second {

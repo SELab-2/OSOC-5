@@ -78,13 +78,7 @@ export default defineComponent({
       onSubmit() {
         authenticationStore.login({email: email.value, password: password.value})
           .then(() => {
-            router.push('/students') 
-            
-            q.notify({
-              icon: 'done',
-              color: 'positive',
-              message: 'Submitted',
-            })
+            router.push('/students')
           }).catch(() => {
             q.notify({
               icon: 'close',

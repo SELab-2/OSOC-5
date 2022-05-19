@@ -112,7 +112,6 @@ export const useProjectStore = defineStore('project', {
      * @param project the project to get
      */
     async getProject(id: number): Promise<Project> {
-      console.log('Loading')
       const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
         project.coaches.map((coach) => useCoachStore().getUser(coach))
@@ -375,13 +374,9 @@ export const useProjectStore = defineStore('project', {
           }),
           coaches: project.coaches?.map((c) => c.url),
         }
-        await instance.post(
-          'projects/',
-          convertObjectKeysToSnakeCase(mappedProject)
-        )
-        return true
+        await instance.post('projects/', convertObjectKeysToSnakeCase(mappedProject))
       } catch (error) {
-        return false
+        return error
       }
     },
     async updateProject(project: Project, id: number) {
@@ -399,25 +394,17 @@ export const useProjectStore = defineStore('project', {
           }),
           coaches: project.coaches?.map((c) => c.url),
         }
-        await instance.patch(
-          `projects/${id}/`,
-          convertObjectKeysToSnakeCase(mappedProject)
-        )
-        return true
+        await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(mappedProject))
       } catch (error) {
-        return false
+        return error
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async deleteProject(id: number, callback: any) {
-      await instance
-        .delete(`projects/${id}/`)
-        .then(() => {
-          callback(true)
-        })
-        .catch(() => {
-          callback(false)
-        })
+    async deleteProject(id: number) {
+      try {
+        await instance.delete(`projects/${id}/`)
+      } catch (e: any) {
+        return e
+      }
     },
   },
 })

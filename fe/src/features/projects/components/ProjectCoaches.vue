@@ -8,10 +8,9 @@
         class="inputfield q-mb-sm"
         outlined
         dense
+        color="teal"
         debounce="300"
-        color="green"
         placeholder="Search"
-        @keydown.enter.prevent=""
       >
         <template #append>
           <q-icon
@@ -166,11 +165,10 @@ import { defineComponent, ref, Ref, PropType } from 'vue'
 import { useProjectStore } from '../../../stores/useProjectStore'
 import { useCoachStore } from '../../../stores/useCoachStore'
 import { User } from '../../../models/User'
-import CreateProjectChip from './createprojectchip.vue'
 import quasarColors from '../../../models/QuasarColors'
 import LottieAnimation from '../../../components/LottieAnimation.vue'
 export default defineComponent({
-  components: { CreateProjectChip, LottieAnimation },
+  components: { LottieAnimation },
   props: {
     coaches: {
       type: [Object] as PropType<User[]>,
