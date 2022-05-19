@@ -59,5 +59,5 @@ function refreshToken(instance: AxiosInstance) {
     .post('/auth/token/refresh/', {
       refresh: localStorage.getItem('refreshToken'),
     })
-    .catch(() => useAuthenticationStore().logout)
+    .catch(useAuthenticationStore().logout)
 }
