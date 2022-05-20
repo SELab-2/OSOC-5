@@ -225,7 +225,7 @@
       "email": "jan.pieter@example.com",
       "phone_number": "",
       "language": "Dutch",
-      "motivation": "I want to make some money buy new paint!",
+      "motivation": "I want to make some money to buy new paint!",
       "cv": "https://en.wikipedia.org/wiki/Jan_Pieter_Brueghel",
       "portfolio": "https://en.wikipedia.org/wiki/Jan_Pieter_Brueghel",
       "school_name": "UGent",
@@ -589,9 +589,9 @@
     "model": "common.project",
     "pk": 1,
     "fields": {
-      "name": "Project A",
-      "partner_name": "Belfius",
-      "extra_info": "Project A",
+      "name": "Destination Insight",
+      "partner_name": "NMBS",
+      "extra_info": "Use [NMBS](https://www.youtube.com/watch?v=MF_5obRl9kw) route search data in a user friendly application. 🚆",
       "coaches": [
         2
       ]
