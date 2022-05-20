@@ -148,12 +148,12 @@ export const useProjectStore = defineStore('project', {
       const students: Array<ProjectSuggestionInterface> =
         await this.fetchSuggestedStudents(project.suggestedStudents)
 
-      // Is added to projects here because we do not want to await on each project.
       return new Project(
         project.name,
         project.partnerName,
         project.extraInfo,
         project.id,
+        project.url,
         skills,
         coaches,
         students

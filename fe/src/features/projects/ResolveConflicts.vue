@@ -35,10 +35,10 @@
                     <div v-if="item">
                       <q-radio
                         v-model="selectedProjectId"
-                        :val="item.id"
-                        label="Select this project "
+                        :val="(item as {id: number}).id"
+                        label="Select this project"
                       />
-                      <ProjectConflictCard :project="item" />
+                      <ProjectConflictCard :project="item as any" />
                     </div>
                   </template>
                 </masonry-wall>
