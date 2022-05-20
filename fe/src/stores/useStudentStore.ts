@@ -370,9 +370,9 @@ export const useStudentStore = defineStore('user/student', {
      * Get a csv of all students in database
      */
     async csv(): Promise<{data: string, headers: object}> {
-      let res = await instance.get('students/export_csv', { responseType: 'blob' })
+      const res = await instance.get('students/export_csv', { responseType: 'blob' })
       exportFile('test.zip', new Blob([res.data]))
-      
+      return res
     }
   },
 })

@@ -79,8 +79,8 @@
           color="red"
           label="Delete"
           glow-color="red-2"
+          :disabled="!deleteItems.every((i: String) => Object.values(deleteConfirmItems).includes(`DELETE ${i.toUpperCase()}`))"
           @click="deleteSelected"
-          :disabled="!deleteItems.every(i => Object.values(deleteConfirmItems).includes(`DELETE ${i.toUpperCase()}`))"
         />
       </q-card-actions>
     </q-card>
@@ -131,14 +131,6 @@ export default defineComponent({
     async getCSV(title: string, csv: Function) {
       const data = await csv()
       exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.zip', data.data)
-    },
-    checkIfValid() {
-      for (const item of this.deleteItems) {
-        if (`DELETE ${item.toUpperCase()}` !== this.deleteConfirmItems[item]) {
-          return false
-        }
-      }
-      return true
     },
     deleteSelected() {
       for (const item of this.deleteItems) {
