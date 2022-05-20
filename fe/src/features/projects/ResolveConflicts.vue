@@ -12,30 +12,6 @@
       class="q-pa-md"
     >
       <div class="row q-gutter-xl">
-        <div
-          class="col-2"
-          style="max-width: 250px"
-        >
-          <q-list
-            bordered
-            padding
-            separator
-            class="rounded-borders"
-          >
-            <q-item
-              v-for="conflict in projectConflictStore.conflicts"
-              :key="conflict.student.url"
-              v-ripple
-              clickable
-              :class="conflict.student.id === selectedConflict.student.id ? 'bg-teal-1' : ''"
-              @click="selectedConflict = conflict"
-            >
-              <q-item-section>
-                {{ fullName(conflict.student) }}
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </div>
         <div class="col">
           <div v-if="selectedConflict.projects && selectedConflict.projects.length !== 0">
             <div
@@ -84,9 +60,9 @@
           v-if="selectedConflict.projects && selectedConflict.projects.length !== 0"
           class="col-2"
         >
-          <q-btn
+          <btn
             color="primary"
-            label="Submit"
+            label="Resolve"
             @click="resolveConflict()"
           />
         </div>
@@ -122,6 +98,10 @@ export default defineComponent({
       this.loadConflicts()
     },
     methods: {
+      selectStudent(id: number) {
+        console.log(id)
+        this.selectedConflict = this.projectConflictStore.conflicts.find(c => c.student.id === id)
+      },
      selectedProject() {
         return this.selectedConflict.projects.filter(({id}) => id === this.selectedProjectId)[0]
      },
@@ -130,9 +110,6 @@ export default defineComponent({
        this.selectedProjectId = -1
        await this.projectConflictStore.getConflictingProjects()
      },
-      fullName(user: { firstName: string; lastName: string }) {
-        return `${user.firstName} ${user.lastName}`
-      },
       async resolveConflict() {
         try {
           this.projectConflictStore.resolveConflict(this.selectedProject(), this.selectedConflict)
@@ -153,6 +130,13 @@ export default defineComponent({
           await this.projectConflictStore.getConflictingProjects(this.projectConflictStore.nextPage)
         
         done()
+      }
+    },
+    watch: {
+      'projectConflictStore.selectedStudentId': {
+        handler(newValue) {
+          this.selectStudent(newValue)
+        }
       }
     }
 })

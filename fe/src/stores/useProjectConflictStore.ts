@@ -8,12 +8,14 @@ import { useStudentStore } from './useStudentStore'
 interface State {
   conflicts: { student: Student; projects: Project[] }[]
   nextPage: string
+  selectedStudentId: number
 }
 
 export const useProjectConflictStore = defineStore('project/conflict', {
   state: (): State => ({
     conflicts: [],
     nextPage: '',
+    selectedStudentId: 0
   }),
   actions: {
     async getConflictingProjects(url?: string) {
