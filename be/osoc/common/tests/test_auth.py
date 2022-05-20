@@ -1,5 +1,5 @@
 """
-Integration tests for other API endpoints.
+Integration tests for auth API endpoints.
 
 each test simulates an API call to one endpoint and checks if the response data and status code are correct
 these tests test serializers.py and views.py and the API endpoints as a whole
