@@ -32,7 +32,7 @@ instance.interceptors.response.use(
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true
         try {
-          
+          console.log("test")
           const rs = await instance.post('/auth/token/refresh/', {
             refresh: localStorage.getItem('refreshToken'),
           }).catch(() => {
