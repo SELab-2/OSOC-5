@@ -21,7 +21,6 @@ const userColumns = [
         label: 'Assigned To',
         align: 'left' as const,
         field: 'assignedto',
-        sortable: true,
     },
     {
         name: 'email',
