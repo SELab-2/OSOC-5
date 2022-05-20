@@ -35,9 +35,12 @@ instance.interceptors.response.use(
           console.log("test")
           const rs = await instance.post('/auth/token/refresh/', {
             refresh: localStorage.getItem('refreshToken'),
+          }).catch(() => {
+            console.log("expired")
+            useAuthenticationStore().logout()
           })
-          
-          const { access } = rs.data
+          console.log("test")
+          const { access } = (rs as any).data
           localStorage.setItem('accessToken', access)
           instance.defaults.headers.common.Authorization = `Bearer ${access}`
           return instance(originalConfig)
