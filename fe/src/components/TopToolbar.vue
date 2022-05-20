@@ -54,6 +54,8 @@
         <q-list separator>
           <q-item
             v-close-popup
+            color="yellow"
+            class="text-black"
             v-ripple
             clickable
             tabindex="0"
@@ -62,8 +64,8 @@
             <q-item-section avatar>
               <q-icon
                 size="xs"
-                name="priority_high"
-                color="negative"
+                name="settings"
+                color="yellow"
               />
             </q-item-section>
             <q-item-section>

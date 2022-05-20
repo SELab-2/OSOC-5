@@ -3,9 +3,9 @@
     <div>
       <div class="text-bold text-h4">Advanced options</div>
       <div class="row">
-        <div class="column">
-          <div class="text-bold text-h5">Bulk deletion</div>
-          <div class="row">Select items to be deleted:</div>
+        <div class="column q-ma-xl">
+          <div class="text-bold text-h5 q-mb-md">Bulk deletion</div>
+          <div>Select items to be deleted:</div>
           <q-checkbox
             v-for="title in Object.keys(items)"
             :key="title"
@@ -15,24 +15,25 @@
             :val="title"
             :label="title"
           />
-          <div class="row">
-            <q-btn
+          
+            <btn
               color="red"
               icon="mdi-trash-can-outline"
-              icon-right="send"
-              label="DELETE"
+              shadow-color="red"
+              label="Delete"
               :disable="deleteItems.length === 0"
               @click="display_popup = true"
             />
-          </div>
+          
         </div>
         <q-separator vertical spaced inset />
-        <div class="column">
-          <div class="text-bold text-h5">Download CSV</div>
-          <div class="column q-gutter-sm">
-            <q-btn
+        <div class="column q-ma-xl">
+          <div class="text-bold text-h5 q-mb-md">Download CSV</div>
+          <div class="column q-gutter-md">
+            <btn
               v-for="(csv, title) in items"
               :key="title"
+              text-color="black"
               color="primary"
               style="width: 200px"
               icon-right="archive"
@@ -50,7 +51,7 @@
     <q-card style="min-width: 350px">
       <q-card-section horizontal>
         <q-card-section class="col-3 flex flex-center">
-          <q-icon name="warning" class="text-red" size="80px"/>
+          <q-icon name="r_warning" class="text-red" size="80px"/>
         </q-card-section>
         <q-card-section class="q-pt-xs">
           <div class="text-h6 q-mt-sm q-mb-xs">Are you sure?</div>
