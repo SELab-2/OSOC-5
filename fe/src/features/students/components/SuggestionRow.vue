@@ -24,7 +24,7 @@
 <script lang="ts">
 import {Suggestion} from "../../../models/Suggestion";
 import DecisionIcon from "../../../components/DecisionIcon.vue";
-import {defineComponent, PropType} from "vue";
+import {defineComponent} from "vue";
 
 export default defineComponent ({
   components: {
