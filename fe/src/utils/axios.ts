@@ -32,11 +32,11 @@ instance.interceptors.response.use(
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true
         try {
-          
+          console.log("test")
           const rs = await instance.post('/auth/token/refresh/', {
             refresh: localStorage.getItem('refreshToken'),
           })
-          console.log("test")
+          
           const { access } = rs.data
           localStorage.setItem('accessToken', access)
           instance.defaults.headers.common.Authorization = `Bearer ${access}`
