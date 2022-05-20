@@ -95,9 +95,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       const projectStore = useStudentStore()
       projectStore.$reset()
 
-      this.loggedInUser = null
       router.push('/login')
-      router.go(0)
     },
     /**
      * Changes the password of the currently logged in user
