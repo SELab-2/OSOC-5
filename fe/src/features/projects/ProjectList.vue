@@ -177,6 +177,7 @@
           <template #default="{ item }">
             <project-card
               editable
+              v-if="item"
               :project="item as any"
             />
           </template>

@@ -1,7 +1,21 @@
 <template>
-  <div style="overflow: hidden" class="fit column">
+  <div
+    style="overflow: hidden"
+    class="fit column"
+  >
     <div class="row">
-      <div class="text-h4">Project Coaches</div>
+      <div class="text-h4">
+        Project Coaches
+      </div>
+      <q-space />
+      <SegmentedControl
+        class="q-mt-xs"
+        v-model="userType"
+        color="teal"
+        style="height: 40px"
+        :options="options"
+        invert-text
+      />
       <q-space />
       <q-input
         v-model="search"
@@ -19,7 +33,10 @@
             class="cursor-pointer"
             @click="search = ''"
           />
-          <q-icon v-else name="search" />
+          <q-icon
+            v-else
+            name="search"
+          />
         </template>
       </q-input>
     </div>
@@ -27,7 +44,12 @@
       <div>Selected Coaches</div>
       <q-space />
       <div>
-        <btn flat round size="sm" @click="ascending = !ascending">
+        <btn
+          flat
+          round
+          size="sm"
+          @click="ascending = !ascending"
+        >
           <q-icon
             size="2em"
             name="arrow_downward"
@@ -48,10 +70,13 @@
       :limits="[20, 80]"
     >
       <template #before>
-        <div v-if="coaches.length === 0" class="placeholder">
+        <div
+          v-if="coaches.length === 0"
+          class="placeholder"
+        >
           <div class="q-mb-xl">
             <lottie-animation
-              animationLink="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json"
+              animation-link="https://assets8.lottiefiles.com/packages/lf20_av8ts5jt.json"
               :height="200"
               :width="200"
               style="transform: rotate(180deg)"
@@ -74,8 +99,8 @@
           >
             <div class="row items-center">
               <q-icon
-                style="margin-left: -6px"
                 v-if="coach.projects.length > 0"
+                style="margin-left: -6px"
                 name="info"
                 size="sm"
               >
@@ -84,9 +109,7 @@
                   class="text-subtitle2 text-black bg-grey-1 shadow-5 cornered"
                 >
                   <span>Already assigned to the projects:</span>
-                  <span v-for="project in coach.projects"
-                    ><br />{{ project.name }}</span
-                  >
+                  <span v-for="project in coach.projects"><br>{{ project.name }}</span>
                 </q-tooltip>
               </q-icon>
               <span class="text-subtitle1 text-black">{{
@@ -115,14 +138,14 @@
         >
           <q-infinite-scroll
             ref="scroll"
-            @load="loadNext"
             scroll-target="#scroll-target-id"
             :offset="250"
+            @load="loadNext"
           >
             <q-chip
               v-for="(coach, i) in allCoaches"
-              :key="coach.id"
               v-show="!coaches.some((c) => c.id === coach.id)"
+              :key="coach.id"
               outline
               clickable
               :color="getColor(i)"
@@ -130,10 +153,13 @@
               style="border-width: 1.5px"
               @click="addCoachToProject(coach)"
             >
-              <div class="row" style="display: flex; align-items: center">
+              <div
+                class="row"
+                style="display: flex; align-items: center"
+              >
                 <q-icon
-                  style="margin-left: -11px"
                   v-if="coach.projects.length > 0"
+                  style="margin-left: -11px"
                   name="info"
                   size="sm"
                   :color="`${getColor(i)}-6`"
@@ -143,9 +169,7 @@
                     class="text-subtitle2 text-black bg-grey-1 shadow-5 cornered"
                   >
                     <span>Already assigned to the projects:</span>
-                    <span v-for="project in coach.projects"
-                      ><br />{{ project.name }}</span
-                    >
+                    <span v-for="project in coach.projects"><br>{{ project.name }}</span>
                   </q-tooltip>
                 </q-icon>
                 <span class="text-subtitle1 text-black">{{
@@ -167,8 +191,10 @@ import { useCoachStore } from '../../../stores/useCoachStore'
 import { User } from '../../../models/User'
 import quasarColors from '../../../models/QuasarColors'
 import LottieAnimation from '../../../components/LottieAnimation.vue'
+import SegmentedControl from  '../../../components/SegmentedControl.vue'
+
 export default defineComponent({
-  components: { LottieAnimation },
+  components: { LottieAnimation, SegmentedControl },
   props: {
     coaches: {
       type: [Object] as PropType<User[]>,
@@ -177,11 +203,14 @@ export default defineComponent({
   },
   setup() {
     const projectStore = useProjectStore()
-
+    
     return {
       projectStore,
       quasarColors,
     }
+  },
+  mounted() {
+    useCoachStore().shouldRefresh = true
   },
   data() {
     const allCoaches: Ref<User[]> = ref([])
@@ -191,7 +220,36 @@ export default defineComponent({
       ascending: ref(true),
       search: ref(''),
       allCoaches,
+      userType: 'all',
     }
+  },
+  computed: {
+    filters() {
+      return {
+        search: this.search,
+        ordering: `${this.ascending ? '' : '-'}first_name`,
+        is_active: this.userType === 'all' ? null : this.userType !== 'inactive',
+        is_admin: this.userType === 'admin' ? true : this.userType === 'coach' ? false : null
+      }
+
+    },
+    options(): Array<{ name: string, label: string }> {
+      return [
+        { name: 'admin', label: 'Admins'},
+        { name: 'coach', label: 'Coaches' },
+        { name: 'inactive', label: 'Inactive' },
+        { name: 'all', label: 'All' },
+      ]
+    },
+  },
+  watch: {
+    filters() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const scroll = this.$refs.scroll as any
+      scroll.reset()
+      scroll.resume()
+      scroll.trigger()
+    },
   },
   methods: {
     addCoachToProject(coach: User) {
@@ -204,9 +262,19 @@ export default defineComponent({
     getColor(i: number) {
       return this.quasarColors[i % this.quasarColors.length]
     },
-    getColorFromCoach(coach: User) {
+    getColorFromCoach(coach: User): string {
+      // Store the used color in the coach object, so the color is kept when allCoaches is changed.
       const i = this.allCoaches.findIndex((c) => c.id === coach.id)
-      return this.getColor(i)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(coach as any).color) {
+        const color = this.getColor(i);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (coach as any).color = color
+        return color
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (coach as any).color
+      }
     },
     async loadNext(i: number, done: Function) {
       let newUsers = await this.coachStore.loadNext(i, done, this.filters)
@@ -214,23 +282,6 @@ export default defineComponent({
         this.allCoaches = []
       }
       this.allCoaches.push(...newUsers)
-    },
-  },
-  computed: {
-    filters() {
-      return {
-        search: this.search,
-        ordering: `${this.ascending ? '' : '-'}first_name`,
-      }
-    },
-  },
-  watch: {
-    filters() {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const scroll = this.$refs.scroll as any
-      scroll.reset()
-      scroll.resume()
-      scroll.trigger()
     },
   },
 })

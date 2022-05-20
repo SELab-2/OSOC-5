@@ -25,7 +25,7 @@ from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSer
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
 from .models import RequiredSkills, Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
 from .tally.tally import TallyForm
-from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
+from .permissions import IsAdmin, IsAdminOrSafe, IsOwnerOrAdmin, IsActive
 
 
 class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -247,9 +247,11 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             students.csv
             suggestions.csv
         """
-        students = export_to_csv(self.get_queryset(), 'students', CSVStudentSerializer)
-        suggestions = export_to_csv(Suggestion.objects.all().order_by('id'), 'suggestions', CSVSuggestionSerializer)
-        return create_zipfile_response('student', [students, suggestions])
+        students = self.filter_queryset(self.get_queryset())
+        students_csv = export_to_csv(students, 'students', CSVStudentSerializer)
+        suggestions = Suggestion.objects.filter(student__in=students).order_by('student')
+        suggestions_csv = export_to_csv(suggestions, 'suggestions', CSVSuggestionSerializer)
+        return create_zipfile_response('student', [students_csv, suggestions_csv])
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
@@ -364,8 +366,9 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
         returns a HTTP response with a zip file containing the following files:
             coaches.csv
         """
-        coaches = export_to_csv(self.get_queryset(), 'coaches', CSVCoachSerializer)
-        return create_zipfile_response('coach', [coaches])
+        coaches = self.filter_queryset(self.get_queryset())
+        coaches_csv = export_to_csv(coaches, 'coaches', CSVCoachSerializer)
+        return create_zipfile_response('coach', [coaches_csv])
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
@@ -403,7 +406,7 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     queryset = Project.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
+    permission_classes = [permissions.IsAuthenticated, IsActive, IsAdminOrSafe]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter,
                        ProjectFullFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']
@@ -564,10 +567,13 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
             required_skills.csv
             suggested_students.csv
         """
-        projects = export_to_csv(self.get_queryset(), 'projects', CSVProjectSerializer)
-        required_skills = export_to_csv(RequiredSkills.objects.all(), 'required_skills', CSVRequiredSkillSerializer)
-        suggested_students = export_to_csv(ProjectSuggestion.objects.all(), 'suggested_students', CSVProjectSuggestionSerializer)
-        return create_zipfile_response('project', [projects, required_skills, suggested_students])
+        projects = self.filter_queryset(self.get_queryset())
+        projects_csv = export_to_csv(projects, 'projects', CSVProjectSerializer)
+        required_skills = RequiredSkills.objects.filter(project__in=projects).order_by('project')
+        required_skills_csv = export_to_csv(required_skills, 'required_skills', CSVRequiredSkillSerializer)
+        suggested_students = ProjectSuggestion.objects.filter(project__in=projects).order_by('project')
+        suggested_students_csv = export_to_csv(suggested_students, 'suggested_students', CSVProjectSuggestionSerializer)
+        return create_zipfile_response('project', [projects_csv, required_skills_csv, suggested_students_csv])
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
@@ -618,8 +624,9 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
         returns a HTTP response with a zip file containing the following files:
             skills.csv
         """
-        skills = export_to_csv(self.get_queryset(), 'skills', CSVSkillSerializer)
-        return create_zipfile_response('skill', [skills])
+        skills = self.filter_queryset(self.get_queryset())
+        skills_csv = export_to_csv(skills, 'skills', CSVSkillSerializer)
+        return create_zipfile_response('skill', [skills_csv])
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):
@@ -691,8 +698,9 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
         returns a HTTP response with a zip file containing the following files:
             emails.csv
         """
-        emails = export_to_csv(self.get_queryset(), 'emails', CSVSentEmailSerializer)
-        return create_zipfile_response('email', [emails])
+        emails = self.filter_queryset(self.get_queryset())
+        emails_csv = export_to_csv(emails, 'emails', CSVSentEmailSerializer)
+        return create_zipfile_response('email', [emails_csv])
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use

@@ -25,10 +25,12 @@
           </div>
           <div class="q-pb-sm">
             <q-slide-transition>
-              <div class="row no-wrap" v-if="!onConflictsPage">
+              <div
+                v-if="!onConflictsPage"
+                class="row no-wrap"
+              >
                 <q-input
                   v-model="search"
-                  @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
                   debounce="300"
                   class="fit q-mr-sm"
                   dense
@@ -36,9 +38,13 @@
                   color="teal"
                   label="Search Students"
                   hide-bottom-space
+                  @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
                 >
-                  <template v-slot:append>
-                    <q-icon name="search" color="teal-4"/>
+                  <template #append>
+                    <q-icon
+                      name="search"
+                      color="teal-4"
+                    />
                   </template>
                 </q-input>
                 <btn
@@ -164,7 +170,7 @@
           @scroll="showShadow = $event.verticalPosition > 5"
         >
           <q-infinite-scroll
-            ref="infiniteScroll"
+            ref="infinite"
             class="q-pa-sm"
 
             :offset="250"
@@ -221,7 +227,6 @@ import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
 import stati from "../features/mails/Status";
 import {useQuasar} from "quasar";
-import {Student} from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 import { wsBaseUrl } from '../utils/baseUrl';
@@ -318,6 +323,16 @@ export default defineComponent({
     }
   },
   async mounted() {
+    this.studentStore.$subscribe(() => {
+      if (this.studentStore.shouldRefresh) {
+        this.studentStore.shouldRefresh = false
+        const infscroll = this.$refs.infinite as any;
+        infscroll.reset()
+        infscroll.resume()
+        infscroll.trigger()
+      }
+    })
+
     await this.skillStore.loadSkills()
 
     this.socket.onmessage = async (event: { data: string }) => {
