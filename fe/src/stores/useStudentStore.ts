@@ -124,7 +124,7 @@ export const useStudentStore = defineStore('user/student', {
         paramsSerializer: (params) => {
           // Remove unused filters and map lists to correct queries
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v && ((v as any).length > 0 || v === true))), { arrayFormat: 'repeat' })
+          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && ((v as any).length > 0 || v === true || typeof(v) === 'number'))), { arrayFormat: 'repeat' })
         },
       })
 
