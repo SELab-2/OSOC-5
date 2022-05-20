@@ -472,7 +472,6 @@
       "school_name": "École Polytechnique",
       "degree": "Masters",
       "studies": "Engineering",
-      "status": "1",
       "skills": [
         2,
         6,
@@ -1167,8 +1166,9 @@
     "fields": {
       "sender": 1,
       "receiver": 3,
-      "info": "confirmation",
-      "time": "2022-04-12T14:07:27.612Z"
+      "info": "hold on tight",
+      "time": "2022-04-12T14:07:27.612Z",
+      "type": "1"
     }
   },
   {
@@ -1177,8 +1177,9 @@
     "fields": {
       "sender": 3,
       "receiver": 4,
-      "info": "confirmation",
-      "time": "2022-03-05T18:04:30.03Z"
+      "info": "awaiting project",
+      "time": "2022-03-05T18:04:30.03Z",
+      "type": "2"
     }
   },
   {
@@ -1186,9 +1187,10 @@
     "pk": 3,
     "fields": {
       "sender": 2,
-      "receiver": 5,
-      "info": "confirmation",
-      "time": "2022-04-12T14:23:21Z"
+      "receiver": 1,
+      "info": "applied",
+      "time": "2022-04-12T14:23:21Z",
+      "type": "0"
     }
   },
   {
@@ -1197,8 +1199,9 @@
     "fields": {
       "sender": 2,
       "receiver": 5,
-      "info": "contract",
-      "time": "2022-05-01T21:45:31.13Z"
+      "info": "contract declined",
+      "time": "2022-05-01T21:45:31.13Z",
+      "type": "4"
     }
   },
   {
@@ -1208,7 +1211,8 @@
       "sender": 6,
       "receiver": 6,
       "info": "rejection",
-      "time": "2022-05-01T21:56:12.456Z"
+      "time": "2022-05-01T21:56:12.456Z",
+      "type": "5"
     }
   },
   {
@@ -1218,17 +1222,8 @@
       "sender": 1,
       "receiver": 7,
       "info": "approved",
-      "time": "2022-04-20T13:37:42.666Z"
-    }
-  },
-  {
-    "model": "common.sentemail",
-    "pk": 7,
-    "fields": {
-      "sender": 7,
-      "receiver": 8,
-      "info": "hold tight",
-      "time": "2022-04-21T09:55:00Z"
+      "time": "2022-04-20T13:37:42.666Z",
+      "type": "2"
     }
   },
   {
@@ -1238,7 +1233,8 @@
       "sender": 4,
       "receiver": 9,
       "info": "confirmation",
-      "time": "2022-05-01T18:02:56.23Z"
+      "time": "2022-05-01T18:02:56.23Z",
+      "type": "3"
     }
   },
   {
@@ -1247,8 +1243,42 @@
     "fields": {
       "sender": 4,
       "receiver": 9,
-      "info": "contract",
-      "time": "2022-05-02T19:17:22.21Z"
+      "info": "confirmed",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "3"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 8,
+    "fields": {
+      "sender": 4,
+      "receiver": 10,
+      "info": "confirmed",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "4"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 9,
+    "fields": {
+      "sender": 6,
+      "receiver": 11,
+      "info": "confirmed",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "2"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 10,
+    "fields": {
+      "sender": 6,
+      "receiver": 8,
+      "info": "applied",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "0"
     }
   }
 ]
