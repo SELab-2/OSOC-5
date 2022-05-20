@@ -30,15 +30,16 @@
                   :ssr-columns="1"
                   :column-width="320"
                   :gap="0"
-                  @scroll="showShadow = $event.target.scrollTop > 5"
                 >
                   <template #default="{ item }">
-                    <q-radio
-                      v-model="selectedProjectId"
-                      :val="item.id"
-                      label="Select this project "
-                    />
-                    <ProjectConflictCard :project="item" />
+                    <div v-if="item">
+                      <q-radio
+                        v-model="selectedProjectId"
+                        :val="item.id"
+                        label="Select this project "
+                      />
+                      <ProjectConflictCard :project="item" />
+                    </div>
                   </template>
                 </masonry-wall>
                 <template #loading>
@@ -106,7 +107,7 @@ export default defineComponent({
     },
     methods: {
       selectStudent(id: number) {
-        this.selectedConflict = this.projectConflictStore.conflicts.find(c => c.student.id === id)
+        this.selectedConflict = this.projectConflictStore.conflicts.find(c => c.student.id === id) as { student: Student; projects: Project[] }
       },
      selectedProject() {
         return this.selectedConflict.projects.filter(({id}) => id === this.selectedProjectId)[0]

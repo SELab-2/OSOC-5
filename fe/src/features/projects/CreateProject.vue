@@ -71,23 +71,23 @@
         v-if="step > 0"
         style="position: absolute; left: 0; bottom: 0"
         class="q-ma-md"
-        @click="step -= 1"
         padding="10px"
         icon="arrow_back"
         label="Previous"
         color="teal"
         shadow-color="teal"
+        @click="step -= 1"
       />
       <btn
-        style="position: absolute; right: 0; bottom: 0"
-        @click="next"
         v-if="step < 2 && (showPreview || id === undefined)"
+        style="position: absolute; right: 0; bottom: 0"
         padding="10px"
         class="q-ma-md"
         icon-right="arrow_forward"
         label="Next"
         color="teal"
         shadow-color="teal"
+        @click="next"
       />
     </template>
     <template #after>
@@ -95,31 +95,55 @@
         v-if="project && showPreview"
         class="column fit justify-center items-center content-center"
       >
-        <div class="text-h6 text-bold">Preview</div>
+        <div class="text-h6 text-bold">
+          Preview
+        </div>
         <project-card
-          style="width: 90%; max-width: 400px"
           v-model:expandedInfo="showInfo"
+          style="width: 90%; max-width: 400px"
           :project="project"
         />
         <q-slide-transition>
-          <div v-if="showDelete" style="width: 70%; text-align: center;" >
-          <div class="q-gutter-sm q-mb-md" >
-            <div class="text-subtitle2 text-bold text-red">Are you sure you want to delete this project?<br/>This action cannot be undone.</div>
-            <div>Please type the name of the project to confirm:</div>
-            <div class="row justify-center q-gutter-sm">
-              <q-input type="text" outlined color="red" v-model="deleteConfirmation" dense :placeholder="project!.name"/>
-              <btn label="confirm" @click="deleteProject" dense color="red" shadow-color="red" :disabled="deleteConfirmation !== project.name" shadow-strength="2"/>
+          <div
+            v-if="showDelete"
+            style="width: 70%; text-align: center;"
+          >
+            <div class="q-gutter-sm q-mb-md">
+              <div class="text-subtitle2 text-bold text-red">
+                Are you sure you want to delete this project?<br>This action cannot be undone.
+              </div>
+              <div>Please type the name of the project to confirm:</div>
+              <div class="row justify-center q-gutter-sm">
+                <q-input
+                  v-model="deleteConfirmation"
+                  type="text"
+                  outlined
+                  color="red"
+                  dense
+                  :placeholder="project!.name"
+                />
+                <btn
+                  label="confirm"
+                  dense
+                  color="red"
+                  shadow-color="red"
+                  :disabled="deleteConfirmation !== project.name"
+                  shadow-strength="2"
+                  @click="deleteProject"
+                />
+              </div>
             </div>
-          </div>
           </div>
         </q-slide-transition>
       </div>
     </template>
   </q-splitter>
-  <div style="position: absolute; right: 0; bottom: 0" class="q-gutter-md q-ma-md">
+  <div
+    style="position: absolute; right: 0; bottom: 0"
+    class="q-gutter-md q-ma-md"
+  >
     <btn
       v-if="id"
-      @click="showDelete = !showDelete; deleteConfirmation = ''; showInfo = true"
       padding="10px"
       icon="delete"
       label="Delete"
@@ -127,15 +151,16 @@
       glow-size="1500px"
       color="teal"
       shadow-color="teal"
+      @click="showDelete = !showDelete; deleteConfirmation = ''; showInfo = true"
     />
     <btn
       v-if="basicInfoDone"
-      @click="showPreview ? submit() : next()"
       padding="10px"
       :icon-right="!showPreview && step < 2 ? 'arrow_forward' : 'check'"
       :label="!showPreview && step < 2 ? 'Next' : id !== undefined ? 'Update' : 'Publish'"
       color="teal"
       shadow-color="teal"
+      @click="showPreview ? submit() : next()"
     />
   </div>
 </template>
@@ -182,6 +207,41 @@ export default defineComponent({
       deleteConfirmation: ref('')
     }
   },
+  computed: {
+    basicInfoDone(): boolean {
+      if (!this.project) return false
+      return this.project.name.length > 0 && this.project.partnerName.length > 0
+    },
+    showInfo: {
+      get(): boolean {
+        return this.step === 0 || this.showDelete
+      },
+      set(n: boolean) {
+        this.step = 0
+      },
+    },
+    showPreview() {
+      return this.width > 1200 || this.step === 0
+    },
+    _splitterModel: {
+      get(): number {
+        return this.showPreview
+          ? this.step === 0
+            ? 50
+            : this.splitterModel
+          : 100
+      },
+      set(n: number) {
+        if (n > 80) return
+        this.splitterModel = n
+      },
+    },
+  },
+  watch: {
+    step(newValue, oldValue) {
+      this.visitedSteps[oldValue] = true
+    },
+  },
   async mounted() {
     if (!useAuthenticationStore().loggedInUser?.isAdmin) {
       router.replace('/notfound')
@@ -196,7 +256,7 @@ export default defineComponent({
         return
       }
     } else {
-      project = new Project('', '', '', 0, [], [], [])
+      project = new Project('', '', '', 0, "", [], [])
     }
     this.project = project
   },
@@ -251,41 +311,6 @@ export default defineComponent({
       this.timeout = setTimeout(() => {
         this.disabled = false
       }, 200)
-    },
-  },
-  watch: {
-    step(newValue, oldValue) {
-      this.visitedSteps[oldValue] = true
-    },
-  },
-  computed: {
-    basicInfoDone(): boolean {
-      if (!this.project) return false
-      return this.project.name.length > 0 && this.project.partnerName.length > 0
-    },
-    showInfo: {
-      get(): boolean {
-        return this.step === 0 || this.showDelete
-      },
-      set(n: boolean) {
-        this.step = 0
-      },
-    },
-    showPreview() {
-      return this.width > 1200 || this.step === 0
-    },
-    _splitterModel: {
-      get(): number {
-        return this.showPreview
-          ? this.step === 0
-            ? 50
-            : this.splitterModel
-          : 100
-      },
-      set(n: number) {
-        if (n > 80) return
-        this.splitterModel = n
-      },
     },
   },
 })

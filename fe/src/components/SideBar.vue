@@ -38,7 +38,7 @@
                   color="teal"
                   label="Search Students"
                   hide-bottom-space
-                  @update:modelValue="async () => await loadStudents($refs.infiniteScroll)"
+                  @update:modelValue="async () => await loadStudents()"
                 >
                   <template #append>
                     <q-icon
