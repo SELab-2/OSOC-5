@@ -25,7 +25,7 @@
             borderless
             min="1"
             style="max-width: 50px"
-            :input-style="`{'text-align': 'right'}`"
+            :input-style="{'text-align': 'right'} as any"
             :input-class="`text-bold text-${skill.skill.color}-8`"
           />
           <btn
