@@ -30,6 +30,7 @@ instance.interceptors.response.use(
     console.log(originalConfig)
     if (originalConfig.url === '/auth/token/refresh/') {
       console.log("expired")
+      console.log(originalConfig.url)
       useAuthenticationStore().logout()
     }
     if (err.response) {
