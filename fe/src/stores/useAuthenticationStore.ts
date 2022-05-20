@@ -85,7 +85,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     async logout() {
       localStorage.removeItem('refreshToken')
       localStorage.removeItem('accessToken')
-
+      this.loggedInUser = null;
       const studentStore = useStudentStore()
       studentStore.$reset()
       const skillStore = useStudentStore()
@@ -95,8 +95,9 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       const projectStore = useStudentStore()
       projectStore.$reset()
 
+      this.loggedInUser = null
       this.$reset()
-      router.push({ name: 'Login' }).then()
+      router.go(0)
     },
     /**
      * Changes the password of the currently logged in user

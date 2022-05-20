@@ -162,7 +162,7 @@
           @scroll="showShadow = $event.verticalPosition > 5"
         >
           <q-infinite-scroll
-            ref="infiniteScroll"
+            ref="infinite"
             class="q-pa-sm"
 
             :offset="250"
@@ -213,7 +213,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue'
+import {defineComponent, ref, watch} from 'vue'
 import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
@@ -224,6 +224,7 @@ import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 import { wsBaseUrl } from '../utils/baseUrl';
 import { useProjectStore } from '../stores/useProjectStore';
+import {createPinia} from "pinia";
 
 export default defineComponent({
   name: 'SideBar',
@@ -306,6 +307,16 @@ export default defineComponent({
     }
   },
   async mounted() {
+    this.studentStore.$subscribe(() => {
+      if (this.studentStore.shouldRefresh) {
+        this.studentStore.shouldRefresh = false
+        const infscroll = this.$refs.infinite as any;
+        infscroll.reset()
+        infscroll.resume()
+        infscroll.trigger()
+      }
+    })
+
     await this.skillStore.loadSkills()
 
     this.socket.onmessage = async (event: { data: string }) => {
