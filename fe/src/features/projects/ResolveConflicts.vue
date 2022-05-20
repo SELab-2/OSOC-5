@@ -2,10 +2,13 @@
   <div style="height: 100%">
     <q-toolbar
       style="height: 8%; overflow: visible; z-index: 1"
-      :class="`text-blue bg-white ${showShadow ? 'shadow-2' : ''}`"
+      :class="`text-blue ${showShadow ? 'shadow-2' : ''}`"
     >
-      <div class="text-bold text-h4 q-ml-md text-black">
-        Conflicting projects
+      <div
+        class="text-bold text-h4 q-ml-md"
+        :class="`text-${$q.dark.isActive ? 'white' : 'black'}`"
+      >
+        Conflicting Projects
       </div>
     </q-toolbar>
     <div
@@ -38,7 +41,7 @@
                         :val="(item as {id: number}).id"
                         label="Select this project"
                       />
-                      <ProjectConflictCard :project="item as any" />
+                      <ProjectCard :project="item as any" expandable-skills />
                     </div>
                   </template>
                 </masonry-wall>
@@ -78,11 +81,11 @@ import { Project } from '../../models/Project'
 import { Student } from '../../models/Student'
 import router from '../../router'
 import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
-import ProjectConflictCard from "./components/ProjectConflictCard.vue"
+import ProjectCard from './components/ProjectCard.vue'
 import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
-    components: { ProjectConflictCard, MasonryWall },
+    components: { ProjectCard, MasonryWall },
     setup() {
       const q = useQuasar()
       const projectConflictStore = useProjectConflictStore()

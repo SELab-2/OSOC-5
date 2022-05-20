@@ -13,6 +13,7 @@
   </q-btn>
 </template>
 
+<!-- A fancier q-btn, which uses custom shadows, highlight color, and more rounded corners. q-btn attributes can be used on this btn. -->
 <script lang="ts">
   import { ref, defineComponent } from 'vue'
   import { colors, getCssVar } from 'quasar'

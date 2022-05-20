@@ -33,6 +33,7 @@
   </div>
 </template>
 
+<!-- Displays the basic info of the project: name, partner name and info. -->
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-core'
 import { useProjectStore } from '../../../stores/useProjectStore'

@@ -53,21 +53,24 @@
   </q-chip>
 </template>
 
-
+<!-- This component displays the chip of a skill in a project card. -->
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { ProjectSkill } from '../../../models/Skill'
 
 export default defineComponent({
   props: {
+    // The skill to display.
     skill: {
       type: ProjectSkill,
       required: true
     },
+    // The amount of places that are occupied of the skill.
     occupied: {
       type: Number,
       required: false
     },
+    // The state of the skill (open/closed).
     modelValue: {
       type: Boolean,
       required: false,

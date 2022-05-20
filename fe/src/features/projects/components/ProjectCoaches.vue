@@ -184,6 +184,8 @@
   </div>
 </template>
 
+<!-- This is used for choosing the coaches for a new project, or editing the coaches of an exisiting project. -->
+
 <script lang="ts">
 import { defineComponent, ref, Ref, PropType } from 'vue'
 import { useProjectStore } from '../../../stores/useProjectStore'
@@ -196,6 +198,7 @@ import SegmentedControl from  '../../../components/SegmentedControl.vue'
 export default defineComponent({
   components: { LottieAnimation, SegmentedControl },
   props: {
+    // Coaches of a project.
     coaches: {
       type: [Object] as PropType<User[]>,
       required: true,
@@ -210,6 +213,7 @@ export default defineComponent({
     }
   },
   mounted() {
+    // Let Manage Users know the store has been modified and that it should refresh its results.
     useCoachStore().shouldRefresh = true
   },
   data() {
@@ -231,7 +235,6 @@ export default defineComponent({
         is_active: this.userType === 'all' ? null : this.userType !== 'inactive',
         is_admin: this.userType === 'admin' ? true : this.userType === 'coach' ? false : null
       }
-
     },
     options(): Array<{ name: string, label: string }> {
       return [
@@ -243,6 +246,8 @@ export default defineComponent({
     },
   },
   watch: {
+    // Called whenever a filter has been modified.
+    // Will reset the backend pagination counter, and load in the new data.
     filters() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scroll = this.$refs.scroll as any
@@ -259,9 +264,12 @@ export default defineComponent({
       const i = this.coaches.findIndex((s) => s.id === coach.id)
       this.coaches.splice(i, 1)
     },
+    // Get a color for a coach. This is done locally, and a coach does not have a color in the backend.
     getColor(i: number) {
       return this.quasarColors[i % this.quasarColors.length]
     },
+    // This gets the color for a coach, and also locally stores the color in the coach object.
+    // This is done so the color does not change when the coaches variable in the coachstore changes.
     getColorFromCoach(coach: User): string {
       // Store the used color in the coach object, so the color is kept when allCoaches is changed.
       const i = this.allCoaches.findIndex((c) => c.id === coach.id)
@@ -276,6 +284,7 @@ export default defineComponent({
         return (coach as any).color
       }
     },
+    // Pagination function
     async loadNext(i: number, done: Function) {
       let newUsers = await this.coachStore.loadNext(i, done, this.filters)
       if (i === 1) {
