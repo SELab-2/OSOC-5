@@ -4,7 +4,7 @@ Utilities.
 import csv
 from io import BytesIO, StringIO
 from zipfile import ZIP_DEFLATED, ZipFile
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.utils import timezone
 from django.utils.http import urlencode
 from rest_framework.reverse import reverse
@@ -87,3 +87,8 @@ def create_zipfile_response(filename, files):
     zipped_file.seek(0)
     return FileResponse(zipped_file, content_type='application/zip',
         headers={'Content-Disposition': f'attachment; filename="{filename}.zip"'})
+
+def create_csv_response(file):
+
+    return HttpResponse(file, content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{file.name}.csv"'})
