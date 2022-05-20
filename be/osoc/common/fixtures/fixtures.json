@@ -139,7 +139,7 @@
       "password": "abcdef",
       "last_login": null,
       "is_superuser": false,
-      "is_staff": false,
+      "is_staff": true,
       "is_active": true,
       "date_joined": "2022-03-27T12:39:14Z",
       "first_name": "Henri",
@@ -606,7 +606,7 @@
     "fields": {
       "name": "Bike To Work",
       "partner_name": "Brussels Mobility",
-      "extra_info": "An application that finds optimal biking routes to work. Improve the UI/UX of our application!\n - [x] Motivation\n - [x] Love for design\n- [x] Love for bikes 🚲",
+      "extra_info": "An application that finds optimal biking routes to work. Improve the UI/UX of our application!\n - [x] Motivation\n - [x] Love for design\n- [ ] Love for bikes 🚲",
       "coaches": [
         2
       ]
