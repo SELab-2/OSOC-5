@@ -2,10 +2,13 @@
   <div style="height: 100%">
     <q-toolbar
       style="height: 8%; overflow: visible; z-index: 1"
-      :class="`text-blue bg-white ${showShadow ? 'shadow-2' : ''}`"
+      :class="`text-blue ${showShadow ? 'shadow-2' : ''}`"
     >
-      <div class="text-bold text-h4 q-ml-md text-black">
-        Conflicting projects
+      <div
+        class="text-bold text-h4 q-ml-md"
+        :class="`text-${$q.dark.isActive ? 'white' : 'black'}`"
+      >
+        Conflicting Projects
       </div>
     </q-toolbar>
     <div
