@@ -265,6 +265,7 @@
       "degree": "Master",
       "studies": "Software Development",
       "status": "0",
+      "final_decision": "2",
       "skills": [
         1,
         2
@@ -332,6 +333,7 @@
       "degree": "Masters",
       "studies": "Computer Science",
       "status": "2",
+      "final_decision": "19",
       "skills": [
         1,
         2,
@@ -394,13 +396,14 @@
       "email": "lisa@simpsons.com",
       "phone_number": "",
       "language": "dutch",
-      "motivation": "My parents thinks its time for me to start working.",
+      "motivation": "My parents think it's time for me to start working.",
       "cv": "https://simpsons.fandom.com/wiki/Lisa_Simpson",
       "portfolio": "https://simpsons.fandom.com/wiki/Lisa_Simpson",
       "school_name": "Springfield Elementary",
       "degree": "Lower School",
       "studies": "Not applicable",
       "status": "5",
+      "final_decision": "11",
       "skills": [
         6
       ]
@@ -615,7 +618,7 @@
     "fields": {
       "name": "Big Brother",
       "partner_name": "Meemoo",
-      "extra_info": "**Big brother** is an open-source, open-data application that uses advanced AI to do facial recognition.",
+      "extra_info": "**Big brother** is an open-source, open-data application that uses advanced AI to do facial recognition. You just need: \n1. A background in Computer Science\n2. A love for complex algorithms",
       "coaches": [
         3,
         4
@@ -889,7 +892,7 @@
     "fields": {
       "final": true,
       "student": 1,
-      "coach": 4,
+      "coach": 8,
       "suggestion": "2",
       "reason": ""
     }
@@ -931,10 +934,10 @@
     "model": "common.suggestion",
     "pk": 10,
     "fields": {
-      "final": true,
-      "student": 11,
+      "final": false,
+      "student": 2,
       "coach": 3,
-      "suggestion": "1",
+      "suggestion": "2",
       "reason": ""
     }
   },
@@ -964,10 +967,10 @@
     "model": "common.suggestion",
     "pk": 13,
     "fields": {
-      "final": true,
-      "student": 8,
+      "final": false,
+      "student": 11,
       "coach": 3,
-      "suggestion": "2",
+      "suggestion": "1",
       "reason": ""
     }
   },
@@ -986,8 +989,8 @@
     "model": "common.suggestion",
     "pk": 15,
     "fields": {
-      "final": true,
-      "student": 4,
+      "final": false,
+      "student": 2,
       "coach": 4,
       "suggestion": "2",
       "reason": ""
@@ -998,9 +1001,53 @@
     "pk": 16,
     "fields": {
       "final": false,
-      "student": 8,
+      "student": 3,
+      "coach": 1,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 17,
+    "fields": {
+      "final": false,
+      "student": 7,
+      "coach": 2,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 18,
+    "fields": {
+      "final": false,
+      "student": 7,
       "coach": 4,
       "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 19,
+    "fields": {
+      "final": true,
+      "student": 4,
+      "coach": 6,
+      "suggestion": "1",
+      "reason": "This looks like a bot!"
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 20,
+    "fields": {
+      "final": false,
+      "student": 4,
+      "coach": 2,
+      "suggestion": "1",
       "reason": ""
     }
   },
@@ -1074,7 +1121,7 @@
     "model": "common.projectsuggestion",
     "pk": 7,
     "fields": {
-      "reason": "",
+      "reason": "Is gefascineerd door treinen en heeft al veel ervaring met open data.",
       "project": 1,
       "student": 2,
       "coach": 1,
