@@ -11,6 +11,7 @@
         <h5
           class="text-bold q-mt-none q-mb-none"
           style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+          :title="project.name"
         >
           {{ project.name }}
         </h5>
