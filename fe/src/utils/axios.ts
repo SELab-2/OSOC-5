@@ -27,10 +27,8 @@ instance.interceptors.response.use(
   },
   async (err) => {
     const originalConfig = err.config
-    console.log(originalConfig)
     if (originalConfig.url === '/auth/token/refresh/') {
-      console.log("expired")
-      console.log(originalConfig.url)
+      // Logout if the token couldn't be refreshed.
       useAuthenticationStore().logout()
     }
     if (err.response) {
