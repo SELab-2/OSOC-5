@@ -299,7 +299,6 @@ export const useProjectStore = defineStore('project', {
       const coachObj = await coachStore.getUser(coach)
       const skillObj = await skillStore.getSkill(skill)
 
-      console.log(studentStore.students)
       project.suggestedStudents?.push(
         new NewProjectSuggestion(
           {
@@ -319,8 +318,10 @@ export const useProjectStore = defineStore('project', {
       else if (
         onProject === 'true' &&
         !studentStore.students.some(({ url }) => url === student)
-      )
-        await studentStore.getStudent(student)
+      ) {
+        const studentObj = await studentStore.getStudent(student)
+        studentStore.students.unshift(studentObj)
+      }
 
       // Remove the "New" badge from the new suggestion after a short period.
       setTimeout(
@@ -375,8 +376,10 @@ export const useProjectStore = defineStore('project', {
           else if (
             onProject === 'false' &&
             !studentStore.students.some(({ url }) => url === student)
-          )
-            await studentStore.getStudent(student)
+          ) {
+            const studentObj = await studentStore.getStudent(student)
+            studentStore.students.unshift(studentObj)
+          }
 
           project.suggestedStudents?.splice(suggestionIndex, 1)
         }

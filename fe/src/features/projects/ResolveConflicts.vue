@@ -94,12 +94,18 @@ export default defineComponent({
           projectConflictStore
       }
     },
+    watch: {
+      'projectConflictStore.selectedStudentId': {
+        handler(newValue) {
+          this.selectStudent(newValue)
+        }
+      }
+    },
     mounted() {
       this.loadConflicts()
     },
     methods: {
       selectStudent(id: number) {
-        console.log(id)
         this.selectedConflict = this.projectConflictStore.conflicts.find(c => c.student.id === id)
       },
      selectedProject() {
@@ -130,13 +136,6 @@ export default defineComponent({
           await this.projectConflictStore.getConflictingProjects(this.projectConflictStore.nextPage)
         
         done()
-      }
-    },
-    watch: {
-      'projectConflictStore.selectedStudentId': {
-        handler(newValue) {
-          this.selectStudent(newValue)
-        }
       }
     }
 })
