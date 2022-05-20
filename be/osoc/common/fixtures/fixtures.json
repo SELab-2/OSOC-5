@@ -242,7 +242,7 @@
     "pk": 2,
     "fields": {
       "employment_agreement": "volunteer",
-      "hinder_work": "I smoke",
+      "hinder_work": "I smoke.",
       "english_rating": 3,
       "gender": "1",
       "pronouns": "he/him",
@@ -326,8 +326,8 @@
       "phone_number": "",
       "language": "French",
       "motivation": "I want to do my summer internship with OSOC!",
-      "cv": "http://example.com",
-      "portfolio": "http://example.com",
+      "cv": "https://en.wikipedia.org/wiki/Sarah_Kerrigan",
+      "portfolio": "https://en.wikipedia.org/wiki/Sarah_Kerrigan",
       "school_name": "MIT",
       "degree": "Masters",
       "studies": "Computer Science",
@@ -447,7 +447,7 @@
     "pk": 8,
     "fields": {
       "employment_agreement": "student",
-      "hinder_work": "I get lost in discussions",
+      "hinder_work": "I get lost in discussions.",
       "english_rating": 2,
       "gender": "0",
       "pronouns": "by firstname",
@@ -591,7 +591,7 @@
     "fields": {
       "name": "Destination Insight",
       "partner_name": "NMBS",
-      "extra_info": "Use [NMBS](https://www.youtube.com/watch?v=MF_5obRl9kw) route search data in a user friendly application. 🚆",
+      "extra_info": "Use [NMBS](https://www.youtube.com/watch?v=MF_5obRl9kw) route search data in a user friendly application 🚆.\n",
       "coaches": [
         2
       ]
@@ -601,9 +601,9 @@
     "model": "common.project",
     "pk": 2,
     "fields": {
-      "name": "Project B",
-      "partner_name": "Nelfius",
-      "extra_info": "Project B",
+      "name": "Bike To Work",
+      "partner_name": "Brussels Mobility",
+      "extra_info": "An application that finds optimal biking routes to work. Improve the UI/UX of our application!\n - [x] Motivation\n - [x] Love for design\n- [x] Love for bikes 🚲",
       "coaches": [
         2
       ]
@@ -613,9 +613,9 @@
     "model": "common.project",
     "pk": 3,
     "fields": {
-      "name": "Project C",
-      "partner_name": "Discsoft",
-      "extra_info": "urlke",
+      "name": "Big Brother",
+      "partner_name": "Meemoo",
+      "extra_info": "**Big brother** is an open-source, open-data application that uses advanced AI to do facial recognition.",
       "coaches": [
         3,
         4
@@ -626,9 +626,9 @@
     "model": "common.project",
     "pk": 4,
     "fields": {
-      "name": "Project D",
-      "partner_name": "MicroBook",
-      "extra_info": "urlke",
+      "name": "OSOC Team",
+      "partner_name": "OSOC",
+      "extra_info": "Making sure communication flows smoothly at **osoc22**.",
       "coaches": [
         2
       ]
@@ -770,7 +770,7 @@
     "pk": 5,
     "fields": {
       "project": 2,
-      "skill": 2,
+      "skill": 1,
       "amount": 2
     }
   },
@@ -817,6 +817,15 @@
       "project": 4,
       "skill": 4,
       "amount": 3
+    }
+  },
+  {
+    "model": "common.requiredskills",
+    "pk": 11,
+    "fields": {
+      "project": 2,
+      "skill": 3,
+      "amount": 4
     }
   },
   {
