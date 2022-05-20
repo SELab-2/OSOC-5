@@ -15,7 +15,7 @@ export const useProjectConflictStore = defineStore('project/conflict', {
   state: (): State => ({
     conflicts: [],
     nextPage: '',
-    selectedStudentId: 0
+    selectedStudentId: 0,
   }),
   actions: {
     async getConflictingProjects(url?: string) {
@@ -75,6 +75,11 @@ export const useProjectConflictStore = defineStore('project/conflict', {
 
       const projectStore = useProjectStore()
       await projectStore.loadProjects()
+
+      const studentStore = useStudentStore()
+      studentStore.students = studentStore.students.filter(
+        ({ url }) => url !== selectedConflict.student.url
+      )
     },
   },
 })
