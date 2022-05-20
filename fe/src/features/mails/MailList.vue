@@ -284,7 +284,6 @@ export default defineComponent({
         ordering: string
         status: string
       }
-      console.log(this.pagination)
       if (this.search) filter.search = this.search
       filter.page_size = this.pagination.rowsPerPage
       filter.page = this.pagination.page

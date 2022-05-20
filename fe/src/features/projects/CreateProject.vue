@@ -256,7 +256,7 @@ export default defineComponent({
         return
       }
     } else {
-      project = new Project('', '', '', 0, "", [], [])
+      project = new Project('', '', '', 0, '', [], [], [])
     }
     this.project = project
   },
@@ -305,7 +305,6 @@ export default defineComponent({
       this.width = e.width
     },
     disable() {
-      console.log('Hello')
       this.disabled = true
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
