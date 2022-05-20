@@ -21,7 +21,7 @@
           size="12px"
           rounded
           outline
-          color="black"
+          :color="$q.dark.isActive ? 'white' : 'black'"
           label="CV"
         />
         <q-btn
@@ -30,7 +30,7 @@
           size="12px"
           rounded
           outline
-          color="black"
+          :color="$q.dark.isActive ? 'white' : 'black'"
           label="Portfolio"
         />
       </div>
