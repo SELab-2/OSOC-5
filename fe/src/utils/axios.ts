@@ -32,14 +32,17 @@ instance.interceptors.response.use(
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true
         try {
-          const rs = await refreshToken(instance)
-          // @ts-ignore
+          const rs = await instance.post('/auth/token/refresh/', {
+            refresh: localStorage.getItem('refreshToken'),
+          })
           const { access } = rs.data
           localStorage.setItem('accessToken', access)
           instance.defaults.headers.common.Authorization = `Bearer ${access}`
           return instance(originalConfig)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (_error: any) {
+          console.log("expired!")
+          useAuthenticationStore().logout()
           if (_error.response && _error.response.data) {
             return Promise.reject(_error.response.data)
           }
@@ -53,11 +56,3 @@ instance.interceptors.response.use(
     return Promise.reject(err)
   }
 )
-
-async function refreshToken(instance: AxiosInstance) {
-  return instance.post('/auth/token/refresh/', {
-    refresh: localStorage.getItem('refreshToken'),
-  }).catch(() => {
-    useAuthenticationStore().logout()
-  })
-}
