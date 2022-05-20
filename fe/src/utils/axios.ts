@@ -32,13 +32,16 @@ instance.interceptors.response.use(
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true
         try {
+          
           const rs = await instance.post('/auth/token/refresh/', {
             refresh: localStorage.getItem('refreshToken'),
           })
+          console.log("test")
           const { access } = rs.data
           localStorage.setItem('accessToken', access)
           instance.defaults.headers.common.Authorization = `Bearer ${access}`
           return instance(originalConfig)
+          
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (_error: any) {
           console.log("expired!")
