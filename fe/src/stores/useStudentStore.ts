@@ -15,7 +15,14 @@ interface State {
   students: Array<Student>
   isLoading: boolean
   currentStudent: Student | null
-  counts: {yes: number, no: number, maybe: number, undecided: number, none: number}
+  counts: {
+    yes: number
+    no: number
+    maybe: number
+    undecided: number
+    none: number
+  }
+  shouldRefresh: Boolean
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -26,7 +33,8 @@ export const useStudentStore = defineStore('user/student', {
     students: [],
     isLoading: false,
     currentStudent: null,
-    counts: {yes: 0, no: 0, maybe: 0, undecided: 0, none: 0},
+    counts: { yes: 0, no: 0, maybe: 0, undecided: 0, none: 0 },
+    shouldRefresh: false,
   }),
   actions: {
     /**
@@ -43,15 +51,15 @@ export const useStudentStore = defineStore('user/student', {
       const student2 = this.students.find((student) => student.url === url)
       if (student2) return student2
 
-      const newstudent = new Student(data)
-      this.students.unshift(newstudent)
-      return newstudent
+      return new Student(data)
     },
     async deleteStudent(url: string, success: Function, fail: Function) {
       await instance
         .delete(url)
         .then(() => success())
         .catch(() => fail())
+
+      this.shouldRefresh = true
     },
     /**
      * Transform a student filling in its skills and transforming some strings to numbers
@@ -115,7 +123,7 @@ export const useStudentStore = defineStore('user/student', {
         paramsSerializer: (params) => {
           // Remove unused filters and map lists to correct queries
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v && ((v as any).length > 0 || v === true))), { arrayFormat: 'repeat' })
+          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && ((v as any).length > 0 || v === true || typeof(v) === 'number'))), { arrayFormat: 'repeat' })
         },
       })
 
@@ -310,7 +318,7 @@ export const useStudentStore = defineStore('user/student', {
       student_id: string
       coach_id: string
       suggestion: string
-      coach: { id: number; firstName: string; lastName: string; url: string }
+      coach: { id: number; first_name: string; last_name: string; url: string }
       reason: string
     }) {
       this.isLoading = true
@@ -322,7 +330,12 @@ export const useStudentStore = defineStore('user/student', {
       const student = this.students.filter(({ id }) => id === studentId)[0]
       const finalDecision = {
         student: studentId,
-        coach: coach,
+        coach: convertObjectKeysToCamelCase(coach) as {
+          id: number
+          firstName: string
+          lastName: string
+          url: string
+        },
         suggestion: Number.parseInt(suggestion),
         reason,
       }
@@ -348,14 +361,14 @@ export const useStudentStore = defineStore('user/student', {
      * @param student to remove the suggestion from
      * @param coach from who the suggestion is deleted
      */
-    async removeFinalDecision({student_id}: { student_id: string }) {
+    async removeFinalDecision({ student_id }: { student_id: string }) {
       this.isLoading = true
 
       await this.loadYesMaybeNo()
 
       const studentId = Number.parseInt(student_id)
 
-      const student = this.students.filter(({id}) => id === studentId)[0]
+      const student = this.students.filter(({ id }) => id === studentId)[0]
 
       // We found the corresponding student
       if (student) {

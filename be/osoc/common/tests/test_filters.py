@@ -1,12 +1,12 @@
 """
 Unit tests for filters.py
 """
-# pylint: disable=duplicate-code,too-many-lines
 from rest_framework.test import APITestCase
 from django.utils import timezone
 from osoc.common.tests import AdminFactory, CoachFactory, ProjectFactory, SentEmailFactory, SkillFactory, StudentFactory
 from osoc.common.utils import reverse_querystring
-from osoc.common.models import ProjectSuggestion, Suggestion, Student
+from osoc.common.models import Project, ProjectSuggestion, Skill, Suggestion, Student
+
 
 class StudentFilterTests(APITestCase):
     """
@@ -22,6 +22,21 @@ class StudentFilterTests(APITestCase):
         StudentFactory()
         StudentFactory(email="email2@example.com")
         StudentFactory(email="email3@example.com")
+
+    def test_multiple_status_filter(self):
+        """
+        test GET /students/?status=
+        """
+        first = Student.objects.first()
+        first.status = 1
+        first.save()
+        second = Student.objects.exclude(id=first.id).first()
+        second.status = 2
+        second.save()
+
+        url = reverse_querystring("student-list", query_kwargs=({"status": "1,2"}))
+        response = self.client.get(url)
+        self.assertEqual(response.data['count'], 2)
 
     def test_student_on_project_filter(self):
         """
@@ -97,6 +112,55 @@ class StudentFilterTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data['count'], 2)
 
+    def test_student_conflict_filter(self):
+        """
+        test GET /students/?conflicting=
+        """
+        project1 = ProjectFactory()
+        project2 = ProjectFactory(name="project2")
+        skill = SkillFactory()
+        project1.required_skills.add(skill)
+        project2.required_skills.add(skill)
+
+        student1 = Student.objects.first()
+        student2 = Student.objects.exclude(id=student1.id).first()
+
+        # assign a student to 2 different projects
+        ProjectSuggestion.objects.create(
+            project=project1,
+            student=student1,
+            skill=skill,
+            coach=self.user
+        )
+        ProjectSuggestion.objects.create(
+            project=project2,
+            student=student1,
+            skill=skill,
+            coach=self.user
+        )
+        # assign a student twice to the same project
+        ProjectSuggestion.objects.create(
+            project=project1,
+            student=student2,
+            skill=skill,
+            coach=self.user
+        )
+        skill2 = SkillFactory(name="skill2")
+        ProjectSuggestion.objects.create(
+            project=project1,
+            student=student2,
+            skill=skill2,
+            coach=self.user
+        )
+
+        url = reverse_querystring("student-list", query_kwargs=({"conflicting": "true"}))
+        response = self.client.get(url)
+        self.assertEqual(response.data['count'], 2)
+
+        url = reverse_querystring("student-list", query_kwargs=({"conflicting": "false"}))
+        response = self.client.get(url)
+        self.assertEqual(response.data['count'], 1)
+
 
 class EmailFilterTests(APITestCase):
     """
@@ -159,3 +223,45 @@ class EmailFilterTests(APITestCase):
         url = reverse_querystring("sentemail-list", query_kwargs=({"date": "wrong format"}))
         response = self.client.get(url)
         self.assertEqual(response.data['count'], 5)
+
+
+class ProjectFilterTests(APITestCase):
+    """
+    test class for testing custom project filters
+    """
+    def setUp(self):
+        """
+        test setup
+        """
+        self.user = AdminFactory()
+        self.client.force_authenticate(self.user)
+
+        projects = [ProjectFactory(name="project1"),
+                    ProjectFactory(name="project2"),
+                    ProjectFactory(name="project3")]
+
+        skill = SkillFactory()
+        for project in projects:
+            project.required_skills.add(skill)
+
+    def test_project_full_filter(self):
+        """
+        test GET /projects/?full=
+        """
+        skill = Skill.objects.first()
+        project = Project.objects.first()
+        student = StudentFactory()
+        ProjectSuggestion.objects.create(
+            project=project,
+            student=student,
+            skill=skill,
+            coach=self.user
+        )
+
+        url = reverse_querystring("project-list", query_kwargs=({"full": "true"}))
+        response = self.client.get(url)
+        self.assertEqual(response.data['count'], 1)
+
+        url = reverse_querystring("project-list", query_kwargs=({"full": "false"}))
+        response = self.client.get(url)
+        self.assertEqual(response.data['count'], 2)

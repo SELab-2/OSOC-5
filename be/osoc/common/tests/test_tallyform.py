@@ -1,7 +1,6 @@
 """
 Unit tests for tally.py
 """
-# pylint: disable=duplicate-code,too-many-lines
 import json
 from pathlib import Path
 from django.test import TestCase
