@@ -165,6 +165,8 @@
   </div>
 </template>
 
+<!-- Displays the steps to create a new project. -->
+
 <script lang="ts">
 import { ref, Ref, defineComponent } from 'vue'
 import BasicInfo from './components/BasicInfo.vue'
@@ -212,6 +214,7 @@ export default defineComponent({
       if (!this.project) return false
       return this.project.name.length > 0 && this.project.partnerName.length > 0
     },
+    // Determines if the project info should be displayed or not.
     showInfo: {
       get(): boolean {
         return this.step === 0 || this.showDelete
@@ -220,6 +223,9 @@ export default defineComponent({
         this.step = 0
       },
     },
+    // Determines if the preview should be shown or not.
+    // If the window is to narrow, it is hidden, except at the first step,
+    // Because it is needed for the markdown preview.
     showPreview() {
       return this.width > 1200 || this.step === 0
     },
@@ -249,6 +255,7 @@ export default defineComponent({
     }
     let project: Project
     if (this.id) {
+      // Check if the given id is a valid id. If not, reroute to not found.
       try {
         const _id = parseInt(this.id)
         if (isNaN(_id)) throw new Error()
@@ -306,6 +313,7 @@ export default defineComponent({
     onResize(e: { width: number }) {
       this.width = e.width
     },
+    // Enable the move animation after a delay. This is because the animation needs to be disabled when dragging the splitter.
     disable() {
       console.log('Hello')
       this.disabled = true

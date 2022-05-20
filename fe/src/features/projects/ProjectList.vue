@@ -210,6 +210,8 @@
   </q-page-sticky>
 </template>
 
+<!-- This component displays a list of project cards. -->
+
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
 import ProjectCard from './components/ProjectCard.vue'
