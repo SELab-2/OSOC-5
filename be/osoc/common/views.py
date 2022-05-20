@@ -13,7 +13,7 @@ from rest_auth.registration.views import RegisterView, SocialLoginView
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from .utils import export_to_csv, create_zipfile_response
+from .utils import create_csv_response, export_to_csv, create_zipfile_response
 from .pagination import StandardPagination
 from .filters import MultipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter, StudentConflictFilter, ProjectFullFilter
@@ -368,7 +368,8 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
         """
         coaches = self.filter_queryset(self.get_queryset())
         coaches_csv = export_to_csv(coaches, 'coaches', CSVCoachSerializer)
-        return create_zipfile_response('coach', [coaches_csv])
+        # return create_zipfile_response('coach', [coaches_csv])
+        return create_csv_response(coaches_csv)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use

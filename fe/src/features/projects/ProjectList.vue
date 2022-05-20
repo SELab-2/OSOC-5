@@ -100,9 +100,9 @@
                   dense
                   multiple
                   color="teal"
-                  bg-color="white"
                   :options="skillStore.skills"
                   :option-label="opt => opt.name"
+                  :dark="$q.dark.isActive"
                   label="Skills"
                   emit-value
                 >
