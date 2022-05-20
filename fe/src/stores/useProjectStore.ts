@@ -22,6 +22,7 @@ import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
 import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 import qs from 'qs'
+import { useProjectConflictStore } from './useProjectConflictStore'
 
 interface State {
   projects: Array<Project>
@@ -281,6 +282,10 @@ export const useProjectStore = defineStore('project', {
           suggestion.skill.url === skill && suggestion.student.url === student
       )
 
+      // Check if we have conflicts now
+      const projectConflictStore = useProjectConflictStore()
+      await projectConflictStore.getConflictingProjects()
+
       const studentStore = useStudentStore()
 
       if (alreadyExists) {
@@ -356,34 +361,37 @@ export const useProjectStore = defineStore('project', {
       const projectId = Number.parseInt(project_id)
       const project = this.projects.filter(({ id }) => id === projectId)[0]
 
-      if (project) {
-        const suggestionIndex = project.suggestedStudents?.findIndex(
-          (s) => s.student.url === student && s.skill.url === skill
-        )
-        if (
-          suggestionIndex !== undefined && // !== undefined must be written here, otherwise suggestionIndex === 0 will fail.
-          suggestionIndex !== -1 &&
-          project.suggestedStudents &&
-          suggestionIndex < project.suggestedStudents.length &&
-          project.suggestedStudents[suggestionIndex].student.url === student
+      if (!project) return
+      const suggestionIndex = project.suggestedStudents?.findIndex(
+        (s) => s.student.url === student && s.skill.url === skill
+      )
+      if (
+        suggestionIndex !== undefined && // !== undefined must be written here, otherwise suggestionIndex === 0 will fail.
+        suggestionIndex !== -1 &&
+        project.suggestedStudents &&
+        suggestionIndex < project.suggestedStudents.length &&
+        project.suggestedStudents[suggestionIndex].student.url === student
+      ) {
+        const studentStore = useStudentStore()
+
+        if (onProject === 'true')
+          studentStore.students = studentStore.students.filter(
+            ({ url }) => url !== student
+          )
+        else if (
+          onProject === 'false' &&
+          !studentStore.students.some(({ url }) => url === student)
         ) {
-          const studentStore = useStudentStore()
-
-          if (onProject === 'true')
-            studentStore.students = studentStore.students.filter(
-              ({ url }) => url !== student
-            )
-          else if (
-            onProject === 'false' &&
-            !studentStore.students.some(({ url }) => url === student)
-          ) {
-            const studentObj = await studentStore.getStudent(student)
-            studentStore.students.unshift(studentObj)
-          }
-
-          project.suggestedStudents?.splice(suggestionIndex, 1)
+          const studentObj = await studentStore.getStudent(student)
+          studentStore.students.unshift(studentObj)
         }
+
+        project.suggestedStudents?.splice(suggestionIndex, 1)
       }
+
+      // Check if we still have conflicts
+      const projectConflictStore = useProjectConflictStore()
+      await projectConflictStore.getConflictingProjects()
     },
 
     async addProject(project: Project) {
