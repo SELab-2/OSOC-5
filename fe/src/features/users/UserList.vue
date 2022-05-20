@@ -1,11 +1,9 @@
 <template>
   <div
     class="relative-position flex justify-center"
-    style="width: 100vw"
   >
     <div
       class="q-pa-md q-gutter-md"
-      style="width: 1000px"
     >
       <div class="row">
         <div class="text-bold text-h4">
@@ -88,6 +86,8 @@
           >
             <q-td
               key="name"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.fullName"
             >
               {{ props.row.fullName }}
             </q-td>
@@ -131,13 +131,15 @@
             </q-td>
             <q-td
               key="assignedto"
+              style="max-width: 20vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+              :title="props.row.projects?.map((p: {name: string}) => p.name).join(', ') ?? ''"
             >
-            <q-scroll-area :thumb-style="thumbStyle" style="height: 20px; width: 250px;">
               {{ props.row.projects?.map((p: {name: string}) => p.name).join(', ') ?? '' }}
-            </q-scroll-area>
             </q-td>
             <q-td
               key="email"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.email"
             >
               {{ props.row.email }}
             </q-td>
@@ -216,11 +218,6 @@ export default defineComponent({
     })
 
     return {
-      thumbStyle: {
-        borderRadius: '7px',
-        backgroundColor: 'black',
-        height: '4px'
-      },
       pagination,
       deleteDialog: ref(false),
       userId: ref(-1),
