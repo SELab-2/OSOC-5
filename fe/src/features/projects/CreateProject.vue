@@ -256,7 +256,7 @@ export default defineComponent({
         return
       }
     } else {
-      project = new Project('', '', '', 0, "", [], [])
+      project = new Project('', '', '', 0, '', [], [], [])
     }
     this.project = project
   },

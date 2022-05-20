@@ -249,6 +249,10 @@ export default defineComponent({
       }
     },
   },
+  unmounted() {
+    // Reload skills for skill filters in sidebar and projects.
+    this.skillStore.loadSkills()
+  }
 })
 </script>
 
