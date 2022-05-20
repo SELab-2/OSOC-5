@@ -97,7 +97,7 @@
               <div class="text-caption text-grey">Skills:</div>
               <btn
                 flat
-                v-if="editable"
+                v-if="expandableSkills"
                 round
                 size="sm"
                 @click="expanded = !expanded"
@@ -123,7 +123,7 @@
                 selectedRoles[skill.skill.id] || hovered === skill.skill.id
               "
               @update:modelValue="
-                editable ? (selectedRoles[skill.skill.id] = $event) : ''
+                expandableSkills ? (selectedRoles[skill.skill.id] = $event) : ''
               "
               v-for="skill in project.requiredSkills"
               @dragleave="editable ? onDragLeave($event, skill) : false"
@@ -133,7 +133,7 @@
               :skill="skill"
               :occupied="
                 groupedStudents[skill.skill.id]?.length ??
-                (editable ? 0 : undefined)
+                (editable || expandableSkills ? 0 : undefined)
               "
             />
           </div>
@@ -197,6 +197,10 @@ export default defineComponent({
     editable: {
       type: Boolean,
       required: false,
+    },
+    expandableSkills: {
+      type: Boolean,
+      required: false
     },
     // This is used by other components to control the visibility of the extra info of a project.
     expandedInfo: {

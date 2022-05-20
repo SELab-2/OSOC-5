@@ -177,6 +177,7 @@
           <template #default="{ item }">
             <project-card
               editable
+              expandable-skills
               v-if="item"
               :project="item as any"
             />

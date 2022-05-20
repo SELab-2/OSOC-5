@@ -41,7 +41,7 @@
                         :val="(item as {id: number}).id"
                         label="Select this project"
                       />
-                      <ProjectConflictCard :project="item as any" />
+                      <ProjectCard :project="item as any" expandable-skills />
                     </div>
                   </template>
                 </masonry-wall>
@@ -81,11 +81,11 @@ import { Project } from '../../models/Project'
 import { Student } from '../../models/Student'
 import router from '../../router'
 import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
-import ProjectConflictCard from "./components/ProjectConflictCard.vue"
+import ProjectCard from './components/ProjectCard.vue'
 import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
-    components: { ProjectConflictCard, MasonryWall },
+    components: { ProjectCard, MasonryWall },
     setup() {
       const q = useQuasar()
       const projectConflictStore = useProjectConflictStore()
