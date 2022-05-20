@@ -626,6 +626,19 @@
     "model": "common.project",
     "pk": 4,
     "fields": {
+      "name": "Seaspiration",
+      "partner_name": "FLIZ",
+      "extra_info": "Help us visualise and link together all our [data](https://www.vliz.be/en/datasets-belgian-coast-and-sea) about the Belgian coast and sea!\n\n![fish-bowl](https://bestanimations.com/Animals/Fish/goldfishbowl-animation.gif)",
+      "coaches": [
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "common.project",
+    "pk": 5,
+    "fields": {
       "name": "OSOC Team",
       "partner_name": "OSOC",
       "extra_info": "Making sure communication flows smoothly at **osoc22**.",
@@ -636,24 +649,11 @@
   },
   {
     "model": "common.project",
-    "pk": 5,
-    "fields": {
-      "name": "Project E",
-      "partner_name": "3M & M",
-      "extra_info": "oui",
-      "coaches": [
-        3,
-        4
-      ]
-    }
-  },
-  {
-    "model": "common.project",
     "pk": 6,
     "fields": {
-      "name": "Project F",
-      "partner_name": "Inex",
-      "extra_info": "Iets",
+      "name": "Rediscover cities",
+      "partner_name": "IDLab",
+      "extra_info": "Create an AI that suggests unique things to rediscover your favourite city!",
       "coaches": [
         8,
         2,
@@ -665,9 +665,9 @@
     "model": "common.project",
     "pk": 7,
     "fields": {
-      "name": "Project K",
-      "partner_name": "OptiDisc",
-      "extra_info": "DiscOptie",
+      "name": "Open Election",
+      "partner_name": "Vlaamse Overheid",
+      "extra_info": "Make election data open and accessible to citizens.",
       "coaches": [
         8,
         1,
@@ -680,9 +680,9 @@
     "model": "common.project",
     "pk": 8,
     "fields": {
-      "name": "Project ABC",
-      "partner_name": "R.E.M.",
-      "extra_info": "Automatic For The People",
+      "name": "Beyond Passwords",
+      "partner_name": "NGI Trust",
+      "extra_info": "We need to move **[beyond passwords](https://www.ngi.eu/ngi-projects/ngi-trust/#beyond_passwords)**.",
       "coaches": [
         8,
         2
@@ -693,9 +693,9 @@
     "model": "common.project",
     "pk": 9,
     "fields": {
-      "name": "Combo Touch",
-      "partner_name": "Logitech",
-      "extra_info": "Touch die combo!",
+      "name": "Brain-On-Chip",
+      "partner_name": "Imec",
+      "extra_info": "Help creating a chip to decode dementia.",
       "coaches": [
         2,
         4,
@@ -707,9 +707,9 @@
     "model": "common.project",
     "pk": 10,
     "fields": {
-      "name": "Borderlands King",
-      "partner_name": "Stephen Eragon",
-      "extra_info": "Plop",
+      "name": "Save Graffiti",
+      "partner_name": "Urban.brussels",
+      "extra_info": "Create an open web application to visualise legal graffiti spots around Brussels.",
       "coaches": [
         8,
         6,
@@ -721,9 +721,9 @@
     "model": "common.project",
     "pk": 11,
     "fields": {
-      "name": "Beiard",
-      "partner_name": "Massa",
-      "extra_info": "Snoopy",
+      "name": "S.T.E.M.",
+      "partner_name": "European commission",
+      "extra_info": "Improve gender equality in the S.T.E.M field.",
       "coaches": [
         2
       ]
@@ -836,7 +836,7 @@
       "student": 1,
       "coach": 2,
       "suggestion": "0",
-      "reason": ""
+      "reason": "Past qua profiel perfect bij Destination Insight."
     }
   },
   {
@@ -847,7 +847,7 @@
       "student": 2,
       "coach": 4,
       "suggestion": "2",
-      "reason": "Een goeie uitleg"
+      "reason": ""
     }
   },
   {
@@ -858,7 +858,7 @@
       "student": 3,
       "coach": 2,
       "suggestion": "1",
-      "reason": "Ze is te dom"
+      "reason": "Bleek na interview toch geen match met het één van de projecten."
     }
   },
   {
@@ -869,7 +869,7 @@
       "student": 3,
       "coach": 4,
       "suggestion": "0",
-      "reason": "Ze is te slim"
+      "reason": ""
     }
   },
   {
@@ -1008,7 +1008,7 @@
     "model": "common.projectsuggestion",
     "pk": 1,
     "fields": {
-      "reason": "",
+      "reason": "Heeft al een vakantiejob gedaan bij NMBS.",
       "project": 1,
       "student": 3,
       "coach": 3,
@@ -1041,7 +1041,7 @@
     "model": "common.projectsuggestion",
     "pk": 4,
     "fields": {
-      "reason": "",
+      "reason": "Woont in Blankenberge en is gefascineerd door de Belgische kust!",
       "project": 4,
       "student": 5,
       "coach": 4,
