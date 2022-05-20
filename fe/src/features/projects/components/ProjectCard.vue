@@ -167,6 +167,8 @@
   </q-card>
 </template>
 
+
+<!-- A component for displaying a project. -->
 <script lang="ts">
 import ProjectRoleChip from './ProjectRoleChip.vue'
 import { useProjectStore } from '../../../stores/useProjectStore'
@@ -186,14 +188,17 @@ import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
 import MarkdownViewer from './MarkdownViewer.vue'
 export default defineComponent({
   props: {
+    // The Project to display.
     project: {
       type: Project,
       required: true,
     },
+    // If disabled, the edit button is hidden, expanding a skill is disabled, and a student cannot be dragged on a skill.
     editable: {
       type: Boolean,
       required: false,
     },
+    // This is used by other components to control the visibility of the extra info of a project.
     expandedInfo: {
       type: Boolean,
       required: false,
@@ -227,6 +232,7 @@ export default defineComponent({
               )
       },
     },
+    // Update a project whenever the extra info text is changed (by the markdown viewer).
     'project.extraInfo': {
       handler() {
         this.projectStore.updateProject(this.project, this.project.id)
@@ -265,7 +271,8 @@ export default defineComponent({
         })
       }
     },
-
+    
+    // Expand all the skills, so all the assigned students are visible.
     expand(skills: ProjectSkillInterface[]) {
       const indexes = skills.map((s) => s.skill.id)
       for (let i in this.selectedRoles) {
@@ -279,6 +286,8 @@ export default defineComponent({
       return skill.amount - (occupied ? occupied.length : 0)
     },
 
+    // Check if a dragged student is already assigned to a skill.
+    // If so, reject the drag.
     checkDrag(e: DragEvent, skill: ProjectSkillInterface) {
       const id: number = parseInt(e.dataTransfer!.types[0])
       if (
@@ -343,6 +352,7 @@ export default defineComponent({
         )
 
       } catch (error) {
+        // When the data in the dragevent is not a valid format, the drag is rejected and nu further action is needed.
         return
       }
     },

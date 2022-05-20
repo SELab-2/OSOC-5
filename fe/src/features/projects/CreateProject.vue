@@ -183,7 +183,7 @@ export default defineComponent({
   components: { BasicInfo, ProjectCoaches, ProjectSkills, ProjectCard },
   props: {
     id: {
-      type: Number,
+      type: String,
       required: false,
     },
   },
@@ -250,7 +250,9 @@ export default defineComponent({
     let project: Project
     if (this.id) {
       try {
-        project = await this.projectStore.getProject(this.id)
+        const _id = parseInt(this.id)
+        if (isNaN(_id)) throw new Error()
+        project = await this.projectStore.getProject(_id)
       } catch (error) {
         router.replace('/notfound')
         return

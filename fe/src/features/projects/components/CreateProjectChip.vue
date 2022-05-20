@@ -51,6 +51,7 @@
   </q-chip>
 </template>
 
+<!-- Component for a selected skill when creating a project. This component allows the user to fill in an amount and a comment. -->
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { Skill, ProjectSkill } from '../../../models/Skill'
