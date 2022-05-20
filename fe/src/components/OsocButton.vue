@@ -29,7 +29,7 @@ export default defineComponent({
   props: {
     'glowColor': {
       type: String,
-      required: true
+      required: false
     },
     'glowSize': {
       type: String,
@@ -41,7 +41,7 @@ export default defineComponent({
     },
     'color': { 
       type: String,
-      required: true
+      required: false
     },
     'shadowColor': {
       type: String,

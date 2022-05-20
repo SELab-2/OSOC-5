@@ -84,11 +84,11 @@ import MasonryWall from './MasonryWall.vue'
 export default defineComponent({
     components: { ProjectConflictCard, MasonryWall },
     setup() {
-      const $q = useQuasar()
+      const q = useQuasar()
       const projectConflictStore = useProjectConflictStore()
 
       return {
-          q: $q,
+          q,
           selectedConflict: ref({student: {}} as { student: Student; projects: Project[] }),
           showShadow: ref(false),
           selectedProjectId: ref(-1),

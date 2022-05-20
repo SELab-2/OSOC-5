@@ -245,14 +245,12 @@ export default defineComponent({
     const skillStore = useSkillStore()
     const projectStore = useProjectStore()
 
-    const $q = useQuasar()
 
     return {
       studentStore,
       skillStore,
       projectStore,
       projectConflictStore: useProjectConflictStore(),
-      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
