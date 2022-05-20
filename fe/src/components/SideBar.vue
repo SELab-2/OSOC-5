@@ -265,7 +265,7 @@ export default defineComponent({
       suggestion: ref('none'),
       byMe: ref(''),
       onProject: ref(''),
-      status: ref(''),
+      status: ref(null),
       skills: ref([])
     }
   },
@@ -358,7 +358,7 @@ export default defineComponent({
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     loadStudents() {
-      const scroll = this.$refs.infiniteScroll as any;
+      const scroll = this.$refs.infinite as any;
       scroll.reset()
       scroll.resume()
       scroll.trigger()
