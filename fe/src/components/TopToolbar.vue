@@ -49,7 +49,6 @@
         icon="mdi-account"
         :label="fullName"
       >
-        <q-separator />
 
         <q-list separator>
           <q-item

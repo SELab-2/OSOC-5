@@ -188,8 +188,6 @@ export default defineComponent({
       return
     }
     let project: Project
-    this.skillStore.loadSkills()
-    this.coachStore.loadUsers()
     if (this.id) {
       try {
         project = await this.projectStore.getProject(this.id)
@@ -204,7 +202,7 @@ export default defineComponent({
   },
   methods: {
     next() {
-      if (this.step < 3) {
+      if (this.step < 2) {
         this.step += 1
       } else {
         this.submit()

@@ -2,16 +2,19 @@ import { defineStore } from 'pinia'
 import { User, UserInterface } from '../models/User'
 import { instance } from '../utils/axios'
 import { useAuthenticationStore } from './useAuthenticationStore'
+import qs from 'qs'
 
 interface State {
   users: Array<User>
   isLoading: boolean
+  shouldRefresh: boolean
 }
 
 export const useCoachStore = defineStore('user/coach', {
   state: (): State => ({
     users: [],
     isLoading: false,
+    shouldRefresh: false
   }),
   actions: {
     /**
@@ -56,7 +59,15 @@ export const useCoachStore = defineStore('user/coach', {
     
     async loadNext(index: number, done: Function, filters: Object): Promise<Array<User>> {
       
-      const { results, next } = (await instance.get<{ results: User[], next: string }>(`coaches/?page=${index}`, { params: filters })).data
+      const { results, next } = (await instance.get<{ results: User[], next: string }>(`coaches/?page=${index}`, 
+        {
+          params: filters,
+          paramsSerializer: (params) => {
+            // Remove unused filters and map lists to correct queries
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined)), { arrayFormat: 'repeat' })
+          },
+        })).data
       
       done(next === null)
       return results.map(u => new User(u))
