@@ -16,13 +16,22 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { Dark } from 'quasar'
-
 (useQuasar().notify as any).setDefaults({
   position: 'bottom',
   actions: [{ icon: 'close', color: 'white' }]
 })
+</script>
 
+<script lang="ts">
+import { Dark } from 'quasar'
+import { useAuthenticationStore } from './stores/useAuthenticationStore'
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  mounted() {
+    Dark.set(useAuthenticationStore().colorScheme)
+  }
+})
 
 </script>
 
