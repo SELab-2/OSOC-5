@@ -25,7 +25,7 @@ from .serializers import BulkStatusSerializer, CSVCoachSerializer, CSVProjectSer
     UpdateCoachSerializer, RemoveProjectSuggestionSerializer, SentEmailSerializer
 from .models import RequiredSkills, Student, Coach, Skill, Project, SentEmail, Suggestion, ProjectSuggestion
 from .tally.tally import TallyForm
-from .permissions import IsAdmin, IsOwnerOrAdmin, IsActive
+from .permissions import IsAdmin, IsAdminOrSafe, IsOwnerOrAdmin, IsActive
 
 
 class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
@@ -406,7 +406,7 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     queryset = Project.objects.all().order_by('id')
     pagination_class = StandardPagination
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdmin, IsActive]
+    permission_classes = [permissions.IsAuthenticated, IsActive, IsAdminOrSafe]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter,
                        ProjectFullFilter, DjangoFilterBackend]
     search_fields = ['name', 'partner_name', 'extra_info']

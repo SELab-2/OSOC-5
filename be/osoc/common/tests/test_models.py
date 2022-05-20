@@ -1,7 +1,6 @@
 """
 Unit tests for models.py
 """
-# pylint: disable=duplicate-code,too-many-lines
 from django.test import TestCase
 from osoc.common.tests import CoachFactory, ProjectFactory, SentEmailFactory, SkillFactory, StudentFactory
 from osoc.common.models import Student, Skill, Coach, Project, Suggestion, SentEmail
