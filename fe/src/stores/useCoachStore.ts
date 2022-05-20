@@ -14,7 +14,7 @@ export const useCoachStore = defineStore('user/coach', {
   state: (): State => ({
     users: [],
     isLoading: false,
-    shouldRefresh: false
+    shouldRefresh: false,
   }),
   actions: {
     /**
@@ -23,7 +23,9 @@ export const useCoachStore = defineStore('user/coach', {
      * @returns the requested user
      */
     async getUser(newUser: UserInterface): Promise<User> {
-      const user = this.users.find((user) => (user && newUser) ? user.url === newUser.url : false)
+      const user = this.users.find((user) =>
+        user && newUser ? user.url === newUser.url : false
+      )
 
       if (user) return user
       let fetchedUser: User
@@ -37,11 +39,21 @@ export const useCoachStore = defineStore('user/coach', {
       }
 
       // Check again if not present, it could be added in the meantime.
-      const user2 = this.users.find((user) => (user && newUser) ? user.url === newUser.url : false)
+      const user2 = this.users.find((user) =>
+        user && newUser ? user.url === newUser.url : false
+      )
       if (user2) return user2
 
       if (fetchedUser) this.users.push(fetchedUser)
       return fetchedUser
+    },
+    async loadUser(url: string) {
+      const user = this.users.find((user) => user.url === url)
+      if (user) return user
+
+      const { data } = await instance.get<UserInterface>(url)
+
+      return new User(data)
     },
     /**
      * Loads the users
@@ -56,31 +68,44 @@ export const useCoachStore = defineStore('user/coach', {
       this.users = results.map((user) => new User(user))
       this.isLoading = false
     },
-    
-    async loadNext(index: number, done: Function, filters: Object): Promise<Array<User>> {
-      
-      const { results, next } = (await instance.get<{ results: User[], next: string }>(`coaches/?page=${index}`, 
-        {
-          params: filters,
-          paramsSerializer: (params) => {
-            // Remove unused filters and map lists to correct queries
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined)), { arrayFormat: 'repeat' })
-          },
-        })).data
-      
+
+    async loadNext(
+      index: number,
+      done: Function,
+      filters: Object
+    ): Promise<Array<User>> {
+      const { results, next } = (
+        await instance.get<{ results: User[]; next: string }>(
+          `coaches/?page=${index}`,
+          {
+            params: filters,
+            paramsSerializer: (params) => {
+              // Remove unused filters and map lists to correct queries
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              return qs.stringify(
+                Object.fromEntries(
+                  Object.entries(params).filter(([_, v]) => v !== undefined)
+                ),
+                { arrayFormat: 'repeat' }
+              )
+            },
+          }
+        )
+      ).data
+
       done(next === null)
-      return results.map(u => new User(u))
+      return results.map((u) => new User(u))
     },
-    
+
     async loadUsersCoaches(filters: Object, setNumberOfRows: Function) {
       this.isLoading = true
 
       const { results, count } = (
         await instance.get<{ results: UserInterface[]; count: number }>(
-          "coaches/", {
-            params: filters
-            }
+          'coaches/',
+          {
+            params: filters,
+          }
         )
       ).data
 

@@ -11,7 +11,12 @@
         style="overflow: visible; padding: 8px"
         :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'blue'}`"
       >
-        <div class="text-bold text-h4 q-ml-md" :class="`text-${$q.dark.isActive ? 'white' : 'black'}`">Projects</div>
+        <div
+          class="text-bold text-h4 q-ml-md"
+          :class="`text-${$q.dark.isActive ? 'white' : 'black'}`"
+        >
+          Projects
+        </div>
         <q-space />
 
         <btn
@@ -63,6 +68,7 @@
 
         <q-space />
         <btn
+          v-if="conflictsExists"
           padding="7px"
           icon="r_warning"
           color="red-7"
@@ -213,6 +219,7 @@ import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 import StudentSkillChip from "../students/components/StudentSkillChip.vue"
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
+import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
 import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
@@ -226,6 +233,7 @@ export default defineComponent({
       loadNext,
       studentStore: useStudentStore(),
       authenticationStore: useAuthenticationStore(),
+      projectConlictStore: useProjectConflictStore(),
       skillStore: useSkillStore(),
     }
   },
@@ -256,6 +264,9 @@ export default defineComponent({
         filters.full = "true"
 
       return filters
+    },
+    conflictsExists(): boolean {
+      return this.projectConlictStore.conflicts.length > 0
     },
     expanded: {
       get(): boolean {
@@ -313,6 +324,9 @@ export default defineComponent({
       infscroll.trigger()
     }
   },
+  mounted() {
+    this.projectConlictStore.getConflictingProjects()
+  },  
 })
 </script>
 

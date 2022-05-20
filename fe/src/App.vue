@@ -1,8 +1,16 @@
 <template>
-  <q-layout style="height: 100vh" view="hHh lpR fFf">
-
-      <router-view />
-
+  <q-layout
+    style="height: 100vh"
+    view="hHh lpR fFf"
+  >
+    <!-- <Suspense> -->
+    <!-- <template #default> -->
+    <router-view />
+    <!-- </template> -->
+    <!-- <template #fallback>
+        Loading...
+      </template>
+    </Suspense> -->
   </q-layout>
 </template>
 

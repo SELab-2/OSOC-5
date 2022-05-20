@@ -50,9 +50,7 @@ export const useStudentStore = defineStore('user/student', {
       const student2 = this.students.find((student) => student.url === url)
       if (student2) return student2
 
-      const newstudent = new Student(data)
-      this.students.unshift(newstudent)
-      return newstudent
+      return new Student(data)
     },
     async deleteStudent(url: string, success: Function, fail: Function) {
       await instance
