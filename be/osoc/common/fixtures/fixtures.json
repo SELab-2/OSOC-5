@@ -44,7 +44,7 @@
     "pk": 6,
     "fields": {
       "name": "Storyteller",
-      "color": "white"
+      "color": "brown"
     }
   },
   {
@@ -52,7 +52,7 @@
     "pk": 7,
     "fields": {
       "name": "Marketer",
-      "color": "black"
+      "color": "indigo"
     }
   },
   {
@@ -1036,7 +1036,7 @@
       "student": 4,
       "coach": 6,
       "suggestion": "1",
-      "reason": "This looks like a bot!"
+      "reason": "Dit lijk mij een bot!"
     }
   },
   {
