@@ -96,7 +96,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       projectStore.$reset()
 
       this.loggedInUser = null
-      this.$reset()
+      router.push('/login')
       router.go(0)
     },
     /**
