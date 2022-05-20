@@ -188,8 +188,6 @@ export default defineComponent({
       return
     }
     let project: Project
-    this.skillStore.loadSkills()
-    this.coachStore.loadUsers()
     if (this.id) {
       try {
         project = await this.projectStore.getProject(this.id)
