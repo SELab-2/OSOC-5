@@ -131,7 +131,8 @@ export default defineComponent({
   methods: {
     async getCSV(title: string, csv: Function) {
       const data = await csv()
-      exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.zip', data.data)
+      console.log(data)
+      exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.csv', data.data)
     },
     deleteSelected() {
       for (const item of this.deleteItems) {
