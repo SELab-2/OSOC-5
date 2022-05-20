@@ -27,6 +27,12 @@ instance.interceptors.response.use(
   },
   async (err) => {
     const originalConfig = err.config
+    console.log(originalConfig)
+    if (originalConfig.url === '/auth/token/refresh/') {
+      console.log("expired")
+      console.log(originalConfig.url)
+      useAuthenticationStore().logout()
+    }
     if (err.response) {
       // Access Token was expired
       if (err.response.status === 401 && !originalConfig._retry) {
@@ -35,20 +41,15 @@ instance.interceptors.response.use(
           console.log("test")
           const rs = await instance.post('/auth/token/refresh/', {
             refresh: localStorage.getItem('refreshToken'),
-          }).catch(() => {
-            console.log("expired")
-            useAuthenticationStore().logout()
           })
-          console.log("test")
-          const { access } = (rs as any).data
+          
+          const { access } = rs.data
           localStorage.setItem('accessToken', access)
           instance.defaults.headers.common.Authorization = `Bearer ${access}`
           return instance(originalConfig)
           
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (_error: any) {
-          console.log("expired!")
-          useAuthenticationStore().logout()
           if (_error.response && _error.response.data) {
             return Promise.reject(_error.response.data)
           }
