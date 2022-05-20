@@ -23,39 +23,47 @@
           <div class="text-bold text-h5 q-py-sm">
             Students
           </div>
-          <div class="row no-wrap q-pb-sm">
-            <q-input
-              v-model="search"
-              debounce="300"
-              class="fit q-mr-sm"
-              dense
-              outlined
-              color="teal"
-              label="Search Students"
-              hide-bottom-space
-            >
-              <template #append>
-                <q-icon
-                  name="search"
-                  color="teal-4"
+          <div class="q-pb-sm">
+            <q-slide-transition>
+              <div
+                v-if="!onConflictsPage"
+                class="row no-wrap"
+              >
+                <q-input
+                  v-model="search"
+                  debounce="300"
+                  class="fit q-mr-sm"
+                  dense
+                  outlined
+                  color="teal"
+                  label="Search Students"
+                  hide-bottom-space
+                  @update:modelValue="async () => await loadStudents()"
+                >
+                  <template #append>
+                    <q-icon
+                      name="search"
+                      color="teal-4"
+                    />
+                  </template>
+                </q-input>
+                <btn
+                  round
+                  size="0.95em"
+                  glow-color="teal-2"
+                  shadow-color="osoc-red"
+                  :shadow-strength="showFilters ? 2 : 5"
+                  :color="showFilters ? 'primary' : 'light-grey'"
+                  :class="`text-${showFilters ? 'white' : 'green'}`"
+                  icon="tune"
+                  @click="showFilters = !showFilters"
                 />
-              </template>
-            </q-input>
-            <btn
-              round
-              size="0.95em"
-              glow-color="teal-2"
-              shadow-color="osoc-red"
-              :shadow-strength="showFilters ? 2 : 5"
-              :color="showFilters ? 'primary' : 'light-grey'"
-              :class="`text-${showFilters ? 'white' : 'green'}`"
-              icon="tune"
-              @click="showFilters = !showFilters"
-            />
+              </div>
+            </q-slide-transition>
           </div>
           <q-slide-transition>
             <div
-              v-if="showFilters"
+              v-if="showFilters && !onConflictsPage"
               class="overflow-hidden"
             >
               <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
@@ -178,7 +186,7 @@
               :must-hover="onProjectsPage"
               :student="student"
               :active="studentStore.currentStudent?.id === student.id && onStudentsPage"
-              @click="$router.push(`/students/${student.id}`)"
+              @click="onConflictsPage ? (projectConflictStore.selectedStudentId = student.id) : $router.push(`/students/${student.id}`)"
               @dragstart="onDragStart($event, student)"
             />
             <template #loading>
@@ -213,18 +221,17 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref, watch} from 'vue'
+import {defineComponent, ref} from 'vue'
 import SegmentedControl from "./SegmentedControl.vue";
 import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
 import stati from "../features/mails/Status";
 import {useQuasar} from "quasar";
-import {Student} from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 import { wsBaseUrl } from '../utils/baseUrl';
 import { useProjectStore } from '../stores/useProjectStore';
-import {createPinia} from "pinia";
+import { useProjectConflictStore } from '../stores/useProjectConflictStore';
 
 export default defineComponent({
   name: 'SideBar',
@@ -244,6 +251,7 @@ export default defineComponent({
       studentStore,
       skillStore,
       projectStore,
+      projectConflictStore: useProjectConflictStore(),
       $q,
       thumbStyle: {
         right: '0px',
@@ -265,7 +273,7 @@ export default defineComponent({
       suggestion: ref('none'),
       byMe: ref(''),
       onProject: ref(''),
-      status: ref(''),
+      status: ref(null),
       skills: ref([])
     }
   },
@@ -276,7 +284,15 @@ export default defineComponent({
     onStudentsPage(): boolean {
       return this.$route.name === "Students" || this.$route.name === "Student Page";
     },
+    onConflictsPage(): boolean {
+      return this.$route.name === "Project Conflicts"
+    },
     filters(): Object {
+      if (this.onConflictsPage) {
+        return {
+          conflicting: true
+        }
+      }
       return {
         search: this.search,
         alum: this.alumni === "alumni",
@@ -298,7 +314,7 @@ export default defineComponent({
       ]
     },
     showDrawer(): boolean {
-      return this.onProjectsPage || this.onStudentsPage
+      return this.onProjectsPage || this.onStudentsPage || this.onConflictsPage
     }
   },
   watch: {
@@ -358,7 +374,7 @@ export default defineComponent({
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     loadStudents() {
-      const scroll = this.$refs.infiniteScroll as any;
+      const scroll = this.$refs.infinite as any;
       scroll.reset()
       scroll.resume()
       scroll.trigger()

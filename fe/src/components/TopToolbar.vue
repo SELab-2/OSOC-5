@@ -6,7 +6,8 @@
     <q-toolbar class="shadow-2" :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'osoc-blue'}`">
       <btn flat round href="https://www.osoc.be">
         <q-avatar size="42px">
-          <img :src="`/src/assets/logo${$q.dark.isActive ? '_dark' : ''}.svg`">
+          <img v-if="$q.dark.isActive" src="../assets/logo_dark.svg"/>
+          <img v-else src="../assets/logo.svg"/>
         </q-avatar>
       </btn>
 
@@ -49,7 +50,6 @@
         icon="mdi-account"
         :label="fullName"
       >
-        <q-separator />
 
         <q-list separator>
           <q-item

@@ -2,13 +2,9 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { User, UserInterface } from '../models/User'
 import { instance } from '../utils/axios'
+import { baseUrl } from '../utils/baseUrl'
 import { useStudentStore } from './useStudentStore'
 import router from '../router'
-
-const baseURL =
-  process.env.NODE_ENV == 'development'
-    ? 'http://127.0.0.1:8000/api/'
-    : 'https://sel2-5.ugent.be/api/'
 
 interface State {
   loggedInUser: UserInterface | null
@@ -65,7 +61,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       email: string
       password: string
     }): Promise<void> {
-      const { data } = await axios.post(baseURL + 'auth/login/', {
+      const { data } = await axios.post(baseUrl + 'auth/login/', {
         username: email,
         email,
         password,
@@ -95,9 +91,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       const projectStore = useStudentStore()
       projectStore.$reset()
 
-      this.loggedInUser = null
-      this.$reset()
-      router.go(0)
+      router.push('/login')
     },
     /**
      * Changes the password of the currently logged in user
@@ -114,7 +108,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         new_password2: p2,
       }
       await axios.post(
-        baseURL + 'auth/password/change/',
+        baseUrl + 'auth/password/change/',
         bodyParameters,
         config
       )
@@ -149,7 +143,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
         password1: password1,
         password2: password2,
       }
-      await axios.post(baseURL + 'auth/register/', bodyParameters, config)
+      await axios.post(baseUrl + 'auth/register/', bodyParameters, config)
     },
   },
 })

@@ -50,9 +50,7 @@ export const useStudentStore = defineStore('user/student', {
       const student2 = this.students.find((student) => student.url === url)
       if (student2) return student2
 
-      const newstudent = new Student(data)
-      this.students.unshift(newstudent)
-      return newstudent
+      return new Student(data)
     },
     async deleteStudent(url: string, success: Function, fail: Function) {
       await instance
@@ -124,7 +122,7 @@ export const useStudentStore = defineStore('user/student', {
         paramsSerializer: (params) => {
           // Remove unused filters and map lists to correct queries
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v && ((v as any).length > 0 || v === true))), { arrayFormat: 'repeat' })
+          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && ((v as any).length > 0 || v === true || typeof(v) === 'number'))), { arrayFormat: 'repeat' })
         },
       })
 

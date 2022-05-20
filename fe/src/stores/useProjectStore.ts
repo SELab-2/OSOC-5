@@ -22,6 +22,7 @@ import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
 import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 import qs from 'qs'
+import { useProjectConflictStore } from './useProjectConflictStore'
 
 interface State {
   projects: Array<Project>
@@ -107,6 +108,29 @@ export const useProjectStore = defineStore('project', {
       const { data } = await instance.get<Skill>(skill.skill)
       return new ProjectSkill(skill.amount, skill.comment, new Skill(data))
     },
+    async getOrFetchProject(url: string) {
+      const splittedUrl = url.split('/')
+      const id = Number.parseInt(splittedUrl[splittedUrl.length - 2])
+
+      const localPoject = this.projects.filter(
+        (project) => project.id === id
+      )[0]
+
+      if (localPoject) return localPoject
+
+      const { data } = await instance.get<Project>(`projects/${id}`)
+      const coachStore = useCoachStore()
+
+      if (data.coaches)
+        data.coaches = await Promise.all(
+          data.coaches.map(
+            async ({ url }) =>
+              await coachStore.loadUser(url as unknown as string)
+          )
+        )
+
+      return data
+    },
     /**
      * Gets a project
      * @param project the project to get
@@ -124,12 +148,12 @@ export const useProjectStore = defineStore('project', {
       const students: Array<ProjectSuggestionInterface> =
         await this.fetchSuggestedStudents(project.suggestedStudents)
 
-      // Is added to projects here because we do not want to await on each project.
       return new Project(
         project.name,
         project.partnerName,
         project.extraInfo,
         project.id,
+        project.url,
         skills,
         coaches,
         students
@@ -143,8 +167,9 @@ export const useProjectStore = defineStore('project', {
         const { results } = (
           await instance.get<{ results: TempProject[] }>('projects/')
         ).data
+
         this.projects = results.map(
-          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
+          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id, p.url)
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
@@ -205,7 +230,7 @@ export const useProjectStore = defineStore('project', {
       this.projects = [
         ...this.projects,
         ...results.map(
-          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id)
+          (p) => new Project(p.name, p.partnerName, p.extraInfo, p.id, p.url)
         ),
       ]
 
@@ -257,6 +282,10 @@ export const useProjectStore = defineStore('project', {
           suggestion.skill.url === skill && suggestion.student.url === student
       )
 
+      // Check if we have conflicts now
+      const projectConflictStore = useProjectConflictStore()
+      await projectConflictStore.getConflictingProjects()
+
       const studentStore = useStudentStore()
 
       if (alreadyExists) {
@@ -275,7 +304,6 @@ export const useProjectStore = defineStore('project', {
       const coachObj = await coachStore.getUser(coach)
       const skillObj = await skillStore.getSkill(skill)
 
-      console.log(studentStore.students)
       project.suggestedStudents?.push(
         new NewProjectSuggestion(
           {
@@ -295,8 +323,10 @@ export const useProjectStore = defineStore('project', {
       else if (
         onProject === 'true' &&
         !studentStore.students.some(({ url }) => url === student)
-      )
-        await studentStore.getStudent(student)
+      ) {
+        const studentObj = await studentStore.getStudent(student)
+        studentStore.students.unshift(studentObj)
+      }
 
       // Remove the "New" badge from the new suggestion after a short period.
       setTimeout(
@@ -331,32 +361,37 @@ export const useProjectStore = defineStore('project', {
       const projectId = Number.parseInt(project_id)
       const project = this.projects.filter(({ id }) => id === projectId)[0]
 
-      if (project) {
-        const suggestionIndex = project.suggestedStudents?.findIndex(
-          (s) => s.student.url === student && s.skill.url === skill
-        )
-        if (
-          suggestionIndex !== undefined && // !== undefined must be written here, otherwise suggestionIndex === 0 will fail.
-          suggestionIndex !== -1 &&
-          project.suggestedStudents &&
-          suggestionIndex < project.suggestedStudents.length &&
-          project.suggestedStudents[suggestionIndex].student.url === student
-        ) {
-          const studentStore = useStudentStore()
+      if (!project) return
+      const suggestionIndex = project.suggestedStudents?.findIndex(
+        (s) => s.student.url === student && s.skill.url === skill
+      )
+      if (
+        suggestionIndex !== undefined && // !== undefined must be written here, otherwise suggestionIndex === 0 will fail.
+        suggestionIndex !== -1 &&
+        project.suggestedStudents &&
+        suggestionIndex < project.suggestedStudents.length &&
+        project.suggestedStudents[suggestionIndex].student.url === student
+      ) {
+        const studentStore = useStudentStore()
 
-          if (onProject === 'true')
-            studentStore.students = studentStore.students.filter(
-              ({ url }) => url !== student
-            )
-          else if (
-            onProject === 'false' &&
-            !studentStore.students.some(({ url }) => url === student)
+        if (onProject === 'true')
+          studentStore.students = studentStore.students.filter(
+            ({ url }) => url !== student
           )
-            await studentStore.getStudent(student)
-
-          project.suggestedStudents?.splice(suggestionIndex, 1)
+        else if (
+          onProject === 'false' &&
+          !studentStore.students.some(({ url }) => url === student)
+        ) {
+          const studentObj = await studentStore.getStudent(student)
+          studentStore.students.unshift(studentObj)
         }
+
+        project.suggestedStudents?.splice(suggestionIndex, 1)
       }
+
+      // Check if we still have conflicts
+      const projectConflictStore = useProjectConflictStore()
+      await projectConflictStore.getConflictingProjects()
     },
 
     async addProject(project: Project) {
@@ -374,7 +409,10 @@ export const useProjectStore = defineStore('project', {
           }),
           coaches: project.coaches?.map((c) => c.url),
         }
-        await instance.post('projects/', convertObjectKeysToSnakeCase(mappedProject))
+        await instance.post(
+          'projects/',
+          convertObjectKeysToSnakeCase(mappedProject)
+        )
       } catch (error) {
         return error
       }
@@ -394,7 +432,10 @@ export const useProjectStore = defineStore('project', {
           }),
           coaches: project.coaches?.map((c) => c.url),
         }
-        await instance.patch(`projects/${id}/`, convertObjectKeysToSnakeCase(mappedProject))
+        await instance.patch(
+          `projects/${id}/`,
+          convertObjectKeysToSnakeCase(mappedProject)
+        )
       } catch (error) {
         return error
       }
