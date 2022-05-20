@@ -79,7 +79,6 @@ export const useSkillStore = defineStore('skills', {
           callback(true)
         })
         .catch((error) => {
-          console.log(error)
           callback(false)
         })
     },
