@@ -10,7 +10,7 @@
         glow-color="teal-3"
         shadow-color="teal"
         :shadow-strength="editMode ? 2 : 5"
-        :color="editMode ? 'teal' : 'white'"
+        :color="editMode ? 'teal' : 'transparent'"
         :class="`text-${editMode ? 'white' : 'teal'}`"
         icon="mdi-pencil-outline"
         @click="editMode = !editMode"

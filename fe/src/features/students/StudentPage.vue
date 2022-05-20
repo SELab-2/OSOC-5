@@ -7,9 +7,9 @@
       class="justify-between row q-px-lg q-pt-lg studentcol"
     >
       <div class="row q-px-sm q-gutter-sm items-center">
-        <h class="text-bold text-h4">
+        <div class="text-bold text-h4">
           {{ student ? student.fullName : '' }}
-        </h>
+        </div>
         <DecisionIcon
           v-if="student?.finalDecision"
           :decision="student?.finalDecision.suggestion"
