@@ -243,9 +243,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     def export_csv_student(self, request):
         """
         endpoint to export students information to csv
-        returns a HTTP response with a zip file containing the following files:
-            students.csv
-            suggestions.csv
+        returns a HTTP response with all the students
         """
         students = self.filter_queryset(self.get_queryset())
         students_csv = export_to_csv(students, 'students', CSVStudentSerializer)
@@ -255,9 +253,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     def export_csv_suggestion(self, request):
         """
         endpoint to export students information to csv
-        returns a HTTP response with a zip file containing the following files:
-            students.csv
-            suggestions.csv
+        returns a HTTP response with all the suggestions
         """
         students = self.filter_queryset(self.get_queryset())
         suggestions = Suggestion.objects.filter(student__in=students).order_by('student')

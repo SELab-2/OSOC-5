@@ -89,6 +89,9 @@ def create_zipfile_response(filename, files):
         headers={'Content-Disposition': f'attachment; filename="{filename}.zip"'})
 
 def create_csv_response(file):
-
+    """
+    create a csv file
+    returns a HTTP File Response with the csv as an attachment
+    """
     return HttpResponse(file, content_type='text/csv',
         headers={'Content-Disposition': f'attachment; filename="{file.name}.csv"'})
