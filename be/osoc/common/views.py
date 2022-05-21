@@ -13,7 +13,7 @@ from rest_auth.registration.views import RegisterView, SocialLoginView
 from django.db.models import RestrictedError, Prefetch
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from .utils import export_to_csv, create_zipfile_response
+from .utils import create_csv_response, export_to_csv
 from .pagination import StandardPagination
 from .filters import MultipleStatusFilter, StudentOnProjectFilter, StudentSuggestedByUserFilter, \
     StudentFinalDecisionFilter, EmailDateTimeFilter, StudentConflictFilter, ProjectFullFilter
@@ -242,16 +242,23 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def export_csv(self, request):
         """
-        endpoint to export students information to csv
-        returns a HTTP response with a zip file containing the following files:
-            students.csv
-            suggestions.csv
+        endpoint to export student information to csv
+        returns a HTTP response with a csv file attachment
         """
         students = self.filter_queryset(self.get_queryset())
         students_csv = export_to_csv(students, 'students', CSVStudentSerializer)
+        return create_csv_response(students_csv)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv_suggestion(self, request):
+        """
+        endpoint to export suggestion information to csv
+        returns a HTTP response with a csv file attachment
+        """
+        students = self.filter_queryset(self.get_queryset())
         suggestions = Suggestion.objects.filter(student__in=students).order_by('student')
         suggestions_csv = export_to_csv(suggestions, 'suggestions', CSVSuggestionSerializer)
-        return create_zipfile_response('student', [students_csv, suggestions_csv])
+        return create_csv_response(suggestions_csv)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
@@ -363,12 +370,11 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
     def export_csv(self, request):
         """
         endpoint to export coach information to csv
-        returns a HTTP response with a zip file containing the following files:
-            coaches.csv
+        returns a HTTP response with a csv file attachment
         """
         coaches = self.filter_queryset(self.get_queryset())
         coaches_csv = export_to_csv(coaches, 'coaches', CSVCoachSerializer)
-        return create_zipfile_response('coach', [coaches_csv])
+        return create_csv_response(coaches_csv)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
@@ -562,18 +568,33 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
     def export_csv(self, request):
         """
         endpoint to export project information to csv
-        returns a HTTP response with a zip file containing the following files:
-            projects.csv
-            required_skills.csv
-            suggested_students.csv
+        returns a HTTP response with a csv file attachment
         """
         projects = self.filter_queryset(self.get_queryset())
         projects_csv = export_to_csv(projects, 'projects', CSVProjectSerializer)
+        return create_csv_response(projects_csv)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv_required_skills(self, request):
+        """
+        endpoint to export projects required skill information to csv
+        returns a HTTP response with a csv file attachment
+        """
+        projects = self.filter_queryset(self.get_queryset())
         required_skills = RequiredSkills.objects.filter(project__in=projects).order_by('project')
         required_skills_csv = export_to_csv(required_skills, 'required_skills', CSVRequiredSkillSerializer)
+        return create_csv_response(required_skills_csv)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv_suggested_students(self, request):
+        """
+        endpoint to export projectsuggestion information to csv
+        returns a HTTP response with a csv file attachment
+        """
+        projects = self.filter_queryset(self.get_queryset())
         suggested_students = ProjectSuggestion.objects.filter(project__in=projects).order_by('project')
         suggested_students_csv = export_to_csv(suggested_students, 'suggested_students', CSVProjectSuggestionSerializer)
-        return create_zipfile_response('project', [projects_csv, required_skills_csv, suggested_students_csv])
+        return create_csv_response(suggested_students_csv)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use
@@ -621,12 +642,11 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
     def export_csv(self, request):
         """
         endpoint to export skill information to csv
-        returns a HTTP response with a zip file containing the following files:
-            skills.csv
+        returns a HTTP response with a csv file attachment
         """
         skills = self.filter_queryset(self.get_queryset())
         skills_csv = export_to_csv(skills, 'skills', CSVSkillSerializer)
-        return create_zipfile_response('skill', [skills_csv])
+        return create_csv_response(skills_csv)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):
@@ -694,13 +714,12 @@ class SentEmailViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ances
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def export_csv(self, request):
         """
-        endpoint to export email information to csv
-        returns a HTTP response with a zip file containing the following files:
-            emails.csv
+        endpoint to export sentemail information to csv
+        returns a HTTP response with a csv file attachment
         """
         emails = self.filter_queryset(self.get_queryset())
         emails_csv = export_to_csv(emails, 'emails', CSVSentEmailSerializer)
-        return create_zipfile_response('email', [emails_csv])
+        return create_csv_response(emails_csv)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use

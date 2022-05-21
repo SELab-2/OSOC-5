@@ -139,5 +139,11 @@ export const useCoachStore = defineStore('user/coach', {
     clearUsers() {
       this.$reset()
     },
+    /**
+     * Get a csv of all coaches in database
+     */
+    async csv() {
+      return { title: 'coach', value: await instance.get('coaches/export_csv') }
+    },
   },
 })
