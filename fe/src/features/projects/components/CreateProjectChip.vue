@@ -25,7 +25,7 @@
             borderless
             min="1"
             style="max-width: 50px"
-            :input-style="`{'text-align': 'right'}`"
+            :input-style="{'text-align': 'right'} as any"
             :input-class="`text-bold text-${skill.skill.color}-8`"
           />
           <btn
@@ -51,6 +51,7 @@
   </q-chip>
 </template>
 
+<!-- Component for a selected skill when creating a project. This component allows the user to fill in an amount and a comment. -->
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { Skill, ProjectSkill } from '../../../models/Skill'

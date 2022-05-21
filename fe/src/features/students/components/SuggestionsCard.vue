@@ -52,7 +52,8 @@ export default defineComponent( {
     },
     decision: {
       type: Object as PropType<Suggestion|null>,
-      required: true
+      required: false,
+      default: null
     }
   },
   setup() {

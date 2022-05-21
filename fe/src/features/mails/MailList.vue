@@ -54,18 +54,18 @@
             label="New status"
             :options="status"
           />
-          <q-button>
-            <btn
-              padding="7px"
-              color="yellow"
-              shadow-color="orange"
-              shadow-strength=2
-              no-wrap
-              @click="updateStatusStudents"
-            >
-              Bulk update status
-            </btn>
-          </q-button>
+          
+          <btn
+            padding="7px"
+            color="yellow"
+            shadow-color="orange"
+            shadow-strength=2
+            no-wrap
+            @click="updateStatusStudents"
+          >
+            Bulk update status
+          </btn>
+          
         </div>
       </div>
       <q-table

@@ -6,6 +6,7 @@ import { Skill } from '../models/Skill'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { baseUrl } from '../utils/baseUrl'
 import qs from 'qs'
+import {Suggestion} from "../models/Suggestion";
 
 interface State {
   skills: Array<Skill>
@@ -21,7 +22,7 @@ interface State {
     undecided: number
     none: number
   }
-  shouldRefresh: Boolean
+  shouldRefresh: boolean
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -87,10 +88,14 @@ export const useStudentStore = defineStore('user/student', {
         student.finalDecision.suggestion = parseInt(
           student.finalDecision.suggestion
         )
+        student.finalDecision = new Suggestion(student.finalDecision)
       }
 
-      for (const suggestion of student.suggestions) {
+      for (const i in student.suggestions) {
+        const suggestion = student.suggestions[i]
+
         suggestion.suggestion = parseInt(suggestion.suggestion)
+        student.suggestions[i] = new Suggestion(student.suggestions[i])
       }
 
       student.gender = parseInt(student.gender)

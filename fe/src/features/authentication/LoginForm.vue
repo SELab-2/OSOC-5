@@ -55,13 +55,11 @@ import {useAuthenticationStore} from "../../stores/useAuthenticationStore"
 import { useQuasar } from 'quasar'
 import { defineComponent, ref } from 'vue'
 import { useMeta } from 'quasar'
-import GitHubSignInButton from './components/GitHubSignInButton.vue'
 import router from "../../router/index"
 const metaData = {
   title: 'Sign In',
 }
 export default defineComponent({
-  components: { GitHubSignInButton },
   setup() {
     const authenticationStore = useAuthenticationStore()
 

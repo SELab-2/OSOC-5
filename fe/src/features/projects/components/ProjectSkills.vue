@@ -10,7 +10,7 @@
         glow-color="teal-3"
         shadow-color="teal"
         :shadow-strength="editMode ? 2 : 5"
-        :color="editMode ? 'teal' : 'white'"
+        :color="editMode ? 'teal' : 'transparent'"
         :class="`text-${editMode ? 'white' : 'teal'}`"
         icon="mdi-pencil-outline"
         @click="editMode = !editMode"
@@ -149,6 +149,9 @@
   </div>
 </template>
 
+<!-- This component displays a splitted view, which lets the user choose new skills for a new project,
+or edit the skills of an existing project. -->
+
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-core'
 import { ref, Ref, PropType } from 'vue'
@@ -161,6 +164,7 @@ import LottieAnimation from '../../../components/LottieAnimation.vue'
 export default defineComponent({
   components: { NewSkillDialog, CreateProjectChip, LottieAnimation },
   props: {
+    // The list of skills from the project.
     skills: {
       type: [Object] as PropType<ProjectSkill[]>,
       required: true,
@@ -218,6 +222,7 @@ export default defineComponent({
     },
   },
   watch: {
+    // Update the data whenever a filter is changed.
     filters() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scroll = this.$refs.scroll as any
@@ -225,7 +230,9 @@ export default defineComponent({
       scroll.resume()
       scroll.trigger()
     },
+    
     editSkill: {
+      // If a skill from the skillstore is updated, also update the skill in the selected skills.
       handler(newValue: Skill, oldValue: Skill) {
         if (oldValue?.id === newValue?.id) {
           this.skills.forEach((s) => {

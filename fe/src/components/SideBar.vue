@@ -186,7 +186,7 @@
               :must-hover="onProjectsPage"
               :student="student"
               :active="studentStore.currentStudent?.id === student.id && onStudentsPage"
-              @click="onConflictsPage ? (projectConflictStore.selectedStudentId = student.id) : $router.push(`/students/${student.id}`)"
+              @click.prevent="onConflictsPage ? (projectConflictStore.selectedStudentId = student.id) : $router.push(`/students/${student.id}`)"
               @dragstart="onDragStart($event, student)"
             />
             <template #loading>
@@ -245,14 +245,12 @@ export default defineComponent({
     const skillStore = useSkillStore()
     const projectStore = useProjectStore()
 
-    const $q = useQuasar()
 
     return {
       studentStore,
       skillStore,
       projectStore,
       projectConflictStore: useProjectConflictStore(),
-      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',

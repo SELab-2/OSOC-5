@@ -97,6 +97,7 @@ export default defineComponent({
     }
   },
   components: { DeleteSkillDialog },
+  emits: ['submit', 'update:skill', 'update:modelValue'],
   data() {
     const backup: Ref<Skill | null> = ref(null)
     return {

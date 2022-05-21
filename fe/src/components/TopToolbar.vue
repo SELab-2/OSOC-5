@@ -178,7 +178,7 @@ import SegmentedControl from './SegmentedControl.vue'
 export default defineComponent({
   components: { SegmentedControl },
   setup() {
-    const $q = useQuasar()
+    const q = useQuasar()
     const authenticationStore = useAuthenticationStore()
     const password1 = ref('')
     const password2 = ref('')
@@ -198,14 +198,14 @@ export default defineComponent({
         if (password1.value == password2.value) {
           display_popup.value = false
           authenticationStore.changePassword({p1:password1.value, p2:password2.value}).then(() => {
-            $q.notify({
+            q.notify({
               icon: 'done',
               color: 'positive',
               message: 'Password was successfully changed',
             })
           }).
           catch((error) => {
-            $q.notify({
+            q.notify({
             icon: 'warning',
             color: 'warning',
             message: `Error ${error} while changing password, please try again`,
@@ -213,7 +213,7 @@ export default defineComponent({
           });
         })
         } else {
-          $q.notify({
+          q.notify({
             color: 'negative',
             message: 'Passwords do not match'
           })
