@@ -75,6 +75,7 @@ def export_to_csv(queryset, filename, serializer):
     csv_data.seek(0)
     return csv_data
 
+# not used
 def create_zipfile_response(filename, files):
     """
     create a zipfile that contains given csv files
