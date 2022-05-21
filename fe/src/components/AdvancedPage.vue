@@ -165,9 +165,17 @@ export default defineComponent({
         exportFile(`${title.toLowerCase()} ${(new Date).toLocaleString()}.csv`, value.data)
       });      
     },
-    deleteSelected() {
+    async deleteSelected() {
       for (const item of this.deleteItems) {
-        instance.delete(`${item.toLowerCase()}/delete_all`)
+        const { data } = await instance.delete(`${item.toLowerCase()}/delete_all`)
+
+        if(data)
+           this.$q.notify({
+              icon: 'warning',
+              color: 'warning',
+              message: `${ data.detail.replace(/^\w/, (c: string) => c.toUpperCase()) }`,
+              textColor: 'black'
+            })
       }
       this.$q.notify({
         icon: 'done',
