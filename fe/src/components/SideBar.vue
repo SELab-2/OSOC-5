@@ -38,7 +38,6 @@
                   color="teal"
                   label="Search Students"
                   hide-bottom-space
-                  @update:modelValue="async () => await loadStudents()"
                 >
                   <template #append>
                     <q-icon
@@ -316,7 +315,9 @@ export default defineComponent({
     }
   },
   watch: {
-    filters() {
+    filters(newValue, oldValue) {
+      // Check equality of filters
+      if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return
       this.loadStudents()
     }
   },
