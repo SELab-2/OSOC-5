@@ -4,7 +4,7 @@ import { User } from './User'
 
 export interface ProjectSuggestionInterface {
   student: Student
-  coach: User
+  coach?: User
   skill: Skill
   reason: string
   coachId?: number
@@ -13,7 +13,7 @@ export interface ProjectSuggestionInterface {
 
 export interface TempProjectSuggestion {
   student: string
-  coach: User
+  coach?: User
   skill: string
   reason: string
   coachId: number
@@ -22,7 +22,7 @@ export interface TempProjectSuggestion {
 
 export class ProjectSuggestion implements ProjectSuggestionInterface {
   student: Student
-  coach: User
+  coach?: User
   skill: Skill
   reason: string
   coachId?: number
