@@ -105,7 +105,7 @@ export default defineComponent({
         }
       }
     },
-    mounted() {
+    activated() {
       this.loadConflicts()
     },
     methods: {
