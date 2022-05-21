@@ -161,8 +161,8 @@ export default defineComponent({
     async getCSV(csv: Function) {
       const csvs = await csv()
       const csvArray = Array.isArray(csvs) ? csvs : new Array(csvs)
-      csvArray.forEach(({ title, data }: {title: string; data: string}) => {
-        exportFile(`${title.toLowerCase()} ${(new Date).toLocaleString()}.csv`, data)
+      csvArray.forEach(({ title, value }: {title: string; value: { data: string }}) => {
+        exportFile(`${title.toLowerCase()} ${(new Date).toLocaleString()}.csv`, value.data)
       });      
     },
     deleteSelected() {
