@@ -59,13 +59,13 @@
             padding="7px"
             color="yellow"
             shadow-color="orange"
-            shadow-strength=2
+            shadow-strength="2"
+            class="text-black"
             no-wrap
             @click="updateStatusStudents"
           >
             Bulk update status
           </btn>
-          
         </div>
       </div>
       <q-table
@@ -79,9 +79,9 @@
         row-key="url"
         selection="multiple"
         separator="horizontal"
-        @request="onRequest"
         :table-class="$q.dark.isActive ? 'bg-dark2' : ''"
         :table-header-class="`${$q.dark.isActive ? 'text-black' : ''} bg-yellow`"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -89,7 +89,10 @@
             :style="`background-color: ${props.rowIndex % 2 == 1 && $q.dark.isActive ? colors.lighten(colors.getPaletteColor('yellow'),-75) : ''}`"
           >
             <q-td>
-              <q-checkbox color="yellow" v-model="props.selected" />
+              <q-checkbox
+                v-model="props.selected"
+                color="yellow"
+              />
             </q-td>
             <q-td auto-width>
               <q-icon
@@ -152,32 +155,72 @@
             </q-td>
             <q-td style="align-content: flex-end">
               <btn
-                dense color="yellow" glow-size="250px" flat icon="forward_to_inbox" @click="reset"
+                dense
+                color="yellow"
+                glow-size="250px"
+                flat
+                icon="forward_to_inbox"
+                @click="reset"
               >
                 <q-menu>
                   <q-list>
                     <q-item tag="label">
                       <div class="column q-gutter-sm">
                         <label>Add new mail:</label>
-                        <q-input outlined color="yellow" v-model="date">
-                          <template v-slot:prepend>
-                            <q-icon name="event" class="cursor-pointer">
-                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
+                        <q-input
+                          v-model="date"
+                          outlined
+                          color="yellow"
+                        >
+                          <template #prepend>
+                            <q-icon
+                              name="event"
+                              class="cursor-pointer"
+                            >
+                              <q-popup-proxy
+                                cover
+                                transition-show="scale"
+                                transition-hide="scale"
+                              >
+                                <q-date
+                                  v-model="date"
+                                  mask="YYYY-MM-DD HH:mm"
+                                >
                                   <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="yellow" flat />
+                                    <q-btn
+                                      v-close-popup
+                                      label="Close"
+                                      color="yellow"
+                                      flat
+                                    />
                                   </div>
                                 </q-date>
                               </q-popup-proxy>
                             </q-icon>
                           </template>
 
-                          <template v-slot:append>
-                            <q-icon name="access_time" class="cursor-pointer">
-                              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                          <template #append>
+                            <q-icon
+                              name="access_time"
+                              class="cursor-pointer"
+                            >
+                              <q-popup-proxy
+                                cover
+                                transition-show="scale"
+                                transition-hide="scale"
+                              >
+                                <q-time
+                                  v-model="date"
+                                  mask="YYYY-MM-DD HH:mm"
+                                  format24h
+                                >
                                   <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="yellow" flat />
+                                    <q-btn
+                                      v-close-popup
+                                      label="Close"
+                                      color="yellow"
+                                      flat
+                                    />
                                   </div>
                                 </q-time>
                               </q-popup-proxy>
@@ -186,14 +229,19 @@
                         </q-input>
 
                         <q-input
-                          label="Info"
                           v-model="info"
+                          label="Info"
                           outlined
                           color="yellow"
                           type="textarea"
                         />
 
-                        <btn color="yellow" shadow-color="orange" @click="() => sendMail(props.row)" v-close-popup>
+                        <btn
+                          v-close-popup
+                          color="yellow"
+                          shadow-color="orange"
+                          @click="() => sendMail(props.row)"
+                        >
                           Send
                         </btn>
                       </div>
@@ -269,14 +317,6 @@ export default defineComponent({
       pagination
     }
   },
-  beforeMount() {
-    if (!this.authenticationStore.loggedInUser?.isAdmin) {
-      router.replace('/notfound')
-    }
-  },
-  async mounted() {
-    await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
-  },
   computed: {
     filters() {
       let filter = {} as {
@@ -300,6 +340,14 @@ export default defineComponent({
 
       return filter
     }
+  },
+  beforeMount() {
+    if (!this.authenticationStore.loggedInUser?.isAdmin) {
+      router.replace('/notfound')
+    }
+  },
+  async mounted() {
+    await this.mailStore.loadStudentsMails(this.filters, (count: number) => this.pagination.rowsNumber = count)
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

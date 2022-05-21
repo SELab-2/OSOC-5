@@ -9,15 +9,6 @@
         <div class="text-bold text-h4">
           Users
         </div>
-        <q-space />
-        <btn
-          stack
-          flat
-          color="yellow"
-          icon="download"
-          label="csv"
-          glow-color="amber-2"
-        />
       </div>
       <div class="row q-mb-md vertical-middle">
         <SegmentedControl
@@ -75,9 +66,9 @@
         row-key="id"
         separator="horizontal"
         :loading="coachStore.isLoading"
-        @request="onRequest"
         :table-class="$q.dark.isActive ? 'bg-dark2' : ''"
         :table-header-class="`${$q.dark.isActive ? 'text-black' : ''} bg-yellow`"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -95,9 +86,9 @@
               key="role"
             >
               <q-select
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 v-model="props.row.role"
                 v-ripple
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 color="yellow"
                 borderless
                 dense
@@ -127,7 +118,9 @@
                   </q-item>
                 </template>
               </q-select>
-              <div v-else>{{ roles.find(r => r.value === props.row.role)!.label }}</div>
+              <div v-else>
+                {{ roles.find(r => r.value === props.row.role)!.label }}
+              </div>
             </q-td>
             <q-td
               key="assignedto"
@@ -178,7 +171,7 @@
 import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
-import {exportFile, useQuasar, colors} from 'quasar'
+import {useQuasar, colors} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
@@ -189,8 +182,8 @@ import router from "../../router";
 import roles from "../../models/UserRoles";
 
 export default defineComponent({
-  components: {AddUser, SegmentedControl, DeleteDialog },
   name: 'Users',
+  components: {AddUser, SegmentedControl, DeleteDialog },
   setup() {
     const coachStore = useCoachStore()
     const q = useQuasar()
@@ -260,6 +253,11 @@ export default defineComponent({
       return filter
     }
   },
+  watch: {
+    filters() {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
+  },
   beforeMount() {
     if (!this.authenticationStore.loggedInUser?.isAdmin) {
       router.replace('/notfound')
@@ -267,6 +265,11 @@ export default defineComponent({
   },
   async mounted() {
     await this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
+  },
+  activated() {
+    if (this.coachStore.shouldRefresh) {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
   },
   methods: {
     async onRequest(props: any) {
@@ -331,16 +334,6 @@ export default defineComponent({
         })
       })
 
-    }
-  },
-  watch: {
-    filters() {
-      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
-    }
-  },
-  activated() {
-    if (this.coachStore.shouldRefresh) {
-      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
     }
   }
 })
