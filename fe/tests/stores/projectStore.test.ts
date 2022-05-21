@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi} from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import axios, { AxiosRequestConfig } from "axios"
 import { instance } from '../../src/utils/axios'
-import {UrlMockMappingPost, UrlMockMappingGet, UrlMockMappingDelete} from '../mockUrlMappings'
+import {UrlMockMappingPost, UrlMockMappingGet, UrlMockMappingDelete, UrlMockMappingPatch} from '../mockUrlMappings'
 import {useProjectStore} from "../../src/stores/useProjectStore";
 import { ProjectSuggestionInterface, TempProjectSuggestion } from "../../src/models/ProjectSuggestion";
 import { Project } from "../../src/models/Project";
@@ -102,4 +102,40 @@ describe("Project Store", () => {
 
   })
 
+  it("removeReceivedSuggestion", async () => {
+    
+    const projectStore = useProjectStore()
+    await projectStore.loadProjects()
+    await projectStore.removeReceivedSuggestion({project_id: "1", student: 'students/1/', skill: "skills/2"}, 'true')
+
+  })
+
+  it("addProject", async () => {
+    
+    const projectStore = useProjectStore()
+    let data = (await instance.get<Project>('projects/1')).data
+    await projectStore.addProject(data)
+    let result = expect(postcall_i).toBeCalledTimes(1)
+    expect(result).toBeTruthy()
+    
+  })
+
+  it("updateProject", async () => {
+    
+    const projectStore = useProjectStore()
+    let data = (await instance.get<Project>('projects/1')).data
+    let result = await projectStore.updateProject(data, 1)
+    expect(patchcall_i).toBeCalledTimes(1)
+    expect(result).toBeTruthy()
+
+  })
+
+  it("deleteProject", async () => {
+    
+    const projectStore = useProjectStore()
+    await projectStore.deleteProject(1, () => true)
+    expect(deletecall_i).toBeCalledTimes(1)
+
+  })
+  
 });

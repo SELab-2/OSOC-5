@@ -20,7 +20,7 @@ import { Project, TempProject } from '../models/Project'
 import { useCoachStore } from './useCoachStore'
 import { useStudentStore } from './useStudentStore'
 import { useSkillStore } from './useSkillStore'
-import { convertObjectKeysToSnakeCase } from '../utils/case-conversion'
+import { convertObjectKeysToCamelCase, convertObjectKeysToSnakeCase } from '../utils/case-conversion'
 
 interface State {
   projects: Array<Project>

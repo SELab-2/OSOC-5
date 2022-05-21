@@ -117,7 +117,8 @@ export const UrlMockMappingPost = {
     'skills/': {data: {skill: "Skill was created!"}},
     'students/bulk_status/': {data: {user: "Users were updated!"}},
     'emails/': {data: {email: "Emails were updated!"}},
-    'projects/1/remove_student/': {data: {student: "removed suggestion!"}}
+    'projects/1/remove_student/': {data: {student: "removed suggestion!"}},
+    "projects/": {data: {succes: true}},
   }
 
 export const UrlMockMappingGet = {
@@ -159,4 +160,5 @@ export const UrlMockMappingDelete = {
 export const UrlMockMappingPatch = {
     "skills/1/": {data: {succes: true}},
     'students/1/': {data: {succes: true}},
+    'projects/1/': {data: {succes: true}},
   }
