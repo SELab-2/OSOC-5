@@ -11,6 +11,7 @@
           {{ student ? student.fullName : '' }}
         </div>
         <DecisionIcon
+          size="md"
           v-if="student?.finalDecision"
           :decision="student?.finalDecision.suggestion"
           :reason="student?.finalDecision.reason"
