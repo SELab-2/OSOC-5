@@ -240,7 +240,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def export_csv(self, request):
+    def export_csv_student(self, request):
         """
         endpoint to export students information to csv
         returns a HTTP response with a zip file containing the following files:
@@ -249,9 +249,20 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         """
         students = self.filter_queryset(self.get_queryset())
         students_csv = export_to_csv(students, 'students', CSVStudentSerializer)
+        return create_csv_response(students_csv)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
+    def export_csv_suggestion(self, request):
+        """
+        endpoint to export students information to csv
+        returns a HTTP response with a zip file containing the following files:
+            students.csv
+            suggestions.csv
+        """
+        students = self.filter_queryset(self.get_queryset())
         suggestions = Suggestion.objects.filter(student__in=students).order_by('student')
         suggestions_csv = export_to_csv(suggestions, 'suggestions', CSVSuggestionSerializer)
-        return create_zipfile_response('student', [students_csv, suggestions_csv])
+        return create_csv_response(suggestions_csv)
 
     @action(detail=False, methods=['delete'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
     def delete_all(self, request):  # pylint: disable=no-self-use

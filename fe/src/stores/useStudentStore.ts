@@ -6,7 +6,7 @@ import { Skill } from '../models/Skill'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { baseUrl } from '../utils/baseUrl'
 import qs from 'qs'
-import {exportFile} from 'quasar';
+import { exportFile } from 'quasar'
 
 interface State {
   skills: Array<Skill>
@@ -22,7 +22,7 @@ interface State {
     undecided: number
     none: number
   }
-  shouldRefresh: Boolean
+  shouldRefresh: boolean
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -123,7 +123,16 @@ export const useStudentStore = defineStore('user/student', {
         paramsSerializer: (params) => {
           // Remove unused filters and map lists to correct queries
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && ((v as any).length > 0 || v === true || typeof(v) === 'number'))), { arrayFormat: 'repeat' })
+          return qs.stringify(
+            Object.fromEntries(
+              Object.entries(params).filter(
+                ([_, v]) =>
+                  v !== null &&
+                  ((v as any).length > 0 || v === true || typeof v === 'number')
+              )
+            ),
+            { arrayFormat: 'repeat' }
+          )
         },
       })
 
@@ -382,10 +391,18 @@ export const useStudentStore = defineStore('user/student', {
     /**
      * Get a csv of all students in database
      */
-    async csv(): Promise<{data: string, headers: object}> {
-      const res = await instance.get('students/export_csv', { responseType: 'blob' })
-      exportFile('test.zip', new Blob([res.data]))
+    async studentCsv(): Promise<{ data: string; headers: object }> {
+      const res = await instance.get('students/export_csv_student')
+      // exportFile('student.csv', new Blob([res.data]))
       return res
-    }
+    },
+    /**
+     * Get a csv of all suggestions in database
+     */
+    async suggestionCsv(): Promise<{ data: string; headers: object }> {
+      const res = await instance.get('students/export_csv_suggestion')
+      // exportFile('suggestion.csv', new Blob([res.data]))
+      return res
+    },
   },
 })

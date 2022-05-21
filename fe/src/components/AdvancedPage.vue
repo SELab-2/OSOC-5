@@ -1,10 +1,14 @@
 <template>
   <div class="q-pt-lg flex relative-position justify-center">
     <div>
-      <div class="text-bold text-h4">Advanced options</div>
+      <div class="text-bold text-h4">
+        Advanced options
+      </div>
       <div class="row">
         <div class="column q-ma-xl">
-          <div class="text-bold text-h5 q-mb-md">Bulk deletion</div>
+          <div class="text-bold text-h5 q-mb-md">
+            Bulk deletion
+          </div>
           <div>Select items to be deleted:</div>
           <q-checkbox
             v-for="title in Object.keys(items)"
@@ -16,19 +20,24 @@
             :label="title"
           />
           
-            <btn
-              color="red"
-              icon="mdi-trash-can-outline"
-              shadow-color="red"
-              label="Delete"
-              :disable="deleteItems.length === 0"
-              @click="display_popup = true"
-            />
-          
+          <btn
+            color="red"
+            icon="mdi-trash-can-outline"
+            shadow-color="red"
+            label="Delete"
+            :disable="deleteItems.length === 0"
+            @click="display_popup = true"
+          />
         </div>
-        <q-separator vertical spaced inset />
+        <q-separator
+          vertical
+          spaced
+          inset
+        />
         <div class="column q-ma-xl">
-          <div class="text-bold text-h5 q-mb-md">Download CSV</div>
+          <div class="text-bold text-h5 q-mb-md">
+            Download CSV
+          </div>
           <div class="column q-gutter-md">
             <btn
               v-for="(csv, title) in items"
@@ -47,25 +56,37 @@
     </div>
   </div>
 
-  <q-dialog v-model="display_popup" persistent>
+  <q-dialog
+    v-model="display_popup"
+    persistent
+  >
     <q-card style="min-width: 350px">
       <q-card-section horizontal>
         <q-card-section class="col-3 flex flex-center">
-          <q-icon name="r_warning" class="text-red" size="80px"/>
+          <q-icon
+            name="r_warning"
+            class="text-red"
+            size="80px"
+          />
         </q-card-section>
         <q-card-section class="q-pt-xs">
-          <div class="text-h6 q-mt-sm q-mb-xs">Are you sure?</div>
+          <div class="text-h6 q-mt-sm q-mb-xs">
+            Are you sure?
+          </div>
           <div class="text text-grey">
             This will delete all '{{ deleteItems.join(', ') }}' immediately. You
             cannot undo this action.
           </div>
-          <br/>
-          <div v-for="item in deleteItems" :key="item">
+          <br>
+          <div
+            v-for="item in deleteItems"
+            :key="item"
+          >
             Type 'DELETE {{ item.toUpperCase() }}' in the field below to
             confirm.
             <q-input
-              color="red"
               v-model="deleteConfirmItems[item]"
+              color="red"
               outlined
               autofocus
             />
@@ -73,8 +94,16 @@
         </q-card-section>
       </q-card-section>
 
-      <q-card-actions align="right" class="text-primary">
-        <btn v-close-popup flat color="grey" label="Cancel"/>
+      <q-card-actions
+        align="right"
+        class="text-primary"
+      >
+        <btn
+          v-close-popup
+          flat
+          color="grey"
+          label="Cancel"
+        />
         <btn
           flat
           color="red"
@@ -117,7 +146,8 @@ export default defineComponent({
     const skillStore = useSkillStore()
 
     const items = {
-      'Students': studentStore.csv,
+      'Students': studentStore.studentCsv,
+      'Suggestions': studentStore.suggestionCsv,
       'Emails': mailStore.csv,
       'Coaches': coachStore.csv,
       'Projects': projectStore.csv,
