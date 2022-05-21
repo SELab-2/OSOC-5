@@ -25,7 +25,7 @@
         color="teal"
         class="text-white"
         icon="add"
-        @click="showDialog = true"
+        @click="editSkill = undefined; showDialog = true"
       />
       <q-input
         v-model="filterSkills"
