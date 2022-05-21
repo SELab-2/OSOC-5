@@ -1,7 +1,7 @@
 <template>
   <q-icon
     class="final-decision-icon"
-    size="xs"
+    v-bind="$attrs"
     :name="icon"
     :color="color"
   >

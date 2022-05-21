@@ -38,7 +38,6 @@
                   color="teal"
                   label="Search Students"
                   hide-bottom-space
-                  @update:modelValue="async () => await loadStudents()"
                 >
                   <template #append>
                     <q-icon
@@ -186,7 +185,7 @@
               :must-hover="onProjectsPage"
               :student="student"
               :active="studentStore.currentStudent?.id === student.id && onStudentsPage"
-              @click="onConflictsPage ? (projectConflictStore.selectedStudentId = student.id) : $router.push(`/students/${student.id}`)"
+              @click.prevent="onConflictsPage ? (projectConflictStore.selectedStudentId = student.id) : $router.push(`/students/${student.id}`)"
               @dragstart="onDragStart($event, student)"
             />
             <template #loading>
@@ -245,14 +244,12 @@ export default defineComponent({
     const skillStore = useSkillStore()
     const projectStore = useProjectStore()
 
-    const $q = useQuasar()
 
     return {
       studentStore,
       skillStore,
       projectStore,
       projectConflictStore: useProjectConflictStore(),
-      $q,
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -318,7 +315,9 @@ export default defineComponent({
     }
   },
   watch: {
-    filters() {
+    filters(newValue, oldValue) {
+      // Check equality of filters
+      if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return
       this.loadStudents()
     }
   },

@@ -20,26 +20,33 @@
   </q-tabs>
 </template>
 
-
+<!-- A custom control for selecting one option. 
+This component has a different style than the default quasar one, and fits in better with the rest of the website. -->
 <script lang="ts">
   import { defineComponent, PropType } from 'vue'
 
   export default defineComponent({
     props: {
+      // The different options that can be chosen.
       options: {
         type:  [Object] as PropType<{name: string|number|boolean, label: string, amount?: number}[]>, 
         required: true
       },
+      // Accent color of the component.
       color: {
         type: String,
         default: "yellow"
       },
+      // Removes padding around the text of each option. Useful for when there is limited space.
       noPadding: {
         type: Boolean
       },
+      // Removed the shadow around the component.
       noShadow: {
         type: Boolean
       },
+      // Inverts the text, so the active option has a white color instead of black.
+      // Useful when the accent color has a darker shade.
       invertText: {
         type: Boolean
       }

@@ -3,11 +3,24 @@
     class="bg-white text-white"
     height-hint="98"
   >
-    <q-toolbar class="shadow-2" :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'osoc-blue'}`">
-      <btn flat round href="https://www.osoc.be">
+    <q-toolbar
+      class="shadow-2"
+      :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'osoc-blue'}`"
+    >
+      <btn
+        flat
+        round
+        href="https://www.osoc.be"
+      >
         <q-avatar size="42px">
-          <img v-if="$q.dark.isActive" src="../assets/logo_dark.svg"/>
-          <img v-else src="../assets/logo.svg"/>
+          <img
+            v-if="$q.dark.isActive"
+            src="../assets/logo_dark.svg"
+          >
+          <img
+            v-else
+            src="../assets/logo.svg"
+          >
         </q-avatar>
       </btn>
 
@@ -50,13 +63,12 @@
         icon="mdi-account"
         :label="fullName"
       >
-
         <q-list separator>
           <q-item
             v-close-popup
+            v-ripple
             color="yellow"
             class="text-black"
-            v-ripple
             clickable
             tabindex="0"
             :to="`/advanced`"
@@ -117,12 +129,14 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <q-separator/>
-        <div class="text-caption text-bold q-ml-xs q-mt-xs">Color Scheme</div>
+        <q-separator />
+        <div class="text-caption text-bold q-ml-xs q-mt-xs">
+          Color Scheme
+        </div>
         <SegmentedControl
+          v-model="authenticationStore.colorScheme"
           no-shadow
           color="yellow"
-          v-model="authenticationStore.colorScheme"
           :options="[
             { name: 'auto', label: 'Auto' },
             { name: false, label: 'Light' },
@@ -143,7 +157,6 @@
 <script lang="ts">
 import {defineComponent, ref, Ref} from 'vue'
 import { useAuthenticationStore } from '../stores/useAuthenticationStore'
-import { useStudentStore } from '../stores/useStudentStore'
 import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 import SegmentedControl from './SegmentedControl.vue'
 

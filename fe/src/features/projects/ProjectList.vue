@@ -177,6 +177,7 @@
           <template #default="{ item }">
             <project-card
               editable
+              expandable-skills
               v-if="item"
               :project="item as any"
             />
@@ -209,6 +210,8 @@
     />
   </q-page-sticky>
 </template>
+
+<!-- This component displays a list of project cards. -->
 
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
