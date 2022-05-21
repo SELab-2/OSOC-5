@@ -71,7 +71,7 @@
           clearable
           clear-icon="close"
           :rules="[
-            (val) => (val && val.length >= 8) || 'Passwords must be longer then 7 characters',
+            (val) => (val && val.length > 8) || 'Passwords must be longer than 8 characters',
           ]"
           @update:model-value="generate = false"
         >
@@ -109,7 +109,7 @@
       flat
       :label="'Create ' + role"
       color="yellow"
-      :disabled="password.length <= 8"
+      :disabled="password.length < 8"
       @click="onSubmit"
     />
   </q-card-actions>
