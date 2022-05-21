@@ -187,8 +187,7 @@ export const useProjectStore = defineStore('project', {
           this.projects[i].requiredSkills = skills
           this.projects[i].suggestedStudents = students
         })
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     async loadNext(index: number, done: Function, filters: Object) {
       // Remove all the data when the first page is requested.
@@ -439,8 +438,11 @@ export const useProjectStore = defineStore('project', {
     /**
      * Get a csv of all projects in database
      */
-    async csv(): Promise<{data: string, headers: object}> {
-      return await instance.get('projects/export_csv')
-    }
+    async csv() {
+      return {
+        title: 'project',
+        value: await instance.get('projects/export_csv'),
+      }
+    },
   },
 })

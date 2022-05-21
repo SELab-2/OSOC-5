@@ -141,8 +141,8 @@ export const useCoachStore = defineStore('user/coach', {
     /**
      * Get a csv of all coaches in database
      */
-    async csv(): Promise<{data: string, headers: object}> {
-      return await instance.get('coaches/export_csv')
-    }
+    async csv() {
+      return { title: 'coach', value: await instance.get('coaches/export_csv') }
+    },
   },
 })

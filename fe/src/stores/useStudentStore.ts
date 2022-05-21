@@ -388,21 +388,23 @@ export const useStudentStore = defineStore('user/student', {
 
       this.isLoading = false
     },
+    async csv() {
+      return [
+        { title: 'student', value: await this.studentCsv() },
+        { title: 'suggestion', value: await this.suggestionCsv() },
+      ]
+    },
     /**
      * Get a csv of all students in database
      */
     async studentCsv(): Promise<{ data: string; headers: object }> {
-      const res = await instance.get('students/export_csv_student')
-      // exportFile('student.csv', new Blob([res.data]))
-      return res
+      return await instance.get('students/export_csv_student')
     },
     /**
      * Get a csv of all suggestions in database
      */
     async suggestionCsv(): Promise<{ data: string; headers: object }> {
-      const res = await instance.get('students/export_csv_suggestion')
-      // exportFile('suggestion.csv', new Blob([res.data]))
-      return res
+      return await instance.get('students/export_csv_suggestion')
     },
   },
 })

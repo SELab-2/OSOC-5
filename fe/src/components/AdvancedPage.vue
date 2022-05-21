@@ -45,10 +45,10 @@
               text-color="black"
               color="primary"
               style="width: 200px"
-              icon-right="archive"
-              :label="title + ' (csv)'"
+              icon="download"
+              :label="title"
               no-caps
-              @click="() => getCSV(title, csv)"
+              @click="() => getCSV(csv)"
             />
           </div>
         </div>
@@ -146,12 +146,11 @@ export default defineComponent({
     const skillStore = useSkillStore()
 
     const items = {
-      'Students': studentStore.studentCsv,
-      'Suggestions': studentStore.suggestionCsv,
+      'Students': studentStore.csv,
       'Emails': mailStore.csv,
       'Coaches': coachStore.csv,
       'Projects': projectStore.csv,
-      'Skills': skillStore.csv
+      'Skills': skillStore.csv,
     }
 
     return {
@@ -159,10 +158,12 @@ export default defineComponent({
     }
   },
   methods: {
-    async getCSV(title: string, csv: Function) {
-      const data = await csv()
-      console.log(data)
-      exportFile(title.toLowerCase() + (new Date).toLocaleString() + '.csv', data.data)
+    async getCSV(csv: Function) {
+      const csvs = await csv()
+      const csvArray = Array.isArray(csvs) ? csvs : new Array(csvs)
+      csvArray.forEach(({ title, data }: {title: string; data: string}) => {
+        exportFile(`${title.toLowerCase()} ${(new Date).toLocaleString()}.csv`, data)
+      });      
     },
     deleteSelected() {
       for (const item of this.deleteItems) {
