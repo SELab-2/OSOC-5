@@ -38,7 +38,6 @@
                   color="teal"
                   label="Search Students"
                   hide-bottom-space
-                  @update:modelValue="async () => await loadStudents()"
                 >
                   <template #append>
                     <q-icon
@@ -316,13 +315,16 @@ export default defineComponent({
     }
   },
   watch: {
-    filters() {
+    filters(newValue, oldValue) {
+      // Check equality of filters
+      if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return
       this.loadStudents()
     }
   },
   async mounted() {
     this.studentStore.$subscribe(() => {
       if (this.studentStore.shouldRefresh) {
+        console.log("refreshing!")
         this.studentStore.shouldRefresh = false
         const infscroll = this.$refs.infinite as any;
         infscroll.reset()
@@ -372,6 +374,7 @@ export default defineComponent({
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     loadStudents() {
+      console.log("reset!")
       const scroll = this.$refs.infinite as any;
       scroll.reset()
       scroll.resume()
