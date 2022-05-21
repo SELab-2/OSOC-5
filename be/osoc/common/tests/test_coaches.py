@@ -263,4 +263,4 @@ class CoachTestsAdmin(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.csv"')

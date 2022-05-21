@@ -240,7 +240,7 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def export_csv_student(self, request):
+    def export_csv(self, request):
         """
         endpoint to export student information to csv
         returns a HTTP response with a csv file attachment
@@ -367,7 +367,7 @@ class CoachViewSet(viewsets.GenericViewSet,  # pylint: disable=too-many-ancestor
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def export_csv_coach(self, request):
+    def export_csv(self, request):
         """
         endpoint to export coach information to csv
         returns a HTTP response with a csv file attachment
@@ -565,7 +565,7 @@ class ProjectViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def export_csv_project(self, request):
+    def export_csv(self, request):
         """
         endpoint to export project information to csv
         returns a HTTP response with a csv file attachment
@@ -639,7 +639,7 @@ class SkillViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancestors
         raise PermissionDenied()
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated, IsActive, IsAdmin])
-    def export_csv_skill(self, request):
+    def export_csv(self, request):
         """
         endpoint to export skill information to csv
         returns a HTTP response with a csv file attachment
