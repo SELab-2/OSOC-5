@@ -187,18 +187,7 @@ export const useProjectStore = defineStore('project', {
           this.projects[i].requiredSkills = skills
           this.projects[i].suggestedStudents = students
         })
-        // for (let [i, project] of data.entries()) {
-        //
-        //   // this.projects = [...this.projects]
-        // }
-        // for (let project of data) {
-        //   this.projects = this.projects.concat([await this.getProject(project)])
-        //   // this.projects.push(await this.getProject(project))
-        // }
-        // this.projects = this.projects.slice(1)
-        // data.forEach(p => this.getProject(p))
       } catch (error) {
-        // console.log(error)
       }
     },
     async loadNext(index: number, done: Function, filters: Object) {

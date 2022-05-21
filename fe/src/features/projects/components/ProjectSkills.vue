@@ -192,7 +192,6 @@ export default defineComponent({
     },
     removeSkillFromProject(skill: Skill) {
       const i = this.skills.findIndex((s) => s.skill.id === skill.id)
-      console.log(i)
       this.skills.splice(i, 1)
     },
 
@@ -228,10 +227,8 @@ export default defineComponent({
     },
     editSkill: {
       handler(newValue: Skill, oldValue: Skill) {
-        console.log(oldValue, newValue)
         if (oldValue?.id === newValue?.id) {
           this.skills.forEach((s) => {
-            console.log(s)
             if (s.skill.id === newValue.id) {
               s.skill = newValue
             }
@@ -249,6 +246,10 @@ export default defineComponent({
       }
     },
   },
+  unmounted() {
+    // Reload skills for skill filters in sidebar and projects.
+    this.skillStore.loadSkills()
+  }
 })
 </script>
 
