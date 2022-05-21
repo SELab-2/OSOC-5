@@ -7,10 +7,11 @@
     style="border-radius: 10px !important"
   >
     <q-card-section>
-      <div class="row no-wrap">
+      <div class="row no-wrap items-center">
         <h5
           class="text-bold q-mt-none q-mb-none"
           style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+          :title="project.name"
         >
           {{ project.name }}
         </h5>
@@ -27,29 +28,27 @@
           class="q-ml-sm q-mt-xs"
         />
         <q-space />
-        <div>
-          <btn
-            v-if="editable && me.isAdmin"
-            flat
-            round
-            size="12px"
-            color="teal"
-            icon="edit"
-            glow-color="teal-3"
-            :to="`/projects/${project.id}`"
-          />
-          <btn
-            round
-            size="12px"
-            glow-color="teal-3"
-            shadow-color="teal"
-            :shadow-strength="_showInfo ? 2 : 5"
-            :color="_showInfo ? 'teal' : 'transparent'"
-            :class="`text-${_showInfo ? 'white' : 'teal'}`"
-            icon="info"
-            @click="_showInfo = !_showInfo"
-          />
-        </div>
+        <btn
+          v-if="editable && me.isAdmin"
+          flat
+          round
+          size="12px"
+          color="teal"
+          icon="edit"
+          glow-color="teal-3"
+          :to="`/projects/${project.id}`"
+        />
+        <btn
+          round
+          size="12px"
+          glow-color="teal-3"
+          shadow-color="teal"
+          :shadow-strength="_showInfo ? 2 : 5"
+          :color="_showInfo ? 'teal' : 'transparent'"
+          :class="`text-${_showInfo ? 'white' : 'teal'}`"
+          icon="info"
+          @click="_showInfo = !_showInfo"
+        />
       </div>
 
       <div class="text-overline">{{ project.partnerName }}</div>
