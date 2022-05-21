@@ -68,7 +68,7 @@ export const useProjectConflictStore = defineStore('project/conflict', {
         {
           project: selectedProject.url,
           student: selectedConflict.student.url,
-          coach: suggestion.coach.url,
+          coach: suggestion.coach?.url,
           skill: suggestion.skill.url,
         },
       ])
