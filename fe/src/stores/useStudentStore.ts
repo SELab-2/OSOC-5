@@ -398,7 +398,7 @@ export const useStudentStore = defineStore('user/student', {
      * Get a csv of all students in database
      */
     async studentCsv(): Promise<{ data: string; headers: object }> {
-      return await instance.get('students/export_csv_student')
+      return await instance.get('students/export_csv')
     },
     /**
      * Get a csv of all suggestions in database
