@@ -13,8 +13,16 @@ if __name__ == "__main__":
     from osoc.common.models import Coach
     from django.core.exceptions import ObjectDoesNotExist
 
+    # Admin
     try:
-        Coach.objects.get(email=environ['DJANGO_SUPERUSER_EMAIL'])
+        Coach.objects.get(email='selah@sudo.com')
     except ObjectDoesNotExist:
-        Coach.objects.create_superuser(first_name='admin', last_name='admin', is_admin=True,
-                                       email=environ['DJANGO_SUPERUSER_EMAIL'], password=environ['DJANGO_SUPERUSER_PASSWORD'])
+        Coach.objects.create_superuser(first_name='Selah', last_name='Sudo', is_admin=True,
+                                       email='selah@sudo.com', password=environ['DJANGO_SUPERUSER_PASSWORD'])
+
+    # Coach
+    try:
+        Coach.objects.get(email='coach@conners.com')
+    except ObjectDoesNotExist:
+        Coach.objects.create_superuser(
+            first_name='Coach', last_name='Conners', password=environ['DJANGO_SUPERUSER_PASSWORD'], email='coach@conners.com', is_admin=False)

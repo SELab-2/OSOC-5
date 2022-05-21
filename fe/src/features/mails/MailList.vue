@@ -1,11 +1,9 @@
 <template>
   <div
     class="relative-position flex justify-center"
-    style="width: 100vw"
   >
     <div
       class="q-pa-md q-gutter-md"
-      style="width: 1000px"
     >
       <div class="text-bold text-h4">
         Sent Mails
@@ -42,7 +40,7 @@
             @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
           />
         </div>
-        <div class="row col-6 q-gutter-sm justify-end">
+        <div class="row no-wrap col-6 q-gutter-sm justify-end">
           <q-select
             v-model="statusUpdate"
             style="width: 220px"
@@ -104,6 +102,8 @@
             <q-td
               key="name"
               :props="props"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.fullName"
             >
               {{ props.row.fullName }}
             </q-td>
@@ -142,6 +142,8 @@
             <q-td
               key="email"
               :props="props"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.email"
             >
               <a
                 :href="'mailto:' + props.row.email"

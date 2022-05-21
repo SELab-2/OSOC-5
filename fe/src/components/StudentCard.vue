@@ -14,7 +14,9 @@
     >
       <q-card-section>
         <div class="row no-wrap">
-          <label class="text-bold q-pr-xs overflow-hidden" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ student.fullName }}</label>
+          <label 
+          :title="student.fullName"
+          class="text-bold q-pr-xs overflow-hidden" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ student.fullName }}</label>
           <DecisionIcon
             v-if="student !== null && student.finalDecision !== null"
             :decision="student.finalDecision.suggestion"
