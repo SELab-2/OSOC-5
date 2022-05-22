@@ -308,6 +308,8 @@ export const useProjectStore = defineStore('project', {
             coach: coachObj,
             skill: skillObj,
             reason,
+            coachId: coach.id,
+            coachName: `${coach.firstName} ${coach.lastName}`
           },
           true
         )

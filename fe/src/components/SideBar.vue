@@ -79,7 +79,7 @@
                   ]"
                 />
 
-                <label>Suggestion:</label>
+                <label>Decision:</label>
                 <SegmentedControl
                   v-model="suggestion"
                   color="primary"
