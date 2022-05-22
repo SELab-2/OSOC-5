@@ -68,7 +68,6 @@
             v-close-popup
             v-ripple
             color="yellow"
-            class="text-black"
             clickable
             tabindex="0"
             :to="`/advanced`"
