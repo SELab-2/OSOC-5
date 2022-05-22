@@ -29,7 +29,7 @@ interface State {
 
   // Flag so projectlist can determine if it should reset the pagination and reload all the projects or not.
   // Is used e.g. when a conflict is resolved, or a project is created/updated.
-  shouldRefresh: Boolean
+  shouldRefresh: boolean
 }
 
 export const useProjectStore = defineStore('project', {
@@ -220,7 +220,7 @@ export const useProjectStore = defineStore('project', {
         )
       ).data
 
-      let base = this.projects.length
+      const base = this.projects.length
 
       this.projects = [
         ...this.projects,
