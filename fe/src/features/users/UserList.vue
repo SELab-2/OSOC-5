@@ -21,7 +21,7 @@
           glow-color="amber-2"
         />
       </div>
-      <div class="row q-mb-md vertical-middle">
+      <div class="row q-mb-md ">
         <SegmentedControl
           v-model="roleFilter"
           :options="[
@@ -33,7 +33,7 @@
         />
 
         <q-space />
-        <div class="row q-px-sm">
+        <div class="row q-gutter-sm">
           <btn
             color="yellow"
             icon-right="add"
@@ -43,9 +43,6 @@
             shadow-strength="2"
             @click="newUserDialog = true"
           />
-        </div>
-        <div class="row q-px-sm">
-          <q-space />
           <q-dialog v-model="newUserDialog">
             <q-card>
               <AddUser :created="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)" />

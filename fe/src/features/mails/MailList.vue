@@ -11,63 +11,67 @@
         Sent Mails
       </div>
       <div class="row">
-        <div class="row col-6 q-gutter-sm">
-          <q-input
-            v-model="search"
-            outlined
-            dense
-            debounce="300"
-            color="yellow-4"
-            placeholder="Search"
-            @update:modelValue="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
-          >
-            <template #append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-          <q-select
-            v-model="statusFilter"
-            class="col"
-            rounded
-            outlined
-            dense
-            multiple
-            clearable
-            use-chips
-            color="yellow"
-            label="Status"
-            :options="status"
-            map-options
-            emit-value
-            @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
-          />
-        </div>
-        <div class="row col-6 q-gutter-sm justify-end">
-          <q-select
-            v-model="statusUpdate"
-            style="width: 220px"
-            rounded
-            outlined
-            color="yellow"
-            dense
-            use-chips
-            emit-value
-            map-options
-            label="New status"
-            :options="status"
-          />
-          <q-button>
-            <btn
-              padding="7px"
-              color="yellow"
-              shadow-color="orange"
-              shadow-strength=2
-              no-wrap
-              @click="updateStatusStudents"
+        <div class="col-6">
+          <div class="row q-gutter-sm">
+            <q-input
+              v-model="search"
+              outlined
+              dense
+              debounce="300"
+              color="yellow-4"
+              placeholder="Search"
+              @update:modelValue="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
             >
-              Bulk update status
-            </btn>
-          </q-button>
+              <template #append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+            <q-select
+              v-model="statusFilter"
+              class="col"
+              rounded
+              outlined
+              dense
+              multiple
+              clearable
+              use-chips
+              color="yellow"
+              label="Status"
+              :options="status"
+              map-options
+              emit-value
+              @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
+            />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="row q-gutter-sm justify-end">
+            <q-select
+              v-model="statusUpdate"
+              style="width: 220px"
+              rounded
+              outlined
+              color="yellow"
+              dense
+              use-chips
+              emit-value
+              map-options
+              label="New status"
+              :options="status"
+            />
+            <q-button>
+              <btn
+                padding="7px"
+                color="yellow"
+                shadow-color="orange"
+                shadow-strength=2
+                no-wrap
+                @click="updateStatusStudents"
+              >
+                Bulk update
+              </btn>
+            </q-button>
+          </div>
         </div>
       </div>
       <q-table
