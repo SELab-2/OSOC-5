@@ -5,6 +5,7 @@ import axios, { AxiosRequestConfig } from "axios"
 import { instance } from '../../src/utils/axios'
 import { UrlMockMappingGet, UrlMockMappingPost, UrlMockMappingPatch, UrlMockMappingDelete} from '../mockUrlMappings'
 import { StudentInterface, Student} from '../../src/models/Student'
+import { User} from '../../src/models/User'
 import { useAuthenticationStore } from '../../src/stores/useAuthenticationStore';
 import { MailInterface, Mail } from '../../src/models/Mail';
 

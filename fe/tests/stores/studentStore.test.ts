@@ -4,7 +4,7 @@ import { useStudentStore } from "../../src/stores/useStudentStore";
 import axios, { AxiosRequestConfig } from "axios"
 import { instance } from '../../src/utils/axios'
 import {UrlMockMappingPost, UrlMockMappingGet, UrlMockMappingDelete} from '../mockUrlMappings'
-import { StudentInterface} from '../../src/models/Student'
+import { Student, StudentInterface} from '../../src/models/Student'
 import { UserInterface } from '../../src/models/User'
 
 const getcall_i = vi.spyOn(instance, 'get').mockImplementation((url: string, data?: unknown, config?:
@@ -27,9 +27,10 @@ describe("Project Store", () => {
 
   it("getStudent", async () => {
     const studentStore = useStudentStore()
-    expect(studentStore.students).toHaveLength(0)
-    await studentStore.getStudent('students/1/')
-    expect(studentStore.students).toHaveLength(1)
+    expect(getcall_i).toHaveBeenCalledTimes(0)
+    let result = await studentStore.getStudent('students/1/')
+    expect(getcall_i).toHaveBeenCalledTimes(2)
+    expect(result).toBeInstanceOf(Student)
   })
 
   it("yesMaybeNo", async () => {
@@ -90,8 +91,8 @@ describe("Project Store", () => {
 
   it("receiveSuggestion", async () => {
     const studentStore = useStudentStore()
-    await studentStore.getStudent('students/1/')
-    expect(studentStore.students).toHaveLength(1)
+    let result = await studentStore.getStudent('students/1/')
+    studentStore.students = [result]
     expect(studentStore.students[0].suggestions).toHaveLength(2)
     var {data} = Object(await instance.get<UserInterface>('coaches/1'))
     await studentStore.receiveSuggestion({student_id: 1, coach: data, suggestion: "0", reason: "test"})
@@ -103,17 +104,17 @@ describe("Project Store", () => {
 
   it("removeSuggestion", async () => {
     const studentStore = useStudentStore()
-    await studentStore.getStudent('students/1/')
-    expect(studentStore.students).toHaveLength(1)
+    let result = await studentStore.getStudent('students/1/')
+    studentStore.students = [result]
     expect(studentStore.students[0].suggestions).toHaveLength(2)
-    await studentStore.removeSuggestion({student_id: "1", coach_id: 2})
+    studentStore.removeSuggestion({student_id: "1", coach_id: 2})
     expect(studentStore.students[0].suggestions).toHaveLength(1)
   })
 
   it("receiveFinalDecision", async () => {
     const studentStore = useStudentStore()
-    await studentStore.getStudent('students/1/')
-    expect(studentStore.students).toHaveLength(1)
+    let result = await studentStore.getStudent('students/1/')
+    studentStore.students = [result]
     expect(studentStore.students[0].finalDecision).toBeUndefined()
     var {data} = Object(await instance.get<UserInterface>('coaches/1'))
     await studentStore.receiveFinalDecision({student_id: "1", coach: data, suggestion: "0", reason: "test"})
@@ -122,7 +123,8 @@ describe("Project Store", () => {
 
   it("removeFinalDecision", async () => {
     const studentStore = useStudentStore()
-    await studentStore.getStudent('students/1/')
+    let result = await studentStore.getStudent('students/1/')
+    studentStore.students = [result]
     var {data} = Object(await instance.get<UserInterface>('coaches/1'))
     await studentStore.receiveFinalDecision({student_id: "1", coach: data, suggestion: "0", reason: "test"})
     expect(studentStore.students[0].finalDecision).toBeDefined()

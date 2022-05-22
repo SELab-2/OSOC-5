@@ -32,11 +32,20 @@ describe("Coach Store", () => {
 
     const coachStore = useCoachStore();
     const authenticationStore = useAuthenticationStore()
-    authenticationStore.loggedInUser = {id: 1, role: "nope", url: "coaches/1", firstName: "test", lastName: "test", email: "test", isAdmin: true, isActive: true}
-    let fetchedUser = {id: 1, role: "nope", url: "coaches/1", firstName: "test", lastName: "test", email: "test", isAdmin: true, isActive: true}
+    authenticationStore.loggedInUser = {id: 1, role: "nope", url: "coaches/1", firstName: "test", lastName: "test", email: "test", isAdmin: true, isActive: true} as User
+    let fetchedUser = {id: 1, role: "nope", url: "coaches/1", firstName: "test", lastName: "test", email: "test", isAdmin: true, isActive: true} as UserInterface
     let result = await coachStore.getUser(fetchedUser)
     expect(result.id).toBeDefined()
     expect(getcall_i).toHaveBeenCalledOnce()
+
+  });
+
+
+  it("loadUser", async () => {
+
+    const coachStore = useCoachStore();
+    let result = await coachStore.loadUser("coaches/1")
+    expect(result).toBeInstanceOf(User)
 
   });
 

@@ -2,7 +2,7 @@
   <div>
     <markdown
       :source="text"
-      :tasklists="{ enabled: true }"
+      :tasklists="{ enabled: editable }"
       ref="md"
       breaks
       v-bind="$attrs"
@@ -10,10 +10,14 @@
   </div>
 </template>
 
+<!-- A custom markdown viewer for the website. This is essentially a plugin which parses the markdown, but with a few tweaks and additions.
+This component uses a smaller font size for h1-h6, to match the font size in projectcard.
+It also adds a few javascript event listeners to listen to actions on the markdown checkboxes, which enable the option to edit the checkboxes in the markdown viewer. This uses javascript eventlisteners instead of Vue events because those were not possible due to limitations by the plugin.
+-->
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Markdown from 'vue3-markdown-it'
-// const Markdown = require('vue3-markdown-it')
+
 let checkboxes: HTMLElement[] = []
 
 export default defineComponent({
@@ -22,22 +26,30 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    // If disabled, the checkboxes cannot be edited.
+    editable: {
+      type: Boolean
+    }
   },
   components: { Markdown },
   destroyed() {
+    // Remove the event listeners.
     checkboxes.forEach((c) =>
       c.removeEventListener('click', this.onClick as any)
     )
   },
   methods: {
+    // Determine which checkbox was clicked, and emit the updated markdown text.
+    // This uses regex matching to determine the location of the clicked checkbox,
+    // And may produce incorrect results if the format it checks appears in the text itself.
     onClick(i: number) {
       var nth = 0
       const newText = this.text.replace(
-        /[-][ ]+[\[][ x][\]]/g,
+        /([-]|([1-9][.]))[ ]+[\[][ x][\]]/g,
         (match, _, original) => {
           nth++
           if (nth === i + 1) {
-            return match.slice(-2) === 'x]' ? '- [ ]' : '- [x]'
+            return match.slice(0,-2) + (match.slice(-2) === 'x]' ? ' ]' : 'x]')
           }
           return match
         }
@@ -48,6 +60,8 @@ export default defineComponent({
   watch: {
     text: {
       handler() {
+        // If the text is updated, remove the eventlisterens for the previous checkboxes (since those don't exist anymore)
+        // And create new event listeners for the new checkboxes.
         this.$nextTick(() => {
           checkboxes.forEach((c) =>
             c.removeEventListener('click', this.onClick as any)

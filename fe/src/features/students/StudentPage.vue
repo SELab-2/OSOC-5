@@ -7,9 +7,9 @@
       class="justify-between row q-px-lg q-pt-lg studentcol"
     >
       <div class="row q-px-sm q-gutter-sm items-center">
-        <h class="text-bold text-h4">
+        <div class="text-bold text-h4">
           {{ student ? student.fullName : '' }}
-        </h>
+        </div>
         <DecisionIcon
           v-if="student?.finalDecision"
           :decision="student?.finalDecision.suggestion"
@@ -21,7 +21,7 @@
           size="12px"
           rounded
           outline
-          color="black"
+          :color="$q.dark.isActive ? 'white' : 'black'"
           label="CV"
         />
         <q-btn
@@ -30,7 +30,7 @@
           size="12px"
           rounded
           outline
-          color="black"
+          :color="$q.dark.isActive ? 'white' : 'black'"
           label="Portfolio"
         />
       </div>
@@ -141,6 +141,7 @@
           <SuggestionsCard
             title="Suggestions"
             :suggestions="student?.suggestions"
+            :decision="student?.finalDecision"
           />
         </div>
         <div class="studentcol col-xs-12 col-sm-12 col-md-4 col-lg-4">
@@ -270,9 +271,7 @@ export default defineComponent ({
      * Retrieve the current selected student from the store
      */
     student(): Student | null {
-      console.log(this.studentStore.currentStudent)
       return this.studentStore.currentStudent
-      // return this.studentStore.students.find(s => s.id === parseInt(this.id))
     },
     /**
      * Retrieve the possible suggestion from the store
@@ -302,7 +301,7 @@ export default defineComponent ({
      */
     mySuggestion(): number {
       if (! this.studentStore.isLoading && this.student) {
-        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach.id === this.authenticationStore.loggedInUser?.id)
+        const mySuggestions = this.student.suggestions.filter(suggestion => suggestion.coach ? suggestion.coach.id === this.authenticationStore.loggedInUser?.id : false)
 
         return mySuggestions.length > 0 ? mySuggestions[0].suggestion : -1
       } else {
@@ -364,11 +363,6 @@ export default defineComponent ({
       if (this.student) {
         await this.studentStore.deleteStudent(this.student.url,
           () => {
-            this.$q.notify({
-              icon: 'done',
-              color: 'positive',
-              message: 'Successfully deleted!',
-            })
             router.push(`/students`)
           },
           () => this.$q.notify({

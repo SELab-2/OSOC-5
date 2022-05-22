@@ -147,6 +147,7 @@ class ProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectSuggestion
         fields = ['student', 'coach', 'skill', 'reason']
+        extra_kwargs = {'student': {'required': True, 'allow_null': False}}
 
     def create(self, validated_data):
         """
@@ -273,6 +274,7 @@ class SentEmailSerializer(serializers.HyperlinkedModelSerializer):
         model = SentEmail
         fields = ['url', 'id', 'sender', 'receiver', 'time', 'info', 'type']
         read_only_fields = ['time']
+        extra_kwargs = {'receiver': {'required': True, 'allow_null': False}}
 
 
 class RemoveProjectSuggestionSerializer(serializers.HyperlinkedModelSerializer):
@@ -345,3 +347,214 @@ class CustomRegisterSerializer(RegisterSerializer): # pylint: disable=abstract-m
         super().get_cleaned_data()
         fields = ['password1', 'password2', 'email', 'first_name', 'last_name']
         return {field: self.validated_data.get(field, '') for field in fields} # pylint: disable=no-member
+
+
+# the following serializer classes are used in the export_csv endpoints
+# these serializers do not have url fields, and all fields are transformed to text
+# for example: all foreign keys are changed from an id to a string representation (such as a name)
+
+
+class CSVStudentSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing student information to a csv file
+    """
+    gender = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    final_decision = serializers.SerializerMethodField()
+    skills = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Student
+        fields = ['id', 'first_name', 'last_name', 'call_name', 'email', 'gender', 'pronouns', 'phone_number',
+                  'language', 'english_rating', 'employment_agreement', 'hinder_work', 'cv', 'portfolio',
+                  'motivation', 'fun_fact', 'school_name', 'degree', 'degree_duration', 'degree_current_year',
+                  'studies', 'alum', 'student_coach', 'status', 'best_skill', 'final_decision', 'skills']
+
+    def get_status(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of status
+        """
+        return Student.Status(obj.status).label
+
+    def get_gender(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of gender
+        """
+        return Student.Gender(obj.gender).label
+
+    def get_final_decision(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of final decision
+        if final_decision is None, return Undecided
+        """
+        if obj.final_decision:
+            return Suggestion.Suggestion(obj.final_decision.suggestion).label
+        return 'Undecided'
+
+    def get_skills(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of skills
+        """
+        return f"[{', '.join([str(skill) for skill in obj.skills.all()])}]"
+
+
+class CSVSuggestionSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing suggestion information to a csv file
+    """
+    student = serializers.SerializerMethodField()
+    coach = serializers.SerializerMethodField()
+    suggestion = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Suggestion
+        fields = ['id', 'student', 'coach', 'suggestion', 'reason', 'final']
+
+    def get_student(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of student
+        """
+        return str(obj.student)
+
+    def get_coach(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of coach
+        """
+        return str(obj.coach)
+
+    def get_suggestion(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of suggestion
+        """
+        return Suggestion.Suggestion(obj.suggestion).label
+
+
+class CSVCoachSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing coach information to a csv file
+    """
+    class Meta:
+        model = Coach
+        fields = ['id', 'first_name', 'last_name', 'email', 'is_admin', 'is_active', 'is_superuser', 'date_joined']
+
+
+class CSVProjectSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing project information to a csv file
+    """
+    coaches = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Project
+        fields = ['id', 'name', 'partner_name', 'extra_info', 'coaches']
+
+    def get_coaches(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of coaches
+        """
+        return f"[{', '.join([str(coach) for coach in obj.coaches.all()])}]"
+
+
+class CSVRequiredSkillSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing required skill information to a csv file
+    """
+    project = serializers.SerializerMethodField()
+    skill = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RequiredSkills
+        fields = ['id', 'project', 'skill', 'amount', 'comment']
+
+    def get_project(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of project
+        """
+        return str(obj.project)
+
+    def get_skill(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of skill
+        """
+        return str(obj.skill)
+
+
+class CSVProjectSuggestionSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing project suggestion information to a csv file
+    """
+    project = serializers.SerializerMethodField()
+    student = serializers.SerializerMethodField()
+    skill = serializers.SerializerMethodField()
+    coach = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProjectSuggestion
+        fields = ['id', 'project', 'student', 'skill', 'coach', 'reason']
+
+    def get_project(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of project
+        """
+        return str(obj.project)
+
+    def get_student(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of student
+        """
+        return str(obj.student)
+
+    def get_skill(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of skill
+        """
+        return str(obj.skill)
+
+    def get_coach(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of coach
+        """
+        return str(obj.coach)
+
+
+class CSVSkillSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing skill information to a csv file
+    """
+    class Meta:
+        model = Skill
+        fields = ['id', 'name', 'color']
+
+
+class CSVSentEmailSerializer(serializers.ModelSerializer):
+    """
+    serializer for writing sent email information to a csv file
+    """
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SentEmail
+        fields = ['id', 'sender', 'receiver', 'time', 'info', 'type']
+
+    def get_sender(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of sender
+        """
+        return str(obj.sender)
+
+    def get_receiver(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of receiver
+        """
+        return str(obj.receiver)
+
+    def get_type(self, obj):  # pylint: disable=no-self-use
+        """
+        get string representation of type
+        if type is None, return 'None'
+        """
+        if obj.type is not None:
+            return Student.Status(obj.type).label
+        return 'None'

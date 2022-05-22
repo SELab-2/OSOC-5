@@ -3,7 +3,7 @@
     v-model="_splitterModel"
     :limits="step === 0 ? [50, 50] : showPreview ? [40, 80] : [100, 100]"
     emit-immediately
-    style="height: 100%"
+    style="height: 100%; overflow: hidden"
     :before-class="disabled ? '' : 'resize-container'"
     @update:modelValue="showPreview ? disable() : ''"
   >
@@ -19,7 +19,7 @@
         error-icon="none"
         done-color="teal"
         active-color="teal"
-        error-color="yellow"
+        error-color="teal"
         animated
         keep-alive
         header-nav
@@ -71,66 +71,101 @@
         v-if="step > 0"
         style="position: absolute; left: 0; bottom: 0"
         class="q-ma-md"
-        @click="step -= 1"
         padding="10px"
         icon="arrow_back"
         label="Previous"
-        color="yellow"
-        shadow-color="orange"
+        color="teal"
+        shadow-color="teal"
+        @click="step -= 1"
       />
       <btn
+        v-if="step < 2 && (showPreview || id === undefined)"
         style="position: absolute; right: 0; bottom: 0"
-        @click="next"
-        v-if="step < 2"
         padding="10px"
         class="q-ma-md"
         icon-right="arrow_forward"
         label="Next"
-        color="yellow"
-        shadow-color="orange"
-      >
-        <q-tooltip v-if="step === 2 && !basicInfoDone" style="width: 300px">
-          <span class="text-body2">
-            Some data is missing.<br />Please check if you filled in a name and
-            partner name.
-          </span>
-        </q-tooltip>
-      </btn>
+        color="teal"
+        shadow-color="teal"
+        @click="next"
+      />
     </template>
     <template #after>
       <div
         v-if="project && showPreview"
         class="column fit justify-center items-center content-center"
       >
-        <div class="text-h6 text-bold">Preview</div>
+        <div class="text-h6 text-bold">
+          Preview
+        </div>
         <project-card
-          style="width: 90%; max-width: 400px"
           v-model:expandedInfo="showInfo"
+          style="width: 90%; max-width: 400px"
           :project="project"
         />
+        <q-slide-transition>
+          <div
+            v-if="showDelete"
+            style="width: 70%; text-align: center;"
+          >
+            <div class="q-gutter-sm q-mb-md">
+              <div class="text-subtitle2 text-bold text-red">
+                Are you sure you want to delete this project?<br>This action cannot be undone.
+              </div>
+              <div>Please type the name of the project to confirm:</div>
+              <div class="row justify-center q-gutter-sm">
+                <q-input
+                  v-model="deleteConfirmation"
+                  type="text"
+                  outlined
+                  color="red"
+                  dense
+                  :placeholder="project!.name"
+                />
+                <btn
+                  label="confirm"
+                  dense
+                  color="red"
+                  shadow-color="red"
+                  :disabled="deleteConfirmation !== project.name"
+                  shadow-strength="2"
+                  @click="deleteProject"
+                />
+              </div>
+            </div>
+          </div>
+        </q-slide-transition>
       </div>
     </template>
   </q-splitter>
-  <btn
+  <div
     style="position: absolute; right: 0; bottom: 0"
-    class="q-ma-md"
-    v-if="basicInfoDone"
-    @click="submit"
-    padding="10px"
-    icon-right="check"
-    :label="id ? 'Update' : 'Publish'"
-    color="yellow"
-    shadow-color="orange"
+    class="q-gutter-md q-ma-md"
   >
-    <q-tooltip v-if="step === 2 && !basicInfoDone" style="width: 300px">
-      <span class="text-body2">
-        Some data is missing.<br />Please check if you filled in a name and
-        partner name.
-      </span>
-    </q-tooltip>
-  </btn>
-  <!-- </div> -->
+    <btn
+      v-if="id"
+      padding="10px"
+      icon="delete"
+      label="Delete"
+      glow-color="red"
+      glow-size="1500px"
+      color="teal"
+      shadow-color="teal"
+      @click="showDelete = !showDelete; deleteConfirmation = ''; showInfo = true"
+    />
+    <btn
+      v-if="basicInfoDone"
+      padding="10px"
+      :icon-right="!showPreview && step < 2 ? 'arrow_forward' : 'check'"
+      :label="!showPreview && step < 2 ? 'Next' : id !== undefined ? 'Update' : 'Publish'"
+      color="teal"
+      shadow-color="teal"
+      @click="showPreview ? submit() : next()"
+    />
+  </div>
 </template>
+
+<!-- Displays the steps to create a new project. -->
 
 <script lang="ts">
 import { ref, Ref, defineComponent } from 'vue'
@@ -140,6 +175,7 @@ import ProjectSkills from './components/ProjectSkills.vue'
 import { useSkillStore } from '../../stores/useSkillStore'
 import { useCoachStore } from '../../stores/useCoachStore'
 import { useProjectStore } from '../../stores/useProjectStore'
+import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
 import { Project } from '../../models/Project'
 import router from '../../router'
 import ProjectCard from './components/ProjectCard.vue'
@@ -149,7 +185,7 @@ export default defineComponent({
   components: { BasicInfo, ProjectCoaches, ProjectSkills, ProjectCard },
   props: {
     id: {
-      type: Number,
+      type: String,
       required: false,
     },
   },
@@ -169,73 +205,27 @@ export default defineComponent({
       width: ref(0),
       disabled: ref(false),
       timeout,
+      showDelete: ref(false),
+      deleteConfirmation: ref('')
     }
-  },
-  async created() {
-    let project: Project
-    if (this.id) {
-      try {
-        project = await this.projectStore.getProject(this.id)
-      } catch (error) {
-        router.replace('/notfound')
-        return
-      }
-    } else {
-      project = new Project('', '', '', 0, [], [], [])
-    }
-    this.project = project
-  },
-  mounted() {
-    this.skillStore.loadSkills()
-    this.coachStore.loadUsers()
-  },
-  methods: {
-    next() {
-      if (this.step < 3) {
-        this.step += 1
-      } else {
-        this.submit()
-      }
-    },
-    async submit() {
-      if (this.id) {
-        await this.projectStore.updateProject(this.project!, this.project!.id)
-      } else {
-        await this.projectStore.addProject(this.project!)
-      }
-      this.projectStore.shouldRefresh = true
-      router.replace('/projects')
-    },
-    onResize(e: { width: number }) {
-      this.width = e.width
-    },
-    disable() {
-      console.log('Hello')
-      this.disabled = true
-      clearTimeout(this.timeout)
-      this.timeout = setTimeout(() => {
-        this.disabled = false
-      }, 200)
-    },
-  },
-  watch: {
-    step(newValue, oldValue) {
-      this.visitedSteps[oldValue] = true
-    },
   },
   computed: {
     basicInfoDone(): boolean {
       if (!this.project) return false
       return this.project.name.length > 0 && this.project.partnerName.length > 0
     },
+    // Determines if the project info should be displayed or not.
     showInfo: {
       get(): boolean {
-        return this.step === 0
+        return this.step === 0 || this.showDelete
       },
       set(n: boolean) {
         this.step = 0
       },
     },
+    // Determines if the preview should be shown or not.
+    // If the window is to narrow, it is hidden, except at the first step,
+    // Because it is needed for the markdown preview.
     showPreview() {
       return this.width > 1200 || this.step === 0
     },
@@ -251,6 +241,85 @@ export default defineComponent({
         if (n > 80) return
         this.splitterModel = n
       },
+    },
+  },
+  watch: {
+    step(newValue, oldValue) {
+      this.visitedSteps[oldValue] = true
+    },
+  },
+  async mounted() {
+    if (!useAuthenticationStore().loggedInUser?.isAdmin) {
+      router.replace('/notfound')
+      return
+    }
+    let project: Project
+    if (this.id) {
+      // Check if the given id is a valid id. If not, reroute to not found.
+      try {
+        const _id = parseInt(this.id)
+        if (isNaN(_id)) throw new Error()
+        project = await this.projectStore.getProject(_id)
+      } catch (error) {
+        router.replace('/notfound')
+        return
+      }
+    } else {
+      project = new Project('', '', '', 0, '', [], [], [])
+    }
+    this.project = project
+  },
+  methods: {
+    next() {
+      if (this.step < 2) {
+        this.step += 1
+      } else {
+        this.submit()
+      }
+    },
+    async submit() {
+      if (this.id) {
+        let error = await this.projectStore.updateProject(this.project!, this.project!.id)
+        this.displayErrorOr(error, () => {
+          this.projectStore.shouldRefresh = true
+          router.push('/projects')
+        })
+      } else {
+        let error = await this.projectStore.addProject(this.project!)
+        this.displayErrorOr(error, () => {
+          this.projectStore.shouldRefresh = true
+          router.replace('/projects')
+        })
+      }
+    },
+    async deleteProject() {
+      let error = await this.projectStore.deleteProject(this.project!.id)
+      this.displayErrorOr(error, () => {
+        this.projectStore.shouldRefresh = true
+        router.replace('/projects')
+      })
+    },
+    displayErrorOr(error: any, other: Function) {
+      if (error) {
+        this.$q.notify({
+          icon: 'error',
+          color: 'warning',
+          message: error.detail,
+        })
+      } else {
+        other()
+      }
+    },
+    onResize(e: { width: number }) {
+      this.width = e.width
+    },
+    // Enable the move animation after a delay. This is because the animation needs to be disabled when dragging the splitter.
+    disable() {
+      this.disabled = true
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        this.disabled = false
+      }, 200)
     },
   },
 })
@@ -271,7 +340,4 @@ export default defineComponent({
   height: 100%;
 }
 
-/* :deep(.q-splitter__panel) {
-  transition: width .1s;
-} */
 </style>

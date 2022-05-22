@@ -5,11 +5,11 @@ import LoginFormVue from '../features/authentication/LoginForm.vue'
 import SelectStudentsPageVue from '../features/students/SelectStudentsPage.vue'
 import StudentPage from '../features/students/StudentPage.vue'
 import ProjectList from '../features/projects/ProjectList.vue'
+import ResolveConflicts from '../features/projects/ResolveConflicts.vue'
 import CreateProject from '../features/projects/CreateProject.vue'
 import UserList from '../features/users/UserList.vue'
 import MailList from '../features/mails/MailList.vue'
 import NotFoundPage from '../components/NotFoundPage.vue'
-import {useStudentStore} from "../stores/useStudentStore";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -52,7 +52,8 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: ProjectList,
-      },{
+      },
+      {
         path: '/projects/:id',
         name: 'Project Page',
         meta: {
@@ -68,6 +69,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: CreateProject,
+      },
+      {
+        path: '/projects/conflicts',
+        name: 'Project Conflicts',
+        meta: {
+          requiresAuth: true,
+        },
+        component: ResolveConflicts,
       },
       {
         path: '/users',

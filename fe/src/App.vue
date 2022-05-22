@@ -1,17 +1,36 @@
 <template>
-  <q-layout style="height: 100vh" view="hHh lpR fFf">
-
-      <router-view />
-
+  <q-layout
+    style="height: 100vh"
+    view="hHh lpR fFf"
+  >
+    <!-- <Suspense> -->
+    <!-- <template #default> -->
+    <router-view />
+    <!-- </template> -->
+    <!-- <template #fallback>
+        Loading...
+      </template>
+    </Suspense> -->
   </q-layout>
 </template>
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-
 (useQuasar().notify as any).setDefaults({
   position: 'bottom',
   actions: [{ icon: 'close', color: 'white' }]
+})
+</script>
+
+<script lang="ts">
+import { Dark } from 'quasar'
+import { useAuthenticationStore } from './stores/useAuthenticationStore'
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  mounted() {
+    Dark.set(useAuthenticationStore().colorScheme)
+  }
 })
 
 </script>
@@ -24,6 +43,10 @@ import { useQuasar } from 'quasar'
   font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow: hidden;
 }
 
 </style>

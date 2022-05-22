@@ -9,9 +9,12 @@
     >
       <q-toolbar
         style="overflow: visible; padding: 8px"
-        class="text-blue bg-white"
+        :class="`bg-${$q.dark.isActive ? 'dark' : 'white'} text-${$q.dark.isActive ? 'white' : 'blue'}`"
       >
-        <div class="text-bold text-h4 q-ml-md text-black">
+        <div
+          class="text-bold text-h4 q-ml-md"
+          :class="`text-${$q.dark.isActive ? 'white' : 'black'}`"
+        >
           Projects
         </div>
         <q-space />
@@ -23,7 +26,7 @@
           glow-color="teal-3"
           shadow-color="teal"
           :shadow-strength="showFilters ? 2 : 5"
-          :color="showFilters ? 'teal' : 'white'"
+          :color="showFilters ? 'teal' : 'transparent'"
           :class="`text-${showFilters ? 'white' : 'teal'}`"
           icon="tune"
           @click="showFilters = !showFilters"
@@ -58,13 +61,14 @@
           glow-color="teal-3"
           shadow-color="teal"
           :shadow-strength="expanded ? 2 : 5"
-          :color="expanded ? 'teal' : 'white'"
+          :color="expanded ? 'teal' : 'transparent'"
           :class="`text-${expanded ? 'white' : 'teal'}`"
           @click="expanded = !expanded"
         />
 
         <q-space />
         <btn
+          v-if="conflictsExists"
           padding="7px"
           icon="r_warning"
           color="red-7"
@@ -73,7 +77,9 @@
           shadow-strength="2"
           no-wrap
         >
-          <div class="ellipsis">Conflicts</div>
+          <div class="ellipsis">
+            Conflicts
+          </div>
         </btn>
       </q-toolbar>
 
@@ -82,24 +88,23 @@
           <q-card-section>
             <span class="text-h5 text-bold">Filters</span><br>
             <div class="row">
-              <div class="column">
-                <!-- <q-checkbox label="My project" /> -->
-                <!-- <q-checkbox label="Students needed" /> -->
-              </div>
-              <!-- <div>
+              <!-- <q-checkbox label="My project" /> -->
+              <!-- <q-checkbox label="Students needed" /> -->
+              
+              <div style="min-width: 50%">
                 <q-select
-                  v-model="studentStore.skills"
+                  v-model="skillFilter"
+                  clearable
                   rounded
                   outlined
                   dense
                   multiple
-                  color="primary"
-                  bg-color="white"
+                  color="teal"
                   :options="skillStore.skills"
-                  :option-label="(opt) => opt.name"
-                  :option-value="(opt) => opt.id"
+                  :option-label="opt => opt.name"
+                  :dark="$q.dark.isActive"
                   label="Skills"
-                  style="width: 200px"
+                  emit-value
                 >
                   <template #selected>
                     <div
@@ -107,16 +112,43 @@
                       style="max-height: 15vh; overflow-y: auto"
                     >
                       <StudentSkillChip
-                        v-for="skill of studentStore.skills"
-                        :key="skill.id"
-                        :color="skill.color"
-                        :name="skill.name"
+                        v-for="skill of skillFilter"
+                        :key="(skill as {id: number}).id"
+                        :color="(skill as {color: string}).color"
+                        :name="(skill as {name: string}).name"
                         best-skill=""
                       />
                     </div>
                   </template>
                 </q-select>
-              </div> -->
+              </div>
+              
+              <div
+                class="column q-mx-md"
+              >
+                <div class="col">
+                  <q-checkbox 
+                    v-model="onlyNotFull"
+                    rounded
+                    outlined
+                    dense
+                    color="teal"
+                    bg-color="white"
+                    label="Only show non-full projects"
+                  />
+                </div>
+                <div class="col">
+                  <q-checkbox 
+                    v-model="onlyFull"
+                    rounded
+                    outlined
+                    dense
+                    color="teal"
+                    bg-color="white"
+                    label="Only show full projects"
+                  />
+                </div>
+              </div>
             </div>
           </q-card-section>
         </div>
@@ -140,10 +172,15 @@
           :ssr-columns="1"
           :column-width="320"
           :gap="0"
-          :scrollTarget="$refs.scroll as any"
+          :scroll-target="$refs.scroll as any"
         >
           <template #default="{ item }">
-            <project-card editable :project="item as any" />
+            <project-card
+              editable
+              expandable-skills
+              v-if="item"
+              :project="item as any"
+            />
           </template>
         </masonry-wall>
         <template #loading>
@@ -174,20 +211,23 @@
   </q-page-sticky>
 </template>
 
+<!-- This component displays a list of project cards. -->
+
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
 import ProjectCard from './components/ProjectCard.vue'
 import { useProjectStore } from '../../stores/useProjectStore'
 import { useStudentStore } from '../../stores/useStudentStore'
 import { useAuthenticationStore } from '../../stores/useAuthenticationStore'
-
+import StudentSkillChip from "../students/components/StudentSkillChip.vue"
 import { useSkillStore } from '../../stores/useSkillStore'
 import { storeToRefs } from 'pinia'
+import { useProjectConflictStore } from '../../stores/useProjectConflictStore'
 import MasonryWall from './MasonryWall.vue'
 
 export default defineComponent({
   name: 'ProjectList',
-  components: { ProjectCard, MasonryWall },
+  components: { ProjectCard, MasonryWall, StudentSkillChip },
   setup() {
     const { loadNext } = useProjectStore()
     
@@ -196,6 +236,7 @@ export default defineComponent({
       loadNext,
       studentStore: useStudentStore(),
       authenticationStore: useAuthenticationStore(),
+      projectConlictStore: useProjectConflictStore(),
       skillStore: useSkillStore(),
     }
   },
@@ -204,13 +245,31 @@ export default defineComponent({
       showShadow: ref(false),
       showFilters: ref(false),
       projectNameFilter: ref(''),
+      skillFilter: ref([]),
+      onlyNotFull: false,
+      onlyFull: false
     }
   },
   computed: {
     filters(): Object {
-      return {
+      const filters =  {
         search: this.projectNameFilter,
-      }
+      } as { search: string; required_skills: never[]; full?: string }
+
+      if(this.skillFilter && this.skillFilter.length)
+        filters.required_skills = this.skillFilter.map(({id}) => id)
+      else
+        filters.required_skills = []
+
+      if(this.onlyNotFull)
+        filters.full = "false"
+      else if(this.onlyFull)
+        filters.full = "true"
+
+      return filters
+    },
+    conflictsExists(): boolean {
+      return this.projectConlictStore.conflicts.length > 0
     },
     expanded: {
       get(): boolean {
@@ -230,14 +289,14 @@ export default defineComponent({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.projects.forEach((p) => {
           for (let r in (p as any).selectedRoles) {
-            ;(p as any).selectedRoles[r] = newValue
+            (p as any).selectedRoles[r] = newValue
           }
         })
       },
     },
   },
   watch: {
-    projectNameFilter: {
+    filters: {
       handler() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const infscroll = this.$refs.infinite as any
@@ -246,6 +305,16 @@ export default defineComponent({
         infscroll.trigger()
       },
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onlyFull(newValue, _oldValue) {
+      if(newValue == true) 
+        this.onlyNotFull = false
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onlyNotFull(newValue, _oldValue) {
+      if(newValue == true) 
+        this.onlyFull = false
+    }
   },
   activated() {
     // Check if the projects list has been altered in another view.
@@ -258,6 +327,9 @@ export default defineComponent({
       infscroll.trigger()
     }
   },
+  mounted() {
+    this.projectConlictStore.getConflictingProjects()
+  },  
 })
 </script>
 

@@ -1,11 +1,9 @@
 <template>
   <div
-    class="relative-position container flex justify-center"
-    style="width: 100vw"
+    class="relative-position flex justify-center"
   >
     <div
       class="q-pa-md q-gutter-md"
-      style="width: 1000px"
     >
       <div class="text-bold text-h4">
         Sent Mails
@@ -34,6 +32,7 @@
             multiple
             clearable
             use-chips
+            color="yellow"
             label="Status"
             :options="status"
             map-options
@@ -41,12 +40,13 @@
             @update:model-value="async () => await mailStore.loadStudentsMails(filters, (count: number) => pagination.rowsNumber = count)"
           />
         </div>
-        <div class="row col-6 q-gutter-sm justify-end">
+        <div class="row no-wrap col-6 q-gutter-sm justify-end">
           <q-select
             v-model="statusUpdate"
             style="width: 220px"
             rounded
             outlined
+            color="yellow"
             dense
             use-chips
             emit-value
@@ -54,38 +54,42 @@
             label="New status"
             :options="status"
           />
-          <q-button>
-            <btn
-              padding="7px"
-              color="yellow"
-              shadow-strength="2.5"
-              no-wrap
-              @click="updateStatusStudents"
-            >
-              Bulk update status
-            </btn>
-          </q-button>
+          
+          <btn
+            padding="7px"
+            color="yellow"
+            shadow-color="orange"
+            shadow-strength=2
+            no-wrap
+            @click="updateStatusStudents"
+          >
+            Bulk update status
+          </btn>
+          
         </div>
       </div>
       <q-table
         v-model:selected="selectedStudents"
-        class="my-table mail-table shadow-4"
+        class="cornered shadow-4"
         :rows="mailStore.mailStudents"
         :columns="mailsColumns"
         :loading="mailStore.isLoading"
+        :pagination="pagination"
         :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
         row-key="url"
         selection="multiple"
         separator="horizontal"
         @request="onRequest"
+        :table-class="$q.dark.isActive ? 'bg-dark2' : ''"
+        :table-header-class="`${$q.dark.isActive ? 'text-black' : ''} bg-yellow`"
       >
         <template #body="props">
           <q-tr
-            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
-            :props="props"
+            :class="props.rowIndex % 2 == 1 && !$q.dark.isActive ? 'bg-yellow-1' : ''"
+            :style="`background-color: ${props.rowIndex % 2 == 1 && $q.dark.isActive ? colors.lighten(colors.getPaletteColor('yellow'),-75) : ''}`"
           >
             <q-td>
-              <q-checkbox v-model="props.selected" />
+              <q-checkbox color="yellow" v-model="props.selected" />
             </q-td>
             <q-td auto-width>
               <q-icon
@@ -98,6 +102,8 @@
             <q-td
               key="name"
               :props="props"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.fullName"
             >
               {{ props.row.fullName }}
             </q-td>
@@ -136,28 +142,30 @@
             <q-td
               key="email"
               :props="props"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.email"
             >
               <a
                 :href="'mailto:' + props.row.email"
-                style="color: black"
+                :class="`text-${$q.dark.isActive ? 'white' : 'black'}`"
               >{{ props.row.email }}</a>
             </q-td>
             <q-td style="align-content: flex-end">
-              <q-btn
-                size="sm" color="yellow" round dense icon="mail" @click="reset"
+              <btn
+                dense color="yellow" glow-size="250px" flat icon="forward_to_inbox" @click="reset"
               >
                 <q-menu>
                   <q-list>
                     <q-item tag="label">
                       <div class="column q-gutter-sm">
                         <label>Add new mail:</label>
-                        <q-input filled v-model="date">
+                        <q-input outlined color="yellow" v-model="date">
                           <template v-slot:prepend>
                             <q-icon name="event" class="cursor-pointer">
                               <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                                 <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
                                   <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                    <q-btn v-close-popup label="Close" color="yellow" flat />
                                   </div>
                                 </q-date>
                               </q-popup-proxy>
@@ -169,7 +177,7 @@
                               <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                                 <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
                                   <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                    <q-btn v-close-popup label="Close" color="yellow" flat />
                                   </div>
                                 </q-time>
                               </q-popup-proxy>
@@ -180,18 +188,19 @@
                         <q-input
                           label="Info"
                           v-model="info"
-                          filled
+                          outlined
+                          color="yellow"
                           type="textarea"
                         />
 
-                        <q-btn class="bg-yellow" @click="() => sendMail(props.row)" v-close-popup>
+                        <btn color="yellow" shadow-color="orange" @click="() => sendMail(props.row)" v-close-popup>
                           Send
-                        </q-btn>
+                        </btn>
                       </div>
                     </q-item>
                   </q-list>
                 </q-menu>
-              </q-btn>
+              </btn>
             </q-td>
           </q-tr>
           <q-tr
@@ -215,7 +224,7 @@
 import {defineComponent} from "@vue/runtime-core";
 import {Ref, ref} from 'vue'
 import {Student} from "../../models/Student";
-import {useQuasar} from "quasar";
+import {useQuasar, colors} from "quasar";
 import status from "./Status";
 import MailsOverview from "./components/MailsOverview.vue";
 import {useMailStore} from "../../stores/useMailStore";
@@ -240,6 +249,7 @@ export default defineComponent({
       columnsMails,
       status,
       q,
+      colors
     }
   },
   data() {
@@ -261,7 +271,7 @@ export default defineComponent({
   },
   beforeMount() {
     if (!this.authenticationStore.loggedInUser?.isAdmin) {
-      router.replace('/projects')
+      router.replace('/notfound')
     }
   },
   async mounted() {
@@ -276,11 +286,10 @@ export default defineComponent({
         ordering: string
         status: string
       }
-
       if (this.search) filter.search = this.search
       filter.page_size = this.pagination.rowsPerPage
       filter.page = this.pagination.page
-      const order = this.pagination.descending ? '-' : '+'
+      const order = this.pagination.descending ? '-' : ''
       if (this.pagination.sortBy === 'name') {
           filter.ordering = `${order}first_name,${order}last_name`
       } else if (this.pagination.sortBy !== null) {
@@ -338,9 +347,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style scoped>
-.mail-table {
-  border-radius: 10px;
-}
-</style>

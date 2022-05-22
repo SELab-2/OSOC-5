@@ -1,12 +1,12 @@
 let student = {
   "id": 1,
-  "url": "https://sel2-5.ugent.be/api/students/1/",
+  "url": "students/1/",
   "suggestions": [
     {
       "suggestion": "0",
       "reason": "",
       "coach": {
-        "url": "https://sel2-5.ugent.be/api/coaches/2/",
+        "url": "coaches/2",
         "id": 2,
         "first_name": "F",
         "last_name": "V"
@@ -16,7 +16,7 @@ let student = {
       "suggestion": "0",
       "reason": "",
       "coach": {
-        "url": "https://sel2-5.ugent.be/api/coaches/3/",
+        "url": "coaches/3",
         "id": 3,
         "first_name": "L",
         "last_name": "S"
@@ -55,7 +55,7 @@ let student = {
 let coach1 = {
   id: 1, 
   role: "nope", 
-  url: "test", 
+  url: 'coaches/1', 
   firstName: "test", 
   lastName: "test", 
   email: "test", 
@@ -63,7 +63,7 @@ let coach1 = {
   isActive: true
 }
 let coach2 = {
-  url: "https://sel2-5.ugent.be/api/coaches/2/",
+  url: 'coaches/1',
   id: 2,
   first_name: "F",
   last_name: "V",
@@ -105,8 +105,20 @@ let project = {
   extraInfo: "liever niet",
   requiredSkills: [{amount: 2, comment: "test", skill: 'proj_skills/1'}],
   coaches: [coach1],
+  suggestedStudents: [projectSuggestion],
   id: 1
 }
+
+let project_extra = {
+  name: "YUPPERS VERVOLG",
+  partnerName: "regen",
+  extraInfo: "liever niet",
+  requiredSkills: [{amount: 2, comment: "test", skill: 'proj_skills/1'}],
+  coaches: [coach2],
+  suggestedStudents: [projectSuggestion],
+  id: 2
+}
+
 
 export const UrlMockMappingPost = {
     'auth/password/change/': {data: {succes: true}},
@@ -140,8 +152,11 @@ export const UrlMockMappingGet = {
     'projects_sug/1': {data: projectSuggestion},
     'projects/': {data: {results: [project]}},
     'projects/1': {data: project},
+    'projects/2': {data: project_extra},
     'projects/1/': {data: project},
+    'projects/2/': {data: project_extra},
     'projects/?page=1': {data: {results: [project], next: null}},
+    'projects/get_conflicting_projects': {data: {results: [{student: 'students/1/', projects: ['projects/1/', 'projects/2/']}]}},
     'proj_skills/1': {data: {amount:2, comment: "test", skill: "skills/2"}}
   }
 

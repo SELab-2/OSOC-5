@@ -41,9 +41,10 @@
         <q-tooltip
           v-if="skill.comment"
           :class="`bg-${skill.skill.color}-2`"
-          class="text-black shadow-2"
+          class="text-black text-body2 shadow-2"
           anchor="bottom middle"
           self="center middle"
+          style="width: 400px; overflow-wrap: break-word"
         >
           {{ skill.comment }}
         </q-tooltip>
@@ -52,21 +53,24 @@
   </q-chip>
 </template>
 
-
+<!-- This component displays the chip of a skill in a project card. -->
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { ProjectSkill } from '../../../models/Skill'
 
 export default defineComponent({
   props: {
+    // The skill to display.
     skill: {
       type: ProjectSkill,
       required: true
     },
+    // The amount of places that are occupied of the skill.
     occupied: {
       type: Number,
       required: false
     },
+    // The state of the skill (open/closed).
     modelValue: {
       type: Boolean,
       required: false,

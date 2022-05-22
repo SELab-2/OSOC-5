@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { baseUrl } from './baseUrl'
+import { useAuthenticationStore } from '../stores/useAuthenticationStore'
 
 export const instance: AxiosInstance = axios.create({
   baseURL: baseUrl,
@@ -21,20 +22,30 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (res) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return convertObjectKeysToCamelCase(res as any)
   },
   async (err) => {
     const originalConfig = err.config
+    if (originalConfig.url === '/auth/token/refresh/') {
+      // Logout if the token couldn't be refreshed.
+      useAuthenticationStore().logout()
+    }
     if (err.response) {
       // Access Token was expired
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true
         try {
-          const rs = await refreshToken(instance)
+          const rs = await instance.post('/auth/token/refresh/', {
+            refresh: localStorage.getItem('refreshToken'),
+          })
+          
           const { access } = rs.data
           localStorage.setItem('accessToken', access)
           instance.defaults.headers.common.Authorization = `Bearer ${access}`
           return instance(originalConfig)
+          
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (_error: any) {
           if (_error.response && _error.response.data) {
             return Promise.reject(_error.response.data)
@@ -49,9 +60,3 @@ instance.interceptors.response.use(
     return Promise.reject(err)
   }
 )
-
-function refreshToken(instance: AxiosInstance) {
-  return instance.post('/auth/token/refresh/', {
-    refresh: localStorage.getItem('refreshToken'),
-  })
-}

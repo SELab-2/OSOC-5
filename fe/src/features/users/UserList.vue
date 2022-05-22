@@ -1,11 +1,9 @@
 <template>
   <div
-    class="relative-position container flex justify-center"
-    style="width: 100vw"
+    class="relative-position flex justify-center"
   >
     <div
       class="q-pa-md q-gutter-md"
-      style="width: 1000px"
     >
       <div class="row">
         <div class="text-bold text-h4">
@@ -30,7 +28,6 @@
             { name: 'coach', label: 'Coaches' },
             { name: 'inactive', label: 'Inactive' },
           ]"
-          @click="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
         />
 
         <q-space />
@@ -49,7 +46,7 @@
           <q-space />
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser :created="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)" />
+              <AddUser :created="async () =>{ newUserDialog = false; await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count); }" />
             </q-card>
           </q-dialog>
           <q-input
@@ -59,7 +56,6 @@
             debounce="300"
             color="yellow-4"
             placeholder="Search"
-            @update:modelValue="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)"
           >
             <template #append>
               <q-icon name="search" />
@@ -72,8 +68,7 @@
              This is needed because there are 2 filters, so while the first may not be empty, the second might be. -->
       <q-table
         v-model:pagination="pagination"
-        class="my-table user-table shadow-4"
-        table-header-style="user-table"
+        class="cornered shadow-4"
         :rows="coachStore.users"
         :columns="userColumns"
         :rows-per-page-options="[ 3, 5, 7, 10, 15, 20, 25, 50 ]"
@@ -81,13 +76,18 @@
         separator="horizontal"
         :loading="coachStore.isLoading"
         @request="onRequest"
+        :table-class="$q.dark.isActive ? 'bg-dark2' : ''"
+        :table-header-class="`${$q.dark.isActive ? 'text-black' : ''} bg-yellow`"
       >
         <template #body="props">
           <q-tr
-            :class="props.rowIndex % 2 == 1 ? 'bg-yellow-1' : ''"
+            :class="props.rowIndex % 2 == 1 && !$q.dark.isActive ? 'bg-yellow-1' : ''"
+            :style="`background-color: ${props.rowIndex % 2 == 1 && $q.dark.isActive ? colors.lighten(colors.getPaletteColor('yellow'),-75) : ''}`"
           >
             <q-td
               key="name"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.fullName"
             >
               {{ props.row.fullName }}
             </q-td>
@@ -127,16 +127,19 @@
                   </q-item>
                 </template>
               </q-select>
+              <div v-else>{{ roles.find(r => r.value === props.row.role)!.label }}</div>
             </q-td>
             <q-td
               key="assignedto"
+              style="max-width: 20vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+              :title="props.row.projects?.map((p: {name: string}) => p.name).join(', ') ?? ''"
             >
-            <q-scroll-area :thumb-style="thumbStyle" style="height: 20px; width: 250px;">
-              {{ props.row.projects.map((p: {name: string}) => p.name).join(', ') }}
-            </q-scroll-area>
+              {{ props.row.projects?.map((p: {name: string}) => p.name).join(', ') ?? '' }}
             </q-td>
             <q-td
               key="email"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.email"
             >
               {{ props.row.email }}
             </q-td>
@@ -175,7 +178,7 @@
 import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
-import {useQuasar} from 'quasar'
+import {exportFile, useQuasar, colors} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
@@ -201,7 +204,8 @@ export default defineComponent({
       userColumns,
       roles,
       coachStore,
-      q
+      q,
+      colors
     }
   },
   data() {
@@ -214,11 +218,6 @@ export default defineComponent({
     })
 
     return {
-      thumbStyle: {
-        borderRadius: '7px',
-        backgroundColor: 'black',
-        height: '4px'
-      },
       pagination,
       deleteDialog: ref(false),
       userId: ref(-1),
@@ -248,11 +247,11 @@ export default defineComponent({
         filter.is_active = true
         filter.is_admin = false
       }
-      const order = this.pagination.descending ? '-' : '+'
+      const order = this.pagination.descending ? '-' : ''
       if (this.pagination.sortBy === 'name') {
         filter.ordering = `${order}first_name,${order}last_name`
       } else if (this.pagination.sortBy === 'role') {
-        const order = this.pagination.descending ? '+' : '-'
+        const order = this.pagination.descending ? '' : '-'
         filter.ordering = `${order}is_admin,${order}is_active`
       } else if (this.pagination.sortBy !== null) {
         filter.ordering = `${order}${this.pagination.sortBy}`
@@ -263,7 +262,7 @@ export default defineComponent({
   },
   beforeMount() {
     if (!this.authenticationStore.loggedInUser?.isAdmin) {
-      router.replace('/projects')
+      router.replace('/notfound')
     }
   },
   async mounted() {
@@ -304,7 +303,7 @@ export default defineComponent({
     // The method filter to the elements which pass both filters.
     useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: unknown, arg1: unknown) => string) {
       const lowerTerms = this.filter?.toLowerCase() ?? ''
-      
+
       return rows.filter((row: unknown) =>
         (terms == 'all' || cellValue(cols[1], row) == terms) &&
         cols.some((col: unknown) => {
@@ -331,9 +330,19 @@ export default defineComponent({
           this.coachStore.users.find((u: User) => u.id === user.id)!.role = oldRole
         })
       })
-      
+
     }
   },
+  watch: {
+    filters() {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
+  },
+  activated() {
+    if (this.coachStore.shouldRefresh) {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
+  }
 })
 </script>
 
@@ -350,14 +359,4 @@ export default defineComponent({
 :deep(.q-menu) {
   border-radius: 10px !important;
 }
-
-.user-table {
-  border-radius: 10px;
-}
-</style>
-
-<style lang="sass">
-.my-table
-  /* bg color is important for th; just specify one */
-  background-color: $yellow-7
 </style>

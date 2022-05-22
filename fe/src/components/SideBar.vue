@@ -6,7 +6,9 @@
       :mini-width="30"
       :width="370"
       :breakpoint="100"
-      class="bg-grey-1 shadow-4"
+      class="shadow-4"
+      :class="`bg-${$q.dark.isActive ? 'dark2' : 'grey-1'}`"
+      :dark="false"
     >
       <div
         :style="!miniState? '' : 'display: none'"
@@ -21,39 +23,47 @@
           <div class="text-bold text-h5 q-py-sm">
             Students
           </div>
-          <div class="row no-wrap q-pb-sm">
-            <q-input
-              v-model="search"
-              debounce="300"
-              class="fit q-mr-sm"
-              dense
-              outlined
-              color="teal"
-              label="Search Students"
-              hide-bottom-space
-            >
-              <template #append>
-                <q-icon
-                  name="search"
-                  color="teal-4"
+          <div class="q-pb-sm">
+            <q-slide-transition>
+              <div
+                v-if="!onConflictsPage"
+                class="row no-wrap"
+              >
+                <q-input
+                  v-model="search"
+                  debounce="300"
+                  class="fit q-mr-sm"
+                  dense
+                  outlined
+                  color="teal"
+                  label="Search Students"
+                  hide-bottom-space
+                  @update:modelValue="async () => await loadStudents()"
+                >
+                  <template #append>
+                    <q-icon
+                      name="search"
+                      color="teal-4"
+                    />
+                  </template>
+                </q-input>
+                <btn
+                  round
+                  size="0.95em"
+                  glow-color="teal-2"
+                  shadow-color="osoc-red"
+                  :shadow-strength="showFilters ? 2 : 5"
+                  :color="showFilters ? 'primary' : 'light-grey'"
+                  :class="`text-${showFilters ? 'white' : 'green'}`"
+                  icon="tune"
+                  @click="showFilters = !showFilters"
                 />
-              </template>
-            </q-input>
-            <btn
-              round
-              size="0.95em"
-              glow-color="teal-2"
-              shadow-color="osoc-red"
-              :shadow-strength="showFilters ? 2 : 5"
-              :color="showFilters ? 'primary' : 'light-grey'"
-              :class="`text-${showFilters ? 'white' : 'green'}`"
-              icon="tune"
-              @click="showFilters = !showFilters"
-            />
+              </div>
+            </q-slide-transition>
           </div>
           <q-slide-transition>
             <div
-              v-if="showFilters"
+              v-if="showFilters && !onConflictsPage"
               class="overflow-hidden"
             >
               <!-- div needs to be wrapped because gutter produces negative margins, which cause issues with q-slide-transition -->
@@ -86,12 +96,11 @@
                   dense
                   multiple
                   color="primary"
-                  bg-color="white"
                   :options="skillStore.skills"
                   :option-label="opt => opt.name"
-                  :option-value="opt => opt.id"
                   label="Skills"
                   emit-value
+                  :dark="$q.dark.isActive"
                 >
                   <template #selected>
                     <div
@@ -100,11 +109,11 @@
                     >
                       <StudentSkillChip
                         v-for="skill of skills"
-                        :key="(skill as any).id"
-                        :color="(skill as any).color"
-                        :name="(skill as any).name"
+                        :key="(skill as {id: number}).id"
+                        :color="(skill as {color: string}).color"
+                        :name="(skill as {name: string}).name"
                         best-skill=""
-                      />
+                      /> 
                     </div>
                   </template>
                 </q-select>
@@ -116,13 +125,13 @@
                   dense
                   clearable
                   color="primary"
-                  bg-color="white"
                   :options="stati"
                   :option-label="opt => opt.label"
                   :option-value="opt => opt.value"
                   label="Status"
                   emit-value
                   map-options
+                  :dark="$q.dark.isActive"
                 />
 
                 <div class="row q-gutter-x-md">
@@ -161,7 +170,7 @@
           @scroll="showShadow = $event.verticalPosition > 5"
         >
           <q-infinite-scroll
-            ref="infiniteScroll"
+            ref="infinite"
             class="q-pa-sm"
 
             :offset="250"
@@ -177,7 +186,7 @@
               :must-hover="onProjectsPage"
               :student="student"
               :active="studentStore.currentStudent?.id === student.id && onStudentsPage"
-              @click="$router.push(`/students/${student.id}`)"
+              @click.prevent="onConflictsPage ? (projectConflictStore.selectedStudentId = student.id) : $router.push(`/students/${student.id}`)"
               @dragstart="onDragStart($event, student)"
             />
             <template #loading>
@@ -191,13 +200,6 @@
           </q-infinite-scroll>
         </q-scroll-area>
       </div>
-
-      <!--      <q-inner-loading-->
-      <!--        :showing="studentStore.isLoading"-->
-      <!--        label="Please wait..."-->
-      <!--        label-class="text-teal"-->
-      <!--        label-style="font-size: 1.1em"-->
-      <!--      />-->
 
       <div
         class="absolute"
@@ -225,11 +227,11 @@ import StudentCard from "./StudentCard.vue";
 import {useStudentStore} from "../stores/useStudentStore";
 import stati from "../features/mails/Status";
 import {useQuasar} from "quasar";
-import {Student} from '../models/Student';
 import {useSkillStore} from "../stores/useSkillStore";
 import StudentSkillChip from "../features/students/components/StudentSkillChip.vue";
 import { wsBaseUrl } from '../utils/baseUrl';
 import { useProjectStore } from '../stores/useProjectStore';
+import { useProjectConflictStore } from '../stores/useProjectConflictStore';
 
 export default defineComponent({
   name: 'SideBar',
@@ -243,13 +245,12 @@ export default defineComponent({
     const skillStore = useSkillStore()
     const projectStore = useProjectStore()
 
-    const $q = useQuasar()
 
     return {
       studentStore,
       skillStore,
       projectStore,
-      $q,
+      projectConflictStore: useProjectConflictStore(),
       thumbStyle: {
         right: '0px',
         borderRadius: '7px',
@@ -270,7 +271,7 @@ export default defineComponent({
       suggestion: ref('none'),
       byMe: ref(''),
       onProject: ref(''),
-      status: ref(''),
+      status: ref(null),
       skills: ref([])
     }
   },
@@ -281,7 +282,15 @@ export default defineComponent({
     onStudentsPage(): boolean {
       return this.$route.name === "Students" || this.$route.name === "Student Page";
     },
+    onConflictsPage(): boolean {
+      return this.$route.name === "Project Conflicts"
+    },
     filters(): Object {
+      if (this.onConflictsPage) {
+        return {
+          conflicting: true
+        }
+      }
       return {
         search: this.search,
         alum: this.alumni === "alumni",
@@ -290,7 +299,7 @@ export default defineComponent({
         suggested_by_user: this.byMe,
         on_project: this.onProject,
         status: this.status,
-        skills: this.skills
+        skills: this.skills && this.skills.length ? this.skills.map(({id}) => id) : []
       }
     },
     options(): Array<{ name: string, label: string, amount: number }> {
@@ -303,7 +312,7 @@ export default defineComponent({
       ]
     },
     showDrawer(): boolean {
-      return this.onProjectsPage || this.onStudentsPage
+      return this.onProjectsPage || this.onStudentsPage || this.onConflictsPage
     }
   },
   watch: {
@@ -312,6 +321,16 @@ export default defineComponent({
     }
   },
   async mounted() {
+    this.studentStore.$subscribe(() => {
+      if (this.studentStore.shouldRefresh) {
+        this.studentStore.shouldRefresh = false
+        const infscroll = this.$refs.infinite as any;
+        infscroll.reset()
+        infscroll.resume()
+        infscroll.trigger()
+      }
+    })
+
     await this.skillStore.loadSkills()
 
     this.socket.onmessage = async (event: { data: string }) => {
@@ -353,7 +372,7 @@ export default defineComponent({
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     loadStudents() {
-      const scroll = this.$refs.infiniteScroll as any;
+      const scroll = this.$refs.infinite as any;
       scroll.reset()
       scroll.resume()
       scroll.trigger()

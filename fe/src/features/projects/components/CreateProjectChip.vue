@@ -9,7 +9,7 @@
     style="border-width: 1.5px; height: fit-content"
     :style="`box-shadow: ${colors.getPaletteColor(
       skill.skill.color
-    )} 0px 8px 20px -12px;`"
+    )} 0px 8px 20px ${$q.dark.isActive ? -6 : -12}px;`"
   >
     <template #default>
       <div class="column">
@@ -25,7 +25,7 @@
             borderless
             min="1"
             style="max-width: 50px"
-            :input-style="`{'text-align': 'right'}`"
+            :input-style="{'text-align': 'right'} as any"
             :input-class="`text-bold text-${skill.skill.color}-8`"
           />
           <btn
@@ -40,6 +40,7 @@
             dense
             autogrow
             outlined
+            :dark="false"
             v-model="_skill.comment"
             :color="_skill.skill.color"
             label="Comment"
@@ -50,6 +51,7 @@
   </q-chip>
 </template>
 
+<!-- Component for a selected skill when creating a project. This component allows the user to fill in an amount and a comment. -->
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { Skill, ProjectSkill } from '../../../models/Skill'
@@ -65,7 +67,6 @@ export default defineComponent({
   },
   components: { ProjectRoleChip },
   data() {
-    console.log('created')
     return {
       open: ref(false),
       colors,

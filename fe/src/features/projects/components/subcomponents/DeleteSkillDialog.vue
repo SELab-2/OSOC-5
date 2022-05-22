@@ -7,7 +7,7 @@
       <q-card-section horizontal>
         <q-card-section class="col-3 flex flex-center">
           <q-icon
-            name="warning"
+            name="r_warning"
             class="text-red"
             size="80px"
           />

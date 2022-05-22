@@ -13,9 +13,10 @@
   </q-btn>
 </template>
 
+<!-- A fancier q-btn, which uses custom shadows, highlight color, and more rounded corners. q-btn attributes can be used on this btn. -->
 <script lang="ts">
   import { ref, defineComponent } from 'vue'
-  import { colors } from 'quasar'
+  import { colors, getCssVar } from 'quasar'
 export default defineComponent({
   name: 'OsocButton',
   /**
@@ -29,7 +30,7 @@ export default defineComponent({
   props: {
     'glowColor': {
       type: String,
-      required: true
+      required: false
     },
     'glowSize': {
       type: String,
@@ -41,7 +42,7 @@ export default defineComponent({
     },
     'color': { 
       type: String,
-      required: true
+      required: false
     },
     'shadowColor': {
       type: String,
@@ -79,7 +80,7 @@ export default defineComponent({
     shadow() {
       if (this.unelevated || this.flat) return 'transparent'
       var color: string = colors.getPaletteColor(`shadow-${this.color}`)
-      if (color !== "#000000") return color
+      if (color !== "#000000" && color !== "#ffffff") return color
       color = colors.getPaletteColor(this.shadowColor)
       return color === "#000000" ? this.shadowColor : color
     },

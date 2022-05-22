@@ -31,13 +31,16 @@ describe("Project Store", () => {
   });
 
   it("fetchSuggestedStudents", async () => {
-
+    
+    
     const projectStore = useProjectStore()
     let data = (await instance.get<TempProjectSuggestion>('projects_sug/1')).data
     let result = await projectStore.fetchSuggestedStudents([data])
     expect(result).toHaveLength(1)
+    
 
   })
+
 
   it("removeSuggestion", async () => {
     
@@ -75,6 +78,15 @@ describe("Project Store", () => {
 
   })
 
+  it("getOrFetchProject", async () => {
+    
+    const projectStore = useProjectStore()
+    let result = await projectStore.getOrFetchProject("projects/2/")
+    expect(result.name).toBeDefined()
+
+  })
+
+  
   it("loadProject", async () => {
     
     const projectStore = useProjectStore()
@@ -124,18 +136,17 @@ describe("Project Store", () => {
     
     const projectStore = useProjectStore()
     let data = (await instance.get<Project>('projects/1')).data
-    let result = await projectStore.updateProject(data, 1)
+    await projectStore.updateProject(data, 1)
     expect(patchcall_i).toBeCalledTimes(1)
-    expect(result).toBeTruthy()
 
   })
 
   it("deleteProject", async () => {
     
     const projectStore = useProjectStore()
-    await projectStore.deleteProject(1, () => true)
+    await projectStore.deleteProject(1)
     expect(deletecall_i).toBeCalledTimes(1)
 
   })
-  
+
 });

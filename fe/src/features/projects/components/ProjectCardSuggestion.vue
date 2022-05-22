@@ -145,6 +145,7 @@
   </q-slide-transition>
 </template>
 
+<!-- A component which displays a student in a project. -->
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import {
@@ -155,14 +156,17 @@ import { useProjectStore } from '../../../stores/useProjectStore'
 
 export default defineComponent({
   props: {
+    // Function to run when a suggesiton is confirmed, and can be sent to the backend.
     confirmSuggestion: {
       type: Function,
       required: true,
     },
+    // Function to run when a suggestion can be removed.
     removeSuggestion: {
       type: Function,
       required: true,
     },
+    // A suggestion.
     suggestion: {
       type: ProjectSuggestion,
       required: true,
@@ -182,18 +186,23 @@ export default defineComponent({
     }
   },
   computed: {
+    // This returns true if the suggestion has been recently added (locally, or by another user).
+    // This a the "draft" suggesiton.
     isNew() {
       return this.suggestion instanceof NewProjectSuggestion
     },
+    // This returns true if the suggestion has been recently added locally (displayed as "draft") and has not yet been pushed to the server.
     fromLocal() {
       return this.isNew && (this.suggestion as NewProjectSuggestion).fromLocal
     },
+    // This returns true if the suggestion has been recently added by another user (displayed as "new").
     fromWebsocket() {
       return (
         this.isNew && (this.suggestion as NewProjectSuggestion).fromWebsocket
       )
     },
   },
+  // Remove any leftover planned student removals.
   beforeUnmount() {
     if (this.timeout) {
       clearTimeout(this.timeout)
@@ -201,6 +210,7 @@ export default defineComponent({
     }
   },
   methods: {
+    // When the user clicks the undo button, this cancels the removal of a student.
     stop() {
       this.removed = false
       if (!this.timeout) return

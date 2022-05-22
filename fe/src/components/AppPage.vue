@@ -1,8 +1,9 @@
 <template>
   <TopToolbar />
   <SideBar />
-  <q-page-container style="height: 100%">
+  <q-page-container style="height: 100%; overflow: auto">
     <router-view v-slot="{ Component }">
+      <!-- KeepAlive is used so the major views are cached, which simplifies lots of things, and more state is kept when switching tabs. -->
       <keep-alive exclude="CreateProject,StudentPlaceholder,NotFound">
         <component :is="Component" />
       </keep-alive>
