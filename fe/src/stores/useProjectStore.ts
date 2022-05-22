@@ -70,7 +70,7 @@ export const useProjectStore = defineStore('project', {
       project: Project,
       suggestion: ProjectSuggestionInterface
     ) {
-      return instance.post(`projects/${project.id}/remove_student/`, {
+      return await instance.post(`projects/${project.id}/remove_student/`, {
         student: suggestion.student.url,
         skill: suggestion.skill.url,
         coach: suggestion.coach?.url,
@@ -141,7 +141,9 @@ export const useProjectStore = defineStore('project', {
     async getProject(id: number): Promise<Project> {
       const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
-        project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
+        project.coaches.map(
+          (coach) => useCoachStore().getUser(coach) as Promise<User>
+        )
       )
 
       const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -176,7 +178,9 @@ export const useProjectStore = defineStore('project', {
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
+            project.coaches.map(
+              (coach) => useCoachStore().getUser(coach) as Promise<User>
+            )
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -227,7 +231,9 @@ export const useProjectStore = defineStore('project', {
 
       results.forEach(async (project, i) => {
         const coaches: Array<User> = await Promise.all(
-          project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
+          project.coaches.map(
+            (coach) => useCoachStore().getUser(coach) as Promise<User>
+          )
         )
 
         const skills: Array<ProjectSkillInterface> = await Promise.all(
