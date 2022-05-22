@@ -63,6 +63,7 @@
                 color="yellow"
                 shadow-color="orange"
                 shadow-strength=2
+                class="text-black"
                 no-wrap
                 @click="updateStatusStudents"
               >
