@@ -206,6 +206,10 @@ class StudentViewSet(viewsets.ModelViewSet):  # pylint: disable=too-many-ancesto
         tally = TallyForm.from_file()
         try:
             form = tally.transform(tally.validate(request.data))
+            if "studies" in form:
+                form["studies"] = ",".join(str(e) for e in form["studies"])
+            if "degree" in form:
+                form["degree"]  = ",".join(str(e) for e in form["degree"])
             skill_names = form.pop("skills")
             student = Student.objects.create(**form)
             skills = []
