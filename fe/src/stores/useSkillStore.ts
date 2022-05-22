@@ -29,16 +29,25 @@ export const useSkillStore = defineStore('skills', {
      * SKILLS
      */
     async loadSkills() {
-      const { results } = (await instance.get<{ results: Skill[] }>('skills/?page_size=500')).data
-      this.skills = results.map(skill => new Skill(skill.name, skill.id, skill.color, skill.url))
+      const { results } = (
+        await instance.get<{ results: Skill[] }>('skills/?page_size=500')
+      ).data
+      this.skills = results.map(
+        (skill) => new Skill(skill.name, skill.id, skill.color, skill.url)
+      )
     },
-    
+
     async loadNext(index: number, done: Function, filters: Object) {
       if (index === 1) this.skills = []
-      
-      const { results, next } = (await instance.get<{ results: Skill[], next: string }>(`skills/?page=${index}`, { params: filters })).data
-      
-      this.skills.push(...results.map(s => new Skill(s)))
+
+      const { results, next } = (
+        await instance.get<{ results: Skill[]; next: string }>(
+          `skills/?page=${index}`,
+          { params: filters }
+        )
+      ).data
+
+      this.skills.push(...results.map((s) => new Skill(s)))
       done(next === null)
     },
 
@@ -55,11 +64,11 @@ export const useSkillStore = defineStore('skills', {
         callback(false)
       }
     },
-    
+
     async updateSkill(skill: Skill, callback: Function) {
       try {
         await instance.patch(`skills/${skill.id}/`, skill)
-      } catch(e) {
+      } catch (e) {
         // Should put the previous value back
         callback()
       }
@@ -78,9 +87,15 @@ export const useSkillStore = defineStore('skills', {
           this.skills.splice(index, 1)
           callback(true)
         })
-        .catch((error) => {
+        .catch(() => {
           callback(false)
         })
+    },
+    /**
+     * Get a csv of all skills in database
+     */
+    async csv() {
+      return { title: 'skill', value: await instance.get('skills/export_csv') }
     },
   },
 })

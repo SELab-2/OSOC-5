@@ -73,7 +73,7 @@ export const useProjectStore = defineStore('project', {
       return instance.post(`projects/${project.id}/remove_student/`, {
         student: suggestion.student.url,
         skill: suggestion.skill.url,
-        coach: suggestion.coach.url,
+        coach: suggestion.coach?.url,
       })
     },
     /**
@@ -141,7 +141,7 @@ export const useProjectStore = defineStore('project', {
     async getProject(id: number): Promise<Project> {
       const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
-        project.coaches.map((coach) => useCoachStore().getUser(coach))
+        project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
       )
 
       const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -176,7 +176,7 @@ export const useProjectStore = defineStore('project', {
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) => useCoachStore().getUser(coach))
+            project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -190,8 +190,7 @@ export const useProjectStore = defineStore('project', {
           this.projects[i].requiredSkills = skills
           this.projects[i].suggestedStudents = students
         })
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     async loadNext(index: number, done: Function, filters: Object) {
       // Remove all the data when the first page is requested.
@@ -228,7 +227,7 @@ export const useProjectStore = defineStore('project', {
 
       results.forEach(async (project, i) => {
         const coaches: Array<User> = await Promise.all(
-          project.coaches.map((coach) => useCoachStore().getUser(coach))
+          project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
         )
 
         const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -327,7 +326,7 @@ export const useProjectStore = defineStore('project', {
             project.suggestedStudents?.find(
               (s) =>
                 s.student.url === studentObj.url &&
-                s.coach.url === coachObj.url &&
+                s.coach?.url === coachObj?.url &&
                 s.skill.url === skillObj.url
             ) as NewProjectSuggestion
           ).fromWebsocket = false),
@@ -437,6 +436,15 @@ export const useProjectStore = defineStore('project', {
         await instance.delete(`projects/${id}/`)
       } catch (e: any) {
         return e
+      }
+    },
+    /**
+     * Get a csv of all projects in database
+     */
+    async csv() {
+      return {
+        title: 'project',
+        value: await instance.get('projects/export_csv'),
       }
     },
   },

@@ -349,6 +349,8 @@ export default defineComponent({
               reason: '',
               skill: skill.skill,
               student: data.student,
+              coachId: this.me.id,
+              coachName: `${this.me.firstName} ${this.me.lastName}`
             },
             false
           )

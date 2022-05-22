@@ -88,7 +88,7 @@
         </div>
         <q-slide-transition>
           <div v-if="progress === 3 || disableHover" style="margin-left: 10px">
-            <div>Assigned by {{ suggestion.coach.fullName }}</div>
+            <div>Assigned by {{ suggestion.coach?.fullName ?? suggestion.coachName ?? "Deleted User" }}</div>
             <div v-if="suggestion.reason">
               <div class="text-bold">Comment</div>
               {{ suggestion.reason }}
