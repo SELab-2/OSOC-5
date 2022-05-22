@@ -68,6 +68,7 @@
             v-close-popup
             v-ripple
             color="yellow"
+            :class="$q.dark.isActive ? 'text-white' : 'text-black'"
             clickable
             tabindex="0"
             :to="`/advanced`"
