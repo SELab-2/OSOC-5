@@ -157,7 +157,13 @@ export const UrlMockMappingGet = {
     'projects/2/': {data: project_extra},
     'projects/?page=1': {data: {results: [project], next: null}},
     'projects/get_conflicting_projects': {data: {results: [{student: 'students/1/', projects: ['projects/1/', 'projects/2/']}]}},
-    'proj_skills/1': {data: {amount:2, comment: "test", skill: "skills/2"}}
+    'proj_skills/1': {data: {amount:2, comment: "test", skill: "skills/2"}},
+    'coaches/export_csv': {data: {succes: true}},
+    'emails/export_csv': {data: {succes: true}},
+    'projects/export_csv': {data: {succes: true}},
+    'skills/export_csv': {data: {succes: true}},
+    'students/export_csv': {data: {succes: true}},
+    'students/export_csv_suggestion': {data: {succes: true}},
   }
 
 export const UrlMockMappingPut = {

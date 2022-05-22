@@ -149,4 +149,13 @@ describe("Project Store", () => {
 
   })
 
+  it("csv", async () => {
+
+    const projectStore = useProjectStore()
+    let result = await projectStore.csv()
+    expect(result).toBeDefined()
+    expect(getcall_i).toHaveBeenCalledTimes(1)
+    
+})
+
 });

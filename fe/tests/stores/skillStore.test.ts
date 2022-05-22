@@ -85,4 +85,14 @@ describe('Skill Store', () => {
         expect(skillStore.skills).toHaveLength(0)
 
     })
+
+    it("csv", async () => {
+
+        const skillStore = useSkillStore()
+        let result = await skillStore.csv()
+        expect(result).toBeDefined()
+        expect(getcall_i).toHaveBeenCalledTimes(1)
+        
+    })
+
 })

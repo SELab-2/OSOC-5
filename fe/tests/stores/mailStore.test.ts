@@ -88,4 +88,14 @@ describe('Skill Store', () => {
         expect(deletecall_i).toHaveBeenCalledOnce()
 
     })
+
+    it("csv", async () => {
+
+        const mailStore = useMailStore();
+        let result = await mailStore.csv()
+        expect(result).toBeDefined()
+        expect(getcall_i).toHaveBeenCalledTimes(1)
+        
+    })
+
 })

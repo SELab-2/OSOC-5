@@ -132,4 +132,32 @@ describe("Project Store", () => {
     expect(studentStore.students[0].finalDecision).toBe(null)
   })
 
+  it("csv", async () => {
+
+    const studentStore = useStudentStore()
+    let result = await studentStore.csv()
+    expect(result).toBeDefined()
+    expect(result).toHaveLength(2)
+    expect(getcall_i).toHaveBeenCalledTimes(2)
+    
+  })
+
+  it("studentCsv", async () => {
+
+    const studentStore = useStudentStore()
+    let result = await studentStore.studentCsv()
+    expect(result).toBeDefined()
+    expect(getcall_i).toHaveBeenCalledTimes(1)
+    
+  })
+
+  it("suggestionCsv", async () => {
+
+    const studentStore = useStudentStore()
+    let result = await studentStore.suggestionCsv()
+    expect(result).toBeDefined()
+    expect(getcall_i).toHaveBeenCalledTimes(1)
+    
+  })
+
 });

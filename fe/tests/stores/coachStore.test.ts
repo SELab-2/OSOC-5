@@ -105,4 +105,14 @@ describe("Coach Store", () => {
     await coachStore.loadUsersCoaches({'test': 'test'}, (c: number) => true)
     expect(coachStore.users).toHaveLength(1)
   })
+
+  it("csv", async () => {
+
+    const coachStore = useCoachStore();
+    let result = await coachStore.csv()
+    expect(result).toBeDefined()
+    expect(getcall_i).toHaveBeenCalledTimes(1)
+    
+  })
+
 });
