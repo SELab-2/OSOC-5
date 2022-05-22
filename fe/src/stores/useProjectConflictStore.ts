@@ -51,13 +51,16 @@ export const useProjectConflictStore = defineStore('project/conflict', {
       selectedProject: Project,
       selectedConflict: { student: Student; projects: Project[] }
     ) {
-      const suggestions = selectedProject.suggestedStudents?.filter(
+
+      if (!(selectedProject.suggestedStudents)) throw new Error('No suggested students present.')
+
+      const suggestions = selectedProject.suggestedStudents.filter(
         ({ student }) => student.id === selectedConflict.student.id
       )
 
-      if (!suggestions) throw new Error('An unexpected error has occured')
+      if (suggestions.length == 0) throw new Error('An unexpected error has occured')
 
-      if (suggestions?.length > 1)
+      if (suggestions.length > 1)
         throw new Error(
           'Please delete the assignment to skills until only 1 is left'
         )

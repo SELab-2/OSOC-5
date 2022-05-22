@@ -45,7 +45,7 @@ export class Project implements ProjectInterface {
     url: string,
     requiredSkills?: { amount: number; comment: string; skill: Skill }[],
     coaches?: Array<User>,
-    suggested_students?: ProjectSuggestionInterface[]
+    suggestedStudents?: ProjectSuggestionInterface[]
   ) {
     this.url = url
     this.id = id
@@ -54,6 +54,6 @@ export class Project implements ProjectInterface {
     this.extraInfo = extraInfo
     this.requiredSkills = requiredSkills
     this.coaches = coaches
-    this.suggestedStudents = suggested_students
+    this.suggestedStudents = suggestedStudents
   }
 }

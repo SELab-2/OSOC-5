@@ -13,12 +13,12 @@ export const useSkillStore = defineStore('skills', {
   }),
   actions: {
     async getSkill(url: string): Promise<Skill> {
-      const skill = this.skills.find((skill) => skill.url === url)
+      const skill = this.skills.find((skill: Skill) => skill.url === url)
       if (skill) return skill
       const { data } = await instance.get<Skill>(url)
 
       // Check again if not present, it could be added in the meantime.
-      const skill2 = this.skills.find((skill) => skill.url === url)
+      const skill2 = this.skills.find((skill: Skill) => skill.url === url)
       if (skill2) return skill2
 
       const newSkill = new Skill(data)
@@ -82,7 +82,7 @@ export const useSkillStore = defineStore('skills', {
         .then(() => {
           // delete locally
           const index = this.skills.findIndex(
-            (skill) => skill.id === deletedSkillId
+            (skill: Skill) => skill.id === deletedSkillId
           )
           this.skills.splice(index, 1)
           callback(true)

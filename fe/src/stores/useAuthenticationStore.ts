@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { User, UserInterface } from '../models/User'
 import { instance } from '../utils/axios'
@@ -9,6 +9,12 @@ import router from '../router'
 interface State {
   loggedInUser: UserInterface | null
   colorScheme: boolean | 'auto'
+}
+
+interface loginResponseInterface {
+  refresh_token: string
+  access_token: string
+  user: { pk: string }
 }
 
 /**
@@ -36,7 +42,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
   persist: true,
   state: (): State => ({
     loggedInUser: null,
-    colorScheme: 'auto'
+    colorScheme: 'auto',
   }),
   actions: {
     /**
@@ -61,11 +67,16 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       email: string
       password: string
     }): Promise<void> {
-      const { data } = await axios.post(baseUrl + 'auth/login/', {
-        username: email,
-        email,
-        password,
-      })
+      const { data } = (await axios
+        .post(baseUrl + 'auth/login/', {
+          username: email,
+          email,
+          password,
+        })
+        .catch((error) => {
+          console.log(error.response)
+        })) as AxiosResponse<loginResponseInterface, unknown>
+
       localStorage.setItem('refreshToken', data.refresh_token)
       localStorage.setItem('accessToken', data.access_token)
       instance.defaults.headers.common['X-CSRFToken'] = getCookie(
@@ -81,7 +92,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
     async logout() {
       localStorage.removeItem('refreshToken')
       localStorage.removeItem('accessToken')
-      this.loggedInUser = null;
+      this.loggedInUser = null
       const studentStore = useStudentStore()
       studentStore.$reset()
       const skillStore = useStudentStore()
@@ -122,7 +133,7 @@ export const useAuthenticationStore = defineStore('user/authentication', {
       lastName,
       email,
       password1,
-      password2
+      password2,
     }: {
       firstName: string
       lastName: string

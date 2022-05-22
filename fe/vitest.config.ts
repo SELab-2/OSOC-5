@@ -5,7 +5,11 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 // https://vitejs.dev/config/
 export default defineConfig({
     test: {
-        environment: 'jsdom'
+        environment: 'jsdom',
+        include: ['**/*Store.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+        coverage: {
+            include: ["src/stores"],
+        }
     },
     plugins: [
         vue({

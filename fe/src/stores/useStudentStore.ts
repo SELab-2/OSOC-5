@@ -78,7 +78,8 @@ export const useStudentStore = defineStore('user/student', {
           await instance.get(student.skills[i]).then(({ data }) => {
             this.skillsStudents.set(student.skills[i].toString(), data)
             skills.push(data)
-          })
+          }).catch((error) => console.log(error));
+          
         }
       }
 
@@ -329,7 +330,6 @@ export const useStudentStore = defineStore('user/student', {
       reason,
     }: {
       student_id: string
-      coach_id: string
       suggestion: string
       coach: { id: number; first_name: string; last_name: string; url: string }
       reason: string

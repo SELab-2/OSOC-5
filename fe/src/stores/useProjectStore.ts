@@ -29,7 +29,7 @@ interface State {
 
   // Flag so projectlist can determine if it should reset the pagination and reload all the projects or not.
   // Is used e.g. when a conflict is resolved, or a project is created/updated.
-  shouldRefresh: Boolean
+  shouldRefresh: boolean
 }
 
 export const useProjectStore = defineStore('project', {
@@ -47,14 +47,16 @@ export const useProjectStore = defineStore('project', {
       students: TempProjectSuggestion[]
     ): Promise<ProjectSuggestionInterface[]> {
       const newStudents: ProjectSuggestionInterface[] = []
-      for (const student of students) {
-        const newStudent = new ProjectSuggestion({
-          student: (await instance.get(student.student)).data as Student,
-          coach: await useCoachStore().getUser(student.coach),
-          skill: (await instance.get(student.skill)).data as Skill,
-          reason: student.reason,
-        })
-        newStudents.push(newStudent)
+      if (students) {
+        for (const student of students) {
+          const newStudent = new ProjectSuggestion({
+            student: (await instance.get(student.student)).data as Student,
+            coach: await useCoachStore().getUser(student.coach),
+            skill: (await instance.get(student.skill)).data as Skill,
+            reason: student.reason,
+          })
+          newStudents.push(newStudent)
+        }
       }
       return newStudents
     },
@@ -68,7 +70,7 @@ export const useProjectStore = defineStore('project', {
       project: Project,
       suggestion: ProjectSuggestionInterface
     ) {
-      return instance.post(`projects/${project.id}/remove_student/`, {
+      return await instance.post(`projects/${project.id}/remove_student/`, {
         student: suggestion.student.url,
         skill: suggestion.skill.url,
         coach: suggestion.coach?.url,
@@ -110,6 +112,7 @@ export const useProjectStore = defineStore('project', {
     },
     async getOrFetchProject(url: string) {
       const splittedUrl = url.split('/')
+
       const id = Number.parseInt(splittedUrl[splittedUrl.length - 2])
 
       const localPoject = this.projects.filter(
@@ -138,7 +141,9 @@ export const useProjectStore = defineStore('project', {
     async getProject(id: number): Promise<Project> {
       const project = (await instance.get<TempProject>(`projects/${id}/`)).data
       const coaches: Array<User> = await Promise.all(
-        project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
+        project.coaches.map(
+          (coach) => useCoachStore().getUser(coach) as Promise<User>
+        )
       )
 
       const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -173,7 +178,9 @@ export const useProjectStore = defineStore('project', {
         )
         results.forEach(async (project, i) => {
           const coaches: Array<User> = await Promise.all(
-            project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
+            project.coaches.map(
+              (coach) => useCoachStore().getUser(coach) as Promise<User>
+            )
           )
 
           const skills: Array<ProjectSkillInterface> = await Promise.all(
@@ -213,7 +220,7 @@ export const useProjectStore = defineStore('project', {
         )
       ).data
 
-      let base = this.projects.length
+      const base = this.projects.length
 
       this.projects = [
         ...this.projects,
@@ -224,7 +231,9 @@ export const useProjectStore = defineStore('project', {
 
       results.forEach(async (project, i) => {
         const coaches: Array<User> = await Promise.all(
-          project.coaches.map((coach) => useCoachStore().getUser(coach) as Promise<User>)
+          project.coaches.map(
+            (coach) => useCoachStore().getUser(coach) as Promise<User>
+          )
         )
 
         const skills: Array<ProjectSkillInterface> = await Promise.all(

@@ -49,6 +49,7 @@ export const useCoachStore = defineStore('user/coach', {
       return fetchedUser
     },
     async loadUser(url: string) {
+
       const user = this.users.find((user) => user.url === url)
       if (user) return user
 
