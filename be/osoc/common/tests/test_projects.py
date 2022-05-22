@@ -396,4 +396,24 @@ class ProjectTestsAdmin(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.csv"')
+
+    def test_export_csv_required_skills(self):
+        """
+        test GET /projects/export_csv_required-skills
+        """
+        url = reverse("project-export-csv-required-skills")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.csv"')
+
+    def test_export_csv_suggested_students(self):
+        """
+        test GET /projects/export_csv_suggested-students
+        """
+        url = reverse("project-export-csv-suggested-students")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.csv"')

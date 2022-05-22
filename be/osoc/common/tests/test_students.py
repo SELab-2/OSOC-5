@@ -358,4 +358,14 @@ class StudentTestsAdmin(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.zip"')
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.csv"')
+
+    def test_export_csv_suggestion(self):
+        """
+        test GET /students/export_csv_suggestion
+        """
+        url = reverse("student-export-csv-suggestion")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(dict(response.items())['Content-Disposition'], r'attachment; filename="\w+.csv"')

@@ -22,7 +22,8 @@ export const useCoachStore = defineStore('user/coach', {
      * @param newUser user to be fetched
      * @returns the requested user
      */
-    async getUser(newUser: UserInterface): Promise<User> {
+    async getUser(newUser: UserInterface | undefined): Promise<User | undefined> {
+      if (!newUser) return undefined
       const user = this.users.find((user) =>
         user && newUser ? user.url === newUser.url : false
       )
@@ -137,6 +138,12 @@ export const useCoachStore = defineStore('user/coach', {
     },
     clearUsers() {
       this.$reset()
+    },
+    /**
+     * Get a csv of all coaches in database
+     */
+    async csv() {
+      return { title: 'coach', value: await instance.get('coaches/export_csv') }
     },
   },
 })

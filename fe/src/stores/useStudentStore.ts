@@ -6,6 +6,7 @@ import { Skill } from '../models/Skill'
 import { convertObjectKeysToCamelCase } from '../utils/case-conversion'
 import { baseUrl } from '../utils/baseUrl'
 import qs from 'qs'
+import { Suggestion } from '../models/Suggestion'
 
 interface State {
   skills: Array<Skill>
@@ -21,7 +22,7 @@ interface State {
     undecided: number
     none: number
   }
-  shouldRefresh: Boolean
+  shouldRefresh: boolean
 }
 
 export const useStudentStore = defineStore('user/student', {
@@ -87,10 +88,14 @@ export const useStudentStore = defineStore('user/student', {
         student.finalDecision.suggestion = parseInt(
           student.finalDecision.suggestion
         )
+        student.finalDecision = new Suggestion(student.finalDecision)
       }
 
-      for (const suggestion of student.suggestions) {
+      for (const i in student.suggestions) {
+        const suggestion = student.suggestions[i]
+
         suggestion.suggestion = parseInt(suggestion.suggestion)
+        student.suggestions[i] = new Suggestion(student.suggestions[i])
       }
 
       student.gender = parseInt(student.gender)
@@ -122,7 +127,16 @@ export const useStudentStore = defineStore('user/student', {
         paramsSerializer: (params) => {
           // Remove unused filters and map lists to correct queries
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return qs.stringify(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && ((v as any).length > 0 || v === true || typeof(v) === 'number'))), { arrayFormat: 'repeat' })
+          return qs.stringify(
+            Object.fromEntries(
+              Object.entries(params).filter(
+                ([_, v]) =>
+                  v !== null &&
+                  ((v as any).length > 0 || v === true || typeof v === 'number')
+              )
+            ),
+            { arrayFormat: 'repeat' }
+          )
         },
       })
 
@@ -377,6 +391,24 @@ export const useStudentStore = defineStore('user/student', {
       }
 
       this.isLoading = false
+    },
+    async csv() {
+      return [
+        { title: 'student', value: await this.studentCsv() },
+        { title: 'suggestion', value: await this.suggestionCsv() },
+      ]
+    },
+    /**
+     * Get a csv of all students in database
+     */
+    async studentCsv(): Promise<{ data: string; headers: object }> {
+      return await instance.get('students/export_csv')
+    },
+    /**
+     * Get a csv of all suggestions in database
+     */
+    async suggestionCsv(): Promise<{ data: string; headers: object }> {
+      return await instance.get('students/export_csv_suggestion')
     },
   },
 })

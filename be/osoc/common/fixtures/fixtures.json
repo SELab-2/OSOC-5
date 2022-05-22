@@ -44,7 +44,7 @@
     "pk": 6,
     "fields": {
       "name": "Storyteller",
-      "color": "white"
+      "color": "brown"
     }
   },
   {
@@ -52,7 +52,7 @@
     "pk": 7,
     "fields": {
       "name": "Marketer",
-      "color": "black"
+      "color": "indigo"
     }
   },
   {
@@ -90,7 +90,7 @@
       "date_joined": "2022-03-19T13:30:53Z",
       "first_name": "Peter",
       "last_name": "Parker",
-      "email": "coach@example.com",
+      "email": "peter@parker.com",
       "is_admin": false,
       "groups": [],
       "user_permissions": []
@@ -139,7 +139,7 @@
       "password": "abcdef",
       "last_login": null,
       "is_superuser": false,
-      "is_staff": false,
+      "is_staff": true,
       "is_active": true,
       "date_joined": "2022-03-27T12:39:14Z",
       "first_name": "Henri",
@@ -160,9 +160,9 @@
       "is_staff": false,
       "is_active": false,
       "date_joined": "2022-04-02T20:15:28Z",
-      "first_name": "test",
-      "last_name": "test",
-      "email": "test@example.com",
+      "first_name": "Bruce",
+      "last_name": "Wayne",
+      "email": "bruce.wayne@enterprises.com",
       "is_admin": false,
       "groups": [],
       "user_permissions": []
@@ -213,21 +213,21 @@
       "english_rating": 5,
       "gender": "1",
       "pronouns": "",
-      "fun_fact": "I skateboard",
+      "fun_fact": "I like to paint in my free time.",
       "degree_duration": 3,
       "degree_current_year": 3,
       "alum": false,
       "student_coach": false,
-      "best_skill": "Back-end Dev",
+      "best_skill": "Back-end developer",
       "first_name": "Jan",
       "last_name": "Pieter",
       "call_name": "",
       "email": "jan.pieter@example.com",
       "phone_number": "",
       "language": "Dutch",
-      "motivation": "Making money",
-      "cv": "http://example.com",
-      "portfolio": "http://example.com",
+      "motivation": "I want to make some money to buy new paint!",
+      "cv": "https://en.wikipedia.org/wiki/Jan_Pieter_Brueghel",
+      "portfolio": "https://en.wikipedia.org/wiki/Jan_Pieter_Brueghel",
       "school_name": "UGent",
       "degree": "MaNaMa",
       "studies": "Computer Science",
@@ -242,29 +242,30 @@
     "pk": 2,
     "fields": {
       "employment_agreement": "volunteer",
-      "hinder_work": "I smoke",
+      "hinder_work": "I smoke.",
       "english_rating": 3,
       "gender": "1",
       "pronouns": "he/him",
-      "fun_fact": "I like to drink coffee",
-      "degree_duration": 500,
-      "degree_current_year": 100,
+      "fun_fact": "I like to sleep and drink coffee.",
+      "degree_duration": 5,
+      "degree_current_year": 3,
       "alum": true,
       "student_coach": false,
-      "best_skill": "Front-end Dev",
+      "best_skill": "Front-end developer",
       "first_name": "Wouter",
       "last_name": "Siemens",
       "call_name": "",
       "email": "wouter.siemens@example.com",
       "phone_number": "",
       "language": "Dutch",
-      "motivation": "Fun experience",
-      "cv": "http://example.com",
-      "portfolio": "http://example.com",
+      "motivation": "I would love to add OSOC to my cv!",
+      "cv": "https://woutersimons.wordpress.com/about/",
+      "portfolio": "https://woutersimons.wordpress.com/about/",
       "school_name": "VUB",
-      "degree": "500 Masters",
-      "studies": "Zeverologie",
+      "degree": "Master",
+      "studies": "Software Development",
       "status": "0",
+      "final_decision": "2",
       "skills": [
         1,
         2
@@ -280,21 +281,21 @@
       "english_rating": 4,
       "gender": "0",
       "pronouns": "she/her",
-      "fun_fact": "I like to read books",
+      "fun_fact": "I like to read books and make music.",
       "degree_duration": 3,
       "degree_current_year": 1,
       "alum": true,
       "student_coach": true,
-      "best_skill": "Sysadmin",
+      "best_skill": "Copywriter",
       "first_name": "Florence",
       "last_name": "Nightingale",
       "call_name": "Flo",
       "email": "flo.floflo@flo.flo",
       "phone_number": "+32444444444",
       "language": "English",
-      "motivation": "Fun experience",
-      "cv": "http://example.com",
-      "portfolio": "http://example.com",
+      "motivation": "I am motivated and like working in groups.",
+      "cv": "https://en.wikipedia.org/wiki/Florence_Nightingale",
+      "portfolio": "https://en.wikipedia.org/wiki/Florence_Nightingale",
       "school_name": "KUL",
       "degree": "Bachelor",
       "studies": "Taal- en letterkunde",
@@ -313,25 +314,26 @@
       "english_rating": 4,
       "gender": "0",
       "pronouns": "she/her",
-      "fun_fact": "I like to swim",
+      "fun_fact": "I like to swim and solve complex math problems.",
       "degree_duration": 2,
       "degree_current_year": 1,
       "alum": true,
       "student_coach": false,
-      "best_skill": "sysadmin",
+      "best_skill": "Graphic designer",
       "first_name": "Sarah",
       "last_name": "Kerrigan",
       "call_name": "Kerrigan",
       "email": "sarah.kerrigan@example.com",
       "phone_number": "",
       "language": "French",
-      "motivation": "No real motivation",
-      "cv": "http://example.com",
-      "portfolio": "http://example.com",
+      "motivation": "I want to do my summer internship with OSOC!",
+      "cv": "https://en.wikipedia.org/wiki/Sarah_Kerrigan",
+      "portfolio": "https://en.wikipedia.org/wiki/Sarah_Kerrigan",
       "school_name": "MIT",
       "degree": "Masters",
       "studies": "Computer Science",
       "status": "2",
+      "final_decision": "19",
       "skills": [
         1,
         2,
@@ -348,21 +350,21 @@
       "english_rating": 5,
       "gender": "3",
       "pronouns": "",
-      "fun_fact": "I like to act",
+      "fun_fact": "I like to act and tell jokes.",
       "degree_duration": 2,
       "degree_current_year": 1,
       "alum": false,
       "student_coach": false,
-      "best_skill": "Communication",
+      "best_skill": "Storyteller",
       "first_name": "Jim",
       "last_name": "Carrey",
       "call_name": "",
       "email": "jim.carrey@example.com",
       "phone_number": "",
       "language": "German",
-      "motivation": "Checkout my github",
-      "cv": "http://example.com",
-      "portfolio": "http://example.com",
+      "motivation": "I think I don't need and introduction. I am funny and can act, what more do you need?",
+      "cv": "https://en.wikipedia.org/wiki/Jim_Carrey",
+      "portfolio": "https://en.wikipedia.org/wiki/Jim_Carrey",
       "school_name": "UCL",
       "degree": "Masters",
       "studies": "Communication",
@@ -378,29 +380,30 @@
     "pk": 6,
     "fields": {
       "employment_agreement": "volunteer",
-      "hinder_work": "I eat donuts, a lot",
+      "hinder_work": "I eat donuts, a lot...",
       "english_rating": 5,
       "gender": "0",
       "pronouns": "simp/son",
-      "fun_fact": "I like to spend time with my brother Bart",
+      "fun_fact": "I like to play golf with my brother Bart.",
       "degree_duration": 6,
       "degree_current_year": 5,
       "alum": false,
       "student_coach": false,
-      "best_skill": "Communication",
+      "best_skill": "Copywriter",
       "first_name": "Lisa",
       "last_name": "Simpsons",
       "call_name": "",
       "email": "lisa@simpsons.com",
       "phone_number": "",
       "language": "dutch",
-      "motivation": "My parents forced me",
-      "cv": "http://example.com",
-      "portfolio": "http://example.com",
+      "motivation": "My parents think it's time for me to start working.",
+      "cv": "https://simpsons.fandom.com/wiki/Lisa_Simpson",
+      "portfolio": "https://simpsons.fandom.com/wiki/Lisa_Simpson",
       "school_name": "Springfield Elementary",
       "degree": "Lower School",
       "studies": "Not applicable",
       "status": "5",
+      "final_decision": "11",
       "skills": [
         6
       ]
@@ -415,19 +418,19 @@
       "english_rating": 5,
       "gender": "1",
       "pronouns": "ze/hir/hir",
-      "fun_fact": "I like maps",
+      "fun_fact": "I like graphs.",
       "degree_duration": 5,
       "degree_current_year": 5,
       "alum": false,
       "student_coach": false,
-      "best_skill": "Front-end dev",
+      "best_skill": "Front-end developer",
       "first_name": "Edsger",
       "last_name": "Dijkstra",
       "call_name": "Dijkstra",
       "email": "edsger@dijkstra.nl",
       "phone_number": "",
       "language": "English",
-      "motivation": "Greater good",
+      "motivation": "I would love to design a new algorithm with OSOC!",
       "cv": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
       "portfolio": "https://en.wikipedia.org/wiki/Edsger_W._Dijkstra",
       "school_name": "Leiden",
@@ -447,29 +450,28 @@
     "pk": 8,
     "fields": {
       "employment_agreement": "student",
-      "hinder_work": "I get lost in discussions",
+      "hinder_work": "I get lost in discussions.",
       "english_rating": 2,
       "gender": "0",
       "pronouns": "by firstname",
-      "fun_fact": "I like france",
+      "fun_fact": "I like baguettes!",
       "degree_duration": 2,
       "degree_current_year": 2,
       "alum": false,
       "student_coach": false,
-      "best_skill": "Tester",
+      "best_skill": "UX/ UI designer",
       "first_name": "Bertrand",
       "last_name": "Meyer",
       "call_name": "",
       "email": "bertrand.meyer@france.fr",
       "phone_number": "",
-      "language": "DUTCH",
-      "motivation": "Meeting new people",
+      "language": "Dutch",
+      "motivation": "I would like to meet new people.",
       "cv": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
       "portfolio": "https://en.wikipedia.org/wiki/Bertrand_Meyer",
       "school_name": "École Polytechnique",
       "degree": "Masters",
       "studies": "Engineering",
-      "status": "1",
       "skills": [
         2,
         6,
@@ -486,7 +488,7 @@
       "english_rating": 5,
       "gender": "0",
       "pronouns": "",
-      "fun_fact": "I like to supervise",
+      "fun_fact": "I like to eat pasta.",
       "degree_duration": 2,
       "degree_current_year": 2,
       "alum": true,
@@ -498,7 +500,7 @@
       "email": "jean@ariel.fr",
       "phone_number": "",
       "language": "Dutch ",
-      "motivation": "I like working",
+      "motivation": "I would like to do some volunteering for a good cause.",
       "cv": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
       "portfolio": "https://en.wikipedia.org/wiki/Jean-Raymond_Abrial",
       "school_name": "ETH Zurich",
@@ -520,7 +522,7 @@
       "english_rating": 5,
       "gender": "0",
       "pronouns": "",
-      "fun_fact": "I like to to talk about the Brexit",
+      "fun_fact": "I like to to talk about the Brexit.",
       "degree_duration": 2,
       "degree_current_year": 2,
       "alum": false,
@@ -532,7 +534,7 @@
       "email": "bowen@bouwer.co.uk",
       "phone_number": "",
       "language": "Spanish",
-      "motivation": "I need money",
+      "motivation": "I need money to fund my erasmus journey next year.",
       "cv": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
       "portfolio": "https://en.wikipedia.org/wiki/Jonathan_Bowen",
       "school_name": "University College, Oxford",
@@ -555,7 +557,7 @@
       "english_rating": 3,
       "gender": "0",
       "pronouns": "",
-      "fun_fact": "I like to play tennis",
+      "fun_fact": "I like to play tennis.",
       "degree_duration": 2,
       "degree_current_year": 2,
       "alum": false,
@@ -567,7 +569,7 @@
       "email": "egon@bergerman.de",
       "phone_number": "",
       "language": "Italian",
-      "motivation": "I have to much sparetime",
+      "motivation": "My mom says I can't play videogames all summer.",
       "cv": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
       "portfolio": "https://en.wikipedia.org/wiki/Egon_B%C3%B6rger",
       "school_name": "University of Münster",
@@ -589,9 +591,9 @@
     "model": "common.project",
     "pk": 1,
     "fields": {
-      "name": "Project A",
-      "partner_name": "Belfius",
-      "extra_info": "Project A",
+      "name": "Destination Insight",
+      "partner_name": "NMBS",
+      "extra_info": "Use [NMBS](https://www.youtube.com/watch?v=MF_5obRl9kw) route search data in a user friendly application 🚆.\n",
       "coaches": [
         2
       ]
@@ -601,9 +603,9 @@
     "model": "common.project",
     "pk": 2,
     "fields": {
-      "name": "Project B",
-      "partner_name": "Nelfius",
-      "extra_info": "Project B",
+      "name": "Bike To Work",
+      "partner_name": "Brussels Mobility",
+      "extra_info": "An application that finds optimal biking routes to work. Improve the UI/UX of our application!\n - [x] Motivation\n - [x] Love for design\n- [ ] Love for bikes 🚲",
       "coaches": [
         2
       ]
@@ -613,9 +615,9 @@
     "model": "common.project",
     "pk": 3,
     "fields": {
-      "name": "Project C",
-      "partner_name": "Discsoft",
-      "extra_info": "urlke",
+      "name": "Big Brother",
+      "partner_name": "Meemoo",
+      "extra_info": "**Big brother** is an open-source, open-data application that uses advanced AI to do facial recognition. You just need: \n1. A background in Computer Science\n2. A love for complex algorithms",
       "coaches": [
         3,
         4
@@ -626,21 +628,9 @@
     "model": "common.project",
     "pk": 4,
     "fields": {
-      "name": "Project D",
-      "partner_name": "MicroBook",
-      "extra_info": "urlke",
-      "coaches": [
-        2
-      ]
-    }
-  },
-  {
-    "model": "common.project",
-    "pk": 5,
-    "fields": {
-      "name": "Project E",
-      "partner_name": "3M & M",
-      "extra_info": "oui",
+      "name": "Seaspiration",
+      "partner_name": "FLIZ",
+      "extra_info": "Help us visualise and link together all our [data](https://www.vliz.be/en/datasets-belgian-coast-and-sea) about the Belgian coast and sea!\n\n![fish-bowl](https://bestanimations.com/Animals/Fish/goldfishbowl-animation.gif)",
       "coaches": [
         3,
         4
@@ -649,11 +639,23 @@
   },
   {
     "model": "common.project",
+    "pk": 5,
+    "fields": {
+      "name": "OSOC Team",
+      "partner_name": "OSOC",
+      "extra_info": "Making sure communication flows smoothly at **osoc22**.",
+      "coaches": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "common.project",
     "pk": 6,
     "fields": {
-      "name": "Project F",
-      "partner_name": "Inex",
-      "extra_info": "Iets",
+      "name": "Rediscover cities",
+      "partner_name": "IDLab",
+      "extra_info": "Create an AI that suggests unique things to rediscover your favourite city!",
       "coaches": [
         8,
         2,
@@ -665,9 +667,9 @@
     "model": "common.project",
     "pk": 7,
     "fields": {
-      "name": "Project K",
-      "partner_name": "OptiDisc",
-      "extra_info": "DiscOptie",
+      "name": "Open Election",
+      "partner_name": "Vlaamse Overheid",
+      "extra_info": "Make election data open and accessible to citizens.",
       "coaches": [
         8,
         1,
@@ -680,9 +682,9 @@
     "model": "common.project",
     "pk": 8,
     "fields": {
-      "name": "Project ABC",
-      "partner_name": "R.E.M.",
-      "extra_info": "Automatic For The People",
+      "name": "Beyond Passwords",
+      "partner_name": "NGI Trust",
+      "extra_info": "We need to move **[beyond passwords](https://www.ngi.eu/ngi-projects/ngi-trust/#beyond_passwords)**.",
       "coaches": [
         8,
         2
@@ -693,9 +695,9 @@
     "model": "common.project",
     "pk": 9,
     "fields": {
-      "name": "Combo Touch",
-      "partner_name": "Logitech",
-      "extra_info": "Touch die combo!",
+      "name": "Brain-On-Chip",
+      "partner_name": "Imec",
+      "extra_info": "Help creating a chip to decode dementia.",
       "coaches": [
         2,
         4,
@@ -707,9 +709,9 @@
     "model": "common.project",
     "pk": 10,
     "fields": {
-      "name": "Borderlands King",
-      "partner_name": "Stephen Eragon",
-      "extra_info": "Plop",
+      "name": "Save Graffiti",
+      "partner_name": "Urban.brussels",
+      "extra_info": "Create an open web application to visualise legal graffiti spots around Brussels.",
       "coaches": [
         8,
         6,
@@ -721,9 +723,9 @@
     "model": "common.project",
     "pk": 11,
     "fields": {
-      "name": "Beiard",
-      "partner_name": "Massa",
-      "extra_info": "Snoopy",
+      "name": "S.T.E.M.",
+      "partner_name": "European commission",
+      "extra_info": "Improve gender equality in the S.T.E.M field.",
       "coaches": [
         2
       ]
@@ -770,7 +772,7 @@
     "pk": 5,
     "fields": {
       "project": 2,
-      "skill": 2,
+      "skill": 1,
       "amount": 2
     }
   },
@@ -820,6 +822,15 @@
     }
   },
   {
+    "model": "common.requiredskills",
+    "pk": 11,
+    "fields": {
+      "project": 2,
+      "skill": 3,
+      "amount": 4
+    }
+  },
+  {
     "model": "common.suggestion",
     "pk": 1,
     "fields": {
@@ -827,7 +838,7 @@
       "student": 1,
       "coach": 2,
       "suggestion": "0",
-      "reason": ""
+      "reason": "Past qua profiel perfect bij Destination Insight."
     }
   },
   {
@@ -838,7 +849,7 @@
       "student": 2,
       "coach": 4,
       "suggestion": "2",
-      "reason": "Een goeie uitleg"
+      "reason": ""
     }
   },
   {
@@ -849,7 +860,7 @@
       "student": 3,
       "coach": 2,
       "suggestion": "1",
-      "reason": "Ze is te dom"
+      "reason": "Bleek na interview toch geen match met het één van de projecten."
     }
   },
   {
@@ -860,7 +871,7 @@
       "student": 3,
       "coach": 4,
       "suggestion": "0",
-      "reason": "Ze is te slim"
+      "reason": ""
     }
   },
   {
@@ -880,7 +891,7 @@
     "fields": {
       "final": true,
       "student": 1,
-      "coach": 4,
+      "coach": 8,
       "suggestion": "2",
       "reason": ""
     }
@@ -922,10 +933,10 @@
     "model": "common.suggestion",
     "pk": 10,
     "fields": {
-      "final": true,
-      "student": 11,
+      "final": false,
+      "student": 2,
       "coach": 3,
-      "suggestion": "1",
+      "suggestion": "2",
       "reason": ""
     }
   },
@@ -955,10 +966,10 @@
     "model": "common.suggestion",
     "pk": 13,
     "fields": {
-      "final": true,
-      "student": 8,
+      "final": false,
+      "student": 11,
       "coach": 3,
-      "suggestion": "2",
+      "suggestion": "1",
       "reason": ""
     }
   },
@@ -977,8 +988,8 @@
     "model": "common.suggestion",
     "pk": 15,
     "fields": {
-      "final": true,
-      "student": 4,
+      "final": false,
+      "student": 2,
       "coach": 4,
       "suggestion": "2",
       "reason": ""
@@ -989,9 +1000,53 @@
     "pk": 16,
     "fields": {
       "final": false,
-      "student": 8,
+      "student": 3,
+      "coach": 1,
+      "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 17,
+    "fields": {
+      "final": false,
+      "student": 7,
+      "coach": 2,
+      "suggestion": "1",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 18,
+    "fields": {
+      "final": false,
+      "student": 7,
       "coach": 4,
       "suggestion": "2",
+      "reason": ""
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 19,
+    "fields": {
+      "final": true,
+      "student": 4,
+      "coach": 6,
+      "suggestion": "1",
+      "reason": "Dit lijk mij een bot!"
+    }
+  },
+  {
+    "model": "common.suggestion",
+    "pk": 20,
+    "fields": {
+      "final": false,
+      "student": 4,
+      "coach": 2,
+      "suggestion": "1",
       "reason": ""
     }
   },
@@ -999,7 +1054,7 @@
     "model": "common.projectsuggestion",
     "pk": 1,
     "fields": {
-      "reason": "",
+      "reason": "Heeft al een vakantiejob gedaan bij NMBS.",
       "project": 1,
       "student": 3,
       "coach": 3,
@@ -1032,7 +1087,7 @@
     "model": "common.projectsuggestion",
     "pk": 4,
     "fields": {
-      "reason": "",
+      "reason": "Woont in Blankenberge en is gefascineerd door de Belgische kust!",
       "project": 4,
       "student": 5,
       "coach": 4,
@@ -1065,7 +1120,7 @@
     "model": "common.projectsuggestion",
     "pk": 7,
     "fields": {
-      "reason": "",
+      "reason": "Is gefascineerd door treinen en heeft al veel ervaring met open data.",
       "project": 1,
       "student": 2,
       "coach": 1,
@@ -1111,8 +1166,9 @@
     "fields": {
       "sender": 1,
       "receiver": 3,
-      "info": "confirmation",
-      "time": "2022-04-12T14:07:27.612Z"
+      "info": "hold on tight",
+      "time": "2022-04-12T14:07:27.612Z",
+      "type": "1"
     }
   },
   {
@@ -1121,8 +1177,9 @@
     "fields": {
       "sender": 3,
       "receiver": 4,
-      "info": "confirmation",
-      "time": "2022-03-05T18:04:30.03Z"
+      "info": "awaiting project",
+      "time": "2022-03-05T18:04:30.03Z",
+      "type": "2"
     }
   },
   {
@@ -1130,9 +1187,10 @@
     "pk": 3,
     "fields": {
       "sender": 2,
-      "receiver": 5,
-      "info": "confirmation",
-      "time": "2022-04-12T14:23:21Z"
+      "receiver": 1,
+      "info": "applied",
+      "time": "2022-04-12T14:23:21Z",
+      "type": "0"
     }
   },
   {
@@ -1141,8 +1199,9 @@
     "fields": {
       "sender": 2,
       "receiver": 5,
-      "info": "contract",
-      "time": "2022-05-01T21:45:31.13Z"
+      "info": "contract declined",
+      "time": "2022-05-01T21:45:31.13Z",
+      "type": "4"
     }
   },
   {
@@ -1152,7 +1211,8 @@
       "sender": 6,
       "receiver": 6,
       "info": "rejection",
-      "time": "2022-05-01T21:56:12.456Z"
+      "time": "2022-05-01T21:56:12.456Z",
+      "type": "5"
     }
   },
   {
@@ -1162,17 +1222,8 @@
       "sender": 1,
       "receiver": 7,
       "info": "approved",
-      "time": "2022-04-20T13:37:42.666Z"
-    }
-  },
-  {
-    "model": "common.sentemail",
-    "pk": 7,
-    "fields": {
-      "sender": 7,
-      "receiver": 8,
-      "info": "hold tight",
-      "time": "2022-04-21T09:55:00Z"
+      "time": "2022-04-20T13:37:42.666Z",
+      "type": "2"
     }
   },
   {
@@ -1182,7 +1233,8 @@
       "sender": 4,
       "receiver": 9,
       "info": "confirmation",
-      "time": "2022-05-01T18:02:56.23Z"
+      "time": "2022-05-01T18:02:56.23Z",
+      "type": "3"
     }
   },
   {
@@ -1191,8 +1243,42 @@
     "fields": {
       "sender": 4,
       "receiver": 9,
-      "info": "contract",
-      "time": "2022-05-02T19:17:22.21Z"
+      "info": "confirmed",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "3"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 8,
+    "fields": {
+      "sender": 4,
+      "receiver": 10,
+      "info": "confirmed",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "4"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 9,
+    "fields": {
+      "sender": 6,
+      "receiver": 11,
+      "info": "confirmed",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "2"
+    }
+  },
+  {
+    "model": "common.sentemail",
+    "pk": 10,
+    "fields": {
+      "sender": 6,
+      "receiver": 8,
+      "info": "applied",
+      "time": "2022-05-02T19:17:22.21Z",
+      "type": "0"
     }
   }
 ]

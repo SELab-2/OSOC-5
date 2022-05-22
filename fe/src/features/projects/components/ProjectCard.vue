@@ -7,10 +7,11 @@
     style="border-radius: 10px !important"
   >
     <q-card-section>
-      <div class="row no-wrap">
+      <div class="row no-wrap items-center">
         <h5
           class="text-bold q-mt-none q-mb-none"
           style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+          :title="project.name"
         >
           {{ project.name }}
         </h5>
@@ -27,29 +28,27 @@
           class="q-ml-sm q-mt-xs"
         />
         <q-space />
-        <div>
-          <btn
-            v-if="editable && me.isAdmin"
-            flat
-            round
-            size="12px"
-            color="teal"
-            icon="edit"
-            glow-color="teal-3"
-            :to="`/projects/${project.id}`"
-          />
-          <btn
-            round
-            size="12px"
-            glow-color="teal-3"
-            shadow-color="teal"
-            :shadow-strength="_showInfo ? 2 : 5"
-            :color="_showInfo ? 'teal' : 'transparent'"
-            :class="`text-${_showInfo ? 'white' : 'teal'}`"
-            icon="info"
-            @click="_showInfo = !_showInfo"
-          />
-        </div>
+        <btn
+          v-if="editable && me.isAdmin"
+          flat
+          round
+          size="12px"
+          color="teal"
+          icon="edit"
+          glow-color="teal-3"
+          :to="`/projects/${project.id}`"
+        />
+        <btn
+          round
+          size="12px"
+          glow-color="teal-3"
+          shadow-color="teal"
+          :shadow-strength="_showInfo ? 2 : 5"
+          :color="_showInfo ? 'teal' : 'transparent'"
+          :class="`text-${_showInfo ? 'white' : 'teal'}`"
+          icon="info"
+          @click="_showInfo = !_showInfo"
+        />
       </div>
 
       <div class="text-overline">{{ project.partnerName }}</div>
@@ -97,7 +96,7 @@
               <div class="text-caption text-grey">Skills:</div>
               <btn
                 flat
-                v-if="editable"
+                v-if="expandableSkills"
                 round
                 size="sm"
                 @click="expanded = !expanded"
@@ -123,7 +122,7 @@
                 selectedRoles[skill.skill.id] || hovered === skill.skill.id
               "
               @update:modelValue="
-                editable ? (selectedRoles[skill.skill.id] = $event) : ''
+                expandableSkills ? (selectedRoles[skill.skill.id] = $event) : ''
               "
               v-for="skill in project.requiredSkills"
               @dragleave="editable ? onDragLeave($event, skill) : false"
@@ -133,7 +132,7 @@
               :skill="skill"
               :occupied="
                 groupedStudents[skill.skill.id]?.length ??
-                (editable ? 0 : undefined)
+                (editable || expandableSkills ? 0 : undefined)
               "
             />
           </div>
@@ -167,6 +166,8 @@
   </q-card>
 </template>
 
+
+<!-- A component for displaying a project. -->
 <script lang="ts">
 import ProjectRoleChip from './ProjectRoleChip.vue'
 import { useProjectStore } from '../../../stores/useProjectStore'
@@ -186,14 +187,21 @@ import ProjectCardSuggestion from './ProjectCardSuggestion.vue'
 import MarkdownViewer from './MarkdownViewer.vue'
 export default defineComponent({
   props: {
+    // The Project to display.
     project: {
       type: Project,
       required: true,
     },
+    // If disabled, the edit button is hidden, expanding a skill is disabled, and a student cannot be dragged on a skill.
     editable: {
       type: Boolean,
       required: false,
     },
+    expandableSkills: {
+      type: Boolean,
+      required: false
+    },
+    // This is used by other components to control the visibility of the extra info of a project.
     expandedInfo: {
       type: Boolean,
       required: false,
@@ -227,6 +235,7 @@ export default defineComponent({
               )
       },
     },
+    // Update a project whenever the extra info text is changed (by the markdown viewer).
     'project.extraInfo': {
       handler() {
         this.projectStore.updateProject(this.project, this.project.id)
@@ -265,7 +274,8 @@ export default defineComponent({
         })
       }
     },
-
+    
+    // Expand all the skills, so all the assigned students are visible.
     expand(skills: ProjectSkillInterface[]) {
       const indexes = skills.map((s) => s.skill.id)
       for (let i in this.selectedRoles) {
@@ -279,6 +289,8 @@ export default defineComponent({
       return skill.amount - (occupied ? occupied.length : 0)
     },
 
+    // Check if a dragged student is already assigned to a skill.
+    // If so, reject the drag.
     checkDrag(e: DragEvent, skill: ProjectSkillInterface) {
       const id: number = parseInt(e.dataTransfer!.types[0])
       if (
@@ -337,12 +349,15 @@ export default defineComponent({
               reason: '',
               skill: skill.skill,
               student: data.student,
+              coachId: this.me.id,
+              coachName: `${this.me.firstName} ${this.me.lastName}`
             },
             false
           )
         )
 
       } catch (error) {
+        // When the data in the dragevent is not a valid format, the drag is rejected and nu further action is needed.
         return
       }
     },

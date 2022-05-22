@@ -1,25 +1,14 @@
 <template>
   <div
     class="relative-position flex justify-center"
-    style="width: 100vw"
   >
     <div
       class="q-pa-md q-gutter-md"
-      style="width: 1000px"
     >
       <div class="row">
         <div class="text-bold text-h4">
           Users
         </div>
-        <q-space />
-        <btn
-          stack
-          flat
-          color="yellow"
-          icon="download"
-          label="csv"
-          glow-color="amber-2"
-        />
       </div>
       <div class="row q-mb-md ">
         <SegmentedControl
@@ -45,7 +34,7 @@
           />
           <q-dialog v-model="newUserDialog">
             <q-card>
-              <AddUser :created="async () => await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count)" />
+              <AddUser :created="async () =>{ newUserDialog = false; await coachStore.loadUsersCoaches(filters, (count: number) => pagination.rowsNumber = count); }" />
             </q-card>
           </q-dialog>
           <q-input
@@ -74,9 +63,9 @@
         row-key="id"
         separator="horizontal"
         :loading="coachStore.isLoading"
-        @request="onRequest"
         :table-class="$q.dark.isActive ? 'bg-dark2' : ''"
         :table-header-class="`${$q.dark.isActive ? 'text-black' : ''} bg-yellow`"
+        @request="onRequest"
       >
         <template #body="props">
           <q-tr
@@ -85,6 +74,8 @@
           >
             <q-td
               key="name"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.fullName"
             >
               {{ props.row.fullName }}
             </q-td>
@@ -92,9 +83,9 @@
               key="role"
             >
               <q-select
+                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 v-model="props.row.role"
                 v-ripple
-                v-if="authenticationStore.loggedInUser?.email != props.row.email"
                 color="yellow"
                 borderless
                 dense
@@ -124,17 +115,21 @@
                   </q-item>
                 </template>
               </q-select>
-              <div v-else>{{ roles.find(r => r.value === props.row.role)!.label }}</div>
+              <div v-else>
+                {{ roles.find(r => r.value === props.row.role)!.label }}
+              </div>
             </q-td>
             <q-td
               key="assignedto"
+              style="max-width: 20vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
+              :title="props.row.projects?.map((p: {name: string}) => p.name).join(', ') ?? ''"
             >
-            <q-scroll-area :thumb-style="thumbStyle" style="height: 20px; width: 250px;">
               {{ props.row.projects?.map((p: {name: string}) => p.name).join(', ') ?? '' }}
-            </q-scroll-area>
             </q-td>
             <q-td
               key="email"
+              style="max-width: 20vw; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"
+              :title="props.row.email"
             >
               {{ props.row.email }}
             </q-td>
@@ -173,7 +168,7 @@
 import {defineComponent} from '@vue/runtime-core'
 import {useCoachStore} from "../../stores/useCoachStore"
 import {ref} from 'vue'
-import {exportFile, useQuasar, colors} from 'quasar'
+import {useQuasar, colors} from 'quasar'
 import SegmentedControl from '../../components/SegmentedControl.vue'
 import DeleteDialog from "../../components/DeleteDialog.vue";
 import { User } from '../../models/User'
@@ -184,8 +179,8 @@ import router from "../../router";
 import roles from "../../models/UserRoles";
 
 export default defineComponent({
-  components: {AddUser, SegmentedControl, DeleteDialog },
   name: 'Users',
+  components: {AddUser, SegmentedControl, DeleteDialog },
   setup() {
     const coachStore = useCoachStore()
     const q = useQuasar()
@@ -213,11 +208,6 @@ export default defineComponent({
     })
 
     return {
-      thumbStyle: {
-        borderRadius: '7px',
-        backgroundColor: 'black',
-        height: '4px'
-      },
       pagination,
       deleteDialog: ref(false),
       userId: ref(-1),
@@ -260,6 +250,11 @@ export default defineComponent({
       return filter
     }
   },
+  watch: {
+    filters() {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
+  },
   beforeMount() {
     if (!this.authenticationStore.loggedInUser?.isAdmin) {
       router.replace('/notfound')
@@ -267,6 +262,11 @@ export default defineComponent({
   },
   async mounted() {
     await this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count)
+  },
+  activated() {
+    if (this.coachStore.shouldRefresh) {
+      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+    }
   },
   methods: {
     async onRequest(props: any) {
@@ -303,7 +303,7 @@ export default defineComponent({
     // The method filter to the elements which pass both filters.
     useTableFilter(rows: object[], terms: string, cols: object[], cellValue: (arg0: unknown, arg1: unknown) => string) {
       const lowerTerms = this.filter?.toLowerCase() ?? ''
-      
+
       return rows.filter((row: unknown) =>
         (terms == 'all' || cellValue(cols[1], row) == terms) &&
         cols.some((col: unknown) => {
@@ -330,17 +330,7 @@ export default defineComponent({
           this.coachStore.users.find((u: User) => u.id === user.id)!.role = oldRole
         })
       })
-      
-    }
-  },
-  watch: {
-    filters() {
-      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
-    }
-  },
-  activated() {
-    if (this.coachStore.shouldRefresh) {
-      this.coachStore.loadUsersCoaches(this.filters, (count: number) => this.pagination.rowsNumber = count);
+
     }
   }
 })
